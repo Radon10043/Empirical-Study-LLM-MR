@@ -1,22 +1,22 @@
-/* ***************************************************************
-    File name : stream.h
-    PURPOSE   : This is the header file for stream.c . This inlcudes
-                the type definitions which are to be exported to the
-                other routines.
-  * **************************************************************** */
 
-typedef struct stream_type {
-                               FILE *fp;  /* File pointer to stream */
-                               int  stream_ind; /* buffer index */
-                               char stream[80];  /* buffer for the file*/
-                            } *character_stream;
+/* stream.h code */
 
-typedef char CHARACTER;
 
-character_stream open_character_stream();
+#include <stdio.h>
+#define SUCCEED 1
+#define FAIL 0
 
-CHARACTER get_char();
+typedef
+       FILE *character_stream;
+typedef 
+       int BOOLEAN;
+typedef 
+       char CHARACTER;
+typedef
+       char *string;
 
-BOOLEAN is_end_of_character_stream();
-
+extern char get_char();
+extern char unget_char();
+extern int is_end_of_character_stream();
+extern character_stream open_character_stream();
 
