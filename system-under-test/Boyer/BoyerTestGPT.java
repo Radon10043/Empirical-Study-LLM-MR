@@ -472,6 +472,283 @@ public class BoyerTestGPT {
         /* Same as MR12 */
     }
 
+    /**
+     * MR21: Change in Pattern Length
+     *
+     * If you change the length of the pattern, the output of the algorithm should remain unchanged
+     * or decrease. This tests the algorithm's ability to adapt to variations in the length of the
+     * pattern.
+     *
+     * @param text
+     * @param pattern
+     */
+    @ParameterizedTest
+    @MethodSource("testcaseProvider")
+    public void test21(String text, String pattern) {
+        int origin_out = Boyer.indexOf(text, pattern);
+
+        /* Change length of pattern */
+        UniformRandomProvider rng = RandomSource.XO_RO_SHI_RO_128_PP.create();
+        int rand_num = rng.nextInt(1, pattern.length() - 1);
+        String follow_pattern = pattern.substring(0, rand_num);
+
+        int follow_out = Boyer.indexOf(text, follow_pattern);
+        assertTrue(follow_out <= origin_out);
+    }
+
+    /**
+     * MR22: Alternating Text and Pattern
+     *
+     * If you create a string by concatenating alternating segments of the original text and the
+     * pattern, the output of the algorithm should remain unchanged or increase. This tests the
+     * algorithm's ability to find the pattern in a mixed sequence.
+     *
+     * @param text
+     * @param pattern
+     */
+    public void test22(String text, String pattern) {
+        /* TODO */
+    }
+
+    /**
+     * MR23: Interleave Text and Pattern Characters
+     *
+     * If you interleave characters from the original text and the pattern, the output of the
+     * algorithm should remain unchanged. This tests the algorithm's resistance to variations in the
+     * arrangement of characters.
+     *
+     * @param text
+     * @param pattern
+     */
+    @ParameterizedTest
+    @MethodSource("testcaseProvider")
+    public void test23(String text, String pattern) {
+        /* TODO */
+    }
+
+    /**
+     * MR24: Concatenation of Text and Reversed Pattern
+     *
+     * If you concatenate the original text with the reversed pattern, the output of the algorithm
+     * should remain unchanged or increase. This tests the algorithm's robustness when dealing with
+     * reversed patterns at the end of the text.
+     *
+     * @param text
+     * @param pattern
+     */
+    @ParameterizedTest
+    @MethodSource("testcaseProvider")
+    public void test24(String text, String pattern) {
+        int origin_out = Boyer.indexOf(text, pattern);
+
+        StringBuilder sb = new StringBuilder(pattern);
+        String rev_pattern = sb.reverse().toString();
+        String follow_text = text + rev_pattern;
+
+        int follow_out = Boyer.indexOf(follow_text, pattern);
+        assertTrue(follow_out >= origin_out);
+    }
+
+    /**
+     * MR25: Random Insertion of Pattern in Text
+     *
+     * If you randomly insert instances of the pattern within the original text, the output of the
+     * algorithm should remain unchanged or increase. This tests the algorithm's ability to handle
+     * multiple occurrences of the pattern scattered throughout the text.
+     *
+     * @param text
+     * @param pattern
+     */
+    @ParameterizedTest
+    @MethodSource("testcaseProvider")
+    public void test25(String text, String pattern) {
+        int origin_out = Boyer.indexOf(text, pattern);
+
+        /* Random insert */
+        UniformRandomProvider rng = RandomSource.XO_SHI_RO_128_PP.create();
+        int n = text.length();
+        int rand_num = rng.nextInt(1, n);
+        String follow_text = text.substring(0, rand_num) + pattern + text.substring(rand_num, n);
+        int follow_out = Boyer.indexOf(follow_text, pattern);
+
+        assertTrue(follow_out >= origin_out);
+    }
+
+    /**
+     * MR26: Pattern with Repetitive Prefix
+     *
+     * If the pattern has a repetitive prefix, the algorithm should still correctly locate
+     * occurrences of the pattern within the text. This tests the algorithm's handling of patterns
+     * with repetitive structures.
+     *
+     * @param text
+     * @param pattern
+     */
+    @ParameterizedTest
+    @MethodSource("testcaseProvider")
+    public void test26(String text, String pattern) {
+        /* TODO */
+    }
+
+    /**
+     * MR27: Pattern with Repetitive Suffix
+     *
+     * If the pattern has a repetitive suffix, the algorithm should still correctly locate
+     * occurrences of the pattern within the text. This complements MR26 by testing the algorithm's
+     * handling of patterns with repetitive structures at the end.
+     *
+     * @param text
+     * @param pattern
+     */
+    @ParameterizedTest
+    @MethodSource("testcaseProvider")
+    public void test27(String text, String pattern) {
+        /* TODO */
+    }
+
+    /**
+     * MR28: Pattern with Overlapping Repetition
+     *
+     * If the pattern has overlapping repetitive segments, the algorithm should correctly identify
+     * occurrences of the pattern in the text. This tests the algorithm's ability to handle patterns
+     * with complex repetitive structures.
+     *
+     * @param text
+     * @param pattern
+     */
+    @ParameterizedTest
+    @MethodSource("testcaseProvider")
+    public void test28(String text, String pattern) {
+        /* TODO */
+    }
+
+    /**
+     * MR29: Changing Text and Pattern Lengths Together
+     *
+     * If you simultaneously change the lengths of the original text and the pattern, the output of
+     * the algorithm should remain unchanged or decrease. This tests the algorithm's adaptability to
+     * changes in both text and pattern lengths.
+     *
+     * @param text
+     * @param pattern
+     */
+    @ParameterizedTest
+    @MethodSource("testcaseProvider")
+    public void test29(String text, String pattern) {
+        int origin_out = Boyer.indexOf(text, pattern);
+
+        /* FIXME: Both text's length and pattern's length need greater than 0 */
+        String follow_text = text.substring(0, text.length() - 2);
+        String follow_pattern = pattern.substring(0, pattern.length() - 2);
+        int follow_out = Boyer.indexOf(follow_text, follow_pattern);
+
+        assertTrue(follow_out <= origin_out);
+    }
+
+    /**
+     * MR30: Pattern with Wildcard Characters
+     *
+     * If the pattern contains wildcard characters (e.g., '?' representing any character), the
+     * output of the algorithm should remain unchanged. This tests the algorithm's ability to handle
+     * wildcard characters without affecting its core functionality.
+     *
+     * @param text
+     * @param pattern
+     */
+    @ParameterizedTest
+    @MethodSource("testcaseProvider")
+    public void test30(String text, String pattern) {
+        int origin_out = Boyer.indexOf(text, pattern);
+
+        /* Random replace */
+        UniformRandomProvider rng = RandomSource.XO_SHI_RO_128_PP.create();
+        int rand_num = rng.nextInt(0, pattern.length());
+        StringBuilder sb = new StringBuilder(pattern);
+        sb.setCharAt(rand_num, '?');
+        String follow_pattern = sb.toString();
+
+        int follow_out = Boyer.indexOf(text, follow_pattern);
+    }
+
+    /**
+     * MR31: Pattern as a Substring of Itself
+     *
+     * If the pattern is a substring of itself (e.g., pattern = "abc" and text = "abcabc"), the
+     * algorithm should correctly identify the first occurrence at index 0. This tests the
+     * algorithm's handling of patterns that are repeated within themselves.
+     *
+     * @param text
+     * @param pattern
+     */
+    @ParameterizedTest
+    @MethodSource("testcaseProvider")
+    public void test31(String text, String pattern) {
+        String follow_text = pattern + pattern;
+        int follow_out = Boyer.indexOf(follow_text, pattern);
+        assertEquals(0, follow_out);
+    }
+
+    /**
+     * MR32: Text with Repeated Patterns
+     *
+     * If the original text contains repeated patterns, the algorithm should return the index of the
+     * first occurrence. This tests the algorithm's ability to find the first instance in a text
+     * with repetitive structures.
+     *
+     * @param text
+     * @param pattern
+     */
+    @ParameterizedTest
+    @MethodSource("testcaseProvider")
+    public void test32(String text, String pattern) {
+        /* Same as MR12 */
+    }
+
+    /**
+     * MR33: Pattern with Varying Case Sensitivity
+     * 
+     * If you vary the case sensitivity of the pattern and the text, the algorithm should return the
+     * same result or handle the case differences appropriately. This checks the algorithm's
+     * behavior when dealing with mixed case scenarios.
+     * 
+     * @param text
+     * @param pattern
+     */
+    @ParameterizedTest
+    @MethodSource("testcaseProvider")
+    public void test33(String text, String pattern) {
+        int origin_out = Boyer.indexOf(text, pattern);
+
+        /* Reverse lower and upper */
+        String follow_text = "", follow_pattern = "";
+        for (int i = 0; i < text.length(); i++)
+            follow_text += text.charAt(i) ^ 32;
+        for (int i = 0; i < pattern.length(); i++)
+            follow_pattern += pattern.charAt(i) ^ 32;
+
+        int follow_out = Boyer.indexOf(follow_text, follow_pattern);
+        assertEquals(origin_out, follow_out);
+    }
+
+    /**
+     * MR34: Pattern Matching at the End of Text
+     * 
+     * If the pattern is present at the end of the text, the algorithm should correctly identify the
+     * occurrence. This tests the algorithm's ability to find patterns when they appear at the end
+     * of the text.
+     * 
+     * @param text
+     * @param pattern
+     */
+    @ParameterizedTest
+    @MethodSource("testcaseProvider")
+    public void test34(String text, String pattern) {
+        /* FIXME: pattern should not occur in text */
+        String follow_text = text + pattern;
+        int follow_out = Boyer.indexOf(follow_text, pattern);
+        assertEquals(text.length(), follow_out);
+    }
+
     static Stream<Arguments> testcaseProvider() {
         return Stream.of(Arguments.of("abcdefg", "abc"), Arguments.of("abcdefg", "xyz"));
     }
