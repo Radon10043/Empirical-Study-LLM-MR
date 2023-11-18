@@ -162,6 +162,56 @@ Please generate more different metamorphic relations.
 
 #### ChatGPT
 
+Certainly! Here are more metamorphic relations for the Boyer-Moore substring search algorithm:
+
+MR31: **Pattern as a Substring of Itself**
+
+- If the pattern is a substring of itself (e.g., pattern = "abc" and text = "abcabc"), the algorithm should correctly identify the first occurrence at index 0. This tests the algorithm's handling of patterns that are repeated within themselves.
+
+MR32: **Text with Repeated Patterns**
+
+- If the original text contains repeated patterns, the algorithm should return the index of the first occurrence. This tests the algorithm's ability to find the first instance in a text with repetitive structures.
+
+MR33: **Pattern with Varying Case Sensitivity**
+
+- If you vary the case sensitivity of the pattern and the text, the algorithm should return the same result or handle the case differences appropriately. This checks the algorithm's behavior when dealing with mixed case scenarios.
+
+MR34: **Pattern Matching at the End of Text**
+
+- If the pattern is present at the end of the text, the algorithm should correctly identify the occurrence. This tests the algorithm's ability to find patterns when they appear at the end of the text.
+
+MR35: **Text with Irrelevant Repetitive Characters**
+
+- If you introduce irrelevant repetitive characters within the text (characters not present in the pattern), the algorithm should still return the correct result. This tests the algorithm's ability to ignore irrelevant characters.
+
+MR36: **Pattern with Irrelevant Repetitive Characters**
+
+- If you introduce irrelevant repetitive characters within the pattern, the algorithm should still correctly identify occurrences of the relevant pattern. This checks the algorithm's resilience to variations in the pattern.
+
+MR37: **Text and Pattern with Special Characters**
+
+- If both the original text and the pattern contain special characters, the algorithm should still return the correct result. This tests the algorithm's ability to handle patterns and text with diverse character sets.
+
+MR38: **Changing Pattern Case**
+
+- If you change the case of the characters in the pattern, the algorithm should still correctly locate occurrences of the pattern in the text. This checks the algorithm's sensitivity to changes in the case of the pattern.
+
+MR39: **Text and Pattern with Numeric Characters**
+
+- If both the original text and the pattern contain numeric characters, the algorithm should still return the correct result. This tests the algorithm's handling of patterns and text with numerical content.
+
+MR40: **Pattern with Variable Lengths**
+
+- If the pattern has variable lengths (e.g., "ab*c"), the algorithm should still correctly locate occurrences of the pattern in the text. This checks the algorithm's ability to handle patterns with variable structures.
+
+These additional metamorphic relations provide further diversity in scenarios and variations to assess the Boyer-Moore substring search algorithm's robustness and correctness.
+
+#### User
+
+Please generate more different metamorphic relations.
+
+#### ChatGPT
+
 Certainly! Here are additional metamorphic relations for the Boyer-Moore substring search algorithm:
 
 MR41: **Pattern with Escaped Characters**
