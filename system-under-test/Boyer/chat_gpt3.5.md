@@ -1,160 +1,128 @@
 # Chat
 
-#### User
+#### Link
 
-Assume there are a trigonometric function sin(x), a source input x1 and corresponding source output y1, if follow-up input x2=pi-x1 and corresponding follow-up output y2=y1, we say that there is a metamorphic relation sin(x)=sin(pi-x).
-
-Next, you need to identify the metamorphic relation of a function. There is a function implements the Boyer-Moore algorithm to find the first occurrence index of substring in origin string. Its inputs are 2 string variables: ```text``` and ```pattern```, which represents origin string and substring respectively. Its return value is an integer, which represents the occurrence index of ```pattern``` in ```text```, if ```pattern``` not occurences in ```text```, the function returns -1. Please identify the metamorphic relation of this function as much as possible, and outputs them as text. It should be note that each metamorphic relation should named as MR[x] where [x] is the number of the test case.
-
-Here is an example::
-
-MR1: Add string to the end of the origin string, the output of the algorithm should be the same or greater.
-
-#### ChatGPT
-
-Metamorphic relations (MRs) for the Boyer-Moore substring search algorithm:
-
-MR1: **Addition of String to the End**
-
-- If you append a string to the end of the original string (e.g., text + "additional"), the output of the algorithm should be the same or greater. This is based on the fact that adding characters to the end of the text doesn't affect the position of the pattern within the original text.
-
-MR2: **Addition of String to the Beginning**
-
-- If you prepend a string to the beginning of the original string (e.g., "additional" + text), the output of the algorithm should remain unchanged or increase. Similar to MR1, adding characters to the beginning of the text should not affect the position of the pattern.
-
-MR3: **Reversal of the Original String**
-
-- If you reverse the characters of the original string, the output of the algorithm should remain unchanged. The Boyer-Moore algorithm is not sensitive to the order of characters in the text; it focuses on efficiently skipping unnecessary comparisons based on the pattern.
-
-MR4: **Reversal of the Pattern**
-
-- If you reverse the characters of the pattern, the output of the algorithm should remain unchanged. The Boyer-Moore algorithm is designed to handle pattern reversals efficiently.
-
-MR5: **Replacement of Characters in the Original String**
-
-- If you replace some characters in the original string with different characters, the output of the algorithm should remain unchanged or increase. This is because the Boyer-Moore algorithm is not affected by changes in characters unrelated to the pattern.
-
-MR6: **Replacement of Characters in the Pattern**
-
-- If you replace some characters in the pattern with different characters, the output of the algorithm should remain unchanged. The Boyer-Moore algorithm accounts for variations in the pattern.
-
-MR7: **Empty Pattern**
-
-- If the pattern is an empty string, the algorithm should return 0, indicating a match at the beginning of the text.
-
-MR8: **Empty Text**
-
-- If the text is an empty string, the algorithm should return -1, indicating that no match is found.
-
-MR9: **Multiple Occurrences**
-
-- If there are multiple occurrences of the pattern in the text, the algorithm should return the index of the first occurrence.
-
-MR10: **No Occurrence**
-
-- If the pattern does not occur in the text, the algorithm should return -1.
-
-These metamorphic relations cover various scenarios and transformations that can be applied to the input strings while maintaining the expected behavior of the Boyer-Moore substring search algorithm.
+[https://chat.openai.com/share/27235529-f7bf-4d23-9fa1-946a11356ec9](https://chat.openai.com/share/27235529-f7bf-4d23-9fa1-946a11356ec9)
 
 #### User
 
-Please generate more different metamorphic relations.
+Assume there is a trigonometric function sin(x), a source input x1, and a corresponding source output y1. If follow-up input x2=pi-x1 and corresponding follow-up output y2=y1, we say there is a metamorphic relation sin(x)=sin(pi-x).
+
+Next, you need to identify the metamorphic relation of a function. There is a function that implements the Boyer-Moore algorithm to find the first occurrence index of the string to be searched in the origin string. Its inputs are 2 string variables: ```text``` and ```pattern```, representing the origin string and the string to be searched, respectively. Its return value is an integer representing the first occurrence index of ```pattern``` in ```text```. If ```pattern```does not occur in ```text```, the function returns -1. Please identify the metamorphic relation of this function as much as possible and output them as java code. Each metamorphic relation should be named test[x], where [x] is the test case number.
+
+Here is an example:
+
+```java
+/**
+ * Metamorphic Relation 1: Add a string to the end of the origin string, the output of the
+ * algorithm should be same or greater.
+ *
+ * @param text
+ * @param pattern
+ */
+@ParameterizedTest
+@MethodSource("testcaseProvider")
+public void test1(String text, String pattern) {
+    /* Get origin output */
+    int origin_res = Boyer.indexOf(text, pattern);
+
+    /* Construct follow-up input */
+    String follow_text = text + "xxx";
+
+    /* Get follow-up output */
+    int follow_res = Boyer.indexOf(follow_text, pattern);
+
+    /* Verification */
+    assertTrue(follow_res >= origin_res);
+}
+```
 
 #### ChatGPT
 
-Certainly! Here are additional metamorphic relations for the Boyer-Moore substring search algorithm:
+Certainly! In the case of the Boyer-Moore algorithm for string searching, here are a few metamorphic relations that you can consider testing:
 
-MR11: **Case Insensitivity**
+```java
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-- If you change the case of characters in both the original string and the pattern (e.g., convert all characters to lowercase), the output of the algorithm should remain unchanged. The Boyer-Moore algorithm is case-sensitive, and this metamorphic relation checks if the algorithm can handle case-insensitive searches.
+public class BoyerMooreTest {
 
-MR12: **Duplicate Occurrences**
+    /**
+     * Metamorphic Relation 1: Add a string to the end of the origin string,
+     * the output of the algorithm should be the same or greater.
+     *
+     * @param text
+     * @param pattern
+     */
+    @ParameterizedTest
+    @MethodSource("testcaseProvider")
+    public void test1(String text, String pattern) {
+        /* Get origin output */
+        int origin_res = Boyer.indexOf(text, pattern);
 
-- If you duplicate occurrences of the pattern within the original string, the output of the algorithm should remain unchanged, or the index should increase. This is to ensure the algorithm can handle multiple occurrences of the pattern.
+        /* Construct follow-up input */
+        String follow_text = text + "xxx";
 
-MR13: **Partial Overlap**
+        /* Get follow-up output */
+        int follow_res = Boyer.indexOf(follow_text, pattern);
 
-- If you overlap a part of the pattern with the end of the original string, the algorithm should still find the pattern at the overlapping position. This tests the robustness of the algorithm when the pattern partially extends beyond the end of the text.
+        /* Verification */
+        assertTrue(follow_res >= origin_res);
+    }
 
-MR14: **Remove Characters from the Original String**
+    /**
+     * Metamorphic Relation 2: If the pattern is an empty string, the output
+     * should be 0 for any input text.
+     *
+     * @param text
+     * @param pattern
+     */
+    @ParameterizedTest
+    @MethodSource("testcaseProvider")
+    public void test2(String text, String pattern) {
+        /* Get output for any input text with an empty pattern */
+        int res = Boyer.indexOf(text, "");
 
-- If you remove characters from the original string, the output of the algorithm should remain unchanged or decrease. The algorithm should still correctly locate the pattern even if some characters are removed.
+        /* Verification */
+        assertTrue(res == 0);
+    }
 
-MR15: **Remove Characters from the Pattern**
+    /**
+     * Metamorphic Relation 3: If the pattern occurs in the text, removing any
+     * character from the pattern should still result in a valid match.
+     *
+     * @param text
+     * @param pattern
+     */
+    @ParameterizedTest
+    @MethodSource("testcaseProvider")
+    public void test3(String text, String pattern) {
+        /* Get origin output */
+        int origin_res = Boyer.indexOf(text, pattern);
 
-- If you remove characters from the pattern, the output of the algorithm should remain unchanged or decrease. The algorithm should correctly find occurrences of the modified pattern within the text.
+        if (origin_res != -1 && pattern.length() > 1) {
+            /* Remove a character from the pattern */
+            String modified_pattern = pattern.substring(0, pattern.length() - 1);
 
-MR16: **Add Special Characters**
+            /* Get follow-up output */
+            int follow_res = Boyer.indexOf(text, modified_pattern);
 
-- If you add special characters to both the original string and the pattern, the output of the algorithm should remain unchanged. This tests the algorithm's ability to handle special characters without affecting the matching process.
+            /* Verification */
+            assertTrue(follow_res == origin_res);
+        }
+    }
 
-MR17: **Pattern as a Prefix of the Text**
+    // Add more metamorphic relations as needed...
 
-- If the pattern is a prefix of the text, the algorithm should return 0, indicating a match at the beginning of the text.
+    // Helper method for providing test cases
+    private static Stream<Arguments> testcaseProvider() {
+        // Provide various test cases here
+    }
+}
+```
 
-MR18: **Pattern as a Suffix of the Text**
-
-- If the pattern is a suffix of the text, the algorithm should return the length difference between the text and the pattern, indicating a match at the end of the text.
-
-MR19: **Random Shuffling of Characters**
-
-- If you randomly shuffle the characters in both the original string and the pattern, the output of the algorithm should remain unchanged. This tests the algorithm's resilience to arbitrary character arrangements.
-
-MR20: **Repeated Patterns**
-
-- If you repeat the pattern multiple times within the text, the algorithm should return the index of the first occurrence. This checks if the algorithm correctly handles repeated patterns.
-
-These additional metamorphic relations provide a diverse set of scenarios to further test the functionality and robustness of the Boyer-Moore substring search algorithm.
-
-#### User
-
-Please generate more different metamorphic relations.
-
-#### ChatGPT
-
-Certainly! Here are more metamorphic relations for the Boyer-Moore substring search algorithm:
-
-MR21: **Change in Pattern Length**
-
-- If you change the length of the pattern, the output of the algorithm should remain unchanged or decrease. This tests the algorithm's ability to adapt to variations in the length of the pattern.
-
-MR22: **Alternating Text and Pattern**
-
-- If you create a string by concatenating alternating segments of the original text and the pattern, the output of the algorithm should remain unchanged or increase. This tests the algorithm's ability to find the pattern in a mixed sequence.
-
-MR23: **Interleave Text and Pattern Characters**
-
-- If you interleave characters from the original text and the pattern, the output of the algorithm should remain unchanged. This tests the algorithm's resistance to variations in the arrangement of characters.
-
-MR24: **Concatenation of Text and Reversed Pattern**
-
-- If you concatenate the original text with the reversed pattern, the output of the algorithm should remain unchanged or increase. This tests the algorithm's robustness when dealing with reversed patterns at the end of the text.
-
-MR25: **Random Insertion of Pattern in Text**
-
-- If you randomly insert instances of the pattern within the original text, the output of the algorithm should remain unchanged or increase. This tests the algorithm's ability to handle multiple occurrences of the pattern scattered throughout the text.
-
-MR26: **Pattern with Repetitive Prefix**
-
-- If the pattern has a repetitive prefix, the algorithm should still correctly locate occurrences of the pattern within the text. This tests the algorithm's handling of patterns with repetitive structures.
-
-MR27: **Pattern with Repetitive Suffix**
-
-- If the pattern has a repetitive suffix, the algorithm should still correctly locate occurrences of the pattern within the text. This complements MR26 by testing the algorithm's handling of patterns with repetitive structures at the end.
-
-MR28: **Pattern with Overlapping Repetition**
-
-- If the pattern has overlapping repetitive segments, the algorithm should correctly identify occurrences of the pattern in the text. This tests the algorithm's ability to handle patterns with complex repetitive structures.
-
-MR29: **Changing Text and Pattern Lengths Together**
-
-- If you simultaneously change the lengths of the original text and the pattern, the output of the algorithm should remain unchanged or decrease. This tests the algorithm's adaptability to changes in both text and pattern lengths.
-
-MR30: **Pattern with Wildcard Characters**
-
-- If the pattern contains wildcard characters (e.g., '?' representing any character), the output of the algorithm should remain unchanged. This tests the algorithm's ability to handle wildcard characters without affecting its core functionality.
-
-These additional metamorphic relations provide further variations and challenges to assess the Boyer-Moore substring search algorithm's performance in diverse scenarios.
+Feel free to add more metamorphic relations based on the specific characteristics and behaviors you want to test for in the Boyer-Moore algorithm. The key is to identify changes in input that should result in predictable changes in output, and then construct test cases accordingly.
 
 #### User
 
@@ -162,49 +130,96 @@ Please generate more different metamorphic relations.
 
 #### ChatGPT
 
-Certainly! Here are more metamorphic relations for the Boyer-Moore substring search algorithm:
+Certainly! Here are a few more metamorphic relations for testing the Boyer-Moore algorithm:
 
-MR31: **Pattern as a Substring of Itself**
+```java
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-- If the pattern is a substring of itself (e.g., pattern = "abc" and text = "abcabc"), the algorithm should correctly identify the first occurrence at index 0. This tests the algorithm's handling of patterns that are repeated within themselves.
+public class BoyerMooreTest {
 
-MR32: **Text with Repeated Patterns**
+    // ... (previous code)
 
-- If the original text contains repeated patterns, the algorithm should return the index of the first occurrence. This tests the algorithm's ability to find the first instance in a text with repetitive structures.
+    /**
+     * Metamorphic Relation 7: If the pattern occurs multiple times in the text,
+     * the output should be the index of the first occurrence.
+     *
+     * @param text
+     * @param pattern
+     */
+    @ParameterizedTest
+    @MethodSource("testcaseProvider")
+    public void test7(String text, String pattern) {
+        /* Get origin output */
+        int origin_res = Boyer.indexOf(text, pattern);
 
-MR33: **Pattern with Varying Case Sensitivity**
+        if (origin_res != -1) {
+            /* Add the pattern multiple times to the text */
+            String multi_occurrence_text = text + pattern + text + pattern;
 
-- If you vary the case sensitivity of the pattern and the text, the algorithm should return the same result or handle the case differences appropriately. This checks the algorithm's behavior when dealing with mixed case scenarios.
+            /* Get follow-up output */
+            int follow_res = Boyer.indexOf(multi_occurrence_text, pattern);
 
-MR34: **Pattern Matching at the End of Text**
+            /* Verification */
+            assertTrue(follow_res == origin_res);
+        }
+    }
 
-- If the pattern is present at the end of the text, the algorithm should correctly identify the occurrence. This tests the algorithm's ability to find patterns when they appear at the end of the text.
+    /**
+     * Metamorphic Relation 8: Searching for a pattern with a space at the beginning
+     * or end should produce the same output as searching for the original pattern.
+     *
+     * @param text
+     * @param pattern
+     */
+    @ParameterizedTest
+    @MethodSource("testcaseProvider")
+    public void test8(String text, String pattern) {
+        /* Get origin output */
+        int origin_res = Boyer.indexOf(text, pattern);
 
-MR35: **Text with Irrelevant Repetitive Characters**
+        if (!pattern.isEmpty()) {
+            /* Add a space at the beginning and end of the pattern */
+            String spaced_pattern = " " + pattern + " ";
 
-- If you introduce irrelevant repetitive characters within the text (characters not present in the pattern), the algorithm should still return the correct result. This tests the algorithm's ability to ignore irrelevant characters.
+            /* Get follow-up output */
+            int follow_res = Boyer.indexOf(text, spaced_pattern);
 
-MR36: **Pattern with Irrelevant Repetitive Characters**
+            /* Verification */
+            assertTrue(follow_res == origin_res);
+        }
+    }
 
-- If you introduce irrelevant repetitive characters within the pattern, the algorithm should still correctly identify occurrences of the relevant pattern. This checks the algorithm's resilience to variations in the pattern.
+    /**
+     * Metamorphic Relation 9: If the pattern is longer than the text, the output
+     * should be -1, indicating that the pattern cannot be found in the text.
+     *
+     * @param text
+     * @param pattern
+     */
+    @ParameterizedTest
+    @MethodSource("testcaseProvider")
+    public void test9(String text, String pattern) {
+        if (pattern.length() > text.length()) {
+            /* Get output for a pattern longer than the text */
+            int res = Boyer.indexOf(text, pattern);
 
-MR37: **Text and Pattern with Special Characters**
+            /* Verification */
+            assertTrue(res == -1);
+        }
+    }
 
-- If both the original text and the pattern contain special characters, the algorithm should still return the correct result. This tests the algorithm's ability to handle patterns and text with diverse character sets.
+    // Add more metamorphic relations as needed...
 
-MR38: **Changing Pattern Case**
+    // Helper method for providing test cases
+    private static Stream<Arguments> testcaseProvider() {
+        // Provide various test cases here
+    }
+}
+```
 
-- If you change the case of the characters in the pattern, the algorithm should still correctly locate occurrences of the pattern in the text. This checks the algorithm's sensitivity to changes in the case of the pattern.
-
-MR39: **Text and Pattern with Numeric Characters**
-
-- If both the original text and the pattern contain numeric characters, the algorithm should still return the correct result. This tests the algorithm's handling of patterns and text with numerical content.
-
-MR40: **Pattern with Variable Lengths**
-
-- If the pattern has variable lengths (e.g., "ab*c"), the algorithm should still correctly locate occurrences of the pattern in the text. This checks the algorithm's ability to handle patterns with variable structures.
-
-These additional metamorphic relations provide further diversity in scenarios and variations to assess the Boyer-Moore substring search algorithm's robustness and correctness.
+These additional metamorphic relations cover scenarios such as multiple occurrences of the pattern, searching for a pattern with spaces, and handling cases where the pattern is longer than the text. Feel free to continue adding more relations based on different aspects of the algorithm and its expected behavior.
 
 #### User
 
@@ -212,46 +227,1449 @@ Please generate more different metamorphic relations.
 
 #### ChatGPT
 
-Certainly! Here are additional metamorphic relations for the Boyer-Moore substring search algorithm:
+Certainly! Here are a few more metamorphic relations for testing the Boyer-Moore algorithm:
 
-MR41: **Pattern with Escaped Characters**
+```java
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-- If the pattern contains escaped characters (e.g., "\n" or "\t"), the algorithm should correctly handle and identify occurrences of the escaped characters in the text.
+public class BoyerMooreTest {
 
-MR42: **Text with Whitespace Variations**
+    // ... (previous code)
 
-- If you introduce whitespace variations (e.g., extra spaces or newlines) within the text, the algorithm should still correctly locate occurrences of the pattern.
+    /**
+     * Metamorphic Relation 10: If the pattern is an exact substring of the text,
+     * the output should be 0, indicating the first occurrence at the beginning.
+     *
+     * @param text
+     * @param pattern
+     */
+    @ParameterizedTest
+    @MethodSource("testcaseProvider")
+    public void test10(String text, String pattern) {
+        /* Get output for a pattern that is an exact substring of the text */
+        int res = Boyer.indexOf(text, pattern);
 
-MR43: **Pattern with Special Control Characters**
+        if (text.contains(pattern)) {
+            /* Verification */
+            assertTrue(res == 0);
+        }
+    }
 
-- If the pattern contains special control characters (e.g., "\b" for backspace), the algorithm should correctly handle and identify occurrences of these characters in the text.
+    /**
+     * Metamorphic Relation 11: If the pattern is not present in the text,
+     * removing any character from the text should still result in -1.
+     *
+     * @param text
+     * @param pattern
+     */
+    @ParameterizedTest
+    @MethodSource("testcaseProvider")
+    public void test11(String text, String pattern) {
+        /* Get output for any modified input text without the pattern */
+        int res = Boyer.indexOf(text.replaceFirst(String.valueOf(pattern.charAt(0)), ""), pattern);
 
-MR44: **Text and Pattern with Unicode Characters**
+        if (!text.contains(pattern)) {
+            /* Verification */
+            assertTrue(res == -1);
+        }
+    }
 
-- If both the original text and the pattern contain Unicode characters, the algorithm should still return the correct result. This tests the algorithm's ability to handle patterns and text with a wide range of Unicode characters.
+    /**
+     * Metamorphic Relation 12: If the pattern is an empty string,
+     * the output should be 0 for any input text.
+     *
+     * @param text
+     * @param pattern
+     */
+    @ParameterizedTest
+    @MethodSource("testcaseProvider")
+    public void test12(String text, String pattern) {
+        /* Get output for any input text with an empty pattern */
+        int res = Boyer.indexOf(text, "");
 
-MR45: **Pattern with Regular Expression Metacharacters**
+        /* Verification */
+        assertTrue(res == 0);
+    }
 
-- If the pattern contains characters with special meanings in regular expressions (e.g., ".", "*", "^"), the algorithm should correctly handle and identify occurrences of these characters in the text.
+    // Add more metamorphic relations as needed...
 
-MR46: **Text and Pattern with Multibyte Characters**
+    // Helper method for providing test cases
+    private static Stream<Arguments> testcaseProvider() {
+        // Provide various test cases here
+    }
+}
+```
 
-- If both the original text and the pattern contain multibyte characters (e.g., UTF-8 or UTF-16 characters), the algorithm should still return the correct result.
+These additional metamorphic relations cover scenarios such as patterns being exact substrings of the text, handling cases where the pattern is not present in the text, and checking behavior with an empty pattern. Feel free to continue adding more relations based on different aspects of the algorithm and its expected behavior.
 
-MR47: **Text and Pattern with Null Characters**
+#### User
 
-- If both the original text and the pattern contain null characters (ASCII code 0), the algorithm should still correctly locate occurrences of the pattern in the text.
+Please generate more different metamorphic relations.
 
-MR48: **Pattern with Alternating Subpatterns**
+#### ChatGPT
 
-- If the pattern is constructed by alternating subpatterns (e.g., "ababab"), the algorithm should still correctly identify occurrences of this repetitive pattern in the text.
+Certainly! Here are a few more metamorphic relations for testing the Boyer-Moore algorithm:
 
-MR49: **Text with Punctuation Variations**
+```java
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-- If you introduce variations in punctuation within the text, the algorithm should still correctly locate occurrences of the pattern, ignoring changes in punctuation.
+public class BoyerMooreTest {
 
-MR50: **Pattern with Word Boundaries**
+    // ... (previous code)
 
-- If the pattern includes word boundaries (e.g., "\bword\b"), the algorithm should correctly handle and identify occurrences of the pattern with respect to word boundaries in the text.
+    /**
+     * Metamorphic Relation 13: If the pattern is present in the text, inserting
+     * any character at the beginning of the text should not affect the output.
+     *
+     * @param text
+     * @param pattern
+     */
+    @ParameterizedTest
+    @MethodSource("testcaseProvider")
+    public void test13(String text, String pattern) {
+        /* Get origin output */
+        int origin_res = Boyer.indexOf(text, pattern);
 
-These metamorphic relations introduce additional complexities related to special characters, Unicode, regular expression metacharacters, and other character set variations to further test the Boyer-Moore substring search algorithm's capabilities.
+        if (origin_res != -1) {
+            /* Insert a character at the beginning of the text */
+            String modified_text = "x" + text;
+
+            /* Get follow-up output */
+            int follow_res = Boyer.indexOf(modified_text, pattern);
+
+            /* Verification */
+            assertTrue(follow_res == origin_res);
+        }
+    }
+
+    /**
+     * Metamorphic Relation 14: If the pattern is not present in the text,
+     * appending any character to the end of the text should not affect the output.
+     *
+     * @param text
+     * @param pattern
+     */
+    @ParameterizedTest
+    @MethodSource("testcaseProvider")
+    public void test14(String text, String pattern) {
+        /* Get origin output */
+        int origin_res = Boyer.indexOf(text, pattern);
+
+        if (origin_res == -1) {
+            /* Append a character to the end of the text */
+            String modified_text = text + "x";
+
+            /* Get follow-up output */
+            int follow_res = Boyer.indexOf(modified_text, pattern);
+
+            /* Verification */
+            assertTrue(follow_res == origin_res);
+        }
+    }
+
+    /**
+     * Metamorphic Relation 15: If the pattern is not present in the text,
+     * reversing the order of characters in the text should not affect the output.
+     *
+     * @param text
+     * @param pattern
+     */
+    @ParameterizedTest
+    @MethodSource("testcaseProvider")
+    public void test15(String text, String pattern) {
+        /* Get origin output */
+        int origin_res = Boyer.indexOf(text, pattern);
+
+        if (origin_res == -1) {
+            /* Reverse the order of characters in the text */
+            String reversed_text = new StringBuilder(text).reverse().toString();
+
+            /* Get follow-up output */
+            int follow_res = Boyer.indexOf(reversed_text, pattern);
+
+            /* Verification */
+            assertTrue(follow_res == origin_res);
+        }
+    }
+
+    // Add more metamorphic relations as needed...
+
+    // Helper method for providing test cases
+    private static Stream<Arguments> testcaseProvider() {
+        // Provide various test cases here
+    }
+}
+```
+
+These additional metamorphic relations cover scenarios such as inserting a character at the beginning of the text, appending a character to the end of the text, and reversing the order of characters in the text. Feel free to continue adding more relations based on different aspects of the algorithm and its expected behavior.
+
+#### User
+
+Please generate more different metamorphic relations.
+
+#### ChatGPT
+
+Certainly! Here are a few more metamorphic relations for testing the Boyer-Moore algorithm:
+
+```java
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+public class BoyerMooreTest {
+
+    // ... (previous code)
+
+    /**
+     * Metamorphic Relation 16: If the pattern is not present in the text,
+     * replacing any character in the text with the same character should not affect the output.
+     *
+     * @param text
+     * @param pattern
+     */
+    @ParameterizedTest
+    @MethodSource("testcaseProvider")
+    public void test16(String text, String pattern) {
+        /* Get origin output */
+        int origin_res = Boyer.indexOf(text, pattern);
+
+        if (origin_res == -1 && !text.isEmpty()) {
+            /* Replace a character in the text with the same character */
+            char replacementChar = text.charAt(0);
+            String modified_text = text.replace(replacementChar, replacementChar);
+
+            /* Get follow-up output */
+            int follow_res = Boyer.indexOf(modified_text, pattern);
+
+            /* Verification */
+            assertTrue(follow_res == origin_res);
+        }
+    }
+
+    /**
+     * Metamorphic Relation 17: If the pattern is present in the text,
+     * replacing any character in the pattern with the same character should not affect the output.
+     *
+     * @param text
+     * @param pattern
+     */
+    @ParameterizedTest
+    @MethodSource("testcaseProvider")
+    public void test17(String text, String pattern) {
+        /* Get origin output */
+        int origin_res = Boyer.indexOf(text, pattern);
+
+        if (origin_res != -1 && !pattern.isEmpty()) {
+            /* Replace a character in the pattern with the same character */
+            char replacementChar = pattern.charAt(0);
+            String modified_pattern = pattern.replace(replacementChar, replacementChar);
+
+            /* Get follow-up output */
+            int follow_res = Boyer.indexOf(text, modified_pattern);
+
+            /* Verification */
+            assertTrue(follow_res == origin_res);
+        }
+    }
+
+    /**
+     * Metamorphic Relation 18: If the pattern is not present in the text,
+     * replacing any character in the text with a different character should not affect the output.
+     *
+     * @param text
+     * @param pattern
+     */
+    @ParameterizedTest
+    @MethodSource("testcaseProvider")
+    public void test18(String text, String pattern) {
+        /* Get origin output */
+        int origin_res = Boyer.indexOf(text, pattern);
+
+        if (origin_res == -1 && !text.isEmpty()) {
+            /* Replace a character in the text with a different character */
+            char replacementChar = text.charAt(0) == 'a' ? 'b' : 'a';
+            String modified_text = text.replace(text.charAt(0), replacementChar);
+
+            /* Get follow-up output */
+            int follow_res = Boyer.indexOf(modified_text, pattern);
+
+            /* Verification */
+            assertTrue(follow_res == origin_res);
+        }
+    }
+
+    // Add more metamorphic relations as needed...
+
+    // Helper method for providing test cases
+    private static Stream<Arguments> testcaseProvider() {
+        // Provide various test cases here
+    }
+}
+```
+
+These additional metamorphic relations cover scenarios such as replacing characters in the text and pattern with the same character or different characters. Feel free to continue adding more relations based on different aspects of the algorithm and its expected behavior.
+
+#### User
+
+Please generate more different metamorphic relations.
+
+#### ChatGPT
+
+Certainly! Here are a few more metamorphic relations for testing the Boyer-Moore algorithm:
+
+```java
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+public class BoyerMooreTest {
+
+    // ... (previous code)
+
+    /**
+     * Metamorphic Relation 19: If the pattern is present in the text,
+     * prepending the pattern to the text should not affect the output.
+     *
+     * @param text
+     * @param pattern
+     */
+    @ParameterizedTest
+    @MethodSource("testcaseProvider")
+    public void test19(String text, String pattern) {
+        /* Get origin output */
+        int origin_res = Boyer.indexOf(text, pattern);
+
+        if (origin_res != -1) {
+            /* Prepend the pattern to the text */
+            String modified_text = pattern + text;
+
+            /* Get follow-up output */
+            int follow_res = Boyer.indexOf(modified_text, pattern);
+
+            /* Verification */
+            assertTrue(follow_res == origin_res);
+        }
+    }
+
+    /**
+     * Metamorphic Relation 20: If the pattern is not present in the text,
+     * appending the text to the pattern should not affect the output.
+     *
+     * @param text
+     * @param pattern
+     */
+    @ParameterizedTest
+    @MethodSource("testcaseProvider")
+    public void test20(String text, String pattern) {
+        /* Get origin output */
+        int origin_res = Boyer.indexOf(text, pattern);
+
+        if (origin_res == -1) {
+            /* Append the text to the pattern */
+            String modified_text = pattern + text;
+
+            /* Get follow-up output */
+            int follow_res = Boyer.indexOf(modified_text, pattern);
+
+            /* Verification */
+            assertTrue(follow_res == origin_res);
+        }
+    }
+
+    /**
+     * Metamorphic Relation 21: If the pattern is not present in the text,
+     * inserting the pattern at any position in the text should not affect the output.
+     *
+     * @param text
+     * @param pattern
+     */
+    @ParameterizedTest
+    @MethodSource("testcaseProvider")
+    public void test21(String text, String pattern) {
+        /* Get origin output */
+        int origin_res = Boyer.indexOf(text, pattern);
+
+        if (origin_res == -1) {
+            /* Insert the pattern at a random position in the text */
+            int insertPosition = Math.min(text.length(), 3);
+            String modified_text = text.substring(0, insertPosition) + pattern + text.substring(insertPosition);
+
+            /* Get follow-up output */
+            int follow_res = Boyer.indexOf(modified_text, pattern);
+
+            /* Verification */
+            assertTrue(follow_res == origin_res);
+        }
+    }
+
+    // Add more metamorphic relations as needed...
+
+    // Helper method for providing test cases
+    private static Stream<Arguments> testcaseProvider() {
+        // Provide various test cases here
+    }
+}
+```
+
+These additional metamorphic relations cover scenarios such as prepending/appending the text to the pattern and inserting the pattern at a random position in the text. Feel free to continue adding more relations based on different aspects of the algorithm and its expected behavior.
+
+#### User
+
+Please generate more different metamorphic relations.
+
+#### ChatGPT
+
+Certainly! Here are a few more metamorphic relations for testing the Boyer-Moore algorithm:
+
+```java
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+public class BoyerMooreTest {
+
+    // ... (previous code)
+
+    /**
+     * Metamorphic Relation 22: If the pattern is present in the text,
+     * replacing the first occurrence of the pattern with a different pattern
+     * should result in a different output.
+     *
+     * @param text
+     * @param pattern
+     */
+    @ParameterizedTest
+    @MethodSource("testcaseProvider")
+    public void test22(String text, String pattern) {
+        /* Get origin output */
+        int origin_res = Boyer.indexOf(text, pattern);
+
+        if (origin_res != -1) {
+            /* Replace the first occurrence of the pattern with a different pattern */
+            String modified_text = text.replaceFirst(pattern, "different");
+
+            /* Get follow-up output */
+            int follow_res = Boyer.indexOf(modified_text, pattern);
+
+            /* Verification */
+            assertTrue(follow_res != origin_res);
+        }
+    }
+
+    /**
+     * Metamorphic Relation 23: If the pattern is present in the text,
+     * doubling the pattern in the text should not affect the output.
+     *
+     * @param text
+     * @param pattern
+     */
+    @ParameterizedTest
+    @MethodSource("testcaseProvider")
+    public void test23(String text, String pattern) {
+        /* Get origin output */
+        int origin_res = Boyer.indexOf(text, pattern);
+
+        if (origin_res != -1) {
+            /* Double the pattern in the text */
+            String modified_text = text + pattern;
+
+            /* Get follow-up output */
+            int follow_res = Boyer.indexOf(modified_text, pattern);
+
+            /* Verification */
+            assertTrue(follow_res == origin_res);
+        }
+    }
+
+    /**
+     * Metamorphic Relation 24: If the pattern is present in the text,
+     * replacing all occurrences of the pattern with a different pattern
+     * should result in a different output.
+     *
+     * @param text
+     * @param pattern
+     */
+    @ParameterizedTest
+    @MethodSource("testcaseProvider")
+    public void test24(String text, String pattern) {
+        /* Get origin output */
+        int origin_res = Boyer.indexOf(text, pattern);
+
+        if (origin_res != -1) {
+            /* Replace all occurrences of the pattern with a different pattern */
+            String modified_text = text.replaceAll(pattern, "different");
+
+            /* Get follow-up output */
+            int follow_res = Boyer.indexOf(modified_text, pattern);
+
+            /* Verification */
+            assertTrue(follow_res != origin_res);
+        }
+    }
+
+    // Add more metamorphic relations as needed...
+
+    // Helper method for providing test cases
+    private static Stream<Arguments> testcaseProvider() {
+        // Provide various test cases here
+    }
+}
+```
+
+These additional metamorphic relations cover scenarios such as replacing occurrences of the pattern with different patterns, doubling the pattern in the text, and replacing the first occurrence of the pattern with a different pattern. Feel free to continue adding more relations based on different aspects of the algorithm and its expected behavior.
+
+#### User
+
+Please generate more different metamorphic relations.
+
+#### ChatGPT
+
+Certainly! Here are a few more metamorphic relations for testing the Boyer-Moore algorithm:
+
+```java
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+public class BoyerMooreTest {
+
+    // ... (previous code)
+
+    /**
+     * Metamorphic Relation 25: If the pattern is present in the text,
+     * changing the case of the pattern in the text should not affect the output.
+     *
+     * @param text
+     * @param pattern
+     */
+    @ParameterizedTest
+    @MethodSource("testcaseProvider")
+    public void test25(String text, String pattern) {
+        /* Get origin output */
+        int origin_res = Boyer.indexOf(text, pattern);
+
+        if (origin_res != -1) {
+            /* Change the case of the pattern in the text */
+            String modified_text = text.replace(pattern, pattern.toUpperCase());
+
+            /* Get follow-up output */
+            int follow_res = Boyer.indexOf(modified_text, pattern);
+
+            /* Verification */
+            assertTrue(follow_res == origin_res);
+        }
+    }
+
+    /**
+     * Metamorphic Relation 26: If the pattern is not present in the text,
+     * changing the case of the text should not affect the output.
+     *
+     * @param text
+     * @param pattern
+     */
+    @ParameterizedTest
+    @MethodSource("testcaseProvider")
+    public void test26(String text, String pattern) {
+        /* Get origin output */
+        int origin_res = Boyer.indexOf(text, pattern);
+
+        if (origin_res == -1) {
+            /* Change the case of the text */
+            String modified_text = text.toUpperCase();
+
+            /* Get follow-up output */
+            int follow_res = Boyer.indexOf(modified_text, pattern);
+
+            /* Verification */
+            assertTrue(follow_res == origin_res);
+        }
+    }
+
+    /**
+     * Metamorphic Relation 27: If the pattern is present in the text,
+     * removing all occurrences of the pattern should result in an output of -1.
+     *
+     * @param text
+     * @param pattern
+     */
+    @ParameterizedTest
+    @MethodSource("testcaseProvider")
+    public void test27(String text, String pattern) {
+        /* Get origin output */
+        int origin_res = Boyer.indexOf(text, pattern);
+
+        if (origin_res != -1) {
+            /* Remove all occurrences of the pattern from the text */
+            String modified_text = text.replaceAll(pattern, "");
+
+            /* Get follow-up output */
+            int follow_res = Boyer.indexOf(modified_text, pattern);
+
+            /* Verification */
+            assertTrue(follow_res == -1);
+        }
+    }
+
+    // Add more metamorphic relations as needed...
+
+    // Helper method for providing test cases
+    private static Stream<Arguments> testcaseProvider() {
+        // Provide various test cases here
+    }
+}
+```
+
+These additional metamorphic relations cover scenarios such as changing the case of the pattern in the text, changing the case of the entire text, and removing all occurrences of the pattern from the text. Feel free to continue adding more relations based on different aspects of the algorithm and its expected behavior.
+
+#### User
+
+Please generate more different metamorphic relations.
+
+#### ChatGPT
+
+Certainly! Here are a few more metamorphic relations for testing the Boyer-Moore algorithm:
+
+```java
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+public class BoyerMooreTest {
+
+    // ... (previous code)
+
+    /**
+     * Metamorphic Relation 28: If the pattern is present in the text,
+     * appending a different pattern to the end of the text should not affect the output.
+     *
+     * @param text
+     * @param pattern
+     */
+    @ParameterizedTest
+    @MethodSource("testcaseProvider")
+    public void test28(String text, String pattern) {
+        /* Get origin output */
+        int origin_res = Boyer.indexOf(text, pattern);
+
+        if (origin_res != -1) {
+            /* Append a different pattern to the end of the text */
+            String modified_text = text + "differentPattern";
+
+            /* Get follow-up output */
+            int follow_res = Boyer.indexOf(modified_text, pattern);
+
+            /* Verification */
+            assertTrue(follow_res == origin_res);
+        }
+    }
+
+    /**
+     * Metamorphic Relation 29: If the pattern is not present in the text,
+     * inserting the pattern at the beginning of the text should not affect the output.
+     *
+     * @param text
+     * @param pattern
+     */
+    @ParameterizedTest
+    @MethodSource("testcaseProvider")
+    public void test29(String text, String pattern) {
+        /* Get origin output */
+        int origin_res = Boyer.indexOf(text, pattern);
+
+        if (origin_res == -1) {
+            /* Insert the pattern at the beginning of the text */
+            String modified_text = pattern + text;
+
+            /* Get follow-up output */
+            int follow_res = Boyer.indexOf(modified_text, pattern);
+
+            /* Verification */
+            assertTrue(follow_res == origin_res);
+        }
+    }
+
+    /**
+     * Metamorphic Relation 30: If the pattern is present in the text,
+     * replacing it with an empty pattern should result in an output of -1.
+     *
+     * @param text
+     * @param pattern
+     */
+    @ParameterizedTest
+    @MethodSource("testcaseProvider")
+    public void test30(String text, String pattern) {
+        /* Get origin output */
+        int origin_res = Boyer.indexOf(text, pattern);
+
+        if (origin_res != -1) {
+            /* Replace the pattern with an empty pattern in the text */
+            String modified_text = text.replace(pattern, "");
+
+            /* Get follow-up output */
+            int follow_res = Boyer.indexOf(modified_text, pattern);
+
+            /* Verification */
+            assertTrue(follow_res == -1);
+        }
+    }
+
+    // Add more metamorphic relations as needed...
+
+    // Helper method for providing test cases
+    private static Stream<Arguments> testcaseProvider() {
+        // Provide various test cases here
+    }
+}
+```
+
+These additional metamorphic relations cover scenarios such as appending a different pattern to the end of the text, inserting the pattern at the beginning of the text, and replacing the pattern with an empty pattern in the text. Feel free to continue adding more relations based on different aspects of the algorithm and its expected behavior.
+
+#### User
+
+Please generate more different metamorphic relations.
+
+#### ChatGPT
+
+Certainly! Here are a few more metamorphic relations for testing the Boyer-Moore algorithm:
+
+```java
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+public class BoyerMooreTest {
+
+    // ... (previous code)
+
+    /**
+     * Metamorphic Relation 31: If the pattern is not present in the text,
+     * removing any character from the pattern should not affect the output.
+     *
+     * @param text
+     * @param pattern
+     */
+    @ParameterizedTest
+    @MethodSource("testcaseProvider")
+    public void test31(String text, String pattern) {
+        /* Get origin output */
+        int origin_res = Boyer.indexOf(text, pattern);
+
+        if (origin_res == -1 && pattern.length() > 1) {
+            /* Remove a character from the pattern */
+            String modified_pattern = pattern.substring(0, pattern.length() - 1);
+
+            /* Get follow-up output */
+            int follow_res = Boyer.indexOf(text, modified_pattern);
+
+            /* Verification */
+            assertTrue(follow_res == origin_res);
+        }
+    }
+
+    /**
+     * Metamorphic Relation 32: If the pattern is not present in the text,
+     * replacing any character in the pattern with a different character should not affect the output.
+     *
+     * @param text
+     * @param pattern
+     */
+    @ParameterizedTest
+    @MethodSource("testcaseProvider")
+    public void test32(String text, String pattern) {
+        /* Get origin output */
+        int origin_res = Boyer.indexOf(text, pattern);
+
+        if (origin_res == -1 && !pattern.isEmpty()) {
+            /* Replace a character in the pattern with a different character */
+            char replacementChar = pattern.charAt(0) == 'a' ? 'b' : 'a';
+            String modified_pattern = pattern.replace(pattern.charAt(0), replacementChar);
+
+            /* Get follow-up output */
+            int follow_res = Boyer.indexOf(text, modified_pattern);
+
+            /* Verification */
+            assertTrue(follow_res == origin_res);
+        }
+    }
+
+    /**
+     * Metamorphic Relation 33: If the pattern is not present in the text,
+     * doubling the pattern in the text should not affect the output.
+     *
+     * @param text
+     * @param pattern
+     */
+    @ParameterizedTest
+    @MethodSource("testcaseProvider")
+    public void test33(String text, String pattern) {
+        /* Get origin output */
+        int origin_res = Boyer.indexOf(text, pattern);
+
+        if (origin_res == -1) {
+            /* Double the pattern in the text */
+            String modified_text = text + pattern;
+
+            /* Get follow-up output */
+            int follow_res = Boyer.indexOf(modified_text, pattern);
+
+            /* Verification */
+            assertTrue(follow_res == origin_res);
+        }
+    }
+
+    // Add more metamorphic relations as needed...
+
+    // Helper method for providing test cases
+    private static Stream<Arguments> testcaseProvider() {
+        // Provide various test cases here
+    }
+}
+```
+
+These additional metamorphic relations cover scenarios such as removing a character from the pattern, replacing a character in the pattern with a different character, and doubling the pattern in the text. Feel free to continue adding more relations based on different aspects of the algorithm and its expected behavior.
+
+#### User
+
+Please generate more different metamorphic relations.
+
+#### ChatGPT
+
+Certainly! Here are a few more metamorphic relations for testing the Boyer-Moore algorithm:
+
+```java
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+public class BoyerMooreTest {
+
+    // ... (previous code)
+
+    /**
+     * Metamorphic Relation 34: If the pattern is not present in the text,
+     * replacing any character in the text with a character from the pattern should not affect the output.
+     *
+     * @param text
+     * @param pattern
+     */
+    @ParameterizedTest
+    @MethodSource("testcaseProvider")
+    public void test34(String text, String pattern) {
+        /* Get origin output */
+        int origin_res = Boyer.indexOf(text, pattern);
+
+        if (origin_res == -1 && !pattern.isEmpty()) {
+            /* Replace a character in the text with a character from the pattern */
+            char replacementChar = pattern.charAt(0);
+            String modified_text = text.replace(text.charAt(0), replacementChar);
+
+            /* Get follow-up output */
+            int follow_res = Boyer.indexOf(modified_text, pattern);
+
+            /* Verification */
+            assertTrue(follow_res == origin_res);
+        }
+    }
+
+    /**
+     * Metamorphic Relation 35: If the pattern is not present in the text,
+     * replacing any character in the pattern with a character from the text should not affect the output.
+     *
+     * @param text
+     * @param pattern
+     */
+    @ParameterizedTest
+    @MethodSource("testcaseProvider")
+    public void test35(String text, String pattern) {
+        /* Get origin output */
+        int origin_res = Boyer.indexOf(text, pattern);
+
+        if (origin_res == -1 && !pattern.isEmpty() && text.length() > 0) {
+            /* Replace a character in the pattern with a character from the text */
+            char replacementChar = text.charAt(0);
+            String modified_pattern = pattern.replace(pattern.charAt(0), replacementChar);
+
+            /* Get follow-up output */
+            int follow_res = Boyer.indexOf(text, modified_pattern);
+
+            /* Verification */
+            assertTrue(follow_res == origin_res);
+        }
+    }
+
+    /**
+     * Metamorphic Relation 36: If the pattern is not present in the text,
+     * replacing any character in the pattern with a character not present in the text should not affect the output.
+     *
+     * @param text
+     * @param pattern
+     */
+    @ParameterizedTest
+    @MethodSource("testcaseProvider")
+    public void test36(String text, String pattern) {
+        /* Get origin output */
+        int origin_res = Boyer.indexOf(text, pattern);
+
+        if (origin_res == -1 && !pattern.isEmpty() && text.length() > 0) {
+            /* Replace a character in the pattern with a character not present in the text */
+            char replacementChar = 'x';
+            String modified_pattern = pattern.replace(pattern.charAt(0), replacementChar);
+
+            /* Get follow-up output */
+            int follow_res = Boyer.indexOf(text, modified_pattern);
+
+            /* Verification */
+            assertTrue(follow_res == origin_res);
+        }
+    }
+
+    // Add more metamorphic relations as needed...
+
+    // Helper method for providing test cases
+    private static Stream<Arguments> testcaseProvider() {
+        // Provide various test cases here
+    }
+}
+```
+
+These additional metamorphic relations cover scenarios such as replacing characters in the text with characters from the pattern and vice versa, as well as replacing characters in the pattern with characters not present in the text. Feel free to continue adding more relations based on different aspects of the algorithm and its expected behavior.
+
+#### User
+
+Please generate more different metamorphic relations.
+
+#### ChatGPT
+
+Certainly! Here are a few more metamorphic relations for testing the Boyer-Moore algorithm:
+
+```java
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+public class BoyerMooreTest {
+
+    // ... (previous code)
+
+    /**
+     * Metamorphic Relation 37: If the pattern is present in the text,
+     * reversing the pattern in the text should not affect the output.
+     *
+     * @param text
+     * @param pattern
+     */
+    @ParameterizedTest
+    @MethodSource("testcaseProvider")
+    public void test37(String text, String pattern) {
+        /* Get origin output */
+        int origin_res = Boyer.indexOf(text, pattern);
+
+        if (origin_res != -1 && !pattern.isEmpty()) {
+            /* Reverse the pattern in the text */
+            String reversed_pattern = new StringBuilder(pattern).reverse().toString();
+            String modified_text = text.replaceFirst(pattern, reversed_pattern);
+
+            /* Get follow-up output */
+            int follow_res = Boyer.indexOf(modified_text, pattern);
+
+            /* Verification */
+            assertTrue(follow_res == origin_res);
+        }
+    }
+
+    /**
+     * Metamorphic Relation 38: If the pattern is present in the text,
+     * appending a different pattern to the end of the pattern in the text should not affect the output.
+     *
+     * @param text
+     * @param pattern
+     */
+    @ParameterizedTest
+    @MethodSource("testcaseProvider")
+    public void test38(String text, String pattern) {
+        /* Get origin output */
+        int origin_res = Boyer.indexOf(text, pattern);
+
+        if (origin_res != -1 && !pattern.isEmpty()) {
+            /* Append a different pattern to the end of the pattern in the text */
+            String modified_text = text.replaceFirst(pattern, pattern + "differentPattern");
+
+            /* Get follow-up output */
+            int follow_res = Boyer.indexOf(modified_text, pattern);
+
+            /* Verification */
+            assertTrue(follow_res == origin_res);
+        }
+    }
+
+    /**
+     * Metamorphic Relation 39: If the pattern is not present in the text,
+     * appending the pattern to itself should not affect the output.
+     *
+     * @param text
+     * @param pattern
+     */
+    @ParameterizedTest
+    @MethodSource("testcaseProvider")
+    public void test39(String text, String pattern) {
+        /* Get origin output */
+        int origin_res = Boyer.indexOf(text, pattern);
+
+        if (origin_res == -1 && !pattern.isEmpty()) {
+            /* Append the pattern to itself */
+            String modified_text = text + pattern;
+
+            /* Get follow-up output */
+            int follow_res = Boyer.indexOf(modified_text, pattern);
+
+            /* Verification */
+            assertTrue(follow_res == origin_res);
+        }
+    }
+
+    // Add more metamorphic relations as needed...
+
+    // Helper method for providing test cases
+    private static Stream<Arguments> testcaseProvider() {
+        // Provide various test cases here
+    }
+}
+```
+
+These additional metamorphic relations cover scenarios such as reversing the pattern in the text, appending a different pattern to the end of the pattern in the text, and appending the pattern to itself. Feel free to continue adding more relations based on different aspects of the algorithm and its expected behavior.
+
+#### User
+
+Please generate more different metamorphic relations.
+
+#### ChatGPT
+
+Certainly! Here are a few more metamorphic relations for testing the Boyer-Moore algorithm:
+
+```java
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+public class BoyerMooreTest {
+
+    // ... (previous code)
+
+    /**
+     * Metamorphic Relation 40: If the pattern is not present in the text,
+     * replacing any character in the text with a different character from the pattern
+     * should not affect the output.
+     *
+     * @param text
+     * @param pattern
+     */
+    @ParameterizedTest
+    @MethodSource("testcaseProvider")
+    public void test40(String text, String pattern) {
+        /* Get origin output */
+        int origin_res = Boyer.indexOf(text, pattern);
+
+        if (origin_res == -1 && !pattern.isEmpty() && text.length() > 0) {
+            /* Replace a character in the text with a different character from the pattern */
+            char replacementChar = pattern.charAt(0) == 'a' ? 'b' : 'a';
+            String modified_text = text.replace(text.charAt(0), replacementChar);
+
+            /* Get follow-up output */
+            int follow_res = Boyer.indexOf(modified_text, pattern);
+
+            /* Verification */
+            assertTrue(follow_res == origin_res);
+        }
+    }
+
+    /**
+     * Metamorphic Relation 41: If the pattern is present in the text,
+     * replacing any character in the pattern with a different character from the text
+     * should not affect the output.
+     *
+     * @param text
+     * @param pattern
+     */
+    @ParameterizedTest
+    @MethodSource("testcaseProvider")
+    public void test41(String text, String pattern) {
+        /* Get origin output */
+        int origin_res = Boyer.indexOf(text, pattern);
+
+        if (origin_res != -1 && !pattern.isEmpty() && text.length() > 0) {
+            /* Replace a character in the pattern with a different character from the text */
+            char replacementChar = text.charAt(0) == 'a' ? 'b' : 'a';
+            String modified_pattern = pattern.replace(pattern.charAt(0), replacementChar);
+
+            /* Get follow-up output */
+            int follow_res = Boyer.indexOf(text, modified_pattern);
+
+            /* Verification */
+            assertTrue(follow_res == origin_res);
+        }
+    }
+
+    /**
+     * Metamorphic Relation 42: If the pattern is present in the text,
+     * replacing all occurrences of the pattern with a different pattern
+     * containing characters not present in the text should not affect the output.
+     *
+     * @param text
+     * @param pattern
+     */
+    @ParameterizedTest
+    @MethodSource("testcaseProvider")
+    public void test42(String text, String pattern) {
+        /* Get origin output */
+        int origin_res = Boyer.indexOf(text, pattern);
+
+        if (origin_res != -1 && !pattern.isEmpty() && text.length() > 0) {
+            /* Replace all occurrences of the pattern with a different pattern */
+            char replacementChar = 'x';
+            String modified_text = text.replaceAll(pattern, pattern + replacementChar);
+
+            /* Get follow-up output */
+            int follow_res = Boyer.indexOf(modified_text, pattern);
+
+            /* Verification */
+            assertTrue(follow_res == origin_res);
+        }
+    }
+
+    // Add more metamorphic relations as needed...
+
+    // Helper method for providing test cases
+    private static Stream<Arguments> testcaseProvider() {
+        // Provide various test cases here
+    }
+}
+```
+
+These additional metamorphic relations cover scenarios such as replacing characters in the text with different characters from the pattern and vice versa, as well as replacing occurrences of the pattern with a different pattern containing characters not present in the text. Feel free to continue adding more relations based on different aspects of the algorithm and its expected behavior.
+
+#### User
+
+Please generate more different metamorphic relations.
+
+#### ChatGPT
+
+Certainly! Here are a few more metamorphic relations for testing the Boyer-Moore algorithm:
+
+```java
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+public class BoyerMooreTest {
+
+    // ... (previous code)
+
+    /**
+     * Metamorphic Relation 43: If the pattern is present in the text,
+     * replacing any character in the pattern with a character not present in the pattern
+     * should not affect the output.
+     *
+     * @param text
+     * @param pattern
+     */
+    @ParameterizedTest
+    @MethodSource("testcaseProvider")
+    public void test43(String text, String pattern) {
+        /* Get origin output */
+        int origin_res = Boyer.indexOf(text, pattern);
+
+        if (origin_res != -1 && !pattern.isEmpty()) {
+            /* Replace a character in the pattern with a character not present in the pattern */
+            char replacementChar = 'x';
+            String modified_pattern = pattern.replace(pattern.charAt(0), replacementChar);
+
+            /* Get follow-up output */
+            int follow_res = Boyer.indexOf(text, modified_pattern);
+
+            /* Verification */
+            assertTrue(follow_res == origin_res);
+        }
+    }
+
+    /**
+     * Metamorphic Relation 44: If the pattern is present in the text,
+     * appending the pattern to itself a certain number of times should not affect the output.
+     *
+     * @param text
+     * @param pattern
+     */
+    @ParameterizedTest
+    @MethodSource("testcaseProvider")
+    public void test44(String text, String pattern) {
+        /* Get origin output */
+        int origin_res = Boyer.indexOf(text, pattern);
+
+        if (origin_res != -1 && !pattern.isEmpty()) {
+            /* Append the pattern to itself a certain number of times */
+            int repeatCount = 3;
+            String modified_text = text.replaceFirst(pattern, pattern.repeat(repeatCount));
+
+            /* Get follow-up output */
+            int follow_res = Boyer.indexOf(modified_text, pattern);
+
+            /* Verification */
+            assertTrue(follow_res == origin_res);
+        }
+    }
+
+    /**
+     * Metamorphic Relation 45: If the pattern is present in the text,
+     * replacing the last occurrence of the pattern with a different pattern
+     * should result in a different output.
+     *
+     * @param text
+     * @param pattern
+     */
+    @ParameterizedTest
+    @MethodSource("testcaseProvider")
+    public void test45(String text, String pattern) {
+        /* Get origin output */
+        int origin_res = Boyer.indexOf(text, pattern);
+
+        if (origin_res != -1 && !pattern.isEmpty()) {
+            /* Replace the last occurrence of the pattern with a different pattern */
+            String modified_text = text.replace(pattern, "different");
+
+            /* Get follow-up output */
+            int follow_res = Boyer.indexOf(modified_text, pattern);
+
+            /* Verification */
+            assertTrue(follow_res != origin_res);
+        }
+    }
+
+    // Add more metamorphic relations as needed...
+
+    // Helper method for providing test cases
+    private static Stream<Arguments> testcaseProvider() {
+        // Provide various test cases here
+    }
+}
+```
+
+These additional metamorphic relations cover scenarios such as replacing characters in the pattern with a character not present in the pattern, appending the pattern to itself a certain number of times, and replacing the last occurrence of the pattern with a different pattern. Feel free to continue adding more relations based on different aspects of the algorithm and its expected behavior.
+
+#### User
+
+Please generate more different metamorphic relations.
+
+#### ChatGPT
+
+Certainly! Here are a few more metamorphic relations for testing the Boyer-Moore algorithm:
+
+```java
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+public class BoyerMooreTest {
+
+    // ... (previous code)
+
+    /**
+     * Metamorphic Relation 46: If the pattern is present in the text,
+     * appending the text to itself should not affect the output.
+     *
+     * @param text
+     * @param pattern
+     */
+    @ParameterizedTest
+    @MethodSource("testcaseProvider")
+    public void test46(String text, String pattern) {
+        /* Get origin output */
+        int origin_res = Boyer.indexOf(text, pattern);
+
+        if (origin_res != -1 && !pattern.isEmpty()) {
+            /* Append the text to itself */
+            String modified_text = text + text;
+
+            /* Get follow-up output */
+            int follow_res = Boyer.indexOf(modified_text, pattern);
+
+            /* Verification */
+            assertTrue(follow_res == origin_res);
+        }
+    }
+
+    /**
+     * Metamorphic Relation 47: If the pattern is present in the text,
+     * replacing any character in the pattern with a character not present in the text
+     * should result in an output of -1.
+     *
+     * @param text
+     * @param pattern
+     */
+    @ParameterizedTest
+    @MethodSource("testcaseProvider")
+    public void test47(String text, String pattern) {
+        /* Get origin output */
+        int origin_res = Boyer.indexOf(text, pattern);
+
+        if (origin_res != -1 && !pattern.isEmpty() && text.length() > 0) {
+            /* Replace a character in the pattern with a character not present in the text */
+            char replacementChar = 'x';
+            String modified_pattern = pattern.replace(pattern.charAt(0), replacementChar);
+
+            /* Get follow-up output */
+            int follow_res = Boyer.indexOf(text, modified_pattern);
+
+            /* Verification */
+            assertTrue(follow_res == -1);
+        }
+    }
+
+    /**
+     * Metamorphic Relation 48: If the pattern is not present in the text,
+     * replacing any character in the text with a character not present in the pattern
+     * should not affect the output.
+     *
+     * @param text
+     * @param pattern
+     */
+    @ParameterizedTest
+    @MethodSource("testcaseProvider")
+    public void test48(String text, String pattern) {
+        /* Get origin output */
+        int origin_res = Boyer.indexOf(text, pattern);
+
+        if (origin_res == -1 && !pattern.isEmpty() && text.length() > 0) {
+            /* Replace a character in the text with a character not present in the pattern */
+            char replacementChar = 'x';
+            String modified_text = text.replace(text.charAt(0), replacementChar);
+
+            /* Get follow-up output */
+            int follow_res = Boyer.indexOf(modified_text, pattern);
+
+            /* Verification */
+            assertTrue(follow_res == origin_res);
+        }
+    }
+
+    // Add more metamorphic relations as needed...
+
+    // Helper method for providing test cases
+    private static Stream<Arguments> testcaseProvider() {
+        // Provide various test cases here
+    }
+}
+```
+
+These additional metamorphic relations cover scenarios such as appending the text to itself, replacing characters in the pattern with a character not present in the text, and replacing characters in the text with a character not present in the pattern. Feel free to continue adding more relations based on different aspects of the algorithm and its expected behavior.
+
+#### User
+
+Please generate more different metamorphic relations.
+
+#### ChatGPT
+
+Certainly! Here are a few more metamorphic relations for testing the Boyer-Moore algorithm:
+
+```java
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+public class BoyerMooreTest {
+
+    // ... (previous code)
+
+    /**
+     * Metamorphic Relation 49: If the pattern is present in the text,
+     * swapping the positions of two different characters in the pattern should not affect the output.
+     *
+     * @param text
+     * @param pattern
+     */
+    @ParameterizedTest
+    @MethodSource("testcaseProvider")
+    public void test49(String text, String pattern) {
+        /* Get origin output */
+        int origin_res = Boyer.indexOf(text, pattern);
+
+        if (origin_res != -1 && pattern.length() > 1) {
+            /* Swap the positions of two different characters in the pattern */
+            char char1 = pattern.charAt(0);
+            char char2 = pattern.charAt(1);
+            String modified_pattern = pattern.replace(char1, char2).replace(char2, char1);
+
+            /* Get follow-up output */
+            int follow_res = Boyer.indexOf(text, modified_pattern);
+
+            /* Verification */
+            assertTrue(follow_res == origin_res);
+        }
+    }
+
+    /**
+     * Metamorphic Relation 50: If the pattern is not present in the text,
+     * swapping the positions of two different characters in the text should not affect the output.
+     *
+     * @param text
+     * @param pattern
+     */
+    @ParameterizedTest
+    @MethodSource("testcaseProvider")
+    public void test50(String text, String pattern) {
+        /* Get origin output */
+        int origin_res = Boyer.indexOf(text, pattern);
+
+        if (origin_res == -1 && text.length() > 1) {
+            /* Swap the positions of two different characters in the text */
+            char char1 = text.charAt(0);
+            char char2 = text.charAt(1);
+            String modified_text = text.replace(char1, char2).replace(char2, char1);
+
+            /* Get follow-up output */
+            int follow_res = Boyer.indexOf(modified_text, pattern);
+
+            /* Verification */
+            assertTrue(follow_res == origin_res);
+        }
+    }
+
+    /**
+     * Metamorphic Relation 51: If the pattern is not present in the text,
+     * replacing any character in the pattern with a character present in the text
+     * should not affect the output.
+     *
+     * @param text
+     * @param pattern
+     */
+    @ParameterizedTest
+    @MethodSource("testcaseProvider")
+    public void test51(String text, String pattern) {
+        /* Get origin output */
+        int origin_res = Boyer.indexOf(text, pattern);
+
+        if (origin_res == -1 && !pattern.isEmpty() && text.length() > 0) {
+            /* Replace a character in the pattern with a character present in the text */
+            char replacementChar = text.charAt(0);
+            String modified_pattern = pattern.replace(pattern.charAt(0), replacementChar);
+
+            /* Get follow-up output */
+            int follow_res = Boyer.indexOf(text, modified_pattern);
+
+            /* Verification */
+            assertTrue(follow_res == origin_res);
+        }
+    }
+
+    // Add more metamorphic relations as needed...
+
+    // Helper method for providing test cases
+    private static Stream<Arguments> testcaseProvider() {
+        // Provide various test cases here
+    }
+}
+```
+
+These additional metamorphic relations cover scenarios such as swapping the positions of two different characters in the pattern and text, and replacing characters in the pattern with a character present in the text. Feel free to continue adding more relations based on different aspects of the algorithm and its expected behavior.
