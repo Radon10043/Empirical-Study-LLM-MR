@@ -16,8 +16,16 @@ public class BoyerTestExample {
     @ParameterizedTest
     @MethodSource("testcaseProvider")
     public void test1(String text, String pattern) {
+        /* Get origin output */
         int origin_res = Boyer.indexOf(text, pattern);
-        int follow_res = Boyer.indexOf(text + "xxxxx", pattern);
+
+        /* Construct follow-up input */
+        String follow_text = text + "xxx";
+
+        /* Get follow-up output */
+        int follow_res = Boyer.indexOf(follow_text, pattern);
+
+        /* Verification */
         assertTrue(follow_res >= origin_res);
     }
 
