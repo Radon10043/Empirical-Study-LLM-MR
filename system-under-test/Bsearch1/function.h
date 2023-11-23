@@ -1,4 +1,11 @@
-int BinSearch(int i_array[],int x,int i_start,int i_end) 
+#ifndef _HAVE_FUNCTION_H
+#define _HAVE_FUNCTION_H
+
+#include <vector>
+
+using namespace std;
+
+int BinSearch(vector<int> i_array,int x,int i_start,int i_end) 
 {
 	 int  i_mid; 
 	 if (i_start > i_end) 
@@ -11,7 +18,7 @@ int BinSearch(int i_array[],int x,int i_start,int i_end)
 	 }
 }
 
-int* GetRange(int i_array[],int i,int i_end) 
+int* GetRange(vector<int> i_array[],int i,int i_end) 
 {
 	 int i_val,i_min,i_max; 
 	 int all[2];
@@ -35,3 +42,5 @@ int* GetRange(int i_array[],int i,int i_end)
        all[0]=i_min;
 	   return all; 
 }
+
+#endif
