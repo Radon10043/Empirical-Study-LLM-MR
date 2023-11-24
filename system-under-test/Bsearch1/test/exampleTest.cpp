@@ -66,7 +66,7 @@ TEST_P(BSearchParamTest, MR2) {
     EXPECT_EQ(origin_out, follow_out);
 }
 
-INSTANTIATE_TEST_CASE_P(TreuReturn, BSearchParamTest, testing::Values(
+INSTANTIATE_TEST_CASE_P(TrueReturn, BSearchParamTest, testing::Values(
     BSearch1Input({1,2,3,4,5}, 3),
     BSearch1Input({1,2,3,4,5}, 1),
     BSearch1Input({1,2,3,4,5}, 99)
