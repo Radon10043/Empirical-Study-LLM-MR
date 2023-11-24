@@ -1021,11 +1021,13 @@ TEST_P(BSearchParamTest, MR42) {
     transform(follow_vec.begin(), follow_vec.end(), follow_vec.begin(), [constant](double x) { return 1 / x; });
     double follow_target = target / (1 / constant);
 
+#if 0
     /* Get follow-up output */
-    // int follow_out = BinSearch(follow_vec, static_cast<int>(follow_target), 0, follow_vec.size() - 1);
+    int follow_out = BinSearch(follow_vec, static_cast<int>(follow_target), 0, follow_vec.size() - 1);
 
     // /* Verification */
-    // EXPECT_EQ(origin_out, follow_out);
+    EXPECT_EQ(origin_out, follow_out);
+#endif
 }
 
 /**
