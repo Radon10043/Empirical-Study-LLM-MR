@@ -1,5 +1,6 @@
 *.class
 *.jar
+*.exe
 
 .VSCodeCounter
 build/
