@@ -6,9 +6,6 @@
 # define TRUE  1
 # define FALSE 0
 
-typedef int BOOLEAN;
-typedef char *string;
-
 # include <stdio.h>
 # include "tokens.h"
 
