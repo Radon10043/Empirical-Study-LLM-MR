@@ -2,7 +2,7 @@
 
 #### Link
 
-[https://chat.openai.com/share/20e6b95a-774e-4fde-8406-eaa8c6467d98](https://chat.openai.com/share/20e6b95a-774e-4fde-8406-eaa8c6467d98)
+[https://chat.openai.com/share/573a8bb9-da75-47d1-bb31-7ce06e006513](https://chat.openai.com/share/573a8bb9-da75-47d1-bb31-7ce06e006513)
 
 <br>
 
