@@ -12,9 +12,9 @@ Assume there is a trigonometric function sin(x), a source input x1, and a corres
 
 Next, you need to identify the metamorphic relation of the function `p`. The specification of this function is as follows:
 
-- The function implements the binary search algorithm to find the occurrence index of the specific element in the ascending array.
+- The function implements the binary search algorithm to determine whether the specific element occurs in the ascending array.
 - The function's input is 2 variables: `vec` and `target`, representing an ascending array and the element to be searched, respectively.
-- The function's return value is an integer representing the occurrence index of `target` in `vec`. If `target` does not occur in `vec`, the function returns -1.
+- The function's return value is an integer representing whether `target` occurs in `vec`. If `target` does not occur in `vec`, the function returns 0; otherwise returns 1.
 - If elements in `vec` are changed, `vec` must also remain in ascending order.
 
 Please identify the metamorphic relation of this function as much as possible and use Google's C++ testing and mocking framework `googletest` to codify them as C++ code.
@@ -34,7 +34,7 @@ TEST_P(BSearchParamTest, MR1) {
     /* Get origin output */
     int origin_out = p(vec, target, vec.size());
 
-    if (origin_out == -1) return;
+    if (!origin_out) return;
 
     /* Construct follow-up input */
     vector<int> follow_vec = vec;
@@ -48,8 +48,7 @@ TEST_P(BSearchParamTest, MR1) {
 }
 
 /**
- * Metamorphic relation 2: Multiply all elements in the array and the element to be located by a constant,
- * the output should remain the same.
+ * Metamorphic relation 2: Multiply all elements in the array and the element to be located by a constant, the output should remain the same.
  */
 TEST_P(BSearchParamTest, MR2) {
     /* Get input data */
@@ -79,102 +78,92 @@ TEST_P(BSearchParamTest, MR2) {
 
 #### ChatGPT
 
-Sure, I'll provide you with a couple of metamorphic relations for the binary search function `p` and demonstrate how to use Google's `googletest` framework to codify them as C++ tests.
+For the binary search function `p`, here are two metamorphic relations that you can use `googletest` to codify in C++:
 
-Assuming the binary search function looks something like this:
-
-```cpp
+```C++
+#include <gtest/gtest.h>
 #include <vector>
 
+// Function implementing binary search
 int p(const std::vector<int>& vec, int target, int size) {
-    // Binary search implementation
+    // Implementation of binary search algorithm
     // ...
 }
-```
 
-Now, let's define two metamorphic relations:
+struct BSearchInput {
+    std::vector<int> vec;
+    int target;
+};
 
-### Metamorphic Relation 1:
+class BSearchParamTest : public testing::TestWithParam<BSearchInput> {};
 
-If the target value is already in the array, add an element greater than the max value in the array to the end of the array, and the output should be unchanged.
-
-```cpp
-#include <gtest/gtest.h>
-
-// Define a test fixture for parameterized tests
-class BSearchParamTest : public testing::TestWithParam<BSearch2Input> {};
-
+// Metamorphic relation 1: If the target value is already in the array,
+// add an element greater than the max value in the array to the end of the array,
+// and the output should be unchanged.
 TEST_P(BSearchParamTest, MR1) {
-    BSearch2Input input = GetParam();
+    /* Get input data */
+    BSearchInput input = GetParam();
     std::vector<int> vec = input.vec;
     int target = input.target;
 
-    // Get origin output
+    /* Get origin output */
     int origin_out = p(vec, target, vec.size());
 
-    if (origin_out == -1) return;
+    if (!origin_out) return;
 
-    // Construct follow-up input
+    /* Construct follow-up input */
     std::vector<int> follow_vec = vec;
     follow_vec.emplace_back(vec.back() + 1);
 
-    // Get follow-up output
+    /* Get follow-up output */
     int follow_out = p(follow_vec, target, follow_vec.size());
 
-    // Verification
+    /* Verification */
     EXPECT_EQ(origin_out, follow_out);
 }
 
-// Define the parameterized test suite
-INSTANTIATE_TEST_SUITE_P(
-    BSearchTests,
-    BSearchParamTest,
-    testing::Values(
-        // Add your test cases here using BSearch2Input
-    )
-);
-```
-
-### Metamorphic Relation 2:
-
-Multiply all elements in the array and the element to be located by a constant, the output should remain the same.
-
-```cpp
+// Metamorphic relation 2: Multiply all elements in the array and the element to be located
+// by a constant, the output should remain the same.
 TEST_P(BSearchParamTest, MR2) {
-    BSearch2Input input = GetParam();
+    /* Get input data */
+    BSearchInput input = GetParam();
     std::vector<int> vec = input.vec;
     int target = input.target;
 
-    // Get origin output
+    /* Get origin output */
     int origin_out = p(vec, target, vec.size());
 
-    // Construct follow-up input
+    /* Construct follow-up input */
     int constant = 2;
     std::vector<int> follow_vec = vec;
     for (int& val : follow_vec)
         val *= constant;
     int follow_target = target * constant;
 
-    // Get follow-up output
+    /* Get follow-up output */
     int follow_out = p(follow_vec, follow_target, follow_vec.size());
 
-    // Verification
+    /* Verification */
     EXPECT_EQ(origin_out, follow_out);
 }
 
-// Add more metamorphic relations as needed...
+// You can add more test cases with different inputs as needed
 
-// Define the parameterized test suite
-INSTANTIATE_TEST_SUITE_P(
-    BSearchTests,
-    BSearchParamTest,
-    testing::Values(
-        // Add your test cases here using BSearch2Input
-    )
-);
+INSTANTIATE_TEST_SUITE_P(Default, BSearchParamTest, testing::Values(
+    // Test case 1
+    BSearchInput{ {1, 2, 3, 4, 5}, 3 },
+    // Test case 2
+    BSearchInput{ {2, 4, 6, 8, 10}, 8 }
+    // Add more test cases as needed
+));
+
+int main(int argc, char** argv) {
+    testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
+}
 ```
 
-Make sure to replace `BSearch2Input` with the actual structure or class you are using to represent the input data for the binary search function. Also, add relevant test cases to the `INSTANTIATE_TEST_SUITE_P` section.
+In this code, `BSearchInput` represents the input structure for the binary search function, and `BSearchParamTest` is a test fixture using `gtest` for parameterized tests. The two metamorphic relations (MR1 and MR2) are implemented as separate test cases. Adjust the test cases according to your specific needs and add more if necessary.
 
 <br>
 
@@ -186,580 +175,194 @@ Please generate more different metamorphic relations.
 
 #### ChatGPT
 
-Certainly! Here are two additional metamorphic relations for the binary search function `p`:
-
-### Metamorphic Relation 3:
-
-If the target value is not in the array, append the target to the end of the array, and the output should be -1.
+Certainly! Here are two additional metamorphic relations for the binary search function:
 
 ```cpp
+// Metamorphic relation 3: Reverse the order of elements in the array,
+// and the output should remain the same.
 TEST_P(BSearchParamTest, MR3) {
-    BSearch2Input input = GetParam();
+    /* Get input data */
+    BSearchInput input = GetParam();
     std::vector<int> vec = input.vec;
     int target = input.target;
 
-    // Get origin output
+    /* Get origin output */
     int origin_out = p(vec, target, vec.size());
 
-    if (origin_out != -1) return;
+    /* Construct follow-up input */
+    std::reverse(vec.begin(), vec.end());
 
-    // Construct follow-up input
-    std::vector<int> follow_vec = vec;
-    follow_vec.emplace_back(target);
-
-    // Get follow-up output
-    int follow_out = p(follow_vec, target, follow_vec.size());
-
-    // Verification
-    EXPECT_EQ(-1, follow_out);
-}
-
-// Define the parameterized test suite
-INSTANTIATE_TEST_SUITE_P(
-    BSearchTests,
-    BSearchParamTest,
-    testing::Values(
-        // Add your test cases here using BSearch2Input
-    )
-);
-```
-
-### Metamorphic Relation 4:
-
-Reverse the array and the target, the output should remain the same.
-
-```cpp
-TEST_P(BSearchParamTest, MR4) {
-    BSearch2Input input = GetParam();
-    std::vector<int> vec = input.vec;
-    int target = input.target;
-
-    // Get origin output
-    int origin_out = p(vec, target, vec.size());
-
-    // Construct follow-up input
-    std::vector<int> follow_vec = vec;
-    std::reverse(follow_vec.begin(), follow_vec.end());
-    int follow_target = -target; // Assuming target is positive
-
-    // Get follow-up output
-    int follow_out = p(follow_vec, follow_target, follow_vec.size());
-
-    // Verification
-    EXPECT_EQ(origin_out, follow_out);
-}
-
-// Define the parameterized test suite
-INSTANTIATE_TEST_SUITE_P(
-    BSearchTests,
-    BSearchParamTest,
-    testing::Values(
-        // Add your test cases here using BSearch2Input
-    )
-);
-```
-
-Feel free to adapt these metamorphic relations based on the specifics of your binary search implementation and the requirements of your testing scenarios.
-
-<br>
-
-#### User
-
-Please generate more different metamorphic relations.
-
-<br>
-
-#### ChatGPT
-
-Certainly! Here are two more metamorphic relations for the binary search function `p`:
-
-### Metamorphic Relation 5:
-
-If the array is empty, the output should always be -1, regardless of the target value.
-
-```cpp
-TEST_P(BSearchParamTest, MR5) {
-    // Construct an empty array
-    std::vector<int> vec;
-    int target = 42; // Choose any target value
-
-    // Get output for the empty array
-    int origin_out = p(vec, target, vec.size());
-
-    // Construct follow-up input (add any value to the empty array)
-    vec.push_back(0);
-
-    // Get follow-up output
+    /* Get follow-up output */
     int follow_out = p(vec, target, vec.size());
 
-    // Verification
-    EXPECT_EQ(-1, origin_out);
-    EXPECT_EQ(-1, follow_out);
-}
-
-// Define the parameterized test suite
-INSTANTIATE_TEST_SUITE_P(
-    BSearchTests,
-    BSearchParamTest,
-    testing::Values(
-        // Add your test cases here using BSearch2Input
-    )
-);
-```
-
-### Metamorphic Relation 6:
-
-If all elements in the array are multiplied by a constant, the target should also be multiplied by the same constant, and the output should remain the same.
-
-```cpp
-TEST_P(BSearchParamTest, MR6) {
-    BSearch2Input input = GetParam();
-    std::vector<int> vec = input.vec;
-    int target = input.target;
-
-    // Get origin output
-    int origin_out = p(vec, target, vec.size());
-
-    // Construct follow-up input (multiply array and target by a constant)
-    int constant = 3;
-    std::vector<int> follow_vec = vec;
-    for (int& val : follow_vec)
-        val *= constant;
-    int follow_target = target * constant;
-
-    // Get follow-up output
-    int follow_out = p(follow_vec, follow_target, follow_vec.size());
-
-    // Verification
+    /* Verification */
     EXPECT_EQ(origin_out, follow_out);
 }
 
-// Define the parameterized test suite
-INSTANTIATE_TEST_SUITE_P(
-    BSearchTests,
-    BSearchParamTest,
-    testing::Values(
-        // Add your test cases here using BSearch2Input
-    )
-);
-```
-
-These additional metamorphic relations provide different perspectives on the behavior of the binary search function. Adjust them according to the specific characteristics and requirements of your application.
-
-<br>
-
-#### User
-
-Please generate more different metamorphic relations.
-
-<br>
-
-#### ChatGPT
-
-Certainly! Here are two more metamorphic relations for the binary search function `p`:
-
-### Metamorphic Relation 7:
-
-If all elements in the array are incremented by a constant, the target should also be incremented by the same constant, and the output should remain the same.
-
-```cpp
-TEST_P(BSearchParamTest, MR7) {
-    BSearch2Input input = GetParam();
+// Metamorphic relation 4: Add a constant to all elements in the array
+// and to the element to be located, the output should remain the same.
+TEST_P(BSearchParamTest, MR4) {
+    /* Get input data */
+    BSearchInput input = GetParam();
     std::vector<int> vec = input.vec;
     int target = input.target;
 
-    // Get origin output
+    /* Get origin output */
     int origin_out = p(vec, target, vec.size());
 
-    // Construct follow-up input (increment array and target by a constant)
+    /* Construct follow-up input */
     int constant = 5;
     std::vector<int> follow_vec = vec;
     for (int& val : follow_vec)
         val += constant;
     int follow_target = target + constant;
 
-    // Get follow-up output
+    /* Get follow-up output */
     int follow_out = p(follow_vec, follow_target, follow_vec.size());
 
-    // Verification
+    /* Verification */
+    EXPECT_EQ(origin_out, follow_out);
+}
+```
+
+In these additional test cases (`MR3` and `MR4`), different transformations are applied to the input array before calling the binary search function. `MR3` reverses the order of elements in the array, and `MR4` adds a constant to all elements in the array and to the element to be located. The expected behavior is that the output of the binary search function should remain the same despite these transformations.
+
+Feel free to add more test cases or modify them based on the specific requirements and characteristics of your binary search function.
+
+<br>
+
+### User
+
+Please generate more different metamorphic relations.
+
+<br>
+
+#### ChatGPT
+
+Certainly! Here are two more metamorphic relations for the binary search function:
+
+```cpp
+// Metamorphic relation 5: Replace all elements in the array with their squares,
+// and square the element to be located, the output should remain the same.
+TEST_P(BSearchParamTest, MR5) {
+    /* Get input data */
+    BSearchInput input = GetParam();
+    std::vector<int> vec = input.vec;
+    int target = input.target;
+
+    /* Get origin output */
+    int origin_out = p(vec, target, vec.size());
+
+    /* Construct follow-up input */
+    std::transform(vec.begin(), vec.end(), vec.begin(),
+                   [](int val) { return val * val; });
+    int follow_target = target * target;
+
+    /* Get follow-up output */
+    int follow_out = p(vec, follow_target, vec.size());
+
+    /* Verification */
     EXPECT_EQ(origin_out, follow_out);
 }
 
-// Define the parameterized test suite
-INSTANTIATE_TEST_SUITE_P(
-    BSearchTests,
-    BSearchParamTest,
-    testing::Values(
-        // Add your test cases here using BSearch2Input
-    )
-);
+// Metamorphic relation 6: Remove the first element from the array,
+// and the element to be located is not present in the modified array,
+// the output should be 0 (not found).
+TEST_P(BSearchParamTest, MR6) {
+    /* Get input data */
+    BSearchInput input = GetParam();
+    std::vector<int> vec = input.vec;
+    int target = input.target;
+
+    /* Get origin output */
+    int origin_out = p(vec, target, vec.size());
+
+    /* Construct follow-up input */
+    if (!vec.empty()) {
+        vec.erase(vec.begin());
+    }
+
+    /* Get follow-up output */
+    int follow_out = p(vec, target, vec.size());
+
+    /* Verification */
+    EXPECT_EQ(0, follow_out);
+}
 ```
 
-### Metamorphic Relation 8:
+In `MR5`, all elements in the array are replaced with their squares, and the target element is squared as well. The expectation is that the output of the binary search function remains the same.
 
-If the array has duplicate elements, removing duplicates from the array should not change the output.
+In `MR6`, the first element is removed from the array, and the target element is not present in the modified array. The expectation is that the output of the binary search function should be 0 (not found).
+
+These additional metamorphic relations provide diverse scenarios for testing the binary search function. Adjust them as needed based on the specifics of your implementation and test requirements.
+
+<br>
+
+### User
+
+Please generate more different metamorphic relations.
+
+<br>
+
+#### ChatGPT
+
+Certainly! Here are two more metamorphic relations for the binary search function:
 
 ```cpp
+// Metamorphic relation 7: Swap the positions of the first and last elements in the array,
+// and the output should remain the same.
+TEST_P(BSearchParamTest, MR7) {
+    /* Get input data */
+    BSearchInput input = GetParam();
+    std::vector<int> vec = input.vec;
+    int target = input.target;
+
+    /* Get origin output */
+    int origin_out = p(vec, target, vec.size());
+
+    /* Construct follow-up input */
+    if (vec.size() >= 2) {
+        std::swap(vec.front(), vec.back());
+    }
+
+    /* Get follow-up output */
+    int follow_out = p(vec, target, vec.size());
+
+    /* Verification */
+    EXPECT_EQ(origin_out, follow_out);
+}
+
+// Metamorphic relation 8: Shuffle the elements randomly in the array,
+// and the output should remain the same.
 TEST_P(BSearchParamTest, MR8) {
-    BSearch2Input input = GetParam();
+    /* Get input data */
+    BSearchInput input = GetParam();
     std::vector<int> vec = input.vec;
     int target = input.target;
 
-    // Get origin output
+    /* Get origin output */
     int origin_out = p(vec, target, vec.size());
 
-    // Construct follow-up input (remove duplicates from the array)
-    std::sort(vec.begin(), vec.end());
-    vec.erase(std::unique(vec.begin(), vec.end()), vec.end());
-
-    // Get follow-up output
-    int follow_out = p(vec, target, vec.size());
-
-    // Verification
-    EXPECT_EQ(origin_out, follow_out);
-}
-
-// Define the parameterized test suite
-INSTANTIATE_TEST_SUITE_P(
-    BSearchTests,
-    BSearchParamTest,
-    testing::Values(
-        // Add your test cases here using BSearch2Input
-    )
-);
-```
-
-These metamorphic relations explore scenarios where the array elements and the target undergo changes such as increments or removal of duplicates. Adapt them as needed based on the specifics of your binary search implementation and testing requirements.
-
-<br>
-
-#### User
-
-Please generate more different metamorphic relations.
-
-<br>
-
-#### ChatGPT
-
-Certainly! Here are two more metamorphic relations for the binary search function `p`:
-
-### Metamorphic Relation 9:
-
-If the array is initially unsorted, sorting the array should not change the output.
-
-```cpp
-TEST_P(BSearchParamTest, MR9) {
-    BSearch2Input input = GetParam();
-    std::vector<int> vec = input.vec;
-    int target = input.target;
-
-    // Get origin output
-    int origin_out = p(vec, target, vec.size());
-
-    // Construct follow-up input (sort the array)
-    std::sort(vec.begin(), vec.end());
-
-    // Get follow-up output
-    int follow_out = p(vec, target, vec.size());
-
-    // Verification
-    EXPECT_EQ(origin_out, follow_out);
-}
-
-// Define the parameterized test suite
-INSTANTIATE_TEST_SUITE_P(
-    BSearchTests,
-    BSearchParamTest,
-    testing::Values(
-        // Add your test cases here using BSearch2Input
-    )
-);
-```
-
-### Metamorphic Relation 10:
-
-If the array is rotated, the output should remain the same.
-
-```cpp
-TEST_P(BSearchParamTest, MR10) {
-    BSearch2Input input = GetParam();
-    std::vector<int> vec = input.vec;
-    int target = input.target;
-
-    // Get origin output
-    int origin_out = p(vec, target, vec.size());
-
-    // Construct follow-up input (rotate the array)
-    std::rotate(vec.begin(), vec.begin() + 1, vec.end()); // rotate one position to the right
-
-    // Get follow-up output
-    int follow_out = p(vec, target, vec.size());
-
-    // Verification
-    EXPECT_EQ(origin_out, follow_out);
-}
-
-// Define the parameterized test suite
-INSTANTIATE_TEST_SUITE_P(
-    BSearchTests,
-    BSearchParamTest,
-    testing::Values(
-        // Add your test cases here using BSearch2Input
-    )
-);
-```
-
-These metamorphic relations explore scenarios where the array undergoes changes in terms of sorting or rotation. Adjust them based on your specific use case and binary search implementation.
-
-<br>
-
-#### User
-
-Please generate more different metamorphic relations.
-
-<br>
-
-#### ChatGPT
-
-Certainly! Here are two more metamorphic relations for the binary search function `p`:
-
-### Metamorphic Relation 11:
-
-If the array has repeated occurrences of the target, removing one or more occurrences should not change the output.
-
-```cpp
-TEST_P(BSearchParamTest, MR11) {
-    BSearch2Input input = GetParam();
-    std::vector<int> vec = input.vec;
-    int target = input.target;
-
-    // Get origin output
-    int origin_out = p(vec, target, vec.size());
-
-    // Construct follow-up input (remove one or more occurrences of the target)
-    auto it = std::remove(vec.begin(), vec.end(), target);
-    vec.erase(it, vec.end());
-
-    // Get follow-up output
-    int follow_out = p(vec, target, vec.size());
-
-    // Verification
-    EXPECT_EQ(origin_out, follow_out);
-}
-
-// Define the parameterized test suite
-INSTANTIATE_TEST_SUITE_P(
-    BSearchTests,
-    BSearchParamTest,
-    testing::Values(
-        // Add your test cases here using BSearch2Input
-    )
-);
-```
-
-### Metamorphic Relation 12:
-
-If the array has repeated occurrences of the target, increasing the number of occurrences should not change the output.
-
-```cpp
-TEST_P(BSearchParamTest, MR12) {
-    BSearch2Input input = GetParam();
-    std::vector<int> vec = input.vec;
-    int target = input.target;
-
-    // Get origin output
-    int origin_out = p(vec, target, vec.size());
-
-    // Construct follow-up input (increase the number of occurrences of the target)
-    vec.push_back(target);
-
-    // Get follow-up output
-    int follow_out = p(vec, target, vec.size());
-
-    // Verification
-    EXPECT_EQ(origin_out, follow_out);
-}
-
-// Define the parameterized test suite
-INSTANTIATE_TEST_SUITE_P(
-    BSearchTests,
-    BSearchParamTest,
-    testing::Values(
-        // Add your test cases here using BSearch2Input
-    )
-);
-```
-
-These metamorphic relations explore scenarios where the array contains repeated occurrences of the target, and modifications are made by removing or adding occurrences. Adjust them based on your specific requirements and binary search implementation.
-
-#### User
-
-Please generate more different metamorphic relations.
-
-<br>
-
-#### ChatGPT
-
-Certainly! Here are two more metamorphic relations for the binary search function `p`:
-
-### Metamorphic Relation 13:
-
-If the array has duplicate elements, replacing one occurrence of the target with a different value should not change the output.
-
-```cpp
-TEST_P(BSearchParamTest, MR13) {
-    BSearch2Input input = GetParam();
-    std::vector<int> vec = input.vec;
-    int target = input.target;
-
-    // Get origin output
-    int origin_out = p(vec, target, vec.size());
-
-    // Find one occurrence of the target and replace it with a different value
-    auto it = std::find(vec.begin(), vec.end(), target);
-    if (it != vec.end()) {
-        *it = target + 1; // Replace with a different value
-    }
-
-    // Get follow-up output
-    int follow_out = p(vec, target, vec.size());
-
-    // Verification
-    EXPECT_EQ(origin_out, follow_out);
-}
-
-// Define the parameterized test suite
-INSTANTIATE_TEST_SUITE_P(
-    BSearchTests,
-    BSearchParamTest,
-    testing::Values(
-        // Add your test cases here using BSearch2Input
-    )
-);
-```
-
-### Metamorphic Relation 14:
-
-If the array has duplicate elements, swapping the positions of two occurrences of the target should not change the output.
-
-```cpp
-TEST_P(BSearchParamTest, MR14) {
-    BSearch2Input input = GetParam();
-    std::vector<int> vec = input.vec;
-    int target = input.target;
-
-    // Get origin output
-    int origin_out = p(vec, target, vec.size());
-
-    // Find two occurrences of the target and swap their positions
-    auto it1 = std::find(vec.begin(), vec.end(), target);
-    auto it2 = std::find(it1 + 1, vec.end(), target);
-    if (it1 != vec.end() && it2 != vec.end()) {
-        std::iter_swap(it1, it2);
-    }
-
-    // Get follow-up output
-    int follow_out = p(vec, target, vec.size());
-
-    // Verification
-    EXPECT_EQ(origin_out, follow_out);
-}
-
-// Define the parameterized test suite
-INSTANTIATE_TEST_SUITE_P(
-    BSearchTests,
-    BSearchParamTest,
-    testing::Values(
-        // Add your test cases here using BSearch2Input
-    )
-);
-```
-
-These metamorphic relations involve manipulating the array by replacing occurrences or swapping positions of the target. Adapt them based on your specific requirements and binary search implementation.
-
-<br>
-
-#### User
-
-Please generate more different metamorphic relations.
-
-<br>
-
-#### ChatGPT
-
-Certainly! Here are two more metamorphic relations for the binary search function `p`:
-
-### Metamorphic Relation 15:
-
-If the array has repeated occurrences of the target, reversing the order of the array should not change the output.
-
-```cpp
-TEST_P(BSearchParamTest, MR15) {
-    BSearch2Input input = GetParam();
-    std::vector<int> vec = input.vec;
-    int target = input.target;
-
-    // Get origin output
-    int origin_out = p(vec, target, vec.size());
-
-    // Construct follow-up input (reverse the order of the array)
-    std::reverse(vec.begin(), vec.end());
-
-    // Get follow-up output
-    int follow_out = p(vec, target, vec.size());
-
-    // Verification
-    EXPECT_EQ(origin_out, follow_out);
-}
-
-// Define the parameterized test suite
-INSTANTIATE_TEST_SUITE_P(
-    BSearchTests,
-    BSearchParamTest,
-    testing::Values(
-        // Add your test cases here using BSearch2Input
-    )
-);
-```
-
-### Metamorphic Relation 16:
-
-If the array has repeated occurrences of the target, shuffling the elements of the array should not change the output.
-
-```cpp
-TEST_P(BSearchParamTest, MR16) {
-    BSearch2Input input = GetParam();
-    std::vector<int> vec = input.vec;
-    int target = input.target;
-
-    // Get origin output
-    int origin_out = p(vec, target, vec.size());
-
-    // Construct follow-up input (shuffle the elements of the array)
+    /* Construct follow-up input */
     std::random_shuffle(vec.begin(), vec.end());
 
-    // Get follow-up output
+    /* Get follow-up output */
     int follow_out = p(vec, target, vec.size());
 
-    // Verification
+    /* Verification */
     EXPECT_EQ(origin_out, follow_out);
 }
-
-// Define the parameterized test suite
-INSTANTIATE_TEST_SUITE_P(
-    BSearchTests,
-    BSearchParamTest,
-    testing::Values(
-        // Add your test cases here using BSearch2Input
-    )
-);
 ```
 
-These metamorphic relations involve changes in the order of elements within the array. Adjust them based on your specific requirements and binary search implementation.
+In `MR7`, the positions of the first and last elements in the array are swapped, and the expectation is that the output of the binary search function remains the same.
+
+In `MR8`, the elements in the array are shuffled randomly, and the expectation is that the output of the binary search function remains the same. Note that `std::random_shuffle` is deprecated in C++14 and removed in C++17, so you may want to use `std::shuffle` with a random number generator if you are using a newer C++ standard.
+
+These additional metamorphic relations introduce more variations in the input array, testing the robustness of the binary search function. Adjust them as needed based on your specific testing requirements.
 
 <br>
 
-#### User
+### User
 
 Please generate more different metamorphic relations.
 
@@ -767,170 +370,387 @@ Please generate more different metamorphic relations.
 
 #### ChatGPT
 
-Certainly! Here are two more metamorphic relations for the binary search function `p`:
-
-### Metamorphic Relation 17:
-
-If the array has repeated occurrences of the target, adding a prefix or suffix to the array should not change the output.
+Certainly! Here are two additional metamorphic relations for the binary search function:
 
 ```cpp
-TEST_P(BSearchParamTest, MR17) {
-    BSearch2Input input = GetParam();
+// Metamorphic relation 9: Add a duplicate of the target element to the array,
+// and the output should remain the same.
+TEST_P(BSearchParamTest, MR9) {
+    /* Get input data */
+    BSearchInput input = GetParam();
     std::vector<int> vec = input.vec;
     int target = input.target;
 
-    // Get origin output
+    /* Get origin output */
     int origin_out = p(vec, target, vec.size());
 
-    // Construct follow-up input (add a prefix or suffix to the array)
-    std::vector<int> follow_vec_prefix = {1, 2, 3}; // Prefix
-    follow_vec_prefix.insert(follow_vec_prefix.end(), vec.begin(), vec.end());
+    /* Construct follow-up input */
+    vec.push_back(target);
 
-    std::vector<int> follow_vec_suffix = vec; // Suffix
-    follow_vec_suffix.insert(follow_vec_suffix.end(), {4, 5, 6}.begin(), {4, 5, 6}.end());
+    /* Get follow-up output */
+    int follow_out = p(vec, target, vec.size());
 
-    // Get follow-up outputs
-    int follow_out_prefix = p(follow_vec_prefix, target, follow_vec_prefix.size());
-    int follow_out_suffix = p(follow_vec_suffix, target, follow_vec_suffix.size());
-
-    // Verification
-    EXPECT_EQ(origin_out, follow_out_prefix);
-    EXPECT_EQ(origin_out, follow_out_suffix);
-}
-
-// Define the parameterized test suite
-INSTANTIATE_TEST_SUITE_P(
-    BSearchTests,
-    BSearchParamTest,
-    testing::Values(
-        // Add your test cases here using BSearch2Input
-    )
-);
-```
-
-### Metamorphic Relation 18:
-
-If the array has repeated occurrences of the target, changing the order of the repeated occurrences while maintaining their frequency should not change the output.
-
-```cpp
-TEST_P(BSearchParamTest, MR18) {
-    BSearch2Input input = GetParam();
-    std::vector<int> vec = input.vec;
-    int target = input.target;
-
-    // Get origin output
-    int origin_out = p(vec, target, vec.size());
-
-    // Construct follow-up input (change the order of repeated occurrences)
-    std::vector<int> follow_vec = vec;
-    std::random_shuffle(follow_vec.begin(), follow_vec.end());
-
-    // Get follow-up output
-    int follow_out = p(follow_vec, target, follow_vec.size());
-
-    // Verification
+    /* Verification */
     EXPECT_EQ(origin_out, follow_out);
 }
 
-// Define the parameterized test suite
-INSTANTIATE_TEST_SUITE_P(
-    BSearchTests,
-    BSearchParamTest,
-    testing::Values(
-        // Add your test cases here using BSearch2Input
-    )
-);
-```
-
-These metamorphic relations involve modifications to the array by adding prefixes or suffixes and changing the order of repeated occurrences while maintaining their frequency. Adapt them based on your specific requirements and binary search implementation.
-
-<br>
-
-#### User
-
-Please generate more different metamorphic relations.
-
-<br>
-
-#### ChatGPT
-
-Certainly! Here are two more metamorphic relations for the binary search function `p`:
-
-### Metamorphic Relation 19:
-
-If the array is multiplied by a constant factor, the target should be multiplied by the same factor, and the output should remain the same.
-
-```cpp
-TEST_P(BSearchParamTest, MR19) {
-    BSearch2Input input = GetParam();
+// Metamorphic relation 10: Subtract a constant from all elements in the array
+// and from the element to be located, the output should remain the same.
+TEST_P(BSearchParamTest, MR10) {
+    /* Get input data */
+    BSearchInput input = GetParam();
     std::vector<int> vec = input.vec;
     int target = input.target;
 
-    // Get origin output
+    /* Get origin output */
     int origin_out = p(vec, target, vec.size());
 
-    // Construct follow-up input (multiply array and target by a constant)
+    /* Construct follow-up input */
     int constant = 3;
     std::vector<int> follow_vec = vec;
     for (int& val : follow_vec)
-        val *= constant;
-    int follow_target = target * constant;
+        val -= constant;
+    int follow_target = target - constant;
 
-    // Get follow-up output
+    /* Get follow-up output */
     int follow_out = p(follow_vec, follow_target, follow_vec.size());
 
-    // Verification
+    /* Verification */
+    EXPECT_EQ(origin_out, follow_out);
+}
+```
+
+In `MR9`, a duplicate of the target element is added to the array, and the expectation is that the output of the binary search function remains the same.
+
+In `MR10`, a constant is subtracted from all elements in the array and from the element to be located. The expectation is that the output of the binary search function remains the same.
+
+These additional metamorphic relations provide further variations in the input array, testing the binary search function under different scenarios. Adjust them based on the specifics of your implementation and testing needs.
+
+<br>
+
+### User
+
+Please generate more different metamorphic relations.
+
+<br>
+
+#### ChatGPT
+
+Certainly! Here are two more metamorphic relations for the binary search function:
+
+```cpp
+// Metamorphic relation 11: Rotate the array to the right by one position,
+// and the output should remain the same.
+TEST_P(BSearchParamTest, MR11) {
+    /* Get input data */
+    BSearchInput input = GetParam();
+    std::vector<int> vec = input.vec;
+    int target = input.target;
+
+    /* Get origin output */
+    int origin_out = p(vec, target, vec.size());
+
+    /* Construct follow-up input */
+    if (!vec.empty()) {
+        std::rotate(vec.rbegin(), vec.rbegin() + 1, vec.rend());
+    }
+
+    /* Get follow-up output */
+    int follow_out = p(vec, target, vec.size());
+
+    /* Verification */
     EXPECT_EQ(origin_out, follow_out);
 }
 
-// Define the parameterized test suite
-INSTANTIATE_TEST_SUITE_P(
-    BSearchTests,
-    BSearchParamTest,
-    testing::Values(
-        // Add your test cases here using BSearch2Input
-    )
-);
+// Metamorphic relation 12: Insert the target element at the beginning of the array,
+// and the output should be 1 (target found) since it is now the first element.
+TEST_P(BSearchParamTest, MR12) {
+    /* Get input data */
+    BSearchInput input = GetParam();
+    std::vector<int> vec = input.vec;
+    int target = input.target;
+
+    /* Get origin output */
+    int origin_out = p(vec, target, vec.size());
+
+    /* Construct follow-up input */
+    vec.insert(vec.begin(), target);
+
+    /* Get follow-up output */
+    int follow_out = p(vec, target, vec.size());
+
+    /* Verification */
+    EXPECT_EQ(1, follow_out);
+}
 ```
 
-### Metamorphic Relation 20:
+In `MR11`, the array is rotated to the right by one position, and the expectation is that the output of the binary search function remains the same.
 
-If the array is empty, adding elements to the array should not change the output.
+In `MR12`, the target element is inserted at the beginning of the array, and the expectation is that the output of the binary search function is 1 (target found) since the target is now the first element in the array.
+
+These metamorphic relations introduce additional variations and edge cases to test the binary search function. Adjust them based on your specific implementation details and testing requirements.
+
+<br>
+
+### User
+
+Please generate more different metamorphic relations.
+
+<br>
+
+#### ChatGPT
+
+Certainly! Here are two more metamorphic relations for the binary search function:
 
 ```cpp
+// Metamorphic relation 13: Reverse the order of the array and negate all elements,
+// and the output should remain the same.
+TEST_P(BSearchParamTest, MR13) {
+    /* Get input data */
+    BSearchInput input = GetParam();
+    std::vector<int> vec = input.vec;
+    int target = input.target;
+
+    /* Get origin output */
+    int origin_out = p(vec, target, vec.size());
+
+    /* Construct follow-up input */
+    std::reverse(vec.begin(), vec.end());
+    std::transform(vec.begin(), vec.end(), vec.begin(), std::negate<int>());
+
+    /* Get follow-up output */
+    int follow_out = p(vec, target, vec.size());
+
+    /* Verification */
+    EXPECT_EQ(origin_out, follow_out);
+}
+
+// Metamorphic relation 14: Multiply all elements in the array by a constant,
+// and double the target element, the output should remain the same.
+TEST_P(BSearchParamTest, MR14) {
+    /* Get input data */
+    BSearchInput input = GetParam();
+    std::vector<int> vec = input.vec;
+    int target = input.target;
+
+    /* Get origin output */
+    int origin_out = p(vec, target, vec.size());
+
+    /* Construct follow-up input */
+    int constant = 3;
+    std::vector<int> follow_vec = vec;
+    std::transform(follow_vec.begin(), follow_vec.end(), follow_vec.begin(),
+                   [constant](int val) { return val * constant; });
+    int follow_target = target * 2;
+
+    /* Get follow-up output */
+    int follow_out = p(follow_vec, follow_target, follow_vec.size());
+
+    /* Verification */
+    EXPECT_EQ(origin_out, follow_out);
+}
+```
+
+In `MR13`, the order of the array is reversed, and all elements are negated. The expectation is that the output of the binary search function remains the same.
+
+In `MR14`, all elements in the array are multiplied by a constant, and the target element is doubled. The expectation is that the output of the binary search function remains the same.
+
+These metamorphic relations provide additional scenarios to test the binary search function under different transformations of the input array. Adjust them based on your specific needs and implementation details.
+
+<br>
+
+### User
+
+Please generate more different metamorphic relations.
+
+<br>
+
+#### ChatGPT
+
+Certainly! Here are two more metamorphic relations for the binary search function:
+
+```cpp
+// Metamorphic relation 15: Insert a new element greater than the target at the beginning of the array,
+// and the output should remain the same.
+TEST_P(BSearchParamTest, MR15) {
+    /* Get input data */
+    BSearchInput input = GetParam();
+    std::vector<int> vec = input.vec;
+    int target = input.target;
+
+    /* Get origin output */
+    int origin_out = p(vec, target, vec.size());
+
+    /* Construct follow-up input */
+    int newElement = target + 1;
+    vec.insert(vec.begin(), newElement);
+
+    /* Get follow-up output */
+    int follow_out = p(vec, target, vec.size());
+
+    /* Verification */
+    EXPECT_EQ(origin_out, follow_out);
+}
+
+// Metamorphic relation 16: Replace all occurrences of the target element with a new element,
+// and the output should be 0 (target not found) as the target is not present in the modified array.
+TEST_P(BSearchParamTest, MR16) {
+    /* Get input data */
+    BSearchInput input = GetParam();
+    std::vector<int> vec = input.vec;
+    int target = input.target;
+
+    /* Get origin output */
+    int origin_out = p(vec, target, vec.size());
+
+    /* Construct follow-up input */
+    int newElement = target + 1;
+    std::replace(vec.begin(), vec.end(), target, newElement);
+
+    /* Get follow-up output */
+    int follow_out = p(vec, target, vec.size());
+
+    /* Verification */
+    EXPECT_EQ(0, follow_out);
+}
+```
+
+In `MR15`, a new element greater than the target is inserted at the beginning of the array. The expectation is that the output of the binary search function remains the same.
+
+In `MR16`, all occurrences of the target element are replaced with a new element. The expectation is that the output of the binary search function is 0 (target not found) since the target is not present in the modified array.
+
+These metamorphic relations introduce scenarios where modifications are made to the array in a way that affects the presence or position of the target element. Adjust them based on your specific testing requirements and implementation details.
+
+<br>
+
+### User
+
+Please generate more different metamorphic relations.
+
+<br>
+
+#### ChatGPT
+
+Certainly! Here are two more metamorphic relations for the binary search function:
+
+```cpp
+// Metamorphic relation 17: Remove all occurrences of the target element from the array,
+// and the output should be 0 (target not found) as the target is not present in the modified array.
+TEST_P(BSearchParamTest, MR17) {
+    /* Get input data */
+    BSearchInput input = GetParam();
+    std::vector<int> vec = input.vec;
+    int target = input.target;
+
+    /* Get origin output */
+    int origin_out = p(vec, target, vec.size());
+
+    /* Construct follow-up input */
+    vec.erase(std::remove(vec.begin(), vec.end(), target), vec.end());
+
+    /* Get follow-up output */
+    int follow_out = p(vec, target, vec.size());
+
+    /* Verification */
+    EXPECT_EQ(0, follow_out);
+}
+
+// Metamorphic relation 18: Remove the last element from the array,
+// and the output should remain the same unless the target was the last element.
+TEST_P(BSearchParamTest, MR18) {
+    /* Get input data */
+    BSearchInput input = GetParam();
+    std::vector<int> vec = input.vec;
+    int target = input.target;
+
+    /* Get origin output */
+    int origin_out = p(vec, target, vec.size());
+
+    /* Construct follow-up input */
+    if (!vec.empty()) {
+        vec.pop_back();
+    }
+
+    /* Get follow-up output */
+    int follow_out = (target == vec.back()) ? 1 : p(vec, target, vec.size());
+
+    /* Verification */
+    EXPECT_EQ(origin_out, follow_out);
+}
+```
+
+In `MR17`, all occurrences of the target element are removed from the array. The expectation is that the output of the binary search function is 0 (target not found) since the target is not present in the modified array.
+
+In `MR18`, the last element is removed from the array, and the output should remain the same unless the target was the last element. If the target was the last element, the expectation is that the output is 0 (target not found) since the array is now shorter.
+
+These additional metamorphic relations provide further scenarios to test the binary search function under different modifications to the input array. Adjust them based on your specific testing needs and implementation details.
+
+<br>
+
+### User
+
+Please generate more different metamorphic relations.
+
+<br>
+
+#### ChatGPT
+
+Certainly! Here are two more metamorphic relations for the binary search function:
+
+```cpp
+// Metamorphic relation 19: Replace all elements in the array with a constant value,
+// and the output should remain the same unless the target is not equal to the constant.
+TEST_P(BSearchParamTest, MR19) {
+    /* Get input data */
+    BSearchInput input = GetParam();
+    std::vector<int> vec = input.vec;
+    int target = input.target;
+
+    /* Get origin output */
+    int origin_out = p(vec, target, vec.size());
+
+    /* Construct follow-up input */
+    int constant = 10;
+    std::fill(vec.begin(), vec.end(), constant);
+
+    /* Get follow-up output */
+    int follow_out = (target == constant) ? origin_out : p(vec, target, vec.size());
+
+    /* Verification */
+    EXPECT_EQ(origin_out, follow_out);
+}
+
+// Metamorphic relation 20: Duplicate all elements in the array,
+// and the output should remain the same unless the target is duplicated as well.
 TEST_P(BSearchParamTest, MR20) {
-    // Construct an empty array
-    std::vector<int> vec;
-    int target = 42; // Choose any target value
+    /* Get input data */
+    BSearchInput input = GetParam();
+    std::vector<int> vec = input.vec;
+    int target = input.target;
 
-    // Get output for the empty array
+    /* Get origin output */
     int origin_out = p(vec, target, vec.size());
 
-    // Construct follow-up input (add any value to the empty array)
-    vec.push_back(0);
+    /* Construct follow-up input */
+    vec.insert(vec.end(), vec.begin(), vec.end());
 
-    // Get follow-up output
-    int follow_out = p(vec, target, vec.size());
+    /* Get follow-up output */
+    int follow_out = (target == vec[vec.size() / 2]) ? origin_out : p(vec, target, vec.size());
 
-    // Verification
+    /* Verification */
     EXPECT_EQ(origin_out, follow_out);
 }
-
-// Define the parameterized test suite
-INSTANTIATE_TEST_SUITE_P(
-    BSearchTests,
-    BSearchParamTest,
-    testing::Values(
-        // Add your test cases here using BSearch2Input
-    )
-);
 ```
 
-These metamorphic relations involve scenarios where the array is multiplied by a constant factor and where elements are added to an initially empty array. Adjust them based on your specific requirements and binary search implementation.
+In `MR19`, all elements in the array are replaced with a constant value. The expectation is that the output of the binary search function remains the same unless the target is not equal to the constant.
+
+In `MR20`, all elements in the array are duplicated. The expectation is that the output of the binary search function remains the same unless the target is duplicated as well.
+
+These metamorphic relations provide variations where the entire array is modified, testing the binary search function under different transformation scenarios. Adjust them based on your specific testing needs and implementation details.
 
 <br>
 
-#### User
+### User
 
 Please generate more different metamorphic relations.
 
@@ -938,84 +758,63 @@ Please generate more different metamorphic relations.
 
 #### ChatGPT
 
-Certainly! Here are two more metamorphic relations for the binary search function `p`:
-
-### Metamorphic Relation 21:
-
-If the array has repeated occurrences of the target, duplicating or removing one or more occurrences should not change the output.
+Certainly! Here are two more metamorphic relations for the binary search function:
 
 ```cpp
+// Metamorphic relation 21: Shuffle the array and then sort it in ascending order,
+// the output should remain the same.
 TEST_P(BSearchParamTest, MR21) {
-    BSearch2Input input = GetParam();
+    /* Get input data */
+    BSearchInput input = GetParam();
     std::vector<int> vec = input.vec;
     int target = input.target;
 
-    // Get origin output
+    /* Get origin output */
     int origin_out = p(vec, target, vec.size());
 
-    // Construct follow-up input (duplicate or remove one or more occurrences of the target)
-    auto it = std::find(vec.begin(), vec.end(), target);
-    if (it != vec.end()) {
-        vec.insert(it, target); // Duplicate
-        // Alternatively, you can remove an occurrence: vec.erase(it);
-    }
+    /* Construct follow-up input */
+    std::random_shuffle(vec.begin(), vec.end());
+    std::sort(vec.begin(), vec.end());
 
-    // Get follow-up output
+    /* Get follow-up output */
     int follow_out = p(vec, target, vec.size());
 
-    // Verification
+    /* Verification */
     EXPECT_EQ(origin_out, follow_out);
 }
 
-// Define the parameterized test suite
-INSTANTIATE_TEST_SUITE_P(
-    BSearchTests,
-    BSearchParamTest,
-    testing::Values(
-        // Add your test cases here using BSearch2Input
-    )
-);
-```
-
-### Metamorphic Relation 22:
-
-If the array is initially unsorted, sorting only a subset of the array containing the target should not change the output.
-
-```cpp
+// Metamorphic relation 22: Reverse the order of the array and then sort it in descending order,
+// the output should remain the same.
 TEST_P(BSearchParamTest, MR22) {
-    BSearch2Input input = GetParam();
+    /* Get input data */
+    BSearchInput input = GetParam();
     std::vector<int> vec = input.vec;
     int target = input.target;
 
-    // Get origin output
+    /* Get origin output */
     int origin_out = p(vec, target, vec.size());
 
-    // Construct follow-up input (sort only a subset of the array containing the target)
-    auto target_range = std::equal_range(vec.begin(), vec.end(), target);
-    std::sort(target_range.first, target_range.second);
+    /* Construct follow-up input */
+    std::reverse(vec.begin(), vec.end());
+    std::sort(vec.begin(), vec.end(), std::greater<int>());
 
-    // Get follow-up output
+    /* Get follow-up output */
     int follow_out = p(vec, target, vec.size());
 
-    // Verification
+    /* Verification */
     EXPECT_EQ(origin_out, follow_out);
 }
-
-// Define the parameterized test suite
-INSTANTIATE_TEST_SUITE_P(
-    BSearchTests,
-    BSearchParamTest,
-    testing::Values(
-        // Add your test cases here using BSearch2Input
-    )
-);
 ```
 
-These metamorphic relations involve scenarios where the array has repeated occurrences of the target, and changes are made by duplicating or removing occurrences and by sorting only a subset of the array containing the target. Adjust them based on your specific requirements and binary search implementation.
+In `MR21`, the array is shuffled randomly and then sorted in ascending order. The expectation is that the output of the binary search function remains the same.
+
+In `MR22`, the array is reversed and then sorted in descending order. The expectation is that the output of the binary search function remains the same.
+
+These metamorphic relations provide scenarios where the order of the array is changed before applying a sorting operation, testing the binary search function under different input transformations. Adjust them based on your specific testing needs and implementation details.
 
 <br>
 
-#### User
+### User
 
 Please generate more different metamorphic relations.
 
@@ -1023,82 +822,62 @@ Please generate more different metamorphic relations.
 
 #### ChatGPT
 
-Certainly! Here are two more metamorphic relations for the binary search function `p`:
-
-### Metamorphic Relation 23:
-
-If the array has repeated occurrences of the target, changing the order of the repeated occurrences while maintaining their frequency should not change the output.
+Certainly! Here are two more metamorphic relations for the binary search function:
 
 ```cpp
+// Metamorphic relation 23: Replace all elements in the array with the target element,
+// and the output should be 1 (target found) if the array is not empty.
 TEST_P(BSearchParamTest, MR23) {
-    BSearch2Input input = GetParam();
+    /* Get input data */
+    BSearchInput input = GetParam();
     std::vector<int> vec = input.vec;
     int target = input.target;
 
-    // Get origin output
+    /* Get origin output */
     int origin_out = p(vec, target, vec.size());
 
-    // Construct follow-up input (change the order of repeated occurrences while maintaining their frequency)
-    std::vector<int> follow_vec = vec;
-    std::sort(follow_vec.begin(), follow_vec.end());
-    auto target_range = std::equal_range(follow_vec.begin(), follow_vec.end(), target);
-    std::random_shuffle(target_range.first, target_range.second);
+    /* Construct follow-up input */
+    std::fill(vec.begin(), vec.end(), target);
 
-    // Get follow-up output
-    int follow_out = p(follow_vec, target, follow_vec.size());
+    /* Get follow-up output */
+    int follow_out = (vec.empty()) ? 0 : 1;
 
-    // Verification
+    /* Verification */
     EXPECT_EQ(origin_out, follow_out);
 }
 
-// Define the parameterized test suite
-INSTANTIATE_TEST_SUITE_P(
-    BSearchTests,
-    BSearchParamTest,
-    testing::Values(
-        // Add your test cases here using BSearch2Input
-    )
-);
-```
-
-### Metamorphic Relation 24:
-
-If the array is initially empty, adding elements to the array should not change the output.
-
-```cpp
+// Metamorphic relation 24: Add the target element at the end of the array twice,
+// and the output should be 1 (target found) if the array is not empty.
 TEST_P(BSearchParamTest, MR24) {
-    // Construct an empty array
-    std::vector<int> vec;
-    int target = 42; // Choose any target value
+    /* Get input data */
+    BSearchInput input = GetParam();
+    std::vector<int> vec = input.vec;
+    int target = input.target;
 
-    // Get output for the empty array
+    /* Get origin output */
     int origin_out = p(vec, target, vec.size());
 
-    // Construct follow-up input (add any value to the empty array)
-    vec.push_back(0);
+    /* Construct follow-up input */
+    vec.push_back(target);
+    vec.push_back(target);
 
-    // Get follow-up output
-    int follow_out = p(vec, target, vec.size());
+    /* Get follow-up output */
+    int follow_out = (vec.empty()) ? 0 : 1;
 
-    // Verification
+    /* Verification */
     EXPECT_EQ(origin_out, follow_out);
 }
-
-// Define the parameterized test suite
-INSTANTIATE_TEST_SUITE_P(
-    BSearchTests,
-    BSearchParamTest,
-    testing::Values(
-        // Add your test cases here using BSearch2Input
-    )
-);
 ```
 
-These metamorphic relations involve scenarios where the order of repeated occurrences is changed while maintaining their frequency and where elements are added to an initially empty array. Adjust them based on your specific requirements and binary search implementation.
+In `MR23`, all elements in the array are replaced with the target element. The expectation is that the output of the binary search function is 1 (target found) if the array is not empty.
+
+In `MR24`, the target element is added at the end of the array twice. The expectation is that the output of the binary search function is 1 (target found) if the array is not empty.
+
+These metamorphic relations introduce scenarios where the array is modified to contain repeated instances of the target element. Adjust them based on your specific testing needs and implementation details.
 
 <br>
 
-#### User
+### User
 
 Please generate more different metamorphic relations.
 
@@ -1106,710 +885,452 @@ Please generate more different metamorphic relations.
 
 #### ChatGPT
 
-Certainly! Here are two more metamorphic relations for the binary search function `p`:
-
-### Metamorphic Relation 25:
-
-If the array has repeated occurrences of the target, changing the order of the repeated occurrences while altering their frequency should not change the output.
+Certainly! Here are two more metamorphic relations for the binary search function:
 
 ```cpp
+// Metamorphic relation 25: Remove all occurrences of the target element from the array,
+// and the output should be 0 (target not found) if the array is not empty.
 TEST_P(BSearchParamTest, MR25) {
-    BSearch2Input input = GetParam();
+    /* Get input data */
+    BSearchInput input = GetParam();
     std::vector<int> vec = input.vec;
     int target = input.target;
 
-    // Get origin output
+    /* Get origin output */
     int origin_out = p(vec, target, vec.size());
 
-    // Construct follow-up input (change the order and frequency of repeated occurrences)
-    std::vector<int> follow_vec = vec;
-    std::sort(follow_vec.begin(), follow_vec.end());
-    
-    // Increase the frequency of the target
-    follow_vec.insert(follow_vec.end(), {target, target});
+    /* Construct follow-up input */
+    vec.erase(std::remove(vec.begin(), vec.end(), target), vec.end());
 
-    // Shuffle the repeated occurrences
-    auto target_range = std::equal_range(follow_vec.begin(), follow_vec.end(), target);
-    std::random_shuffle(target_range.first, target_range.second);
+    /* Get follow-up output */
+    int follow_out = (vec.empty()) ? 0 : 1;
 
-    // Get follow-up output
-    int follow_out = p(follow_vec, target, follow_vec.size());
-
-    // Verification
+    /* Verification */
     EXPECT_EQ(origin_out, follow_out);
 }
 
-// Define the parameterized test suite
-INSTANTIATE_TEST_SUITE_P(
-    BSearchTests,
-    BSearchParamTest,
-    testing::Values(
-        // Add your test cases here using BSearch2Input
-    )
-);
-```
-
-### Metamorphic Relation 26:
-
-If the array is initially unsorted, sorting a subset of the array not containing the target should not change the output.
-
-```cpp
+// Metamorphic relation 26: Insert the target element at the beginning and end of the array,
+// and the output should be 1 (target found) if the array is not empty.
 TEST_P(BSearchParamTest, MR26) {
-    BSearch2Input input = GetParam();
+    /* Get input data */
+    BSearchInput input = GetParam();
     std::vector<int> vec = input.vec;
     int target = input.target;
 
-    // Get origin output
+    /* Get origin output */
     int origin_out = p(vec, target, vec.size());
 
-    // Construct follow-up input (sort a subset of the array not containing the target)
-    auto target_range = std::equal_range(vec.begin(), vec.end(), target);
-    std::sort(vec.begin(), target_range.first);
-    std::sort(target_range.second, vec.end());
+    /* Construct follow-up input */
+    vec.insert(vec.begin(), target);
+    vec.push_back(target);
 
-    // Get follow-up output
+    /* Get follow-up output */
+    int follow_out = (vec.empty()) ? 0 : 1;
+
+    /* Verification */
+    EXPECT_EQ(origin_out, follow_out);
+}
+```
+
+In `MR25`, all occurrences of the target element are removed from the array. The expectation is that the output of the binary search function is 0 (target not found) if the array is not empty.
+
+In `MR26`, the target element is inserted at the beginning and end of the array. The expectation is that the output of the binary search function is 1 (target found) if the array is not empty.
+
+These metamorphic relations introduce scenarios where the array is modified by removing or adding occurrences of the target element. Adjust them based on your specific testing needs and implementation details.
+
+<br>
+
+### User
+
+Please generate more different metamorphic relations.
+
+<br>
+
+#### ChatGPT
+
+Certainly! Here are two more metamorphic relations for the binary search function:
+
+```cpp
+// Metamorphic relation 27: Subtract 1 from all elements in the array and the target element,
+// and the output should remain the same.
+TEST_P(BSearchParamTest, MR27) {
+    /* Get input data */
+    BSearchInput input = GetParam();
+    std::vector<int> vec = input.vec;
+    int target = input.target;
+
+    /* Get origin output */
+    int origin_out = p(vec, target, vec.size());
+
+    /* Construct follow-up input */
+    std::for_each(vec.begin(), vec.end(), [](int& val) { val -= 1; });
+    int follow_target = target - 1;
+
+    /* Get follow-up output */
+    int follow_out = p(vec, follow_target, vec.size());
+
+    /* Verification */
+    EXPECT_EQ(origin_out, follow_out);
+}
+
+// Metamorphic relation 28: Add 1 to all elements in the array and the target element,
+// and the output should remain the same.
+TEST_P(BSearchParamTest, MR28) {
+    /* Get input data */
+    BSearchInput input = GetParam();
+    std::vector<int> vec = input.vec;
+    int target = input.target;
+
+    /* Get origin output */
+    int origin_out = p(vec, target, vec.size());
+
+    /* Construct follow-up input */
+    std::for_each(vec.begin(), vec.end(), [](int& val) { val += 1; });
+    int follow_target = target + 1;
+
+    /* Get follow-up output */
+    int follow_out = p(vec, follow_target, vec.size());
+
+    /* Verification */
+    EXPECT_EQ(origin_out, follow_out);
+}
+```
+
+In `MR27`, 1 is subtracted from all elements in the array and the target element. The expectation is that the output of the binary search function remains the same.
+
+In `MR28`, 1 is added to all elements in the array and the target element. The expectation is that the output of the binary search function remains the same.
+
+These metamorphic relations modify the array and the target element by a constant value, testing the binary search function's resilience to such transformations. Adjust them based on your specific testing needs and implementation details.
+
+<br>
+
+### User
+
+Please generate more different metamorphic relations.
+
+<br>
+
+#### ChatGPT
+
+Certainly! Here are two more metamorphic relations for the binary search function:
+
+```cpp
+// Metamorphic relation 29: Replace the target element with a new element in the array,
+// and the output should be 1 (target found) if the new element is equal to the target.
+TEST_P(BSearchParamTest, MR29) {
+    /* Get input data */
+    BSearchInput input = GetParam();
+    std::vector<int> vec = input.vec;
+    int target = input.target;
+
+    /* Get origin output */
+    int origin_out = p(vec, target, vec.size());
+
+    /* Construct follow-up input */
+    int newElement = target + 1;
+    std::replace(vec.begin(), vec.end(), target, newElement);
+
+    /* Get follow-up output */
+    int follow_out = (newElement == target) ? 1 : p(vec, target, vec.size());
+
+    /* Verification */
+    EXPECT_EQ(origin_out, follow_out);
+}
+
+// Metamorphic relation 30: Reverse the array and replace all occurrences of the target element with a new element,
+// and the output should be 0 (target not found) if the new element is not equal to the target.
+TEST_P(BSearchParamTest, MR30) {
+    /* Get input data */
+    BSearchInput input = GetParam();
+    std::vector<int> vec = input.vec;
+    int target = input.target;
+
+    /* Get origin output */
+    int origin_out = p(vec, target, vec.size());
+
+    /* Construct follow-up input */
+    std::reverse(vec.begin(), vec.end());
+    int newElement = target + 1;
+    std::replace(vec.begin(), vec.end(), target, newElement);
+
+    /* Get follow-up output */
+    int follow_out = (newElement != target) ? 0 : p(vec, target, vec.size());
+
+    /* Verification */
+    EXPECT_EQ(origin_out, follow_out);
+}
+```
+
+In `MR29`, the target element is replaced with a new element in the array. The expectation is that the output of the binary search function is 1 (target found) if the new element is equal to the target.
+
+In `MR30`, the array is reversed, and all occurrences of the target element are replaced with a new element. The expectation is that the output of the binary search function is 0 (target not found) if the new element is not equal to the target.
+
+These metamorphic relations introduce scenarios where specific modifications are made to the array to test the binary search function's behavior. Adjust them based on your specific testing needs and implementation details.
+
+<br>
+
+### User
+
+Please generate more different metamorphic relations.
+
+<br>
+
+#### ChatGPT
+
+Certainly! Here are two more metamorphic relations for the binary search function:
+
+```cpp
+// Metamorphic relation 31: Rotate the array to the right by a random number of positions,
+// and the output should remain the same.
+TEST_P(BSearchParamTest, MR31) {
+    /* Get input data */
+    BSearchInput input = GetParam();
+    std::vector<int> vec = input.vec;
+    int target = input.target;
+
+    /* Get origin output */
+    int origin_out = p(vec, target, vec.size());
+
+    /* Construct follow-up input */
+    int rotationAmount = std::rand() % vec.size();
+    std::rotate(vec.rbegin(), vec.rbegin() + rotationAmount, vec.rend());
+
+    /* Get follow-up output */
     int follow_out = p(vec, target, vec.size());
 
-    // Verification
+    /* Verification */
     EXPECT_EQ(origin_out, follow_out);
 }
 
-// Define the parameterized test suite
-INSTANTIATE_TEST_SUITE_P(
-    BSearchTests,
-    BSearchParamTest,
-    testing::Values(
-        // Add your test cases here using BSearch2Input
-    )
-);
-```
-
-These metamorphic relations involve scenarios where the order and frequency of repeated occurrences are changed while maintaining their frequency and where a subset of the array not containing the target is sorted. Adjust them based on your specific requirements and binary search implementation.
-
-<br>
-
-#### User
-
-Please generate more different metamorphic relations.
-
-<br>
-
-#### ChatGPT
-
-Certainly! Here are two more metamorphic relations for the binary search function `p`:
-
-### Metamorphic Relation 27:
-
-If the array has repeated occurrences of the target, changing the order of the repeated occurrences while modifying their frequency and adding a prefix or suffix to the array should not change the output.
-
-```cpp
-TEST_P(BSearchParamTest, MR27) {
-    BSearch2Input input = GetParam();
-    std::vector<int> vec = input.vec;
-    int target = input.target;
-
-    // Get origin output
-    int origin_out = p(vec, target, vec.size());
-
-    // Construct follow-up input (change the order, frequency, and add a prefix or suffix)
-    std::vector<int> follow_vec = vec;
-    std::sort(follow_vec.begin(), follow_vec.end());
-    
-    // Increase the frequency of the target
-    follow_vec.insert(follow_vec.end(), {target, target});
-
-    // Shuffle the repeated occurrences
-    auto target_range = std::equal_range(follow_vec.begin(), follow_vec.end(), target);
-    std::random_shuffle(target_range.first, target_range.second);
-
-    // Add a prefix
-    std::vector<int> prefix = {1, 2, 3};
-    follow_vec.insert(follow_vec.begin(), prefix.begin(), prefix.end());
-
-    // Get follow-up output
-    int follow_out = p(follow_vec, target, follow_vec.size());
-
-    // Verification
-    EXPECT_EQ(origin_out, follow_out);
-}
-
-// Define the parameterized test suite
-INSTANTIATE_TEST_SUITE_P(
-    BSearchTests,
-    BSearchParamTest,
-    testing::Values(
-        // Add your test cases here using BSearch2Input
-    )
-);
-```
-
-### Metamorphic Relation 28:
-
-If the array has repeated occurrences of the target, changing the order of the repeated occurrences while modifying their frequency and removing a subset of the array containing the target should not change the output.
-
-```cpp
-TEST_P(BSearchParamTest, MR28) {
-    BSearch2Input input = GetParam();
-    std::vector<int> vec = input.vec;
-    int target = input.target;
-
-    // Get origin output
-    int origin_out = p(vec, target, vec.size());
-
-    // Construct follow-up input (change the order, frequency, and remove a subset containing the target)
-    std::vector<int> follow_vec = vec;
-    std::sort(follow_vec.begin(), follow_vec.end());
-    
-    // Increase the frequency of the target
-    follow_vec.insert(follow_vec.end(), {target, target});
-
-    // Shuffle the repeated occurrences
-    auto target_range = std::equal_range(follow_vec.begin(), follow_vec.end(), target);
-    std::random_shuffle(target_range.first, target_range.second);
-
-    // Remove a subset containing the target
-    follow_vec.erase(target_range.first, target_range.second);
-
-    // Get follow-up output
-    int follow_out = p(follow_vec, target, follow_vec.size());
-
-    // Verification
-    EXPECT_EQ(origin_out, follow_out);
-}
-
-// Define the parameterized test suite
-INSTANTIATE_TEST_SUITE_P(
-    BSearchTests,
-    BSearchParamTest,
-    testing::Values(
-        // Add your test cases here using BSearch2Input
-    )
-);
-```
-
-These metamorphic relations involve scenarios where the order, frequency, and the presence of prefixes or suffixes in the array are changed. Adjust them based on your specific requirements and binary search implementation.
-
-<br>
-
-#### User
-
-Please generate more different metamorphic relations.
-
-<br>
-
-#### ChatGPT
-
-Certainly! Here are two more metamorphic relations for the binary search function `p`:
-
-### Metamorphic Relation 29:
-
-If the array has repeated occurrences of the target, changing the order of the repeated occurrences while modifying their frequency and inserting elements randomly within the array should not change the output.
-
-```cpp
-TEST_P(BSearchParamTest, MR29) {
-    BSearch2Input input = GetParam();
-    std::vector<int> vec = input.vec;
-    int target = input.target;
-
-    // Get origin output
-    int origin_out = p(vec, target, vec.size());
-
-    // Construct follow-up input (change the order, frequency, and insert elements randomly)
-    std::vector<int> follow_vec = vec;
-    std::sort(follow_vec.begin(), follow_vec.end());
-    
-    // Increase the frequency of the target
-    follow_vec.insert(follow_vec.end(), {target, target});
-
-    // Shuffle the repeated occurrences
-    auto target_range = std::equal_range(follow_vec.begin(), follow_vec.end(), target);
-    std::random_shuffle(target_range.first, target_range.second);
-
-    // Insert elements randomly
-    std::vector<int> random_elements = {100, 200, 300};
-    std::random_shuffle(random_elements.begin(), random_elements.end());
-    follow_vec.insert(follow_vec.begin() + vec.size() / 2, random_elements.begin(), random_elements.end());
-
-    // Get follow-up output
-    int follow_out = p(follow_vec, target, follow_vec.size());
-
-    // Verification
-    EXPECT_EQ(origin_out, follow_out);
-}
-
-// Define the parameterized test suite
-INSTANTIATE_TEST_SUITE_P(
-    BSearchTests,
-    BSearchParamTest,
-    testing::Values(
-        // Add your test cases here using BSearch2Input
-    )
-);
-```
-
-### Metamorphic Relation 30:
-
-If the array has repeated occurrences of the target, changing the order of the repeated occurrences while modifying their frequency and reversing a subset of the array containing the target should not change the output.
-
-```cpp
-TEST_P(BSearchParamTest, MR30) {
-    BSearch2Input input = GetParam();
-    std::vector<int> vec = input.vec;
-    int target = input.target;
-
-    // Get origin output
-    int origin_out = p(vec, target, vec.size());
-
-    // Construct follow-up input (change the order, frequency, and reverse a subset containing the target)
-    std::vector<int> follow_vec = vec;
-    std::sort(follow_vec.begin(), follow_vec.end());
-    
-    // Increase the frequency of the target
-    follow_vec.insert(follow_vec.end(), {target, target});
-
-    // Shuffle the repeated occurrences
-    auto target_range = std::equal_range(follow_vec.begin(), follow_vec.end(), target);
-    std::random_shuffle(target_range.first, target_range.second);
-
-    // Reverse a subset containing the target
-    std::reverse(target_range.first, target_range.second);
-
-    // Get follow-up output
-    int follow_out = p(follow_vec, target, follow_vec.size());
-
-    // Verification
-    EXPECT_EQ(origin_out, follow_out);
-}
-
-// Define the parameterized test suite
-INSTANTIATE_TEST_SUITE_P(
-    BSearchTests,
-    BSearchParamTest,
-    testing::Values(
-        // Add your test cases here using BSearch2Input
-    )
-);
-```
-
-These metamorphic relations involve scenarios where the order, frequency, and the insertion or reversal of elements within the array are changed. Adjust them based on your specific requirements and binary search implementation.
-
-<br>
-
-#### User
-
-Please generate more different metamorphic relations.
-
-<br>
-
-#### ChatGPT
-
-Certainly! Here are two more metamorphic relations for the binary search function `p`:
-
-### Metamorphic Relation 31:
-
-If the array has repeated occurrences of the target, changing the order of the repeated occurrences while modifying their frequency and rotating the array should not change the output.
-
-```cpp
-TEST_P(BSearchParamTest, MR31) {
-    BSearch2Input input = GetParam();
-    std::vector<int> vec = input.vec;
-    int target = input.target;
-
-    // Get origin output
-    int origin_out = p(vec, target, vec.size());
-
-    // Construct follow-up input (change the order, frequency, and rotate the array)
-    std::vector<int> follow_vec = vec;
-    std::sort(follow_vec.begin(), follow_vec.end());
-    
-    // Increase the frequency of the target
-    follow_vec.insert(follow_vec.end(), {target, target});
-
-    // Shuffle the repeated occurrences
-    auto target_range = std::equal_range(follow_vec.begin(), follow_vec.end(), target);
-    std::random_shuffle(target_range.first, target_range.second);
-
-    // Rotate the array
-    std::rotate(follow_vec.begin(), follow_vec.begin() + vec.size() / 2, follow_vec.end());
-
-    // Get follow-up output
-    int follow_out = p(follow_vec, target, follow_vec.size());
-
-    // Verification
-    EXPECT_EQ(origin_out, follow_out);
-}
-
-// Define the parameterized test suite
-INSTANTIATE_TEST_SUITE_P(
-    BSearchTests,
-    BSearchParamTest,
-    testing::Values(
-        // Add your test cases here using BSearch2Input
-    )
-);
-```
-
-### Metamorphic Relation 32:
-
-If the array has repeated occurrences of the target, changing the order of the repeated occurrences while modifying their frequency and replacing a subset of the array containing the target should not change the output.
-
-```cpp
+// Metamorphic relation 32: Reverse the order of the array and swap the target element with the first element,
+// and the output should be 1 (target found) if the target is now the first element.
 TEST_P(BSearchParamTest, MR32) {
-    BSearch2Input input = GetParam();
+    /* Get input data */
+    BSearchInput input = GetParam();
     std::vector<int> vec = input.vec;
     int target = input.target;
 
-    // Get origin output
+    /* Get origin output */
     int origin_out = p(vec, target, vec.size());
 
-    // Construct follow-up input (change the order, frequency, and replace a subset containing the target)
-    std::vector<int> follow_vec = vec;
-    std::sort(follow_vec.begin(), follow_vec.end());
-    
-    // Increase the frequency of the target
-    follow_vec.insert(follow_vec.end(), {target, target});
-
-    // Shuffle the repeated occurrences
-    auto target_range = std::equal_range(follow_vec.begin(), follow_vec.end(), target);
-    std::random_shuffle(target_range.first, target_range.second);
-
-    // Replace a subset containing the target
-    std::replace(target_range.first, target_range.second, target, target + 1);
-
-    // Get follow-up output
-    int follow_out = p(follow_vec, target, follow_vec.size());
-
-    // Verification
-    EXPECT_EQ(origin_out, follow_out);
-}
-
-// Define the parameterized test suite
-INSTANTIATE_TEST_SUITE_P(
-    BSearchTests,
-    BSearchParamTest,
-    testing::Values(
-        // Add your test cases here using BSearch2Input
-    )
-);
-```
-
-These metamorphic relations involve scenarios where the order, frequency, and rotation or replacement of elements within the array are changed. Adjust them based on your specific requirements and binary search implementation.
-
-<br>
-
-#### User
-
-Please generate more different metamorphic relations.
-
-<br>
-
-#### ChatGPT
-
-Certainly! Here are two more metamorphic relations for the binary search function `p`:
-
-### Metamorphic Relation 33:
-
-If the array has repeated occurrences of the target, changing the order of the repeated occurrences while modifying their frequency and removing a subset and then adding it back to the array should not change the output.
-
-```cpp
-TEST_P(BSearchParamTest, MR33) {
-    BSearch2Input input = GetParam();
-    std::vector<int> vec = input.vec;
-    int target = input.target;
-
-    // Get origin output
-    int origin_out = p(vec, target, vec.size());
-
-    // Construct follow-up input (change the order, frequency, remove a subset, and add it back)
-    std::vector<int> follow_vec = vec;
-    std::sort(follow_vec.begin(), follow_vec.end());
-    
-    // Increase the frequency of the target
-    follow_vec.insert(follow_vec.end(), {target, target});
-
-    // Shuffle the repeated occurrences
-    auto target_range = std::equal_range(follow_vec.begin(), follow_vec.end(), target);
-    std::random_shuffle(target_range.first, target_range.second);
-
-    // Remove a subset containing the target
-    follow_vec.erase(target_range.first, target_range.second);
-
-    // Add the removed subset back to the array
-    follow_vec.insert(follow_vec.end(), target_range.first, target_range.second);
-
-    // Get follow-up output
-    int follow_out = p(follow_vec, target, follow_vec.size());
-
-    // Verification
-    EXPECT_EQ(origin_out, follow_out);
-}
-
-// Define the parameterized test suite
-INSTANTIATE_TEST_SUITE_P(
-    BSearchTests,
-    BSearchParamTest,
-    testing::Values(
-        // Add your test cases here using BSearch2Input
-    )
-);
-```
-
-### Metamorphic Relation 34:
-
-If the array has repeated occurrences of the target, changing the order of the repeated occurrences while modifying their frequency and reversing the entire array should not change the output.
-
-```cpp
-TEST_P(BSearchParamTest, MR34) {
-    BSearch2Input input = GetParam();
-    std::vector<int> vec = input.vec;
-    int target = input.target;
-
-    // Get origin output
-    int origin_out = p(vec, target, vec.size());
-
-    // Construct follow-up input (change the order, frequency, and reverse the entire array)
-    std::vector<int> follow_vec = vec;
-    std::sort(follow_vec.begin(), follow_vec.end());
-    
-    // Increase the frequency of the target
-    follow_vec.insert(follow_vec.end(), {target, target});
-
-    // Shuffle the repeated occurrences
-    auto target_range = std::equal_range(follow_vec.begin(), follow_vec.end(), target);
-    std::random_shuffle(target_range.first, target_range.second);
-
-    // Reverse the entire array
-    std::reverse(follow_vec.begin(), follow_vec.end());
-
-    // Get follow-up output
-    int follow_out = p(follow_vec, target, follow_vec.size());
-
-    // Verification
-    EXPECT_EQ(origin_out, follow_out);
-}
-
-// Define the parameterized test suite
-INSTANTIATE_TEST_SUITE_P(
-    BSearchTests,
-    BSearchParamTest,
-    testing::Values(
-        // Add your test cases here using BSearch2Input
-    )
-);
-```
-
-These metamorphic relations involve scenarios where the order, frequency, and removal/addition or reversal of elements within the array are changed. Adjust them based on your specific requirements and binary search implementation.
-
-<br>
-
-#### User
-
-Please generate more different metamorphic relations.
-
-<br>
-
-#### ChatGPT
-
-Certainly! Here are two more metamorphic relations for the binary search function `p`:
-
-### Metamorphic Relation 35:
-
-If the array has repeated occurrences of the target, changing the order of the repeated occurrences while modifying their frequency and inserting a subset of the array containing the target in a different position should not change the output.
-
-```cpp
-TEST_P(BSearchParamTest, MR35) {
-    BSearch2Input input = GetParam();
-    std::vector<int> vec = input.vec;
-    int target = input.target;
-
-    // Get origin output
-    int origin_out = p(vec, target, vec.size());
-
-    // Construct follow-up input (change the order, frequency, and insert a subset in a different position)
-    std::vector<int> follow_vec = vec;
-    std::sort(follow_vec.begin(), follow_vec.end());
-    
-    // Increase the frequency of the target
-    follow_vec.insert(follow_vec.end(), {target, target});
-
-    // Shuffle the repeated occurrences
-    auto target_range = std::equal_range(follow_vec.begin(), follow_vec.end(), target);
-    std::random_shuffle(target_range.first, target_range.second);
-
-    // Insert the subset in a different position
-    follow_vec.insert(follow_vec.begin() + vec.size() / 2, target_range.first, target_range.second);
-
-    // Get follow-up output
-    int follow_out = p(follow_vec, target, follow_vec.size());
-
-    // Verification
-    EXPECT_EQ(origin_out, follow_out);
-}
-
-// Define the parameterized test suite
-INSTANTIATE_TEST_SUITE_P(
-    BSearchTests,
-    BSearchParamTest,
-    testing::Values(
-        // Add your test cases here using BSearch2Input
-    )
-);
-```
-
-### Metamorphic Relation 36:
-
-If the array has repeated occurrences of the target, changing the order of the repeated occurrences while modifying their frequency and replacing a subset of the array containing the target with a different set of elements should not change the output.
-
-```cpp
-TEST_P(BSearchParamTest, MR36) {
-    BSearch2Input input = GetParam();
-    std::vector<int> vec = input.vec;
-    int target = input.target;
-
-    // Get origin output
-    int origin_out = p(vec, target, vec.size());
-
-    // Construct follow-up input (change the order, frequency, and replace a subset with different elements)
-    std::vector<int> follow_vec = vec;
-    std::sort(follow_vec.begin(), follow_vec.end());
-    
-    // Increase the frequency of the target
-    follow_vec.insert(follow_vec.end(), {target, target});
-
-    // Shuffle the repeated occurrences
-    auto target_range = std::equal_range(follow_vec.begin(), follow_vec.end(), target);
-    std::random_shuffle(target_range.first, target_range.second);
-
-    // Replace the subset with different elements
-    std::replace(target_range.first, target_range.second, target, target + 1);
-
-    // Get follow-up output
-    int follow_out = p(follow_vec, target, follow_vec.size());
-
-    // Verification
-    EXPECT_EQ(origin_out, follow_out);
-}
-
-// Define the parameterized test suite
-INSTANTIATE_TEST_SUITE_P(
-    BSearchTests,
-    BSearchParamTest,
-    testing::Values(
-        // Add your test cases here using BSearch2Input
-    )
-);
-```
-
-These metamorphic relations involve scenarios where the order, frequency, and insertion or replacement of elements within the array are changed. Adjust them based on your specific requirements and binary search implementation.
-
-<br>
-
-#### User
-
-Please generate more different metamorphic relations.
-
-<br>
-
-#### ChatGPT
-
-Certainly! Here are two more metamorphic relations for the binary search function `p`:
-
-### Metamorphic Relation 37:
-
-If the array has repeated occurrences of the target, changing the order of the repeated occurrences while modifying their frequency and interleaving the array with a different set of elements should not change the output.
-
-```cpp
-TEST_P(BSearchParamTest, MR37) {
-    BSearch2Input input = GetParam();
-    std::vector<int> vec = input.vec;
-    int target = input.target;
-
-    // Get origin output
-    int origin_out = p(vec, target, vec.size());
-
-    // Construct follow-up input (change the order, frequency, and interleave with a different set of elements)
-    std::vector<int> follow_vec = vec;
-    std::sort(follow_vec.begin(), follow_vec.end());
-    
-    // Increase the frequency of the target
-    follow_vec.insert(follow_vec.end(), {target, target});
-
-    // Shuffle the repeated occurrences
-    auto target_range = std::equal_range(follow_vec.begin(), follow_vec.end(), target);
-    std::random_shuffle(target_range.first, target_range.second);
-
-    // Interleave with a different set of elements
-    std::vector<int> interleaved_elements = {100, 200, 300};
-    std::vector<int> interleaved_vec;
-    for (size_t i = 0; i < follow_vec.size(); ++i) {
-        interleaved_vec.push_back(follow_vec[i]);
-        if (i < interleaved_elements.size()) {
-            interleaved_vec.push_back(interleaved_elements[i]);
-        }
+    /* Construct follow-up input */
+    std::reverse(vec.begin(), vec.end());
+    if (!vec.empty()) {
+        std::swap(vec.front(), vec.at(std::rand() % vec.size()));
     }
 
-    // Get follow-up output
-    int follow_out = p(interleaved_vec, target, interleaved_vec.size());
+    /* Get follow-up output */
+    int follow_out = (target == vec.front()) ? 1 : p(vec, target, vec.size());
 
-    // Verification
+    /* Verification */
+    EXPECT_EQ(origin_out, follow_out);
+}
+```
+
+In `MR31`, the array is rotated to the right by a random number of positions, and the expectation is that the output of the binary search function remains the same.
+
+In `MR32`, the array is reversed, and the target element is swapped with the first element. The expectation is that the output of the binary search function is 1 (target found) if the target is now the first element.
+
+These metamorphic relations introduce scenarios where the array is modified by rotation and reversal, testing the binary search function under different transformation scenarios. Adjust them based on your specific testing needs and implementation details.
+
+<br>
+
+### User
+
+Please generate more different metamorphic relations.
+
+<br>
+
+#### ChatGPT
+
+Certainly! Here are two more metamorphic relations for the binary search function:
+
+```cpp
+// Metamorphic relation 33: Remove the first element from the array and the target element,
+// and the output should remain the same unless the target was the first element.
+TEST_P(BSearchParamTest, MR33) {
+    /* Get input data */
+    BSearchInput input = GetParam();
+    std::vector<int> vec = input.vec;
+    int target = input.target;
+
+    /* Get origin output */
+    int origin_out = p(vec, target, vec.size());
+
+    /* Construct follow-up input */
+    if (!vec.empty()) {
+        vec.erase(vec.begin());
+    }
+
+    /* Get follow-up output */
+    int follow_out = (target == vec.front()) ? 1 : p(vec, target, vec.size());
+
+    /* Verification */
     EXPECT_EQ(origin_out, follow_out);
 }
 
-// Define the parameterized test suite
-INSTANTIATE_TEST_SUITE_P(
-    BSearchTests,
-    BSearchParamTest,
-    testing::Values(
-        // Add your test cases here using BSearch2Input
-    )
-);
+// Metamorphic relation 34: Add a new element smaller than the target at the beginning of the array,
+// and the output should remain the same unless the target was the first element.
+TEST_P(BSearchParamTest, MR34) {
+    /* Get input data */
+    BSearchInput input = GetParam();
+    std::vector<int> vec = input.vec;
+    int target = input.target;
+
+    /* Get origin output */
+    int origin_out = p(vec, target, vec.size());
+
+    /* Construct follow-up input */
+    int newElement = target - 1;
+    vec.insert(vec.begin(), newElement);
+
+    /* Get follow-up output */
+    int follow_out = (target == vec.front()) ? 1 : p(vec, target, vec.size());
+
+    /* Verification */
+    EXPECT_EQ(origin_out, follow_out);
+}
 ```
 
-### Metamorphic Relation 38:
+In `MR33`, the first element is removed from the array, and the expectation is that the output of the binary search function remains the same unless the target was the first element.
 
-If the array has repeated occurrences of the target, changing the order of the repeated occurrences while modifying their frequency and shuffling the entire array should not change the output.
+In `MR34`, a new element smaller than the target is added at the beginning of the array. The expectation is that the output of the binary search function remains the same unless the target was the first element.
+
+These metamorphic relations provide scenarios where modifications are made to the array, affecting the position of the target element. Adjust them based on your specific testing needs and implementation details.
+
+<br>
+
+### User
+
+Please generate more different metamorphic relations.
+
+<br>
+
+#### ChatGPT
+
+Certainly! Here are two more metamorphic relations for the binary search function:
 
 ```cpp
+// Metamorphic relation 35: Add a new element greater than the target at the end of the array,
+// and the output should remain the same unless the target was the last element.
+TEST_P(BSearchParamTest, MR35) {
+    /* Get input data */
+    BSearchInput input = GetParam();
+    std::vector<int> vec = input.vec;
+    int target = input.target;
+
+    /* Get origin output */
+    int origin_out = p(vec, target, vec.size());
+
+    /* Construct follow-up input */
+    int newElement = target + 1;
+    vec.push_back(newElement);
+
+    /* Get follow-up output */
+    int follow_out = (target == vec.back()) ? 1 : p(vec, target, vec.size());
+
+    /* Verification */
+    EXPECT_EQ(origin_out, follow_out);
+}
+
+// Metamorphic relation 36: Remove the last element from the array and the target element,
+// and the output should remain the same unless the target was the last element.
+TEST_P(BSearchParamTest, MR36) {
+    /* Get input data */
+    BSearchInput input = GetParam();
+    std::vector<int> vec = input.vec;
+    int target = input.target;
+
+    /* Get origin output */
+    int origin_out = p(vec, target, vec.size());
+
+    /* Construct follow-up input */
+    if (!vec.empty()) {
+        vec.pop_back();
+    }
+
+    /* Get follow-up output */
+    int follow_out = (target == vec.back()) ? 1 : p(vec, target, vec.size());
+
+    /* Verification */
+    EXPECT_EQ(origin_out, follow_out);
+}
+```
+
+In `MR35`, a new element greater than the target is added at the end of the array. The expectation is that the output of the binary search function remains the same unless the target was the last element.
+
+In `MR36`, the last element is removed from the array, and the expectation is that the output of the binary search function remains the same unless the target was the last element.
+
+These metamorphic relations introduce scenarios where modifications are made to the array, affecting the position of the target element. Adjust them based on your specific testing needs and implementation details.
+
+<br>
+
+### User
+
+Please generate more different metamorphic relations.
+
+<br>
+
+#### ChatGPT
+
+Certainly! Here are two more metamorphic relations for the binary search function:
+
+```cpp
+// Metamorphic relation 37: Swap the positions of the target element and the middle element,
+// and the output should remain the same unless the target was the middle element.
+TEST_P(BSearchParamTest, MR37) {
+    /* Get input data */
+    BSearchInput input = GetParam();
+    std::vector<int> vec = input.vec;
+    int target = input.target;
+
+    /* Get origin output */
+    int origin_out = p(vec, target, vec.size());
+
+    /* Construct follow-up input */
+    if (vec.size() >= 3) {
+        std::swap(vec[vec.size() / 2], vec[vec.size() / 2 - 1]);
+    }
+
+    /* Get follow-up output */
+    int follow_out = (target == vec[vec.size() / 2]) ? 1 : p(vec, target, vec.size());
+
+    /* Verification */
+    EXPECT_EQ(origin_out, follow_out);
+}
+
+// Metamorphic relation 38: Replace all occurrences of the target element with a new element,
+// and the output should be 0 (target not found) if the array is not empty.
 TEST_P(BSearchParamTest, MR38) {
-    BSearch2Input input = GetParam();
+    /* Get input data */
+    BSearchInput input = GetParam();
     std::vector<int> vec = input.vec;
     int target = input.target;
 
-    // Get origin output
+    /* Get origin output */
     int origin_out = p(vec, target, vec.size());
 
-    // Construct follow-up input (change the order, frequency, and shuffle the entire array)
-    std::vector<int> follow_vec = vec;
-    std::sort(follow_vec.begin(), follow_vec.end());
-    
-    // Increase the frequency of the target
-    follow_vec.insert(follow_vec.end(), {target, target});
+    /* Construct follow-up input */
+    int newElement = target + 1;
+    std::replace(vec.begin(), vec.end(), target, newElement);
 
-    // Shuffle the entire array
-    std::random_shuffle(follow_vec.begin(), follow_vec.end());
+    /* Get follow-up output */
+    int follow_out = (vec.empty()) ? 0 : p(vec, target, vec.size());
 
-    // Get follow-up output
-    int follow_out = p(follow_vec, target, follow_vec.size());
-
-    // Verification
+    /* Verification */
     EXPECT_EQ(origin_out, follow_out);
 }
-
-// Define the parameterized test suite
-INSTANTIATE_TEST_SUITE_P(
-    BSearchTests,
-    BSearchParamTest,
-    testing::Values(
-        // Add your test cases here using BSearch2Input
-    )
-);
 ```
 
-These metamorphic relations involve scenarios where the order, frequency, and interleaving or shuffling of elements within the array are changed. Adjust them based on your specific requirements and binary search implementation.
+In `MR37`, the positions of the target element and the middle element are swapped. The expectation is that the output of the binary search function remains the same unless the target was the middle element.
+
+In `MR38`, all occurrences of the target element are replaced with a new element. The expectation is that the output of the binary search function is 0 (target not found) if the array is not empty.
+
+These metamorphic relations provide scenarios where modifications are made to the array, affecting the position or occurrence of the target element. Adjust them based on your specific testing needs and implementation details.
 
 <br>
 
-#### User
+### User
 
 Please generate more different metamorphic relations.
 
@@ -1817,101 +1338,64 @@ Please generate more different metamorphic relations.
 
 #### ChatGPT
 
-Certainly! Here are two more metamorphic relations for the binary search function `p`:
-
-### Metamorphic Relation 39:
-
-If the array has repeated occurrences of the target, changing the order of the repeated occurrences while modifying their frequency and rotating a subset of the array containing the target should not change the output.
+Certainly! Here are two more metamorphic relations for the binary search function:
 
 ```cpp
+// Metamorphic relation 39: Add a new element equal to the target in the middle of the array,
+// and the output should be 1 (target found) if the array is not empty.
 TEST_P(BSearchParamTest, MR39) {
-    BSearch2Input input = GetParam();
+    /* Get input data */
+    BSearchInput input = GetParam();
     std::vector<int> vec = input.vec;
     int target = input.target;
 
-    // Get origin output
+    /* Get origin output */
     int origin_out = p(vec, target, vec.size());
 
-    // Construct follow-up input (change the order, frequency, and rotate a subset containing the target)
-    std::vector<int> follow_vec = vec;
-    std::sort(follow_vec.begin(), follow_vec.end());
+    /* Construct follow-up input */
+    if (!vec.empty()) {
+        vec.insert(vec.begin() + vec.size() / 2, target);
+    }
 
-    // Increase the frequency of the target
-    follow_vec.insert(follow_vec.end(), {target, target});
+    /* Get follow-up output */
+    int follow_out = (vec.empty()) ? 0 : 1;
 
-    // Shuffle the repeated occurrences
-    auto target_range = std::equal_range(follow_vec.begin(), follow_vec.end(), target);
-    std::random_shuffle(target_range.first, target_range.second);
-
-    // Rotate a subset containing the target
-    std::rotate(target_range.first, target_range.first + 1, target_range.second);
-
-    // Get follow-up output
-    int follow_out = p(follow_vec, target, follow_vec.size());
-
-    // Verification
+    /* Verification */
     EXPECT_EQ(origin_out, follow_out);
 }
 
-// Define the parameterized test suite
-INSTANTIATE_TEST_SUITE_P(
-    BSearchTests,
-    BSearchParamTest,
-    testing::Values(
-        // Add your test cases here using BSearch2Input
-    )
-);
-```
-
-### Metamorphic Relation 40:
-
-If the array has repeated occurrences of the target, changing the order of the repeated occurrences while modifying their frequency and reversing a subset of the array not containing the target should not change the output.
-
-```cpp
+// Metamorphic relation 40: Subtract 1 from all elements in the array,
+// and the output should remain the same unless the target was 0.
 TEST_P(BSearchParamTest, MR40) {
-    BSearch2Input input = GetParam();
+    /* Get input data */
+    BSearchInput input = GetParam();
     std::vector<int> vec = input.vec;
     int target = input.target;
 
-    // Get origin output
+    /* Get origin output */
     int origin_out = p(vec, target, vec.size());
 
-    // Construct follow-up input (change the order, frequency, and reverse a subset not containing the target)
-    std::vector<int> follow_vec = vec;
-    std::sort(follow_vec.begin(), follow_vec.end());
+    /* Construct follow-up input */
+    std::for_each(vec.begin(), vec.end(), [](int& val) { val -= 1; });
+    int follow_target = (target == 0) ? 0 : target - 1;
 
-    // Increase the frequency of the target
-    follow_vec.insert(follow_vec.end(), {target, target});
+    /* Get follow-up output */
+    int follow_out = p(vec, follow_target, vec.size());
 
-    // Shuffle the repeated occurrences
-    auto target_range = std::equal_range(follow_vec.begin(), follow_vec.end(), target);
-    std::random_shuffle(target_range.first, target_range.second);
-
-    // Reverse a subset not containing the target
-    std::reverse(follow_vec.begin(), target_range.first);
-
-    // Get follow-up output
-    int follow_out = p(follow_vec, target, follow_vec.size());
-
-    // Verification
+    /* Verification */
     EXPECT_EQ(origin_out, follow_out);
 }
-
-// Define the parameterized test suite
-INSTANTIATE_TEST_SUITE_P(
-    BSearchTests,
-    BSearchParamTest,
-    testing::Values(
-        // Add your test cases here using BSearch2Input
-    )
-);
 ```
 
-These metamorphic relations involve scenarios where the order, frequency, and rotation or reversal of subsets within the array are changed. Adjust them based on your specific requirements and binary search implementation.
+In `MR39`, a new element equal to the target is added in the middle of the array. The expectation is that the output of the binary search function is 1 (target found) if the array is not empty.
+
+In `MR40`, 1 is subtracted from all elements in the array. The expectation is that the output of the binary search function remains the same unless the target was 0.
+
+These metamorphic relations provide additional scenarios where modifications are made to the array, affecting the presence or position of the target element. Adjust them based on your specific testing needs and implementation details.
 
 <br>
 
-#### User
+### User
 
 Please generate more different metamorphic relations.
 
@@ -1919,103 +1403,64 @@ Please generate more different metamorphic relations.
 
 #### ChatGPT
 
-Certainly! Here are two more metamorphic relations for the binary search function `p`:
-
-### Metamorphic Relation 41:
-
-If the array has repeated occurrences of the target, changing the order of the repeated occurrences while modifying their frequency and replacing a subset containing the target with the same set of elements in a different order should not change the output.
+Certainly! Here are two more metamorphic relations for the binary search function:
 
 ```cpp
+// Metamorphic relation 41: Add a new element greater than the target at the beginning and the end of the array,
+// and the output should remain the same unless the target was the first or last element.
 TEST_P(BSearchParamTest, MR41) {
-    BSearch2Input input = GetParam();
+    /* Get input data */
+    BSearchInput input = GetParam();
     std::vector<int> vec = input.vec;
     int target = input.target;
 
-    // Get origin output
+    /* Get origin output */
     int origin_out = p(vec, target, vec.size());
 
-    // Construct follow-up input (change the order, frequency, and replace a subset with the same elements in a different order)
-    std::vector<int> follow_vec = vec;
-    std::sort(follow_vec.begin(), follow_vec.end());
+    /* Construct follow-up input */
+    int newElement = target + 1;
+    vec.insert(vec.begin(), newElement);
+    vec.push_back(newElement);
 
-    // Increase the frequency of the target
-    follow_vec.insert(follow_vec.end(), {target, target});
+    /* Get follow-up output */
+    int follow_out = ((target == vec.front()) || (target == vec.back())) ? 1 : p(vec, target, vec.size());
 
-    // Shuffle the repeated occurrences
-    auto target_range = std::equal_range(follow_vec.begin(), follow_vec.end(), target);
-    std::random_shuffle(target_range.first, target_range.second);
-
-    // Replace a subset with the same elements in a different order
-    std::replace(target_range.first, target_range.second, target, target);
-    std::reverse(target_range.first, target_range.second);
-
-    // Get follow-up output
-    int follow_out = p(follow_vec, target, follow_vec.size());
-
-    // Verification
+    /* Verification */
     EXPECT_EQ(origin_out, follow_out);
 }
 
-// Define the parameterized test suite
-INSTANTIATE_TEST_SUITE_P(
-    BSearchTests,
-    BSearchParamTest,
-    testing::Values(
-        // Add your test cases here using BSearch2Input
-    )
-);
-```
-
-### Metamorphic Relation 42:
-
-If the array has repeated occurrences of the target, changing the order of the repeated occurrences while modifying their frequency and adding a prefix to the array should not change the output.
-
-```cpp
+// Metamorphic relation 42: Multiply all elements in the array by 2,
+// and the output should remain the same unless the target was an odd number.
 TEST_P(BSearchParamTest, MR42) {
-    BSearch2Input input = GetParam();
+    /* Get input data */
+    BSearchInput input = GetParam();
     std::vector<int> vec = input.vec;
     int target = input.target;
 
-    // Get origin output
+    /* Get origin output */
     int origin_out = p(vec, target, vec.size());
 
-    // Construct follow-up input (change the order, frequency, and add a prefix to the array)
-    std::vector<int> follow_vec = vec;
-    std::sort(follow_vec.begin(), follow_vec.end());
+    /* Construct follow-up input */
+    std::for_each(vec.begin(), vec.end(), [](int& val) { val *= 2; });
+    int follow_target = (target % 2 == 1) ? target * 2 : target;
 
-    // Increase the frequency of the target
-    follow_vec.insert(follow_vec.end(), {target, target});
+    /* Get follow-up output */
+    int follow_out = p(vec, follow_target, vec.size());
 
-    // Shuffle the repeated occurrences
-    auto target_range = std::equal_range(follow_vec.begin(), follow_vec.end(), target);
-    std::random_shuffle(target_range.first, target_range.second);
-
-    // Add a prefix to the array
-    std::vector<int> prefix = {1, 2, 3};
-    follow_vec.insert(follow_vec.begin(), prefix.begin(), prefix.end());
-
-    // Get follow-up output
-    int follow_out = p(follow_vec, target, follow_vec.size());
-
-    // Verification
+    /* Verification */
     EXPECT_EQ(origin_out, follow_out);
 }
-
-// Define the parameterized test suite
-INSTANTIATE_TEST_SUITE_P(
-    BSearchTests,
-    BSearchParamTest,
-    testing::Values(
-        // Add your test cases here using BSearch2Input
-    )
-);
 ```
 
-These metamorphic relations involve scenarios where the order, frequency, and replacement or addition of elements within the array are changed. Adjust them based on your specific requirements and binary search implementation.
+In `MR41`, a new element greater than the target is added at the beginning and the end of the array. The expectation is that the output of the binary search function remains the same unless the target was the first or last element.
+
+In `MR42`, all elements in the array are multiplied by 2. The expectation is that the output of the binary search function remains the same unless the target was an odd number.
+
+These metamorphic relations introduce scenarios where modifications are made to the array, affecting the presence or values of the target element. Adjust them based on your specific testing needs and implementation details.
 
 <br>
 
-#### User
+### User
 
 Please generate more different metamorphic relations.
 
@@ -2023,101 +1468,63 @@ Please generate more different metamorphic relations.
 
 #### ChatGPT
 
-Certainly! Here are two more metamorphic relations for the binary search function `p`:
-
-### Metamorphic Relation 43:
-
-If the array has repeated occurrences of the target, changing the order of the repeated occurrences while modifying their frequency and replacing a subset not containing the target with a different set of elements should not change the output.
+Certainly! Here are two more metamorphic relations for the binary search function:
 
 ```cpp
+// Metamorphic relation 43: Reverse the order of the array and add a new element equal to the target at the beginning,
+// and the output should be 1 (target found) if the target is now the first element.
 TEST_P(BSearchParamTest, MR43) {
-    BSearch2Input input = GetParam();
+    /* Get input data */
+    BSearchInput input = GetParam();
     std::vector<int> vec = input.vec;
     int target = input.target;
 
-    // Get origin output
+    /* Get origin output */
     int origin_out = p(vec, target, vec.size());
 
-    // Construct follow-up input (change the order, frequency, and replace a subset not containing the target)
-    std::vector<int> follow_vec = vec;
-    std::sort(follow_vec.begin(), follow_vec.end());
+    /* Construct follow-up input */
+    std::reverse(vec.begin(), vec.end());
+    vec.insert(vec.begin(), target);
 
-    // Increase the frequency of the target
-    follow_vec.insert(follow_vec.end(), {target, target});
+    /* Get follow-up output */
+    int follow_out = (target == vec.front()) ? 1 : p(vec, target, vec.size());
 
-    // Shuffle the repeated occurrences
-    auto target_range = std::equal_range(follow_vec.begin(), follow_vec.end(), target);
-    std::random_shuffle(target_range.first, target_range.second);
-
-    // Replace a subset not containing the target with a different set of elements
-    std::replace(target_range.second, follow_vec.end(), target, target + 1);
-
-    // Get follow-up output
-    int follow_out = p(follow_vec, target, follow_vec.size());
-
-    // Verification
+    /* Verification */
     EXPECT_EQ(origin_out, follow_out);
 }
 
-// Define the parameterized test suite
-INSTANTIATE_TEST_SUITE_P(
-    BSearchTests,
-    BSearchParamTest,
-    testing::Values(
-        // Add your test cases here using BSearch2Input
-    )
-);
-```
-
-### Metamorphic Relation 44:
-
-If the array has repeated occurrences of the target, changing the order of the repeated occurrences while modifying their frequency and removing a prefix from the array should not change the output.
-
-```cpp
+// Metamorphic relation 44: Replace the target element with a new element in the array,
+// and the output should be 0 (target not found) if the array is not empty.
 TEST_P(BSearchParamTest, MR44) {
-    BSearch2Input input = GetParam();
+    /* Get input data */
+    BSearchInput input = GetParam();
     std::vector<int> vec = input.vec;
     int target = input.target;
 
-    // Get origin output
+    /* Get origin output */
     int origin_out = p(vec, target, vec.size());
 
-    // Construct follow-up input (change the order, frequency, and remove a prefix from the array)
-    std::vector<int> follow_vec = vec;
-    std::sort(follow_vec.begin(), follow_vec.end());
+    /* Construct follow-up input */
+    int newElement = target + 1;
+    std::replace(vec.begin(), vec.end(), target, newElement);
 
-    // Increase the frequency of the target
-    follow_vec.insert(follow_vec.end(), {target, target});
+    /* Get follow-up output */
+    int follow_out = (vec.empty()) ? 0 : p(vec, target, vec.size());
 
-    // Shuffle the repeated occurrences
-    auto target_range = std::equal_range(follow_vec.begin(), follow_vec.end(), target);
-    std::random_shuffle(target_range.first, target_range.second);
-
-    // Remove a prefix from the array
-    follow_vec.erase(follow_vec.begin(), follow_vec.begin() + 3);
-
-    // Get follow-up output
-    int follow_out = p(follow_vec, target, follow_vec.size());
-
-    // Verification
+    /* Verification */
     EXPECT_EQ(origin_out, follow_out);
 }
-
-// Define the parameterized test suite
-INSTANTIATE_TEST_SUITE_P(
-    BSearchTests,
-    BSearchParamTest,
-    testing::Values(
-        // Add your test cases here using BSearch2Input
-    )
-);
 ```
 
-These metamorphic relations involve scenarios where the order, frequency, and replacement or removal of elements within the array are changed. Adjust them based on your specific requirements and binary search implementation.
+In `MR43`, the order of the array is reversed, and a new element equal to the target is added at the beginning. The expectation is that the output of the binary search function is 1 (target found) if the target is now the first element.
+
+In `MR44`, the target element is replaced with a new element in the array. The expectation is that the output of the binary search function is 0 (target not found) if the array is not empty.
+
+These metamorphic relations introduce scenarios where modifications are made to the array, affecting the presence or values of the target element. Adjust them based on your specific testing needs and implementation details.
 
 <br>
 
-#### User
+### User
 
 Please generate more different metamorphic relations.
 
@@ -2125,101 +1532,66 @@ Please generate more different metamorphic relations.
 
 #### ChatGPT
 
-Certainly! Here are two more metamorphic relations for the binary search function `p`:
-
-### Metamorphic Relation 45:
-
-If the array has repeated occurrences of the target, changing the order of the repeated occurrences while modifying their frequency and swapping the positions of two elements not containing the target should not change the output.
+Certainly! Here are two more metamorphic relations for the binary search function:
 
 ```cpp
+// Metamorphic relation 45: Insert the target element at random positions in the array,
+// and the output should be 1 (target found) if the array is not empty.
 TEST_P(BSearchParamTest, MR45) {
-    BSearch2Input input = GetParam();
+    /* Get input data */
+    BSearchInput input = GetParam();
     std::vector<int> vec = input.vec;
     int target = input.target;
 
-    // Get origin output
+    /* Get origin output */
     int origin_out = p(vec, target, vec.size());
 
-    // Construct follow-up input (change the order, frequency, and swap positions of two elements not containing the target)
-    std::vector<int> follow_vec = vec;
-    std::sort(follow_vec.begin(), follow_vec.end());
+    /* Construct follow-up input */
+    if (!vec.empty()) {
+        int randomPos = std::rand() % (vec.size() + 1);
+        vec.insert(vec.begin() + randomPos, target);
+    }
 
-    // Increase the frequency of the target
-    follow_vec.insert(follow_vec.end(), {target, target});
+    /* Get follow-up output */
+    int follow_out = (vec.empty()) ? 0 : 1;
 
-    // Shuffle the repeated occurrences
-    auto target_range = std::equal_range(follow_vec.begin(), follow_vec.end(), target);
-    std::random_shuffle(target_range.first, target_range.second);
-
-    // Swap positions of two elements not containing the target
-    std::iter_swap(follow_vec.begin() + 1, follow_vec.begin() + 3);
-
-    // Get follow-up output
-    int follow_out = p(follow_vec, target, follow_vec.size());
-
-    // Verification
+    /* Verification */
     EXPECT_EQ(origin_out, follow_out);
 }
 
-// Define the parameterized test suite
-INSTANTIATE_TEST_SUITE_P(
-    BSearchTests,
-    BSearchParamTest,
-    testing::Values(
-        // Add your test cases here using BSearch2Input
-    )
-);
-```
-
-### Metamorphic Relation 46:
-
-If the array has repeated occurrences of the target, changing the order of the repeated occurrences while modifying their frequency and replacing a subset not containing the target with the same set of elements in reverse order should not change the output.
-
-```cpp
+// Metamorphic relation 46: Sort the array in descending order and add a new element smaller than the target at the end,
+// and the output should be 0 (target not found) if the array is not empty.
 TEST_P(BSearchParamTest, MR46) {
-    BSearch2Input input = GetParam();
+    /* Get input data */
+    BSearchInput input = GetParam();
     std::vector<int> vec = input.vec;
     int target = input.target;
 
-    // Get origin output
+    /* Get origin output */
     int origin_out = p(vec, target, vec.size());
 
-    // Construct follow-up input (change the order, frequency, and replace a subset not containing the target with the same elements in reverse order)
-    std::vector<int> follow_vec = vec;
-    std::sort(follow_vec.begin(), follow_vec.end());
+    /* Construct follow-up input */
+    std::sort(vec.begin(), vec.end(), std::greater<int>());
+    int newElement = target - 1;
+    vec.push_back(newElement);
 
-    // Increase the frequency of the target
-    follow_vec.insert(follow_vec.end(), {target, target});
+    /* Get follow-up output */
+    int follow_out = (vec.empty()) ? 0 : p(vec, target, vec.size());
 
-    // Shuffle the repeated occurrences
-    auto target_range = std::equal_range(follow_vec.begin(), follow_vec.end(), target);
-    std::random_shuffle(target_range.first, target_range.second);
-
-    // Replace a subset not containing the target with the same elements in reverse order
-    std::reverse(follow_vec.begin() + 1, follow_vec.begin() + 4);
-
-    // Get follow-up output
-    int follow_out = p(follow_vec, target, follow_vec.size());
-
-    // Verification
+    /* Verification */
     EXPECT_EQ(origin_out, follow_out);
 }
-
-// Define the parameterized test suite
-INSTANTIATE_TEST_SUITE_P(
-    BSearchTests,
-    BSearchParamTest,
-    testing::Values(
-        // Add your test cases here using BSearch2Input
-    )
-);
 ```
 
-These metamorphic relations involve scenarios where the order, frequency, and swapping or replacement of elements within the array are changed. Adjust them based on your specific requirements and binary search implementation.
+In `MR45`, the target element is inserted at random positions in the array. The expectation is that the output of the binary search function is 1 (target found) if the array is not empty.
+
+In `MR46`, the array is sorted in descending order, and a new element smaller than the target is added at the end. The expectation is that the output of the binary search function is 0 (target not found) if the array is not empty.
+
+These metamorphic relations provide additional scenarios where modifications are made to the array, affecting the presence or values of the target element. Adjust them based on your specific testing needs and implementation details.
 
 <br>
 
-#### User
+### User
 
 Please generate more different metamorphic relations.
 
@@ -2227,105 +1599,60 @@ Please generate more different metamorphic relations.
 
 #### ChatGPT
 
-Certainly! Here are two more metamorphic relations for the binary search function `p`:
-
-### Metamorphic Relation 47:
-
-If the array has repeated occurrences of the target, changing the order of the repeated occurrences while modifying their frequency and replacing a subset containing the target with a subset not containing the target should not change the output.
+Certainly! Here are two more metamorphic relations for the binary search function:
 
 ```cpp
+// Metamorphic relation 47: Shuffle the array randomly, and the output should remain the same.
 TEST_P(BSearchParamTest, MR47) {
-    BSearch2Input input = GetParam();
+    /* Get input data */
+    BSearchInput input = GetParam();
     std::vector<int> vec = input.vec;
     int target = input.target;
 
-    // Get origin output
+    /* Get origin output */
     int origin_out = p(vec, target, vec.size());
 
-    // Construct follow-up input (change the order, frequency, and replace a subset containing the target with a subset not containing the target)
-    std::vector<int> follow_vec = vec;
-    std::sort(follow_vec.begin(), follow_vec.end());
+    /* Construct follow-up input */
+    std::random_shuffle(vec.begin(), vec.end());
 
-    // Increase the frequency of the target
-    follow_vec.insert(follow_vec.end(), {target, target});
+    /* Get follow-up output */
+    int follow_out = p(vec, target, vec.size());
 
-    // Shuffle the repeated occurrences
-    auto target_range = std::equal_range(follow_vec.begin(), follow_vec.end(), target);
-    std::random_shuffle(target_range.first, target_range.second);
-
-    // Replace a subset containing the target with a subset not containing the target
-    std::vector<int> replacement_subset = {1, 2, 3};
-    follow_vec.erase(target_range.first, target_range.second);
-    follow_vec.insert(target_range.first, replacement_subset.begin(), replacement_subset.end());
-
-    // Get follow-up output
-    int follow_out = p(follow_vec, target, follow_vec.size());
-
-    // Verification
+    /* Verification */
     EXPECT_EQ(origin_out, follow_out);
 }
 
-// Define the parameterized test suite
-INSTANTIATE_TEST_SUITE_P(
-    BSearchTests,
-    BSearchParamTest,
-    testing::Values(
-        // Add your test cases here using BSearch2Input
-    )
-);
-```
-
-### Metamorphic Relation 48:
-
-If the array has repeated occurrences of the target, changing the order of the repeated occurrences while modifying their frequency and replacing a subset not containing the target with a subset containing the target should not change the output.
-
-```cpp
+// Metamorphic relation 48: Remove all elements in the array that are smaller than the target,
+// and the output should remain the same unless the target was the smallest element.
 TEST_P(BSearchParamTest, MR48) {
-    BSearch2Input input = GetParam();
+    /* Get input data */
+    BSearchInput input = GetParam();
     std::vector<int> vec = input.vec;
     int target = input.target;
 
-    // Get origin output
+    /* Get origin output */
     int origin_out = p(vec, target, vec.size());
 
-    // Construct follow-up input (change the order, frequency, and replace a subset not containing the target with a subset containing the target)
-    std::vector<int> follow_vec = vec;
-    std::sort(follow_vec.begin(), follow_vec.end());
+    /* Construct follow-up input */
+    vec.erase(std::remove_if(vec.begin(), vec.end(), [target](int val) { return val < target; }), vec.end());
 
-    // Increase the frequency of the target
-    follow_vec.insert(follow_vec.end(), {target, target});
+    /* Get follow-up output */
+    int follow_out = (target == *std::min_element(vec.begin(), vec.end())) ? 1 : p(vec, target, vec.size());
 
-    // Shuffle the repeated occurrences
-    auto target_range = std::equal_range(follow_vec.begin(), follow_vec.end(), target);
-    std::random_shuffle(target_range.first, target_range.second);
-
-    // Replace a subset not containing the target with a subset containing the target
-    std::vector<int> replacement_subset = {target, target};
-    follow_vec.erase(target_range.first, target_range.second);
-    follow_vec.insert(target_range.first, replacement_subset.begin(), replacement_subset.end());
-
-    // Get follow-up output
-    int follow_out = p(follow_vec, target, follow_vec.size());
-
-    // Verification
+    /* Verification */
     EXPECT_EQ(origin_out, follow_out);
 }
-
-// Define the parameterized test suite
-INSTANTIATE_TEST_SUITE_P(
-    BSearchTests,
-    BSearchParamTest,
-    testing::Values(
-        // Add your test cases here using BSearch2Input
-    )
-);
 ```
 
-These metamorphic relations involve scenarios where the order, frequency, and replacement or addition of subsets within the array are changed. Adjust them based on your specific requirements and binary search implementation.
+In `MR47`, the array is shuffled randomly. The expectation is that the output of the binary search function remains the same.
+
+In `MR48`, all elements in the array that are smaller than the target are removed. The expectation is that the output of the binary search function remains the same unless the target was the smallest element.
+
+These metamorphic relations introduce scenarios where the array is modified by shuffling or removing elements, testing the binary search function's behavior under different transformations. Adjust them based on your specific testing needs and implementation details.
 
 <br>
 
-#### User
+### User
 
 Please generate more different metamorphic relations.
 
@@ -2333,94 +1660,57 @@ Please generate more different metamorphic relations.
 
 #### ChatGPT
 
-Certainly! Here are two more metamorphic relations for the binary search function `p`:
-
-### Metamorphic Relation 49:
-
-If the array has repeated occurrences of the target, changing the order of the repeated occurrences while modifying their frequency and replacing a subset containing the target with a reversed version of that subset should not change the output.
+Certainly! Here are two more metamorphic relations for the binary search function:
 
 ```cpp
+// Metamorphic relation 49: Duplicate all elements in the array and the target element,
+// and the output should remain the same.
 TEST_P(BSearchParamTest, MR49) {
-    BSearch2Input input = GetParam();
+    /* Get input data */
+    BSearchInput input = GetParam();
     std::vector<int> vec = input.vec;
     int target = input.target;
 
-    // Get origin output
+    /* Get origin output */
     int origin_out = p(vec, target, vec.size());
 
-    // Construct follow-up input (change the order, frequency, and replace a subset containing the target with a reversed version of that subset)
-    std::vector<int> follow_vec = vec;
-    std::sort(follow_vec.begin(), follow_vec.end());
+    /* Construct follow-up input */
+    vec.insert(vec.end(), vec.begin(), vec.end());
+    int follow_target = target;
 
-    // Increase the frequency of the target
-    follow_vec.insert(follow_vec.end(), {target, target});
+    /* Get follow-up output */
+    int follow_out = p(vec, follow_target, vec.size());
 
-    // Shuffle the repeated occurrences
-    auto target_range = std::equal_range(follow_vec.begin(), follow_vec.end(), target);
-    std::random_shuffle(target_range.first, target_range.second);
-
-    // Replace a subset containing the target with a reversed version of that subset
-    std::reverse(target_range.first, target_range.second);
-
-    // Get follow-up output
-    int follow_out = p(follow_vec, target, follow_vec.size());
-
-    // Verification
+    /* Verification */
     EXPECT_EQ(origin_out, follow_out);
 }
 
-// Define the parameterized test suite
-INSTANTIATE_TEST_SUITE_P(
-    BSearchTests,
-    BSearchParamTest,
-    testing::Values(
-        // Add your test cases here using BSearch2Input
-    )
-);
-```
-
-### Metamorphic Relation 50:
-
-If the array has repeated occurrences of the target, changing the order of the repeated occurrences while modifying their frequency and replacing a subset not containing the target with a reversed version of that subset should not change the output.
-
-```cpp
+// Metamorphic relation 50: Replace all elements in the array with a constant value,
+// and the output should remain the same unless the target was the constant value.
 TEST_P(BSearchParamTest, MR50) {
-    BSearch2Input input = GetParam();
+    /* Get input data */
+    BSearchInput input = GetParam();
     std::vector<int> vec = input.vec;
     int target = input.target;
 
-    // Get origin output
+    /* Get origin output */
     int origin_out = p(vec, target, vec.size());
 
-    // Construct follow-up input (change the order, frequency, and replace a subset not containing the target with a reversed version of that subset)
-    std::vector<int> follow_vec = vec;
-    std::sort(follow_vec.begin(), follow_vec.end());
+    /* Construct follow-up input */
+    int constant = 42;
+    std::fill(vec.begin(), vec.end(), constant);
+    int follow_target = (target == constant) ? target : 0; // Set target to constant value if it was already
 
-    // Increase the frequency of the target
-    follow_vec.insert(follow_vec.end(), {target, target});
+    /* Get follow-up output */
+    int follow_out = p(vec, follow_target, vec.size());
 
-    // Shuffle the repeated occurrences
-    auto target_range = std::equal_range(follow_vec.begin(), follow_vec.end(), target);
-    std::random_shuffle(target_range.first, target_range.second);
-
-    // Replace a subset not containing the target with a reversed version of that subset
-    std::reverse(follow_vec.begin() + 1, follow_vec.begin() + 4);
-
-    // Get follow-up output
-    int follow_out = p(follow_vec, target, follow_vec.size());
-
-    // Verification
+    /* Verification */
     EXPECT_EQ(origin_out, follow_out);
 }
-
-// Define the parameterized test suite
-INSTANTIATE_TEST_SUITE_P(
-    BSearchTests,
-    BSearchParamTest,
-    testing::Values(
-        // Add your test cases here using BSearch2Input
-    )
-);
 ```
 
-These metamorphic relations involve scenarios where the order, frequency, and replacement or reversal of subsets within the array are changed. Adjust them based on your specific requirements and binary search implementation.
+In `MR49`, all elements in the array and the target element are duplicated. The expectation is that the output of the binary search function remains the same.
+
+In `MR50`, all elements in the array are replaced with a constant value. The expectation is that the output of the binary search function remains the same unless the target was the constant value.
+
+These metamorphic relations introduce scenarios where the array is modified by duplication or replacement of elements, testing the binary search function's behavior under different transformations. Adjust them based on your specific testing needs and implementation details.

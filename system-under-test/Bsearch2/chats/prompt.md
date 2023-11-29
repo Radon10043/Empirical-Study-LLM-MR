@@ -4,9 +4,9 @@ Assume there is a trigonometric function sin(x), a source input x1, and a corres
 
 Next, you need to identify the metamorphic relation of the function `p`. The specification of this function is as follows:
 
-- The function implements the binary search algorithm to find the occurrence index of the specific element in the ascending array.
+- The function implements the binary search algorithm to determine whether the specific element occurs in the ascending array.
 - The function's input is 2 variables: `vec` and `target`, representing an ascending array and the element to be searched, respectively.
-- The function's return value is an integer representing the occurrence index of `target` in `vec`. If `target` does not occur in `vec`, the function returns -1.
+- The function's return value is an integer representing whether `target` occurs in `vec`. If `target` does not occur in `vec`, the function returns 0; otherwise returns 1.
 - If elements in `vec` are changed, `vec` must also remain in ascending order.
 
 Please identify the metamorphic relation of this function as much as possible and use Google's C++ testing and mocking framework `googletest` to codify them as C++ code.
@@ -26,7 +26,7 @@ TEST_P(BSearchParamTest, MR1) {
     /* Get origin output */
     int origin_out = p(vec, target, vec.size());
 
-    if (origin_out == -1) return;
+    if (!origin_out) return;
 
     /* Construct follow-up input */
     vector<int> follow_vec = vec;
@@ -40,8 +40,7 @@ TEST_P(BSearchParamTest, MR1) {
 }
 
 /**
- * Metamorphic relation 2: Multiply all elements in the array and the element to be located by a constant,
- * the output should remain the same.
+ * Metamorphic relation 2: Multiply all elements in the array and the element to be located by a constant, the output should remain the same.
  */
 TEST_P(BSearchParamTest, MR2) {
     /* Get input data */

@@ -27,7 +27,7 @@ TEST_P(BSearchParamTest, MR1) {
     /* Get origin output */
     int origin_out = p(vec, target, vec.size());
 
-    if (origin_out == -1) return;
+    if (!origin_out) return;
 
     /* Construct follow-up input */
     vector<int> follow_vec = vec;
@@ -41,8 +41,7 @@ TEST_P(BSearchParamTest, MR1) {
 }
 
 /**
- * Metamorphic relation 2: Multiply all elements in the array and the element to be located by a constant,
- * the output should remain the same.
+ * Metamorphic relation 2: Multiply all elements in the array and the element to be located by a constant, the output should remain the same.
  */
 TEST_P(BSearchParamTest, MR2) {
     /* Get input data */
@@ -62,30 +61,6 @@ TEST_P(BSearchParamTest, MR2) {
 
     /* Get follow-up output */
     int follow_out = p(follow_vec, follow_target, follow_vec.size());
-
-    /* Verification */
-    EXPECT_EQ(origin_out, follow_out);
-}
-
-/**
- * Metamorphic relation 3: Add an element greater than the target to the array, then perform a binary search for the target in the array.
- * The output should remain the same.
- */
-TEST_P(BSearchParamTest, MR3) {
-    /* Get input data */
-    BSearch2Input input = GetParam();
-    vector<int> vec = input.vec;
-    int target = input.target;
-
-    /* Get origin output */
-    int origin_out = p(vec, target, vec.size());
-
-    /* Construct follow-up input */
-    vector<int> follow_vec = vec;
-    follow_vec.push_back(target + 1);
-
-    /* Get follow-up output */
-    int follow_out = p(follow_vec, target, follow_vec.size());
 
     /* Verification */
     EXPECT_EQ(origin_out, follow_out);

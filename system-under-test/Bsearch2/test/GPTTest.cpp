@@ -17,1402 +17,1129 @@ typedef struct BSearch2Input {
 
 class BSearchParamTest : public ::testing::TestWithParam<BSearch2Input> {};
 
-/**
- * Metamorphic relation 1: If the target value is already in the array, add an element greater than the max value in the array to the end of the array, and the output should be unchanged.
- */
+// Metamorphic relation 1: If the target value is already in the array,
+// add an element greater than the max value in the array to the end of the array,
+// and the output should be unchanged.
 TEST_P(BSearchParamTest, MR1) {
+    /* Get input data */
     BSearch2Input input = GetParam();
     vector<int> vec = input.vec;
     int target = input.target;
 
-    // Get origin output
+    /* Get origin output */
     int origin_out = p(vec, target, vec.size());
 
-    if (origin_out == -1)
-        return;
+    if (!origin_out) return;
 
-    // Construct follow-up input
+    /* Construct follow-up input */
     vector<int> follow_vec = vec;
     follow_vec.emplace_back(vec.back() + 1);
 
-    // Get follow-up output
+    /* Get follow-up output */
     int follow_out = p(follow_vec, target, follow_vec.size());
 
-    // Verification
+    /* Verification */
     EXPECT_EQ(origin_out, follow_out);
 }
 
-/**
- * Metamorphic relation 2: Multiply all elements in the array and the element to be located by a constant, the output should remain the same.
- */
+// Metamorphic relation 2: Multiply all elements in the array and the element to be located
+// by a constant, the output should remain the same.
 TEST_P(BSearchParamTest, MR2) {
+    /* Get input data */
     BSearch2Input input = GetParam();
     vector<int> vec = input.vec;
     int target = input.target;
 
-    // Get origin output
+    /* Get origin output */
     int origin_out = p(vec, target, vec.size());
 
-    // Construct follow-up input
+    /* Construct follow-up input */
     int constant = 2;
     vector<int> follow_vec = vec;
-    for (int &val : follow_vec)
+    for (int& val : follow_vec)
         val *= constant;
     int follow_target = target * constant;
 
-    // Get follow-up output
+    /* Get follow-up output */
     int follow_out = p(follow_vec, follow_target, follow_vec.size());
 
-    // Verification
+    /* Verification */
     EXPECT_EQ(origin_out, follow_out);
 }
 
-/**
- * Metamorphic relation 3: If the target value is not in the array, append the target to the end of the array, and the output should be -1.
- */
+// Metamorphic relation 3: Reverse the order of elements in the array,
+// and the output should remain the same.
 TEST_P(BSearchParamTest, MR3) {
+    /* Get input data */
     BSearch2Input input = GetParam();
     vector<int> vec = input.vec;
     int target = input.target;
 
-    // Get origin output
+    /* Get origin output */
     int origin_out = p(vec, target, vec.size());
 
-    if (origin_out != -1)
-        return;
+    /* Construct follow-up input */
+    reverse(vec.begin(), vec.end());
 
-    // Construct follow-up input
-    vector<int> follow_vec = vec;
-    follow_vec.emplace_back(target);
-
-    // Get follow-up output
-    int follow_out = p(follow_vec, target, follow_vec.size());
-
-    // Verification
-    EXPECT_EQ(-1, follow_out);
-}
-
-/**
- * Metamorphic relation 4: Reverse the array and the target, the output should remain the same.
- */
-TEST_P(BSearchParamTest, MR4) {
-    BSearch2Input input = GetParam();
-    vector<int> vec = input.vec;
-    int target = input.target;
-
-    // Get origin output
-    int origin_out = p(vec, target, vec.size());
-
-    // Construct follow-up input
-    vector<int> follow_vec = vec;
-    reverse(follow_vec.begin(), follow_vec.end());
-    int follow_target = -target; // Assuming target is positive
-
-    // Get follow-up output
-    int follow_out = p(follow_vec, follow_target, follow_vec.size());
-
-    // Verification
-    EXPECT_EQ(origin_out, follow_out);
-}
-
-/**
- * Metamorphic relation 5: If the array is empty, the output should always be -1, regardless of the target value.
- */
-TEST_P(BSearchParamTest, MR5) {
-#ifndef SKIP_CRASH
-    // Construct an empty array
-    vector<int> vec;
-    int target = 42; // Choose any target value
-
-    // Get output for the empty array
-    int origin_out = p(vec, target, vec.size());
-
-    // Construct follow-up input (add any value to the empty array)
-    vec.push_back(0);
-
-    // Get follow-up output
+    /* Get follow-up output */
     int follow_out = p(vec, target, vec.size());
 
-    // Verification
-    EXPECT_EQ(-1, origin_out);
-    EXPECT_EQ(-1, follow_out);
-#endif
-}
-
-/**
- * Metamorphic relation 6: If all elements in the array are multiplied by a constant, the target should also be multiplied by the same constant, and the output should remain the same.
- */
-TEST_P(BSearchParamTest, MR6) {
-    BSearch2Input input = GetParam();
-    vector<int> vec = input.vec;
-    int target = input.target;
-
-    // Get origin output
-    int origin_out = p(vec, target, vec.size());
-
-    // Construct follow-up input (multiply array and target by a constant)
-    int constant = 3;
-    vector<int> follow_vec = vec;
-    for (int &val : follow_vec)
-        val *= constant;
-    int follow_target = target * constant;
-
-    // Get follow-up output
-    int follow_out = p(follow_vec, follow_target, follow_vec.size());
-
-    // Verification
+    /* Verification */
     EXPECT_EQ(origin_out, follow_out);
 }
 
-/**
- * Metamorphic relation 7: If all elements in the array are incremented by a constant, the target should also be incremented by the same constant, and the output should remain the same.
- */
-TEST_P(BSearchParamTest, MR7) {
+// Metamorphic relation 4: Add a constant to all elements in the array
+// and to the element to be located, the output should remain the same.
+TEST_P(BSearchParamTest, MR4) {
+    /* Get input data */
     BSearch2Input input = GetParam();
     vector<int> vec = input.vec;
     int target = input.target;
 
-    // Get origin output
+    /* Get origin output */
     int origin_out = p(vec, target, vec.size());
 
-    // Construct follow-up input (increment array and target by a constant)
+    /* Construct follow-up input */
     int constant = 5;
     vector<int> follow_vec = vec;
-    for (int &val : follow_vec)
+    for (int& val : follow_vec)
         val += constant;
     int follow_target = target + constant;
 
-    // Get follow-up output
+    /* Get follow-up output */
     int follow_out = p(follow_vec, follow_target, follow_vec.size());
 
-    // Verification
+    /* Verification */
     EXPECT_EQ(origin_out, follow_out);
 }
 
-/**
- * Metamorphic relation 8: If the array has duplicate elements, removing duplicates from the array should not change the output.
- */
+// Metamorphic relation 5: Replace all elements in the array with their squares,
+// and square the element to be located, the output should remain the same.
+TEST_P(BSearchParamTest, MR5) {
+    /* Get input data */
+    BSearch2Input input = GetParam();
+    vector<int> vec = input.vec;
+    int target = input.target;
+
+    /* Get origin output */
+    int origin_out = p(vec, target, vec.size());
+
+    /* Construct follow-up input */
+    transform(vec.begin(), vec.end(), vec.begin(),
+                   [](int val) { return val * val; });
+    int follow_target = target * target;
+
+    /* Get follow-up output */
+    int follow_out = p(vec, follow_target, vec.size());
+
+    /* Verification */
+    EXPECT_EQ(origin_out, follow_out);
+}
+
+// Metamorphic relation 6: Remove the first element from the array,
+// and the element to be located is not present in the modified array,
+// the output should be 0 (not found).
+TEST_P(BSearchParamTest, MR6) {
+    /* Get input data */
+    BSearch2Input input = GetParam();
+    vector<int> vec = input.vec;
+    int target = input.target;
+
+    /* Get origin output */
+    int origin_out = p(vec, target, vec.size());
+
+    /* Construct follow-up input */
+    if (!vec.empty()) {
+        vec.erase(vec.begin());
+    }
+
+    /* Get follow-up output */
+    int follow_out = p(vec, target, vec.size());
+
+    /* Verification */
+    EXPECT_EQ(0, follow_out);
+}
+
+// Metamorphic relation 7: Swap the positions of the first and last elements in the array,
+// and the output should remain the same.
+TEST_P(BSearchParamTest, MR7) {
+    /* Get input data */
+    BSearch2Input input = GetParam();
+    vector<int> vec = input.vec;
+    int target = input.target;
+
+    /* Get origin output */
+    int origin_out = p(vec, target, vec.size());
+
+    /* Construct follow-up input */
+    if (vec.size() >= 2) {
+        swap(vec.front(), vec.back());
+    }
+
+    /* Get follow-up output */
+    int follow_out = p(vec, target, vec.size());
+
+    /* Verification */
+    EXPECT_EQ(origin_out, follow_out);
+}
+
+// Metamorphic relation 8: Shuffle the elements randomly in the array,
+// and the output should remain the same.
 TEST_P(BSearchParamTest, MR8) {
+    /* Get input data */
     BSearch2Input input = GetParam();
     vector<int> vec = input.vec;
     int target = input.target;
 
-    // Get origin output
+    /* Get origin output */
     int origin_out = p(vec, target, vec.size());
 
-    // Construct follow-up input (remove duplicates from the array)
-    sort(vec.begin(), vec.end());
-    vec.erase(unique(vec.begin(), vec.end()), vec.end());
-
-    // Get follow-up output
-    int follow_out = p(vec, target, vec.size());
-
-    // Verification
-    EXPECT_EQ(origin_out, follow_out);
-}
-
-/**
- * Metamorphic relation 9: If the array is initially unsorted, sorting the array should not change the output.
- */
-TEST_P(BSearchParamTest, MR9) {
-    BSearch2Input input = GetParam();
-    vector<int> vec = input.vec;
-    int target = input.target;
-
-    // Get origin output
-    int origin_out = p(vec, target, vec.size());
-
-    // Construct follow-up input (sort the array)
-    sort(vec.begin(), vec.end());
-
-    // Get follow-up output
-    int follow_out = p(vec, target, vec.size());
-
-    // Verification
-    EXPECT_EQ(origin_out, follow_out);
-}
-
-/**
- * Metamorphic relation 10: If the array is rotated, the output should remain the same.
- */
-TEST_P(BSearchParamTest, MR10) {
-    BSearch2Input input = GetParam();
-    vector<int> vec = input.vec;
-    int target = input.target;
-
-    // Get origin output
-    int origin_out = p(vec, target, vec.size());
-
-    // Construct follow-up input (rotate the array)
-    rotate(vec.begin(), vec.begin() + 1, vec.end()); // rotate one position to the right
-
-    // Get follow-up output
-    int follow_out = p(vec, target, vec.size());
-
-    // Verification
-    EXPECT_EQ(origin_out, follow_out);
-}
-
-/**
- * Metamorphic relation 11: If the array has repeated occurrences of the target, removing one or more occurrences should not change the output.
- */
-TEST_P(BSearchParamTest, MR11) {
-    BSearch2Input input = GetParam();
-    vector<int> vec = input.vec;
-    int target = input.target;
-
-    // Get origin output
-    int origin_out = p(vec, target, vec.size());
-
-    // Construct follow-up input (remove one or more occurrences of the target)
-    auto it = remove(vec.begin(), vec.end(), target);
-    vec.erase(it, vec.end());
-
-    // Get follow-up output
-    int follow_out = p(vec, target, vec.size());
-
-    // Verification
-    EXPECT_EQ(origin_out, follow_out);
-}
-
-/**
- * Metamorphic relation 12: If the array has repeated occurrences of the target, increasing the number of occurrences should not change the output.
- */
-TEST_P(BSearchParamTest, MR12) {
-    BSearch2Input input = GetParam();
-    vector<int> vec = input.vec;
-    int target = input.target;
-
-    // Get origin output
-    int origin_out = p(vec, target, vec.size());
-
-    // Construct follow-up input (increase the number of occurrences of the target)
-    vec.push_back(target);
-
-    // Get follow-up output
-    int follow_out = p(vec, target, vec.size());
-
-    // Verification
-    EXPECT_EQ(origin_out, follow_out);
-}
-
-/**
- * Metamorphic relation 13: If the array has duplicate elements, replacing one occurrence of the target with a different value should not change the output.
- */
-TEST_P(BSearchParamTest, MR13) {
-    BSearch2Input input = GetParam();
-    vector<int> vec = input.vec;
-    int target = input.target;
-
-    // Get origin output
-    int origin_out = p(vec, target, vec.size());
-
-    // Find one occurrence of the target and replace it with a different value
-    auto it = find(vec.begin(), vec.end(), target);
-    if (it != vec.end()) {
-        *it = target + 1; // Replace with a different value
-    }
-
-    // Get follow-up output
-    int follow_out = p(vec, target, vec.size());
-
-    // Verification
-    EXPECT_EQ(origin_out, follow_out);
-}
-
-/**
- * Metamorphic relation 14: If the array has duplicate elements, swapping the positions of two occurrences of the target should not change the output.
- */
-TEST_P(BSearchParamTest, MR14) {
-    BSearch2Input input = GetParam();
-    vector<int> vec = input.vec;
-    int target = input.target;
-
-    // Get origin output
-    int origin_out = p(vec, target, vec.size());
-
-    // Find two occurrences of the target and swap their positions
-    auto it1 = find(vec.begin(), vec.end(), target);
-    auto it2 = find(it1 + 1, vec.end(), target);
-    if (it1 != vec.end() && it2 != vec.end()) {
-        iter_swap(it1, it2);
-    }
-
-    // Get follow-up output
-    int follow_out = p(vec, target, vec.size());
-
-    // Verification
-    EXPECT_EQ(origin_out, follow_out);
-}
-
-/**
- * Metamorphic relation 15: If the array has repeated occurrences of the target, reversing the order of the array should not change the output.
- */
-TEST_P(BSearchParamTest, MR15) {
-    BSearch2Input input = GetParam();
-    vector<int> vec = input.vec;
-    int target = input.target;
-
-    // Get origin output
-    int origin_out = p(vec, target, vec.size());
-
-    // Construct follow-up input (reverse the order of the array)
-    reverse(vec.begin(), vec.end());
-
-    // Get follow-up output
-    int follow_out = p(vec, target, vec.size());
-
-    // Verification
-    EXPECT_EQ(origin_out, follow_out);
-}
-
-/**
- * Metamorphic relation 16: If the array has repeated occurrences of the target, shuffling the elements of the array should not change the output.
- */
-TEST_P(BSearchParamTest, MR16) {
-    BSearch2Input input = GetParam();
-    vector<int> vec = input.vec;
-    int target = input.target;
-
-    // Get origin output
-    int origin_out = p(vec, target, vec.size());
-
-    // Construct follow-up input (shuffle the elements of the array)
+    /* Construct follow-up input */
     random_shuffle(vec.begin(), vec.end());
 
-    // Get follow-up output
+    /* Get follow-up output */
     int follow_out = p(vec, target, vec.size());
 
-    // Verification
+    /* Verification */
     EXPECT_EQ(origin_out, follow_out);
 }
 
-/**
- * Metamorphic relation 17: If the array has repeated occurrences of the target, adding a prefix or suffix to the array should not change the output.
- */
-TEST_P(BSearchParamTest, MR17) {
+// Metamorphic relation 9: Add a duplicate of the target element to the array,
+// and the output should remain the same.
+TEST_P(BSearchParamTest, MR9) {
+    /* Get input data */
     BSearch2Input input = GetParam();
     vector<int> vec = input.vec;
     int target = input.target;
 
-    // Get origin output
+    /* Get origin output */
     int origin_out = p(vec, target, vec.size());
 
-    // Construct follow-up input (add a prefix or suffix to the array)
-    vector<int> follow_vec_prefix = {1, 2, 3}; // Prefix
-    follow_vec_prefix.insert(follow_vec_prefix.end(), vec.begin(), vec.end());
+    /* Construct follow-up input */
+    vec.push_back(target);
 
-    vector<int> follow_vec_suffix = vec; // Suffix
-    vector<int> tmp = {4, 5, 6};
-    follow_vec_suffix.insert(follow_vec_suffix.end(), tmp.begin(), tmp.end());
+    /* Get follow-up output */
+    int follow_out = p(vec, target, vec.size());
 
-    // Get follow-up outputs
-    int follow_out_prefix = p(follow_vec_prefix, target, follow_vec_prefix.size());
-    int follow_out_suffix = p(follow_vec_suffix, target, follow_vec_suffix.size());
-
-    // Verification
-    EXPECT_EQ(origin_out, follow_out_prefix);
-    EXPECT_EQ(origin_out, follow_out_suffix);
-}
-
-/**
- * Metamorphic relation 18: If the array has repeated occurrences of the target, changing the order of the repeated occurrences while maintaining their frequency should not change the output.
- */
-TEST_P(BSearchParamTest, MR18) {
-    BSearch2Input input = GetParam();
-    vector<int> vec = input.vec;
-    int target = input.target;
-
-    // Get origin output
-    int origin_out = p(vec, target, vec.size());
-
-    // Construct follow-up input (change the order of repeated occurrences)
-    vector<int> follow_vec = vec;
-    random_shuffle(follow_vec.begin(), follow_vec.end());
-
-    // Get follow-up output
-    int follow_out = p(follow_vec, target, follow_vec.size());
-
-    // Verification
+    /* Verification */
     EXPECT_EQ(origin_out, follow_out);
 }
 
-/**
- * Metamorphic relation 19: If the array is multiplied by a constant factor, the target should be multiplied by the same factor, and the output should remain the same.
- */
-TEST_P(BSearchParamTest, MR19) {
+// Metamorphic relation 10: Subtract a constant from all elements in the array
+// and from the element to be located, the output should remain the same.
+TEST_P(BSearchParamTest, MR10) {
+    /* Get input data */
     BSearch2Input input = GetParam();
     vector<int> vec = input.vec;
     int target = input.target;
 
-    // Get origin output
+    /* Get origin output */
     int origin_out = p(vec, target, vec.size());
 
-    // Construct follow-up input (multiply array and target by a constant)
+    /* Construct follow-up input */
     int constant = 3;
     vector<int> follow_vec = vec;
-    for (int &val : follow_vec)
-        val *= constant;
-    int follow_target = target * constant;
+    for (int& val : follow_vec)
+        val -= constant;
+    int follow_target = target - constant;
 
-    // Get follow-up output
+    /* Get follow-up output */
     int follow_out = p(follow_vec, follow_target, follow_vec.size());
 
-    // Verification
+    /* Verification */
     EXPECT_EQ(origin_out, follow_out);
 }
 
-/**
- * Metamorphic relation 20: If the array is empty, adding elements to the array should not change the output.
- */
+// Metamorphic relation 11: Rotate the array to the right by one position,
+// and the output should remain the same.
+TEST_P(BSearchParamTest, MR11) {
+    /* Get input data */
+    BSearch2Input input = GetParam();
+    vector<int> vec = input.vec;
+    int target = input.target;
+
+    /* Get origin output */
+    int origin_out = p(vec, target, vec.size());
+
+    /* Construct follow-up input */
+    if (!vec.empty()) {
+        rotate(vec.rbegin(), vec.rbegin() + 1, vec.rend());
+    }
+
+    /* Get follow-up output */
+    int follow_out = p(vec, target, vec.size());
+
+    /* Verification */
+    EXPECT_EQ(origin_out, follow_out);
+}
+
+// Metamorphic relation 12: Insert the target element at the beginning of the array,
+// and the output should be 1 (target found) since it is now the first element.
+TEST_P(BSearchParamTest, MR12) {
+    /* Get input data */
+    BSearch2Input input = GetParam();
+    vector<int> vec = input.vec;
+    int target = input.target;
+
+    /* Get origin output */
+    int origin_out = p(vec, target, vec.size());
+
+    /* Construct follow-up input */
+    vec.insert(vec.begin(), target);
+
+    /* Get follow-up output */
+    int follow_out = p(vec, target, vec.size());
+
+    /* Verification */
+    EXPECT_EQ(1, follow_out);
+}
+
+// Metamorphic relation 13: Reverse the order of the array and negate all elements,
+// and the output should remain the same.
+TEST_P(BSearchParamTest, MR13) {
+    /* Get input data */
+    BSearch2Input input = GetParam();
+    vector<int> vec = input.vec;
+    int target = input.target;
+
+    /* Get origin output */
+    int origin_out = p(vec, target, vec.size());
+
+    /* Construct follow-up input */
+    reverse(vec.begin(), vec.end());
+    transform(vec.begin(), vec.end(), vec.begin(), negate<int>());
+
+    /* Get follow-up output */
+    int follow_out = p(vec, target, vec.size());
+
+    /* Verification */
+    EXPECT_EQ(origin_out, follow_out);
+}
+
+// Metamorphic relation 14: Multiply all elements in the array by a constant,
+// and double the target element, the output should remain the same.
+TEST_P(BSearchParamTest, MR14) {
+    /* Get input data */
+    BSearch2Input input = GetParam();
+    vector<int> vec = input.vec;
+    int target = input.target;
+
+    /* Get origin output */
+    int origin_out = p(vec, target, vec.size());
+
+    /* Construct follow-up input */
+    int constant = 3;
+    vector<int> follow_vec = vec;
+    transform(follow_vec.begin(), follow_vec.end(), follow_vec.begin(),
+                   [constant](int val) { return val * constant; });
+    int follow_target = target * 2;
+
+    /* Get follow-up output */
+    int follow_out = p(follow_vec, follow_target, follow_vec.size());
+
+    /* Verification */
+    EXPECT_EQ(origin_out, follow_out);
+}
+
+// Metamorphic relation 15: Insert a new element greater than the target at the beginning of the array,
+// and the output should remain the same.
+TEST_P(BSearchParamTest, MR15) {
+    /* Get input data */
+    BSearch2Input input = GetParam();
+    vector<int> vec = input.vec;
+    int target = input.target;
+
+    /* Get origin output */
+    int origin_out = p(vec, target, vec.size());
+
+    /* Construct follow-up input */
+    int newElement = target + 1;
+    vec.insert(vec.begin(), newElement);
+
+    /* Get follow-up output */
+    int follow_out = p(vec, target, vec.size());
+
+    /* Verification */
+    EXPECT_EQ(origin_out, follow_out);
+}
+
+// Metamorphic relation 16: Replace all occurrences of the target element with a new element,
+// and the output should be 0 (target not found) as the target is not present in the modified array.
+TEST_P(BSearchParamTest, MR16) {
+    /* Get input data */
+    BSearch2Input input = GetParam();
+    vector<int> vec = input.vec;
+    int target = input.target;
+
+    /* Get origin output */
+    int origin_out = p(vec, target, vec.size());
+
+    /* Construct follow-up input */
+    int newElement = target + 1;
+    replace(vec.begin(), vec.end(), target, newElement);
+
+    /* Get follow-up output */
+    int follow_out = p(vec, target, vec.size());
+
+    /* Verification */
+    EXPECT_EQ(0, follow_out);
+}
+
+// Metamorphic relation 17: Remove all occurrences of the target element from the array,
+// and the output should be 0 (target not found) as the target is not present in the modified array.
+TEST_P(BSearchParamTest, MR17) {
+    /* Get input data */
+    BSearch2Input input = GetParam();
+    vector<int> vec = input.vec;
+    int target = input.target;
+
+    /* Get origin output */
+    int origin_out = p(vec, target, vec.size());
+
+    /* Construct follow-up input */
+    vec.erase(remove(vec.begin(), vec.end(), target), vec.end());
+
+    /* Get follow-up output */
+    int follow_out = p(vec, target, vec.size());
+
+    /* Verification */
+    EXPECT_EQ(0, follow_out);
+}
+
+// Metamorphic relation 18: Remove the last element from the array,
+// and the output should remain the same unless the target was the last element.
+TEST_P(BSearchParamTest, MR18) {
+    /* Get input data */
+    BSearch2Input input = GetParam();
+    vector<int> vec = input.vec;
+    int target = input.target;
+
+    /* Get origin output */
+    int origin_out = p(vec, target, vec.size());
+
+    /* Construct follow-up input */
+    if (!vec.empty()) {
+        vec.pop_back();
+    }
+
+    /* Get follow-up output */
+    int follow_out = (target == vec.back()) ? 1 : p(vec, target, vec.size());
+
+    /* Verification */
+    EXPECT_EQ(origin_out, follow_out);
+}
+
+// Metamorphic relation 19: Replace all elements in the array with a constant value,
+// and the output should remain the same unless the target is not equal to the constant.
+TEST_P(BSearchParamTest, MR19) {
+    /* Get input data */
+    BSearch2Input input = GetParam();
+    vector<int> vec = input.vec;
+    int target = input.target;
+
+    /* Get origin output */
+    int origin_out = p(vec, target, vec.size());
+
+    /* Construct follow-up input */
+    int constant = 10;
+    fill(vec.begin(), vec.end(), constant);
+
+    /* Get follow-up output */
+    int follow_out = (target == constant) ? origin_out : p(vec, target, vec.size());
+
+    /* Verification */
+    EXPECT_EQ(origin_out, follow_out);
+}
+
+// Metamorphic relation 20: Duplicate all elements in the array,
+// and the output should remain the same unless the target is duplicated as well.
 TEST_P(BSearchParamTest, MR20) {
-#ifndef SKIP_CRASH
-    // Construct an empty array
-    vector<int> vec;
-    int target = 42; // Choose any target value
+    /* Get input data */
+    BSearch2Input input = GetParam();
+    vector<int> vec = input.vec;
+    int target = input.target;
 
-    // Get output for the empty array
+    /* Get origin output */
     int origin_out = p(vec, target, vec.size());
 
-    // Construct follow-up input (add any value to the empty array)
-    vec.push_back(0);
+    /* Construct follow-up input */
+    vec.insert(vec.end(), vec.begin(), vec.end());
 
-    // Get follow-up output
-    int follow_out = p(vec, target, vec.size());
+    /* Get follow-up output */
+    int follow_out = (target == vec[vec.size() / 2]) ? origin_out : p(vec, target, vec.size());
 
-    // Verification
+    /* Verification */
     EXPECT_EQ(origin_out, follow_out);
-#endif
 }
 
-/**
- * Metamorphic relation 21: If the array has repeated occurrences of the target, duplicating or removing one or more occurrences should not change the output.
- */
+// Metamorphic relation 21: Shuffle the array and then sort it in ascending order,
+// the output should remain the same.
 TEST_P(BSearchParamTest, MR21) {
+    /* Get input data */
     BSearch2Input input = GetParam();
     vector<int> vec = input.vec;
     int target = input.target;
 
-    // Get origin output
+    /* Get origin output */
     int origin_out = p(vec, target, vec.size());
 
-    // Construct follow-up input (duplicate or remove one or more occurrences of the target)
-    auto it = find(vec.begin(), vec.end(), target);
-    if (it != vec.end()) {
-        vec.insert(it, target); // Duplicate
-        // Alternatively, you can remove an occurrence: vec.erase(it);
+    /* Construct follow-up input */
+    random_shuffle(vec.begin(), vec.end());
+    sort(vec.begin(), vec.end());
+
+    /* Get follow-up output */
+    int follow_out = p(vec, target, vec.size());
+
+    /* Verification */
+    EXPECT_EQ(origin_out, follow_out);
+}
+
+// Metamorphic relation 22: Reverse the order of the array and then sort it in descending order,
+// the output should remain the same.
+TEST_P(BSearchParamTest, MR22) {
+    /* Get input data */
+    BSearch2Input input = GetParam();
+    vector<int> vec = input.vec;
+    int target = input.target;
+
+    /* Get origin output */
+    int origin_out = p(vec, target, vec.size());
+
+    /* Construct follow-up input */
+    reverse(vec.begin(), vec.end());
+    sort(vec.begin(), vec.end(), greater<int>());
+
+    /* Get follow-up output */
+    int follow_out = p(vec, target, vec.size());
+
+    /* Verification */
+    EXPECT_EQ(origin_out, follow_out);
+}
+
+// Metamorphic relation 23: Replace all elements in the array with the target element,
+// and the output should be 1 (target found) if the array is not empty.
+TEST_P(BSearchParamTest, MR23) {
+    /* Get input data */
+    BSearch2Input input = GetParam();
+    vector<int> vec = input.vec;
+    int target = input.target;
+
+    /* Get origin output */
+    int origin_out = p(vec, target, vec.size());
+
+    /* Construct follow-up input */
+    fill(vec.begin(), vec.end(), target);
+
+    /* Get follow-up output */
+    int follow_out = (vec.empty()) ? 0 : 1;
+
+    /* Verification */
+    EXPECT_EQ(origin_out, follow_out);
+}
+
+// Metamorphic relation 24: Add the target element at the end of the array twice,
+// and the output should be 1 (target found) if the array is not empty.
+TEST_P(BSearchParamTest, MR24) {
+    /* Get input data */
+    BSearch2Input input = GetParam();
+    vector<int> vec = input.vec;
+    int target = input.target;
+
+    /* Get origin output */
+    int origin_out = p(vec, target, vec.size());
+
+    /* Construct follow-up input */
+    vec.push_back(target);
+    vec.push_back(target);
+
+    /* Get follow-up output */
+    int follow_out = (vec.empty()) ? 0 : 1;
+
+    /* Verification */
+    EXPECT_EQ(origin_out, follow_out);
+}
+
+// Metamorphic relation 25: Remove all occurrences of the target element from the array,
+// and the output should be 0 (target not found) if the array is not empty.
+TEST_P(BSearchParamTest, MR25) {
+    /* Get input data */
+    BSearch2Input input = GetParam();
+    vector<int> vec = input.vec;
+    int target = input.target;
+
+    /* Get origin output */
+    int origin_out = p(vec, target, vec.size());
+
+    /* Construct follow-up input */
+    vec.erase(remove(vec.begin(), vec.end(), target), vec.end());
+
+    /* Get follow-up output */
+    int follow_out = (vec.empty()) ? 0 : 1;
+
+    /* Verification */
+    EXPECT_EQ(origin_out, follow_out);
+}
+
+// Metamorphic relation 26: Insert the target element at the beginning and end of the array,
+// and the output should be 1 (target found) if the array is not empty.
+TEST_P(BSearchParamTest, MR26) {
+    /* Get input data */
+    BSearch2Input input = GetParam();
+    vector<int> vec = input.vec;
+    int target = input.target;
+
+    /* Get origin output */
+    int origin_out = p(vec, target, vec.size());
+
+    /* Construct follow-up input */
+    vec.insert(vec.begin(), target);
+    vec.push_back(target);
+
+    /* Get follow-up output */
+    int follow_out = (vec.empty()) ? 0 : 1;
+
+    /* Verification */
+    EXPECT_EQ(origin_out, follow_out);
+}
+
+// Metamorphic relation 27: Subtract 1 from all elements in the array and the target element,
+// and the output should remain the same.
+TEST_P(BSearchParamTest, MR27) {
+    /* Get input data */
+    BSearch2Input input = GetParam();
+    vector<int> vec = input.vec;
+    int target = input.target;
+
+    /* Get origin output */
+    int origin_out = p(vec, target, vec.size());
+
+    /* Construct follow-up input */
+    for_each(vec.begin(), vec.end(), [](int& val) { val -= 1; });
+    int follow_target = target - 1;
+
+    /* Get follow-up output */
+    int follow_out = p(vec, follow_target, vec.size());
+
+    /* Verification */
+    EXPECT_EQ(origin_out, follow_out);
+}
+
+// Metamorphic relation 28: Add 1 to all elements in the array and the target element,
+// and the output should remain the same.
+TEST_P(BSearchParamTest, MR28) {
+    /* Get input data */
+    BSearch2Input input = GetParam();
+    vector<int> vec = input.vec;
+    int target = input.target;
+
+    /* Get origin output */
+    int origin_out = p(vec, target, vec.size());
+
+    /* Construct follow-up input */
+    for_each(vec.begin(), vec.end(), [](int& val) { val += 1; });
+    int follow_target = target + 1;
+
+    /* Get follow-up output */
+    int follow_out = p(vec, follow_target, vec.size());
+
+    /* Verification */
+    EXPECT_EQ(origin_out, follow_out);
+}
+
+// Metamorphic relation 29: Replace the target element with a new element in the array,
+// and the output should be 1 (target found) if the new element is equal to the target.
+TEST_P(BSearchParamTest, MR29) {
+    /* Get input data */
+    BSearch2Input input = GetParam();
+    vector<int> vec = input.vec;
+    int target = input.target;
+
+    /* Get origin output */
+    int origin_out = p(vec, target, vec.size());
+
+    /* Construct follow-up input */
+    int newElement = target + 1;
+    replace(vec.begin(), vec.end(), target, newElement);
+
+    /* Get follow-up output */
+    int follow_out = (newElement == target) ? 1 : p(vec, target, vec.size());
+
+    /* Verification */
+    EXPECT_EQ(origin_out, follow_out);
+}
+
+// Metamorphic relation 30: Reverse the array and replace all occurrences of the target element with a new element,
+// and the output should be 0 (target not found) if the new element is not equal to the target.
+TEST_P(BSearchParamTest, MR30) {
+    /* Get input data */
+    BSearch2Input input = GetParam();
+    vector<int> vec = input.vec;
+    int target = input.target;
+
+    /* Get origin output */
+    int origin_out = p(vec, target, vec.size());
+
+    /* Construct follow-up input */
+    reverse(vec.begin(), vec.end());
+    int newElement = target + 1;
+    replace(vec.begin(), vec.end(), target, newElement);
+
+    /* Get follow-up output */
+    int follow_out = (newElement != target) ? 0 : p(vec, target, vec.size());
+
+    /* Verification */
+    EXPECT_EQ(origin_out, follow_out);
+}
+
+// Metamorphic relation 31: Rotate the array to the right by a random number of positions,
+// and the output should remain the same.
+TEST_P(BSearchParamTest, MR31) {
+    /* Get input data */
+    BSearch2Input input = GetParam();
+    vector<int> vec = input.vec;
+    int target = input.target;
+
+    /* Get origin output */
+    int origin_out = p(vec, target, vec.size());
+
+    /* Construct follow-up input */
+    int rotationAmount = rand() % vec.size();
+    rotate(vec.rbegin(), vec.rbegin() + rotationAmount, vec.rend());
+
+    /* Get follow-up output */
+    int follow_out = p(vec, target, vec.size());
+
+    /* Verification */
+    EXPECT_EQ(origin_out, follow_out);
+}
+
+// Metamorphic relation 32: Reverse the order of the array and swap the target element with the first element,
+// and the output should be 1 (target found) if the target is now the first element.
+TEST_P(BSearchParamTest, MR32) {
+    /* Get input data */
+    BSearch2Input input = GetParam();
+    vector<int> vec = input.vec;
+    int target = input.target;
+
+    /* Get origin output */
+    int origin_out = p(vec, target, vec.size());
+
+    /* Construct follow-up input */
+    reverse(vec.begin(), vec.end());
+    if (!vec.empty()) {
+        swap(vec.front(), vec.at(rand() % vec.size()));
     }
 
-    // Get follow-up output
-    int follow_out = p(vec, target, vec.size());
+    /* Get follow-up output */
+    int follow_out = (target == vec.front()) ? 1 : p(vec, target, vec.size());
 
-    // Verification
+    /* Verification */
     EXPECT_EQ(origin_out, follow_out);
 }
 
-/**
- * Metamorphic relation 22: If the array is initially unsorted, sorting only a subset of the array containing the target should not change the output.
- */
-TEST_P(BSearchParamTest, MR22) {
+// Metamorphic relation 33: Remove the first element from the array and the target element,
+// and the output should remain the same unless the target was the first element.
+TEST_P(BSearchParamTest, MR33) {
+    /* Get input data */
     BSearch2Input input = GetParam();
     vector<int> vec = input.vec;
     int target = input.target;
 
-    // Get origin output
+    /* Get origin output */
     int origin_out = p(vec, target, vec.size());
 
-    // Construct follow-up input (sort only a subset of the array containing the target)
-    auto target_range = equal_range(vec.begin(), vec.end(), target);
-    sort(target_range.first, target_range.second);
+    /* Construct follow-up input */
+    if (!vec.empty()) {
+        vec.erase(vec.begin());
+    }
 
-    // Get follow-up output
-    int follow_out = p(vec, target, vec.size());
+    /* Get follow-up output */
+    int follow_out = (target == vec.front()) ? 1 : p(vec, target, vec.size());
 
-    // Verification
+    /* Verification */
     EXPECT_EQ(origin_out, follow_out);
 }
 
-/**
- * Metamorphic relation 23: If the array has repeated occurrences of the target, changing the order of the repeated occurrences while maintaining their frequency should not change the output.
- */
-TEST_P(BSearchParamTest, MR23) {
+// Metamorphic relation 34: Add a new element smaller than the target at the beginning of the array,
+// and the output should remain the same unless the target was the first element.
+TEST_P(BSearchParamTest, MR34) {
+    /* Get input data */
     BSearch2Input input = GetParam();
     vector<int> vec = input.vec;
     int target = input.target;
 
-    // Get origin output
+    /* Get origin output */
     int origin_out = p(vec, target, vec.size());
 
-    // Construct follow-up input (change the order of repeated occurrences while maintaining their frequency)
-    vector<int> follow_vec = vec;
-    sort(follow_vec.begin(), follow_vec.end());
-    auto target_range = equal_range(follow_vec.begin(), follow_vec.end(), target);
-    random_shuffle(target_range.first, target_range.second);
+    /* Construct follow-up input */
+    int newElement = target - 1;
+    vec.insert(vec.begin(), newElement);
 
-    // Get follow-up output
-    int follow_out = p(follow_vec, target, follow_vec.size());
+    /* Get follow-up output */
+    int follow_out = (target == vec.front()) ? 1 : p(vec, target, vec.size());
 
-    // Verification
+    /* Verification */
     EXPECT_EQ(origin_out, follow_out);
 }
 
-/**
- * Metamorphic relation 24: If the array is initially empty, adding elements to the array should not change the output.
- */
-TEST_P(BSearchParamTest, MR24) {
+// Metamorphic relation 35: Add a new element greater than the target at the end of the array,
+// and the output should remain the same unless the target was the last element.
+TEST_P(BSearchParamTest, MR35) {
+    /* Get input data */
+    BSearch2Input input = GetParam();
+    vector<int> vec = input.vec;
+    int target = input.target;
+
+    /* Get origin output */
+    int origin_out = p(vec, target, vec.size());
+
+    /* Construct follow-up input */
+    int newElement = target + 1;
+    vec.push_back(newElement);
+
+    /* Get follow-up output */
+    int follow_out = (target == vec.back()) ? 1 : p(vec, target, vec.size());
+
+    /* Verification */
+    EXPECT_EQ(origin_out, follow_out);
+}
+
+// Metamorphic relation 36: Remove the last element from the array and the target element,
+// and the output should remain the same unless the target was the last element.
+TEST_P(BSearchParamTest, MR36) {
+    /* Get input data */
+    BSearch2Input input = GetParam();
+    vector<int> vec = input.vec;
+    int target = input.target;
+
+    /* Get origin output */
+    int origin_out = p(vec, target, vec.size());
+
+    /* Construct follow-up input */
+    if (!vec.empty()) {
+        vec.pop_back();
+    }
+
+    /* Get follow-up output */
+    int follow_out = (target == vec.back()) ? 1 : p(vec, target, vec.size());
+
+    /* Verification */
+    EXPECT_EQ(origin_out, follow_out);
+}
+
+// Metamorphic relation 37: Swap the positions of the target element and the middle element,
+// and the output should remain the same unless the target was the middle element.
+TEST_P(BSearchParamTest, MR37) {
+    /* Get input data */
+    BSearch2Input input = GetParam();
+    vector<int> vec = input.vec;
+    int target = input.target;
+
+    /* Get origin output */
+    int origin_out = p(vec, target, vec.size());
+
+    /* Construct follow-up input */
+    if (vec.size() >= 3) {
+        swap(vec[vec.size() / 2], vec[vec.size() / 2 - 1]);
+    }
+
+    /* Get follow-up output */
+    int follow_out = (target == vec[vec.size() / 2]) ? 1 : p(vec, target, vec.size());
+
+    /* Verification */
+    EXPECT_EQ(origin_out, follow_out);
+}
+
+// Metamorphic relation 38: Replace all occurrences of the target element with a new element,
+// and the output should be 0 (target not found) if the array is not empty.
+TEST_P(BSearchParamTest, MR38) {
+    /* Get input data */
+    BSearch2Input input = GetParam();
+    vector<int> vec = input.vec;
+    int target = input.target;
+
+    /* Get origin output */
+    int origin_out = p(vec, target, vec.size());
+
+    /* Construct follow-up input */
+    int newElement = target + 1;
+    replace(vec.begin(), vec.end(), target, newElement);
+
+    /* Get follow-up output */
+    int follow_out = (vec.empty()) ? 0 : p(vec, target, vec.size());
+
+    /* Verification */
+    EXPECT_EQ(origin_out, follow_out);
+}
+
+// Metamorphic relation 39: Add a new element equal to the target in the middle of the array,
+// and the output should be 1 (target found) if the array is not empty.
+TEST_P(BSearchParamTest, MR39) {
+    /* Get input data */
+    BSearch2Input input = GetParam();
+    vector<int> vec = input.vec;
+    int target = input.target;
+
+    /* Get origin output */
+    int origin_out = p(vec, target, vec.size());
+
+    /* Construct follow-up input */
+    if (!vec.empty()) {
+        vec.insert(vec.begin() + vec.size() / 2, target);
+    }
+
+    /* Get follow-up output */
+    int follow_out = (vec.empty()) ? 0 : 1;
+
+    /* Verification */
+    EXPECT_EQ(origin_out, follow_out);
+}
+
+// Metamorphic relation 40: Subtract 1 from all elements in the array,
+// and the output should remain the same unless the target was 0.
+TEST_P(BSearchParamTest, MR40) {
+    /* Get input data */
+    BSearch2Input input = GetParam();
+    vector<int> vec = input.vec;
+    int target = input.target;
+
+    /* Get origin output */
+    int origin_out = p(vec, target, vec.size());
+
+    /* Construct follow-up input */
+    for_each(vec.begin(), vec.end(), [](int& val) { val -= 1; });
+    int follow_target = (target == 0) ? 0 : target - 1;
+
+    /* Get follow-up output */
+    int follow_out = p(vec, follow_target, vec.size());
+
+    /* Verification */
+    EXPECT_EQ(origin_out, follow_out);
+}
+
+// Metamorphic relation 41: Add a new element greater than the target at the beginning and the end of the array,
+// and the output should remain the same unless the target was the first or last element.
+TEST_P(BSearchParamTest, MR41) {
+    /* Get input data */
+    BSearch2Input input = GetParam();
+    vector<int> vec = input.vec;
+    int target = input.target;
+
+    /* Get origin output */
+    int origin_out = p(vec, target, vec.size());
+
+    /* Construct follow-up input */
+    int newElement = target + 1;
+    vec.insert(vec.begin(), newElement);
+    vec.push_back(newElement);
+
+    /* Get follow-up output */
+    int follow_out = ((target == vec.front()) || (target == vec.back())) ? 1 : p(vec, target, vec.size());
+
+    /* Verification */
+    EXPECT_EQ(origin_out, follow_out);
+}
+
+// Metamorphic relation 42: Multiply all elements in the array by 2,
+// and the output should remain the same unless the target was an odd number.
+TEST_P(BSearchParamTest, MR42) {
+    /* Get input data */
+    BSearch2Input input = GetParam();
+    vector<int> vec = input.vec;
+    int target = input.target;
+
+    /* Get origin output */
+    int origin_out = p(vec, target, vec.size());
+
+    /* Construct follow-up input */
+    for_each(vec.begin(), vec.end(), [](int& val) { val *= 2; });
+    int follow_target = (target % 2 == 1) ? target * 2 : target;
+
+    /* Get follow-up output */
+    int follow_out = p(vec, follow_target, vec.size());
+
+    /* Verification */
+    EXPECT_EQ(origin_out, follow_out);
+}
+
+// Metamorphic relation 43: Reverse the order of the array and add a new element equal to the target at the beginning,
+// and the output should be 1 (target found) if the target is now the first element.
+TEST_P(BSearchParamTest, MR43) {
+    /* Get input data */
+    BSearch2Input input = GetParam();
+    vector<int> vec = input.vec;
+    int target = input.target;
+
+    /* Get origin output */
+    int origin_out = p(vec, target, vec.size());
+
+    /* Construct follow-up input */
+    reverse(vec.begin(), vec.end());
+    vec.insert(vec.begin(), target);
+
+    /* Get follow-up output */
+    int follow_out = (target == vec.front()) ? 1 : p(vec, target, vec.size());
+
+    /* Verification */
+    EXPECT_EQ(origin_out, follow_out);
+}
+
+// Metamorphic relation 44: Replace the target element with a new element in the array,
+// and the output should be 0 (target not found) if the array is not empty.
+TEST_P(BSearchParamTest, MR44) {
+    /* Get input data */
+    BSearch2Input input = GetParam();
+    vector<int> vec = input.vec;
+    int target = input.target;
+
+    /* Get origin output */
+    int origin_out = p(vec, target, vec.size());
+
+    /* Construct follow-up input */
+    int newElement = target + 1;
+    replace(vec.begin(), vec.end(), target, newElement);
+
+    /* Get follow-up output */
+    int follow_out = (vec.empty()) ? 0 : p(vec, target, vec.size());
+
+    /* Verification */
+    EXPECT_EQ(origin_out, follow_out);
+}
+
+// Metamorphic relation 45: Insert the target element at random positions in the array,
+// and the output should be 1 (target found) if the array is not empty.
+TEST_P(BSearchParamTest, MR45) {
+    /* Get input data */
+    BSearch2Input input = GetParam();
+    vector<int> vec = input.vec;
+    int target = input.target;
+
+    /* Get origin output */
+    int origin_out = p(vec, target, vec.size());
+
+    /* Construct follow-up input */
+    if (!vec.empty()) {
+        int randomPos = rand() % (vec.size() + 1);
+        vec.insert(vec.begin() + randomPos, target);
+    }
+
+    /* Get follow-up output */
+    int follow_out = (vec.empty()) ? 0 : 1;
+
+    /* Verification */
+    EXPECT_EQ(origin_out, follow_out);
+}
+
+// Metamorphic relation 46: Sort the array in descending order and add a new element smaller than the target at the end,
+// and the output should be 0 (target not found) if the array is not empty.
+TEST_P(BSearchParamTest, MR46) {
+    /* Get input data */
+    BSearch2Input input = GetParam();
+    vector<int> vec = input.vec;
+    int target = input.target;
+
+    /* Get origin output */
+    int origin_out = p(vec, target, vec.size());
+
+    /* Construct follow-up input */
+    sort(vec.begin(), vec.end(), greater<int>());
+    int newElement = target - 1;
+    vec.push_back(newElement);
+
+    /* Get follow-up output */
+    int follow_out = (vec.empty()) ? 0 : p(vec, target, vec.size());
+
+    /* Verification */
+    EXPECT_EQ(origin_out, follow_out);
+}
+
+// Metamorphic relation 47: Shuffle the array randomly, and the output should remain the same.
+TEST_P(BSearchParamTest, MR47) {
+    /* Get input data */
+    BSearch2Input input = GetParam();
+    vector<int> vec = input.vec;
+    int target = input.target;
+
+    /* Get origin output */
+    int origin_out = p(vec, target, vec.size());
+
+    /* Construct follow-up input */
+    random_shuffle(vec.begin(), vec.end());
+
+    /* Get follow-up output */
+    int follow_out = p(vec, target, vec.size());
+
+    /* Verification */
+    EXPECT_EQ(origin_out, follow_out);
+}
+
+// Metamorphic relation 48: Remove all elements in the array that are smaller than the target,
+// and the output should remain the same unless the target was the smallest element.
+TEST_P(BSearchParamTest, MR48) {
 #ifndef SKIP_CRASH
-    // Construct an empty array
-    vector<int> vec;
-    int target = 42; // Choose any target value
+    /* Get input data */
+    BSearch2Input input = GetParam();
+    vector<int> vec = input.vec;
+    int target = input.target;
 
-    // Get output for the empty array
+    /* Get origin output */
     int origin_out = p(vec, target, vec.size());
 
-    // Construct follow-up input (add any value to the empty array)
-    vec.push_back(0);
+    /* Construct follow-up input */
+    vec.erase(remove_if(vec.begin(), vec.end(), [target](int val) { return val < target; }), vec.end());
 
-    // Get follow-up output
-    int follow_out = p(vec, target, vec.size());
+    /* Get follow-up output */
+    int follow_out = (target == *min_element(vec.begin(), vec.end())) ? 1 : p(vec, target, vec.size());
 
-    // Verification
+    /* Verification */
     EXPECT_EQ(origin_out, follow_out);
 #endif
 }
 
-/**
- * Metamorphic relation 25: If the array has repeated occurrences of the target, changing the order of the repeated occurrences while altering their frequency should not change the output.
- */
-TEST_P(BSearchParamTest, MR25) {
-    BSearch2Input input = GetParam();
-    vector<int> vec = input.vec;
-    int target = input.target;
-
-    // Get origin output
-    int origin_out = p(vec, target, vec.size());
-
-    // Construct follow-up input (change the order and frequency of repeated occurrences)
-    vector<int> follow_vec = vec;
-    sort(follow_vec.begin(), follow_vec.end());
-
-    // Increase the frequency of the target
-    follow_vec.insert(follow_vec.end(), {target, target});
-
-    // Shuffle the repeated occurrences
-    auto target_range = equal_range(follow_vec.begin(), follow_vec.end(), target);
-    random_shuffle(target_range.first, target_range.second);
-
-    // Get follow-up output
-    int follow_out = p(follow_vec, target, follow_vec.size());
-
-    // Verification
-    EXPECT_EQ(origin_out, follow_out);
-}
-
-/**
- * Metamorphic relation 26: If the array is initially unsorted, sorting a subset of the array not containing the target should not change the output.
- */
-TEST_P(BSearchParamTest, MR26) {
-    BSearch2Input input = GetParam();
-    vector<int> vec = input.vec;
-    int target = input.target;
-
-    // Get origin output
-    int origin_out = p(vec, target, vec.size());
-
-    // Construct follow-up input (sort a subset of the array not containing the target)
-    auto target_range = equal_range(vec.begin(), vec.end(), target);
-    sort(vec.begin(), target_range.first);
-    sort(target_range.second, vec.end());
-
-    // Get follow-up output
-    int follow_out = p(vec, target, vec.size());
-
-    // Verification
-    EXPECT_EQ(origin_out, follow_out);
-}
-
-/**
- * Metamorphic relation 27: If the array has repeated occurrences of the target, changing the order of the repeated occurrences while modifying their frequency and adding a prefix or suffix to the array should not change the output.
- */
-TEST_P(BSearchParamTest, MR27) {
-    BSearch2Input input = GetParam();
-    vector<int> vec = input.vec;
-    int target = input.target;
-
-    // Get origin output
-    int origin_out = p(vec, target, vec.size());
-
-    // Construct follow-up input (change the order, frequency, and add a prefix or suffix)
-    vector<int> follow_vec = vec;
-    sort(follow_vec.begin(), follow_vec.end());
-
-    // Increase the frequency of the target
-    follow_vec.insert(follow_vec.end(), {target, target});
-
-    // Shuffle the repeated occurrences
-    auto target_range = equal_range(follow_vec.begin(), follow_vec.end(), target);
-    random_shuffle(target_range.first, target_range.second);
-
-    // Add a prefix
-    vector<int> prefix = {1, 2, 3};
-    follow_vec.insert(follow_vec.begin(), prefix.begin(), prefix.end());
-
-    // Get follow-up output
-    int follow_out = p(follow_vec, target, follow_vec.size());
-
-    // Verification
-    EXPECT_EQ(origin_out, follow_out);
-}
-
-/**
- * Metamorphic relation 28: If the array has repeated occurrences of the target, changing the order of the repeated occurrences while modifying their frequency and removing a subset of the array containing the target should not change the output.
- */
-TEST_P(BSearchParamTest, MR28) {
-    BSearch2Input input = GetParam();
-    vector<int> vec = input.vec;
-    int target = input.target;
-
-    // Get origin output
-    int origin_out = p(vec, target, vec.size());
-
-    // Construct follow-up input (change the order, frequency, and remove a subset containing the target)
-    vector<int> follow_vec = vec;
-    sort(follow_vec.begin(), follow_vec.end());
-
-    // Increase the frequency of the target
-    follow_vec.insert(follow_vec.end(), {target, target});
-
-    // Shuffle the repeated occurrences
-    auto target_range = equal_range(follow_vec.begin(), follow_vec.end(), target);
-    random_shuffle(target_range.first, target_range.second);
-
-    // Remove a subset containing the target
-    follow_vec.erase(target_range.first, target_range.second);
-
-    // Get follow-up output
-    int follow_out = p(follow_vec, target, follow_vec.size());
-
-    // Verification
-    EXPECT_EQ(origin_out, follow_out);
-}
-
-/**
- * Metamorphic relation 29: If the array has repeated occurrences of the target, changing the order of the repeated occurrences while modifying their frequency and inserting elements randomly within the array should not change the output.
- */
-TEST_P(BSearchParamTest, MR29) {
-    BSearch2Input input = GetParam();
-    vector<int> vec = input.vec;
-    int target = input.target;
-
-    // Get origin output
-    int origin_out = p(vec, target, vec.size());
-
-    // Construct follow-up input (change the order, frequency, and insert elements randomly)
-    vector<int> follow_vec = vec;
-    sort(follow_vec.begin(), follow_vec.end());
-
-    // Increase the frequency of the target
-    follow_vec.insert(follow_vec.end(), {target, target});
-
-    // Shuffle the repeated occurrences
-    auto target_range = equal_range(follow_vec.begin(), follow_vec.end(), target);
-    random_shuffle(target_range.first, target_range.second);
-
-    // Insert elements randomly
-    vector<int> random_elements = {100, 200, 300};
-    random_shuffle(random_elements.begin(), random_elements.end());
-    follow_vec.insert(follow_vec.begin() + vec.size() / 2, random_elements.begin(), random_elements.end());
-
-    // Get follow-up output
-    int follow_out = p(follow_vec, target, follow_vec.size());
-
-    // Verification
-    EXPECT_EQ(origin_out, follow_out);
-}
-
-/**
- * Metamorphic relation 30: If the array has repeated occurrences of the target, changing the order of the repeated occurrences while modifying their frequency and reversing a subset of the array containing the target should not change the output.
- */
-TEST_P(BSearchParamTest, MR30) {
-    BSearch2Input input = GetParam();
-    vector<int> vec = input.vec;
-    int target = input.target;
-
-    // Get origin output
-    int origin_out = p(vec, target, vec.size());
-
-    // Construct follow-up input (change the order, frequency, and reverse a subset containing the target)
-    vector<int> follow_vec = vec;
-    sort(follow_vec.begin(), follow_vec.end());
-
-    // Increase the frequency of the target
-    follow_vec.insert(follow_vec.end(), {target, target});
-
-    // Shuffle the repeated occurrences
-    auto target_range = equal_range(follow_vec.begin(), follow_vec.end(), target);
-    random_shuffle(target_range.first, target_range.second);
-
-    // Reverse a subset containing the target
-    reverse(target_range.first, target_range.second);
-
-    // Get follow-up output
-    int follow_out = p(follow_vec, target, follow_vec.size());
-
-    // Verification
-    EXPECT_EQ(origin_out, follow_out);
-}
-
-/**
- * Metamorphic relation 31: If the array has repeated occurrences of the target, changing the order of the repeated occurrences while modifying their frequency and rotating the array should not change the output.
- */
-TEST_P(BSearchParamTest, MR31) {
-    BSearch2Input input = GetParam();
-    vector<int> vec = input.vec;
-    int target = input.target;
-
-    // Get origin output
-    int origin_out = p(vec, target, vec.size());
-
-    // Construct follow-up input (change the order, frequency, and rotate the array)
-    vector<int> follow_vec = vec;
-    sort(follow_vec.begin(), follow_vec.end());
-
-    // Increase the frequency of the target
-    follow_vec.insert(follow_vec.end(), {target, target});
-
-    // Shuffle the repeated occurrences
-    auto target_range = equal_range(follow_vec.begin(), follow_vec.end(), target);
-    random_shuffle(target_range.first, target_range.second);
-
-    // Rotate the array
-    rotate(follow_vec.begin(), follow_vec.begin() + vec.size() / 2, follow_vec.end());
-
-    // Get follow-up output
-    int follow_out = p(follow_vec, target, follow_vec.size());
-
-    // Verification
-    EXPECT_EQ(origin_out, follow_out);
-}
-
-/**
- * Metamorphic relation 32: If the array has repeated occurrences of the target, changing the order of the repeated occurrences while modifying their frequency and replacing a subset of the array containing the target should not change the output.
- */
-TEST_P(BSearchParamTest, MR32) {
-    BSearch2Input input = GetParam();
-    vector<int> vec = input.vec;
-    int target = input.target;
-
-    // Get origin output
-    int origin_out = p(vec, target, vec.size());
-
-    // Construct follow-up input (change the order, frequency, and replace a subset containing the target)
-    vector<int> follow_vec = vec;
-    sort(follow_vec.begin(), follow_vec.end());
-
-    // Increase the frequency of the target
-    follow_vec.insert(follow_vec.end(), {target, target});
-
-    // Shuffle the repeated occurrences
-    auto target_range = equal_range(follow_vec.begin(), follow_vec.end(), target);
-    random_shuffle(target_range.first, target_range.second);
-
-    // Replace a subset containing the target
-    replace(target_range.first, target_range.second, target, target + 1);
-
-    // Get follow-up output
-    int follow_out = p(follow_vec, target, follow_vec.size());
-
-    // Verification
-    EXPECT_EQ(origin_out, follow_out);
-}
-
-/**
- * Metamorphic relation 33: If the array has repeated occurrences of the target, changing the order of the repeated occurrences while modifying their frequency and removing a subset and then adding it back to the array should not change the output.
- */
-TEST_P(BSearchParamTest, MR33) {
-    BSearch2Input input = GetParam();
-    vector<int> vec = input.vec;
-    int target = input.target;
-
-    // Get origin output
-    int origin_out = p(vec, target, vec.size());
-
-    // Construct follow-up input (change the order, frequency, remove a subset, and add it back)
-    vector<int> follow_vec = vec;
-    sort(follow_vec.begin(), follow_vec.end());
-
-    // Increase the frequency of the target
-    follow_vec.insert(follow_vec.end(), {target, target});
-
-    // Shuffle the repeated occurrences
-    auto target_range = equal_range(follow_vec.begin(), follow_vec.end(), target);
-    random_shuffle(target_range.first, target_range.second);
-
-    // Remove a subset containing the target
-    follow_vec.erase(target_range.first, target_range.second);
-
-    // Add the removed subset back to the array
-    follow_vec.insert(follow_vec.end(), target_range.first, target_range.second);
-
-    // Get follow-up output
-    int follow_out = p(follow_vec, target, follow_vec.size());
-
-    // Verification
-    EXPECT_EQ(origin_out, follow_out);
-}
-
-/**
- * Metamorphic relation 34: If the array has repeated occurrences of the target, changing the order of the repeated occurrences while modifying their frequency and reversing the entire array should not change the output.
- */
-TEST_P(BSearchParamTest, MR34) {
-    BSearch2Input input = GetParam();
-    vector<int> vec = input.vec;
-    int target = input.target;
-
-    // Get origin output
-    int origin_out = p(vec, target, vec.size());
-
-    // Construct follow-up input (change the order, frequency, and reverse the entire array)
-    vector<int> follow_vec = vec;
-    sort(follow_vec.begin(), follow_vec.end());
-
-    // Increase the frequency of the target
-    follow_vec.insert(follow_vec.end(), {target, target});
-
-    // Shuffle the repeated occurrences
-    auto target_range = equal_range(follow_vec.begin(), follow_vec.end(), target);
-    random_shuffle(target_range.first, target_range.second);
-
-    // Reverse the entire array
-    reverse(follow_vec.begin(), follow_vec.end());
-
-    // Get follow-up output
-    int follow_out = p(follow_vec, target, follow_vec.size());
-
-    // Verification
-    EXPECT_EQ(origin_out, follow_out);
-}
-
-/**
- * Metamorphic relation 35: If the array has repeated occurrences of the target, changing the order of the repeated occurrences while modifying their frequency and inserting a subset of the array containing the target in a different position should not change the output.
- */
-TEST_P(BSearchParamTest, MR35) {
-    BSearch2Input input = GetParam();
-    vector<int> vec = input.vec;
-    int target = input.target;
-
-    // Get origin output
-    int origin_out = p(vec, target, vec.size());
-
-    // Construct follow-up input (change the order, frequency, and insert a subset in a different position)
-    vector<int> follow_vec = vec;
-    sort(follow_vec.begin(), follow_vec.end());
-
-    // Increase the frequency of the target
-    follow_vec.insert(follow_vec.end(), {target, target});
-
-    // Shuffle the repeated occurrences
-    auto target_range = equal_range(follow_vec.begin(), follow_vec.end(), target);
-    random_shuffle(target_range.first, target_range.second);
-
-    // Insert the subset in a different position
-    follow_vec.insert(follow_vec.begin() + vec.size() / 2, target_range.first, target_range.second);
-
-    // Get follow-up output
-    int follow_out = p(follow_vec, target, follow_vec.size());
-
-    // Verification
-    EXPECT_EQ(origin_out, follow_out);
-}
-
-/**
- * Metamorphic relation 36: If the array has repeated occurrences of the target, changing the order of the repeated occurrences while modifying their frequency and replacing a subset of the array containing the target with a different set of elements should not change the output.
- */
-TEST_P(BSearchParamTest, MR36) {
-    BSearch2Input input = GetParam();
-    vector<int> vec = input.vec;
-    int target = input.target;
-
-    // Get origin output
-    int origin_out = p(vec, target, vec.size());
-
-    // Construct follow-up input (change the order, frequency, and replace a subset with different elements)
-    vector<int> follow_vec = vec;
-    sort(follow_vec.begin(), follow_vec.end());
-
-    // Increase the frequency of the target
-    follow_vec.insert(follow_vec.end(), {target, target});
-
-    // Shuffle the repeated occurrences
-    auto target_range = equal_range(follow_vec.begin(), follow_vec.end(), target);
-    random_shuffle(target_range.first, target_range.second);
-
-    // Replace the subset with different elements
-    replace(target_range.first, target_range.second, target, target + 1);
-
-    // Get follow-up output
-    int follow_out = p(follow_vec, target, follow_vec.size());
-
-    // Verification
-    EXPECT_EQ(origin_out, follow_out);
-}
-
-/**
- * Metamorphic relation 37: If the array has repeated occurrences of the target, changing the order of the repeated occurrences while modifying their frequency and interleaving the array with a different set of elements should not change the output.
- */
-TEST_P(BSearchParamTest, MR37) {
-    BSearch2Input input = GetParam();
-    vector<int> vec = input.vec;
-    int target = input.target;
-
-    // Get origin output
-    int origin_out = p(vec, target, vec.size());
-
-    // Construct follow-up input (change the order, frequency, and interleave with a different set of elements)
-    vector<int> follow_vec = vec;
-    sort(follow_vec.begin(), follow_vec.end());
-
-    // Increase the frequency of the target
-    follow_vec.insert(follow_vec.end(), {target, target});
-
-    // Shuffle the repeated occurrences
-    auto target_range = equal_range(follow_vec.begin(), follow_vec.end(), target);
-    random_shuffle(target_range.first, target_range.second);
-
-    // Interleave with a different set of elements
-    vector<int> interleaved_elements = {100, 200, 300};
-    vector<int> interleaved_vec;
-    for (size_t i = 0; i < follow_vec.size(); ++i) {
-        interleaved_vec.push_back(follow_vec[i]);
-        if (i < interleaved_elements.size()) {
-            interleaved_vec.push_back(interleaved_elements[i]);
-        }
-    }
-
-    // Get follow-up output
-    int follow_out = p(interleaved_vec, target, interleaved_vec.size());
-
-    // Verification
-    EXPECT_EQ(origin_out, follow_out);
-}
-
-/**
- * Metamorphic relation 38: If the array has repeated occurrences of the target, changing the order of the repeated occurrences while modifying their frequency and shuffling the entire array should not change the output.
- */
-TEST_P(BSearchParamTest, MR38) {
-    BSearch2Input input = GetParam();
-    vector<int> vec = input.vec;
-    int target = input.target;
-
-    // Get origin output
-    int origin_out = p(vec, target, vec.size());
-
-    // Construct follow-up input (change the order, frequency, and shuffle the entire array)
-    vector<int> follow_vec = vec;
-    sort(follow_vec.begin(), follow_vec.end());
-
-    // Increase the frequency of the target
-    follow_vec.insert(follow_vec.end(), {target, target});
-
-    // Shuffle the entire array
-    random_shuffle(follow_vec.begin(), follow_vec.end());
-
-    // Get follow-up output
-    int follow_out = p(follow_vec, target, follow_vec.size());
-
-    // Verification
-    EXPECT_EQ(origin_out, follow_out);
-}
-
-/**
- * Metamorphic relation 39: If the array has repeated occurrences of the target, changing the order of the repeated occurrences while modifying their frequency and rotating a subset of the array containing the target should not change the output.
- */
-TEST_P(BSearchParamTest, MR39) {
-    BSearch2Input input = GetParam();
-    vector<int> vec = input.vec;
-    int target = input.target;
-
-    // Get origin output
-    int origin_out = p(vec, target, vec.size());
-
-    // Construct follow-up input (change the order, frequency, and rotate a subset containing the target)
-    vector<int> follow_vec = vec;
-    sort(follow_vec.begin(), follow_vec.end());
-
-    // Increase the frequency of the target
-    follow_vec.insert(follow_vec.end(), {target, target});
-
-    // Shuffle the repeated occurrences
-    auto target_range = equal_range(follow_vec.begin(), follow_vec.end(), target);
-    random_shuffle(target_range.first, target_range.second);
-
-    // Rotate a subset containing the target
-    rotate(target_range.first, target_range.first + 1, target_range.second);
-
-    // Get follow-up output
-    int follow_out = p(follow_vec, target, follow_vec.size());
-
-    // Verification
-    EXPECT_EQ(origin_out, follow_out);
-}
-
-/**
- * Metamorphic relation 40: If the array has repeated occurrences of the target, changing the order of the repeated occurrences while modifying their frequency and reversing a subset of the array not containing the target should not change the output.
- */
-TEST_P(BSearchParamTest, MR40) {
-    BSearch2Input input = GetParam();
-    vector<int> vec = input.vec;
-    int target = input.target;
-
-    // Get origin output
-    int origin_out = p(vec, target, vec.size());
-
-    // Construct follow-up input (change the order, frequency, and reverse a subset not containing the target)
-    vector<int> follow_vec = vec;
-    sort(follow_vec.begin(), follow_vec.end());
-
-    // Increase the frequency of the target
-    follow_vec.insert(follow_vec.end(), {target, target});
-
-    // Shuffle the repeated occurrences
-    auto target_range = equal_range(follow_vec.begin(), follow_vec.end(), target);
-    random_shuffle(target_range.first, target_range.second);
-
-    // Reverse a subset not containing the target
-    reverse(follow_vec.begin(), target_range.first);
-
-    // Get follow-up output
-    int follow_out = p(follow_vec, target, follow_vec.size());
-
-    // Verification
-    EXPECT_EQ(origin_out, follow_out);
-}
-
-/**
- * Metamorphic relation 41: If the array has repeated occurrences of the target, changing the order of the repeated occurrences while modifying their frequency and replacing a subset containing the target with the same set of elements in a different order should not change the output.
- */
-TEST_P(BSearchParamTest, MR41) {
-    BSearch2Input input = GetParam();
-    vector<int> vec = input.vec;
-    int target = input.target;
-
-    // Get origin output
-    int origin_out = p(vec, target, vec.size());
-
-    // Construct follow-up input (change the order, frequency, and replace a subset with the same elements in a different order)
-    vector<int> follow_vec = vec;
-    sort(follow_vec.begin(), follow_vec.end());
-
-    // Increase the frequency of the target
-    follow_vec.insert(follow_vec.end(), {target, target});
-
-    // Shuffle the repeated occurrences
-    auto target_range = equal_range(follow_vec.begin(), follow_vec.end(), target);
-    random_shuffle(target_range.first, target_range.second);
-
-    // Replace a subset with the same elements in a different order
-    replace(target_range.first, target_range.second, target, target);
-    reverse(target_range.first, target_range.second);
-
-    // Get follow-up output
-    int follow_out = p(follow_vec, target, follow_vec.size());
-
-    // Verification
-    EXPECT_EQ(origin_out, follow_out);
-}
-
-/**
- * Metamorphic relation 42: If the array has repeated occurrences of the target, changing the order of the repeated occurrences while modifying their frequency and adding a prefix to the array should not change the output.
- */
-TEST_P(BSearchParamTest, MR42) {
-    BSearch2Input input = GetParam();
-    vector<int> vec = input.vec;
-    int target = input.target;
-
-    // Get origin output
-    int origin_out = p(vec, target, vec.size());
-
-    // Construct follow-up input (change the order, frequency, and add a prefix to the array)
-    vector<int> follow_vec = vec;
-    sort(follow_vec.begin(), follow_vec.end());
-
-    // Increase the frequency of the target
-    follow_vec.insert(follow_vec.end(), {target, target});
-
-    // Shuffle the repeated occurrences
-    auto target_range = equal_range(follow_vec.begin(), follow_vec.end(), target);
-    random_shuffle(target_range.first, target_range.second);
-
-    // Add a prefix to the array
-    vector<int> prefix = {1, 2, 3};
-    follow_vec.insert(follow_vec.begin(), prefix.begin(), prefix.end());
-
-    // Get follow-up output
-    int follow_out = p(follow_vec, target, follow_vec.size());
-
-    // Verification
-    EXPECT_EQ(origin_out, follow_out);
-}
-
-/**
- * Metamorphic relation 43: If the array has repeated occurrences of the target, changing the order of the repeated occurrences while modifying their frequency and replacing a subset not containing the target with a different set of elements should not change the output.
- */
-TEST_P(BSearchParamTest, MR43) {
-    BSearch2Input input = GetParam();
-    vector<int> vec = input.vec;
-    int target = input.target;
-
-    // Get origin output
-    int origin_out = p(vec, target, vec.size());
-
-    // Construct follow-up input (change the order, frequency, and replace a subset not containing the target)
-    vector<int> follow_vec = vec;
-    sort(follow_vec.begin(), follow_vec.end());
-
-    // Increase the frequency of the target
-    follow_vec.insert(follow_vec.end(), {target, target});
-
-    // Shuffle the repeated occurrences
-    auto target_range = equal_range(follow_vec.begin(), follow_vec.end(), target);
-    random_shuffle(target_range.first, target_range.second);
-
-    // Replace a subset not containing the target with a different set of elements
-    replace(target_range.second, follow_vec.end(), target, target + 1);
-
-    // Get follow-up output
-    int follow_out = p(follow_vec, target, follow_vec.size());
-
-    // Verification
-    EXPECT_EQ(origin_out, follow_out);
-}
-
-/**
- * Metamorphic relation 44: If the array has repeated occurrences of the target, changing the order of the repeated occurrences while modifying their frequency and removing a prefix from the array should not change the output.
- */
-TEST_P(BSearchParamTest, MR44) {
-    BSearch2Input input = GetParam();
-    vector<int> vec = input.vec;
-    int target = input.target;
-
-    // Get origin output
-    int origin_out = p(vec, target, vec.size());
-
-    // Construct follow-up input (change the order, frequency, and remove a prefix from the array)
-    vector<int> follow_vec = vec;
-    sort(follow_vec.begin(), follow_vec.end());
-
-    // Increase the frequency of the target
-    follow_vec.insert(follow_vec.end(), {target, target});
-
-    // Shuffle the repeated occurrences
-    auto target_range = equal_range(follow_vec.begin(), follow_vec.end(), target);
-    random_shuffle(target_range.first, target_range.second);
-
-    // Remove a prefix from the array
-    follow_vec.erase(follow_vec.begin(), follow_vec.begin() + 3);
-
-    // Get follow-up output
-    int follow_out = p(follow_vec, target, follow_vec.size());
-
-    // Verification
-    EXPECT_EQ(origin_out, follow_out);
-}
-
-/**
- * Metamorphic relation 45: If the array has repeated occurrences of the target, changing the order of the repeated occurrences while modifying their frequency and swapping the positions of two elements not containing the target should not change the output.
- */
-TEST_P(BSearchParamTest, MR45) {
-    BSearch2Input input = GetParam();
-    vector<int> vec = input.vec;
-    int target = input.target;
-
-    // Get origin output
-    int origin_out = p(vec, target, vec.size());
-
-    // Construct follow-up input (change the order, frequency, and swap positions of two elements not containing the target)
-    vector<int> follow_vec = vec;
-    sort(follow_vec.begin(), follow_vec.end());
-
-    // Increase the frequency of the target
-    follow_vec.insert(follow_vec.end(), {target, target});
-
-    // Shuffle the repeated occurrences
-    auto target_range = equal_range(follow_vec.begin(), follow_vec.end(), target);
-    random_shuffle(target_range.first, target_range.second);
-
-    // Swap positions of two elements not containing the target
-    iter_swap(follow_vec.begin() + 1, follow_vec.begin() + 3);
-
-    // Get follow-up output
-    int follow_out = p(follow_vec, target, follow_vec.size());
-
-    // Verification
-    EXPECT_EQ(origin_out, follow_out);
-}
-
-/**
- * Metamorphic relation 46: If the array has repeated occurrences of the target, changing the order of the repeated occurrences while modifying their frequency and replacing a subset not containing the target with the same set of elements in reverse order should not change the output.
- */
-TEST_P(BSearchParamTest, MR46) {
-    BSearch2Input input = GetParam();
-    vector<int> vec = input.vec;
-    int target = input.target;
-
-    // Get origin output
-    int origin_out = p(vec, target, vec.size());
-
-    // Construct follow-up input (change the order, frequency, and replace a subset not containing the target with the same elements in reverse order)
-    vector<int> follow_vec = vec;
-    sort(follow_vec.begin(), follow_vec.end());
-
-    // Increase the frequency of the target
-    follow_vec.insert(follow_vec.end(), {target, target});
-
-    // Shuffle the repeated occurrences
-    auto target_range = equal_range(follow_vec.begin(), follow_vec.end(), target);
-    random_shuffle(target_range.first, target_range.second);
-
-    // Replace a subset not containing the target with the same elements in reverse order
-    reverse(follow_vec.begin() + 1, follow_vec.begin() + 4);
-
-    // Get follow-up output
-    int follow_out = p(follow_vec, target, follow_vec.size());
-
-    // Verification
-    EXPECT_EQ(origin_out, follow_out);
-}
-
-/**
- * Metamorphic relation 47: If the array has repeated occurrences of the target, changing the order of the repeated occurrences while modifying their frequency and replacing a subset containing the target with a subset not containing the target should not change the output.
- */
-TEST_P(BSearchParamTest, MR47) {
-    BSearch2Input input = GetParam();
-    vector<int> vec = input.vec;
-    int target = input.target;
-
-    // Get origin output
-    int origin_out = p(vec, target, vec.size());
-
-    // Construct follow-up input (change the order, frequency, and replace a subset containing the target with a subset not containing the target)
-    vector<int> follow_vec = vec;
-    sort(follow_vec.begin(), follow_vec.end());
-
-    // Increase the frequency of the target
-    follow_vec.insert(follow_vec.end(), {target, target});
-
-    // Shuffle the repeated occurrences
-    auto target_range = equal_range(follow_vec.begin(), follow_vec.end(), target);
-    random_shuffle(target_range.first, target_range.second);
-
-    // Replace a subset containing the target with a subset not containing the target
-    vector<int> replacement_subset = {1, 2, 3};
-    follow_vec.erase(target_range.first, target_range.second);
-    follow_vec.insert(target_range.first, replacement_subset.begin(), replacement_subset.end());
-
-    // Get follow-up output
-    int follow_out = p(follow_vec, target, follow_vec.size());
-
-    // Verification
-    EXPECT_EQ(origin_out, follow_out);
-}
-
-/**
- * Metamorphic relation 48: If the array has repeated occurrences of the target, changing the order of the repeated occurrences while modifying their frequency and replacing a subset not containing the target with a subset containing the target should not change the output.
- */
-TEST_P(BSearchParamTest, MR48) {
-    BSearch2Input input = GetParam();
-    vector<int> vec = input.vec;
-    int target = input.target;
-
-    // Get origin output
-    int origin_out = p(vec, target, vec.size());
-
-    // Construct follow-up input (change the order, frequency, and replace a subset not containing the target with a subset containing the target)
-    vector<int> follow_vec = vec;
-    sort(follow_vec.begin(), follow_vec.end());
-
-    // Increase the frequency of the target
-    follow_vec.insert(follow_vec.end(), {target, target});
-
-    // Shuffle the repeated occurrences
-    auto target_range = equal_range(follow_vec.begin(), follow_vec.end(), target);
-    random_shuffle(target_range.first, target_range.second);
-
-    // Replace a subset not containing the target with a subset containing the target
-    vector<int> replacement_subset = {target, target};
-    follow_vec.erase(target_range.first, target_range.second);
-    follow_vec.insert(target_range.first, replacement_subset.begin(), replacement_subset.end());
-
-    // Get follow-up output
-    int follow_out = p(follow_vec, target, follow_vec.size());
-
-    // Verification
-    EXPECT_EQ(origin_out, follow_out);
-}
-
-/**
- * Metamorphic relation 49: If the array has repeated occurrences of the target, changing the order of the repeated occurrences while modifying their frequency and replacing a subset containing the target with a reversed version of that subset should not change the output.
- */
+// Metamorphic relation 49: Duplicate all elements in the array and the target element,
+// and the output should remain the same.
 TEST_P(BSearchParamTest, MR49) {
+    /* Get input data */
     BSearch2Input input = GetParam();
     vector<int> vec = input.vec;
     int target = input.target;
 
-    // Get origin output
+    /* Get origin output */
     int origin_out = p(vec, target, vec.size());
 
-    // Construct follow-up input (change the order, frequency, and replace a subset containing the target with a reversed version of that subset)
-    vector<int> follow_vec = vec;
-    sort(follow_vec.begin(), follow_vec.end());
+    /* Construct follow-up input */
+    vec.insert(vec.end(), vec.begin(), vec.end());
+    int follow_target = target;
 
-    // Increase the frequency of the target
-    follow_vec.insert(follow_vec.end(), {target, target});
+    /* Get follow-up output */
+    int follow_out = p(vec, follow_target, vec.size());
 
-    // Shuffle the repeated occurrences
-    auto target_range = equal_range(follow_vec.begin(), follow_vec.end(), target);
-    random_shuffle(target_range.first, target_range.second);
-
-    // Replace a subset containing the target with a reversed version of that subset
-    reverse(target_range.first, target_range.second);
-
-    // Get follow-up output
-    int follow_out = p(follow_vec, target, follow_vec.size());
-
-    // Verification
+    /* Verification */
     EXPECT_EQ(origin_out, follow_out);
 }
 
-/**
- * Metamorphic relation 50: If the array has repeated occurrences of the target, changing the order of the repeated occurrences while modifying their frequency and replacing a subset not containing the target with a reversed version of that subset should not change the output.
- */
+// Metamorphic relation 50: Replace all elements in the array with a constant value,
+// and the output should remain the same unless the target was the constant value.
 TEST_P(BSearchParamTest, MR50) {
+    /* Get input data */
     BSearch2Input input = GetParam();
     vector<int> vec = input.vec;
     int target = input.target;
 
-    // Get origin output
+    /* Get origin output */
     int origin_out = p(vec, target, vec.size());
 
-    // Construct follow-up input (change the order, frequency, and replace a subset not containing the target with a reversed version of that subset)
-    vector<int> follow_vec = vec;
-    sort(follow_vec.begin(), follow_vec.end());
+    /* Construct follow-up input */
+    int constant = 42;
+    fill(vec.begin(), vec.end(), constant);
+    int follow_target = (target == constant) ? target : 0; // Set target to constant value if it was already
 
-    // Increase the frequency of the target
-    follow_vec.insert(follow_vec.end(), {target, target});
+    /* Get follow-up output */
+    int follow_out = p(vec, follow_target, vec.size());
 
-    // Shuffle the repeated occurrences
-    auto target_range = equal_range(follow_vec.begin(), follow_vec.end(), target);
-    random_shuffle(target_range.first, target_range.second);
-
-    // Replace a subset not containing the target with a reversed version of that subset
-    reverse(follow_vec.begin() + 1, follow_vec.begin() + 4);
-
-    // Get follow-up output
-    int follow_out = p(follow_vec, target, follow_vec.size());
-
-    // Verification
+    /* Verification */
     EXPECT_EQ(origin_out, follow_out);
 }
 
 INSTANTIATE_TEST_CASE_P(TrueReturn, BSearchParamTest,
-                        testing::Values(BSearch2Input({1, 2, 3, 4, 5}, 3), BSearch2Input({1, 2, 3, 4, 5}, 1), BSearch2Input({1, 2, 3, 4, 5}, 99)));
+                        testing::Values(BSearch2Input({1, 2, 3, 4, 5}, 3), BSearch2Input({1, 2, 3, 4, 5}, 1), BSearch2Input({1, 2, 3, 4, 5}, 99), BSearch2Input({1,1,2,2,3,3,4,4,5,5}, 2)));
