@@ -523,6 +523,85 @@ Please generate more different metamorphic relations.
 
 Certainly! Here are two more metamorphic relations for the binary search function `p`:
 
+### Metamorphic Relation 11:
+
+If the array has repeated occurrences of the target, removing one or more occurrences should not change the output.
+
+```cpp
+TEST_P(BSearchParamTest, MR11) {
+    BSearch2Input input = GetParam();
+    std::vector<int> vec = input.vec;
+    int target = input.target;
+
+    // Get origin output
+    int origin_out = p(vec, target, vec.size());
+
+    // Construct follow-up input (remove one or more occurrences of the target)
+    auto it = std::remove(vec.begin(), vec.end(), target);
+    vec.erase(it, vec.end());
+
+    // Get follow-up output
+    int follow_out = p(vec, target, vec.size());
+
+    // Verification
+    EXPECT_EQ(origin_out, follow_out);
+}
+
+// Define the parameterized test suite
+INSTANTIATE_TEST_SUITE_P(
+    BSearchTests,
+    BSearchParamTest,
+    testing::Values(
+        // Add your test cases here using BSearch2Input
+    )
+);
+```
+
+### Metamorphic Relation 12:
+
+If the array has repeated occurrences of the target, increasing the number of occurrences should not change the output.
+
+```cpp
+TEST_P(BSearchParamTest, MR12) {
+    BSearch2Input input = GetParam();
+    std::vector<int> vec = input.vec;
+    int target = input.target;
+
+    // Get origin output
+    int origin_out = p(vec, target, vec.size());
+
+    // Construct follow-up input (increase the number of occurrences of the target)
+    vec.push_back(target);
+
+    // Get follow-up output
+    int follow_out = p(vec, target, vec.size());
+
+    // Verification
+    EXPECT_EQ(origin_out, follow_out);
+}
+
+// Define the parameterized test suite
+INSTANTIATE_TEST_SUITE_P(
+    BSearchTests,
+    BSearchParamTest,
+    testing::Values(
+        // Add your test cases here using BSearch2Input
+    )
+);
+```
+
+These metamorphic relations explore scenarios where the array contains repeated occurrences of the target, and modifications are made by removing or adding occurrences. Adjust them based on your specific requirements and binary search implementation.
+
+#### User
+
+Please generate more different metamorphic relations.
+
+<br>
+
+#### ChatGPT
+
+Certainly! Here are two more metamorphic relations for the binary search function `p`:
+
 ### Metamorphic Relation 13:
 
 If the array has duplicate elements, replacing one occurrence of the target with a different value should not change the output.
