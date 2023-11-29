@@ -1,5 +1,7 @@
+#include <vector>
+using namespace std;
 
-int p(int a[], int e, int len) {
+int p(vector<int> a, int e, int len) {
 
     int l, h, mid, ret;
     l = 0;
