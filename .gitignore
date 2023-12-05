@@ -5,3 +5,4 @@
 .vscode/
 .VSCodeCounter
 build/
+venv/
