@@ -2,7 +2,7 @@
 Author: Radon
 Date: 2023-12-06 15:26:45
 LastEditors: Radon
-LastEditTime: 2023-12-07 15:24:33
+LastEditTime: 2023-12-07 15:25:53
 Description: Hi, say something
 """
 import openai
@@ -97,7 +97,7 @@ def read_prompt(prompt_path: str) -> list:
     Returns
     -------
     list
-        村粗提示词内容的列表
+        存储提示词内容的列表
 
     Notes
     -----
@@ -139,7 +139,7 @@ def read_prompt(prompt_path: str) -> list:
     if not is_all_blank(sub_document):
         list_prompt.append(md_instance.render(sub_document))
 
-    # 为了保证蜕变关系生成的数量至少有50个, 反复重复最后一个提示词, 直到list_prompt的长度到达30
+    # 为了保证蜕变关系生成的数量至少有50个, 反复重复最后一个提示词, 直到list_prompt的长度到达指定值
     while len(list_prompt) < 30:
         list_prompt.append(list_prompt[-1])
 
