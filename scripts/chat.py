@@ -2,7 +2,7 @@
 Author: Radon
 Date: 2023-12-06 15:26:45
 LastEditors: Radon
-LastEditTime: 2023-12-07 14:49:07
+LastEditTime: 2023-12-07 15:24:33
 Description: Hi, say something
 """
 import openai
@@ -28,12 +28,13 @@ def gpt_3p5_turbo(list_prompt: list):
     -----
     _description_
     """
-    msgs = list()  # 提问列表
+    msgs = list()  # 聊天记录列表
 
     for prompt in list_prompt:
         # 将提示词加入列表, 以让gpt记住历史聊天内容
         msgs.append({"role": "user", "content": prompt})
 
+        # 获取gpt的回复内容, 加入到answer中
         answer = str()
         response = openai.ChatCompletion.create(model="gpt-3.5-turbo", messages=msgs, stream=True)
         print("ChatGPT: ", end="")
@@ -49,7 +50,15 @@ def gpt_3p5_turbo(list_prompt: list):
                 print(delta_v, end="")
                 answer += delta_v
 
+        # 将answer加入msgs, 以让gpt记住历史聊天内容
         msgs.append({"role": "assistant", "content": answer})
+
+    # 将聊天内容输出到文件
+    with open("gpt3.5turbo.md", mode="w") as f:
+        for msg in msgs:
+            f.write("#### " + msg["role"] + "\n\n")
+            f.write(msg["content"] + "\n\n")
+    print("Finish!")
 
 
 def is_all_blank(document: marko.block.Document) -> bool:
@@ -119,7 +128,7 @@ def read_prompt(prompt_path: str) -> list:
             # 判断sub_document中的节点是否都是空行的节点, 如果都是空行的节点就不加到list_prompt里了
             # 如果存在非空行节点, 加入list_prompt
             if not is_all_blank(sub_document):
-                list_prompt.append(md_instance.render(sub_document))
+                list_prompt.append(md_instance.render(sub_document).lstrip("\n"))
             sub_document.children = []
 
         # 如果不是标题, 将节点加入到sub_document中
