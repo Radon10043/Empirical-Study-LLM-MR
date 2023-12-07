@@ -16,17 +16,66 @@ with open("api_key.txt") as f:
 openai.api_base = "https://api.chatanywhere.com.cn/v1"
 
 
-def main():
-    """向ChatGPT发送信息并进行聊天"""
-    msgs = list()  # 提问列表
-    turn = 0  # 当前是第几个聊天
-    max_turn = 30  # 最大聊天次数
+def gpt_3p5_turbo(list_prompt: list):
+    """向gpt-3.5-turbo发送信息, 让其识别蜕变关系并生成单元测试用例代码
 
-    while turn < max_turn:
-        # 将提问内容加入列表, 以让AI记住历史聊天内容
-        print("(%d/%d)请输入内容:" % (turn + 1, max_turn), end="")
-        question = input()
-        msgs.append({"role": "user", "content": question})
+    Parameters
+    ----------
+    list_prompt : list
+        提示词列表
+
+    Notes
+    -----
+    _description_
+    """
+    msgs = list()  # 提问列表
+
+    for prompt in list_prompt:
+        # 将提示词加入列表, 以让gpt记住历史聊天内容
+        msgs.append({"role": "user", "content": prompt})
+
+        answer = str()
+        response = openai.ChatCompletion.create(model="gpt-3.5-turbo", messages=msgs, stream=True)
+        print("ChatGPT: ", end="")
+
+        for event in response:
+            if event["choices"][0]["finish_reason"] == "stop":
+                answer += "\n\n"
+                print("\n\n")
+                break
+            for delta_k, delta_v in event["choices"][0]["delta"].items():
+                if delta_k == "role":
+                    continue
+                print(delta_v, end="")
+                answer += delta_v
+
+        msgs.append({"role": "assistant", "content": answer})
+
+
+def is_all_blank(document: marko.block.Document) -> bool:
+    """判断document的子集里是否全为空行
+
+    Parameters
+    ----------
+    document : marko.block.Document
+        存储了markdown内容的结点
+
+    Returns
+    -------
+    bool
+        document的children中是否全为BlankLine
+
+    Notes
+    -----
+    _description_
+    """
+    b_all_blank = True
+    for child in document.children:
+        if child.get_type() != "BlankLine":
+            b_all_blank = False
+            break
+    return b_all_blank
+
 
 def read_prompt(prompt_path: str) -> list:
     """解析存储了提示词的文件, 并返回存有提示词内容的列表
@@ -67,31 +116,25 @@ def read_prompt(prompt_path: str) -> list:
         # FIXME: 现在没有对markdown的注释作判断, 可能会向list_prompt中多加内容
         # 如果是标题, 根据情况决定是否要将sub_document转换为文本并加入list_prompt
         if child_type == "Heading":
-
             # 判断sub_document中的节点是否都是空行的节点, 如果都是空行的节点就不加到list_prompt里了
-            b_all_blank = True
-            for sub_child in sub_document.children:
-                if sub_child.get_type() != "BlankLine":
-                    b_all_blank = False
-                    break
-
             # 如果存在非空行节点, 加入list_prompt
-            if not b_all_blank:
+            if not is_all_blank(sub_document):
                 list_prompt.append(md_instance.render(sub_document))
-
-            # 清空sub_document
             sub_document.children = []
 
         # 如果不是标题, 将节点加入到sub_document中
         else:
             sub_document.children.append(child)
 
-    with open("tmp.txt", mode="w") as f:
-        for text in list_prompt:
-            f.write(text)
-            f.write("--------------------\n\n")
+    # 为防止遗漏最后一段, 判断结尾的paragraph是否全为BlankLine, 如果不是, 加入到list_prompt中
+    if not is_all_blank(sub_document):
+        list_prompt.append(md_instance.render(sub_document))
 
-    print("Please check.")
+    # 为了保证蜕变关系生成的数量至少有50个, 反复重复最后一个提示词, 直到list_prompt的长度到达30
+    while len(list_prompt) < 30:
+        list_prompt.append(list_prompt[-1])
+
+    return list_prompt
 
 
 if __name__ == "__main__":
@@ -99,3 +142,4 @@ if __name__ == "__main__":
     prompt_path = "prompt.md"
 
     list_prompt = read_prompt(prompt_path)
+    gpt_3p5_turbo(list_prompt)
