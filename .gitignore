@@ -2,6 +2,8 @@
 *.jar
 *.exe
 
+api_key.txt
+
 .vscode/
 .VSCodeCounter
 build/

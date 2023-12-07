@@ -2,7 +2,7 @@
 Author: Radon
 Date: 2023-12-06 15:26:45
 LastEditors: Radon
-LastEditTime: 2023-12-07 14:06:34
+LastEditTime: 2023-12-07 14:49:07
 Description: Hi, say something
 """
 import openai
@@ -11,7 +11,8 @@ import marko
 from marko.md_renderer import MarkdownRenderer
 
 # openai.log = "debug"
-openai.api_key = ""
+with open("api_key.txt") as f:
+    openai.api_key = f.read()
 openai.api_base = "https://api.chatanywhere.com.cn/v1"
 
 
@@ -27,29 +28,29 @@ def main():
         question = input()
         msgs.append({"role": "user", "content": question})
 
-        try:
-            response = openai.ChatCompletion.create(model="gpt-3.5-turbo", messages=msgs, stream=True)
-            print("ChatGPT: ", end="")
-            for event in response:
-                if event["choices"][0]["finish_reason"] == "stop":
-                    print("\n\n")
-                    break
-                for delta_k, delta_v in event["choices"][0]["delta"].items():
-                    if delta_k == "role":
-                        continue
-                    print(delta_v, end="")
-            turn += 1
-        except BaseException as e:
-            print("Openai API 出现异常: ", e)
+def read_prompt(prompt_path: str) -> list:
+    """解析存储了提示词的文件, 并返回存有提示词内容的列表
 
+    Parameters
+    ----------
+    prompt_path : str
+        存储提示内容的文件路径
 
-def read_prompt():
+    Returns
+    -------
+    list
+        村粗提示词内容的列表
+
+    Notes
+    -----
+    _description_
+    """
     # 由于使用render函数会默认呈现为HTML的文本, 因此构造一个MarkDown实例, 使用MarkdownRenderer, 使AST可呈现为md文本
     md_instance = marko.Markdown(renderer=MarkdownRenderer)
 
     # 读取markdown文件的原始内容, 存入md_text
     md_text = str()
-    with open("prompt.md") as f:
+    with open(prompt_path) as f:
         md_text = f.read()
 
     # 解析markdown文件
@@ -94,5 +95,7 @@ def read_prompt():
 
 
 if __name__ == "__main__":
-    read_prompt()
-    # main()
+    # TODO: args
+    prompt_path = "prompt.md"
+
+    list_prompt = read_prompt(prompt_path)
