@@ -2,11 +2,12 @@
 Author: Radon
 Date: 2023-12-06 15:26:45
 LastEditors: Radon
-LastEditTime: 2023-12-07 15:25:53
+LastEditTime: 2023-12-07 16:39:59
 Description: Hi, say something
 """
 import openai
 import marko
+import random, time
 
 from marko.md_renderer import MarkdownRenderer
 
@@ -30,35 +31,43 @@ def gpt_3p5_turbo(list_prompt: list):
     """
     msgs = list()  # 聊天记录列表
 
-    for prompt in list_prompt:
-        # 将提示词加入列表, 以让gpt记住历史聊天内容
-        msgs.append({"role": "user", "content": prompt})
+    try:
+        for prompt in list_prompt:
+            # 将提示词加入列表, 以让gpt记住历史聊天内容
+            msgs.append({"role": "user", "content": prompt})
 
-        # 获取gpt的回复内容, 加入到answer中
-        answer = str()
-        response = openai.ChatCompletion.create(model="gpt-3.5-turbo", messages=msgs, stream=True)
-        print("ChatGPT: ", end="")
+            # 随机休息几秒, 防止报错
+            time.sleep(random.randint(1, 5))
 
-        for event in response:
-            if event["choices"][0]["finish_reason"] == "stop":
-                answer += "\n\n"
-                print("\n\n")
-                break
-            for delta_k, delta_v in event["choices"][0]["delta"].items():
-                if delta_k == "role":
-                    continue
-                print(delta_v, end="")
-                answer += delta_v
+            # 获取gpt的回复内容, 加入到answer中
+            answer = str()
+            response = openai.ChatCompletion.create(model="gpt-3.5-turbo", messages=msgs, stream=True)
+            print("ChatGPT: ", end="")
 
-        # 将answer加入msgs, 以让gpt记住历史聊天内容
-        msgs.append({"role": "assistant", "content": answer})
+            for event in response:
+                if event["choices"][0]["finish_reason"] == "stop":
+                    answer += "\n\n"
+                    print("\n\n")
+                    break
+                for delta_k, delta_v in event["choices"][0]["delta"].items():
+                    if delta_k == "role":
+                        continue
+                    print(delta_v, end="")
+                    answer += delta_v
+
+            # 将answer加入msgs, 以让gpt记住历史聊天内容
+            msgs.append({"role": "assistant", "content": answer})
+
+    except BaseException as e:
+        print("出现错误: " + str(e))
 
     # 将聊天内容输出到文件
+    print("Writing to the gpt3.5turbo.md ... ", end="")
     with open("gpt3.5turbo.md", mode="w") as f:
         for msg in msgs:
             f.write("#### " + msg["role"] + "\n\n")
             f.write(msg["content"] + "\n\n")
-    print("Finish!")
+    print("finish!")
 
 
 def is_all_blank(document: marko.block.Document) -> bool:
@@ -137,7 +146,7 @@ def read_prompt(prompt_path: str) -> list:
 
     # 为防止遗漏最后一段, 判断结尾的paragraph是否全为BlankLine, 如果不是, 加入到list_prompt中
     if not is_all_blank(sub_document):
-        list_prompt.append(md_instance.render(sub_document))
+        list_prompt.append(md_instance.render(sub_document).lstrip("\n"))
 
     # 为了保证蜕变关系生成的数量至少有50个, 反复重复最后一个提示词, 直到list_prompt的长度到达指定值
     while len(list_prompt) < 30:
