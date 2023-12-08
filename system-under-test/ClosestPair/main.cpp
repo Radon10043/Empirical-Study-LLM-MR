@@ -79,8 +79,8 @@ float closestUtil(Point Px[], Point Py[], int n)
             Pyr[ri++] = Py[i];
     }
 
-    float dl = closestUtil(Px, Pyl, mid);
-    float dr = closestUtil(Px + mid, Pyr, n-mid);
+    float dl = closestUtil(Px, Pyl, mid + 1);
+    float dr = closestUtil(Px + mid + 1, Pyr, n-mid - 1);
 
     // Find the smaller of two distances 
     float d = min(dl, dr);
