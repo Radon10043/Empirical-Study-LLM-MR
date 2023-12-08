@@ -2,12 +2,13 @@
 Author: Radon
 Date: 2023-12-06 15:26:45
 LastEditors: Radon
-LastEditTime: 2023-12-07 16:39:59
+LastEditTime: 2023-12-08 15:03:34
 Description: Hi, say something
 """
 import openai
 import marko
 import random, time
+import argparse, os
 
 from marko.md_renderer import MarkdownRenderer
 
@@ -17,13 +18,15 @@ with open("api_key.txt") as f:
 openai.api_base = "https://api.chatanywhere.com.cn/v1"
 
 
-def gpt_3p5_turbo(list_prompt: list):
+def gpt_3p5_turbo(list_prompt: list, output_dir: str):
     """向gpt-3.5-turbo发送信息, 让其识别蜕变关系并生成单元测试用例代码
 
     Parameters
     ----------
     list_prompt : list
         提示词列表
+    output_dir : str
+        聊天内容要输出到的目录
 
     Notes
     -----
@@ -63,11 +66,15 @@ def gpt_3p5_turbo(list_prompt: list):
 
     # 将聊天内容输出到文件
     print("Writing to the gpt3.5turbo.md ... ", end="")
-    with open("gpt3.5turbo.md", mode="w") as f:
+    with open(os.path.join(output_dir, "gpt3.5turbo.md"), mode="w") as f:
         for msg in msgs:
             f.write("#### " + msg["role"] + "\n\n")
             f.write(msg["content"] + "\n\n")
     print("finish!")
+
+
+def gpt4(list_prompt: list, output_dir: str):
+    print("待完成!")
 
 
 def is_all_blank(document: marko.block.Document) -> bool:
@@ -155,9 +162,25 @@ def read_prompt(prompt_path: str) -> list:
     return list_prompt
 
 
-if __name__ == "__main__":
-    # TODO: args
-    prompt_path = "prompt.md"
+# fmt:off
+DICT_MODEL_FUNC = {
+    "gpt3.5turbo": gpt_3p5_turbo,
+    "gpt4": gpt4
+}
+# fmt:on
 
-    list_prompt = read_prompt(prompt_path)
-    gpt_3p5_turbo(list_prompt)
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="自动向大模型发送提示并输出内容至markdown文件")
+    parser.add_argument("-p", "--prompt", nargs="*", required=True, help="prompt文件路径, 需要是markdown文件, 且遵循模板的规则, 可同时输入多个文件路径.")
+    parser.add_argument("-m", "--model", choices=["gpt3.5turbo", "gpt4"], required=True, help="要使用的大模型")
+    args = parser.parse_args()
+
+    prompt_paths = args.prompt
+
+    for prompt_path in prompt_paths:
+        # 聊天内容文件保存到prompt文件同目录下
+        output_dir = os.path.dirname(prompt_path)
+
+        list_prompt = read_prompt(prompt_path)
+        DICT_MODEL_FUNC[args.model](list_prompt, output_dir)
