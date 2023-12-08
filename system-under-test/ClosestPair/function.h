@@ -1,3 +1,6 @@
+#ifndef _HAVE_FUNCTION_H
+#define _HAVE_FUNCTION_H
+
 #include <iostream>
 #include <float.h>
 #include <stdlib.h>
@@ -111,13 +114,4 @@ float closest(Point P[], int n)
     return closestUtil(Px, Py, n);
 }
 
-// Driver program to test above functions 
-int main()
-{
-    Point P[] = {{795, 981}, {1905, 4574}, {8891, 665}, {6370, 1396}, {93, 8603}, {302, 7099},
-                 {326, 5318}, {4493, 3977}, {429, 8687}, {9198, 1558}};
-    int n = sizeof(P) / sizeof(P[0]);
-    cout << closest(P, n) << std::endl;
-    cout << bruteForce(P, n) << std::endl;
-    return 0;
-} 
+#endif
