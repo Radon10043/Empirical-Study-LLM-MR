@@ -1,8 +1,16 @@
-# Chat 1
+# Prompt
 
-Assume there is a trigonometric function sin(x), a source input x1, and a corresponding source output y1. If follow-up input x2=pi-x1 and corresponding follow-up output y2=y1, we say there is a metamorphic relation sin(x)=sin(pi-x).
+## Chat 1
 
-Next, you need to identify the metamorphic relation of a function. There is a function that implements the binary search algorithm to find the occurrence index of the specific element in the ascending array. Its inputs are 2 variables: ```vec``` and ```target```, representing an ascending array and the element to be searched, respectively. Its return value is an integer representing the occurrence index of ```target``` in ```vec```. If ```target```does not occur in ```vec```, the function returns -1. Please identify the metamorphic relation of this function as much as possible and use Google's C++ testing and mocking framework ```googletest``` to codify them as C++ code.
+Metamorphic testing is usually used to check whether the system under test satisfies specific properties. Among them, metamorphic relation is the core concept of metamorphic testing. The metamorphic relation can be considered a formal expression of the properties of the system under test and usually consists of two parts, namely the input relation and the output relation.
+
+## Chat 2
+
+For the function $sin(x)$, assuming there is an origin input $x1$, the corresponding origin output is $y1$, $x2$ is a follow-up input, and the corresponding follow-up output is $y2$. $x2$ is transformed from $x1$, and there is an input relation between $x2$ and $x1$: $x2=\pi-x1$, an output relation between $y1$ and $y2$: $y1=y2$. Therefore, there is a metamorphic relation $sin(x)=sin(\pi-x)$.
+
+# Chat 3
+
+Based on the above case, please identify the metamorphic relation of this system: There is a function that implements the binary search algorithm to find the occurrence index of the specific element in the ascending array. Its inputs are 2 variables: `vec` and `target`, representing an ascending array and the element to be searched, respectively. Its return value is an integer representing the occurrence index of `target` in `vec`. If `target`does not occur in `vec`, the function returns -1. Please identify the metamorphic relation of this function as much as possible and use Google's C++ testing and mocking framework `googletest` to codify them as C++ code.
 
 Here is some examples:
 
@@ -59,6 +67,6 @@ TEST_P(BSearchParamTest, MR2) {
 }
 ```
 
-# Chat 2
+# Chat 4...n
 
-Please generate more different metamorphic relations.
+Please identify more different metamorphic relations of this system.

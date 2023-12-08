@@ -1,8 +1,16 @@
+# Prompt
+
+## Chat 1
+
+Metamorphic testing is usually used to check whether the system under test satisfies specific properties. Among them, metamorphic relation is the core concept of metamorphic testing. The metamorphic relation can be considered a formal expression of the properties of the system under test and usually consists of two parts, namely the input relation and the output relation.
+
+## Chat 2
+
+For the function $sin(x)$, assuming there is an origin input $x1$, the corresponding origin output is $y1$, $x2$ is a follow-up input, and the corresponding follow-up output is $y2$. $x2$ is transformed from $x1$, and there is an input relation between $x2$ and $x1$: $x2=\pi-x1$, an output relation between $y1$ and $y2$: $y1=y2$. Therefore, there is a metamorphic relation $sin(x)=sin(\pi-x)$.
+
 # Chat 1
 
-Assume there is a trigonometric function sin(x), a source input x1, and a corresponding source output y1. If follow-up input x2=pi-x1 and corresponding follow-up output y2=y1, we say there is a metamorphic relation sin(x)=sin(pi-x).
-
-Next, you need to identify the metamorphic relation of the function `p`. The specification of this function is as follows:
+Based on the above case, please identify the metamorphic relation of the function `p`. The specification of this function is as follows:
 
 - The function implements the binary search algorithm to determine whether the specific element occurs in the ascending array.
 - The function's input is 2 variables: `vec` and `target`, representing an ascending array and the element to be searched, respectively.

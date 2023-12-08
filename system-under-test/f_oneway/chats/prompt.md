@@ -6,7 +6,7 @@ Metamorphic testing is usually used to check whether the system under test satis
 
 ## Chat 2
 
-For the function sin(x), assuming there is an origin input x1, the corresponding origin output is y1, x2 is a follow-up input, and the corresponding follow-up output is y2. x2 is transformed from x1, and there is an input relation between x2 and x1: x2=pi-x1, an output relation between y1 and y2: y1=y2. Therefore, there is a metamorphic relation sin(x)=sin(pi-x).
+For the function $sin(x)$, assuming there is an origin input $x1$, the corresponding origin output is $y1$, $x2$ is a follow-up input, and the corresponding follow-up output is $y2$. $x2$ is transformed from $x1$, and there is an input relation between $x2$ and $x1$: $x2=\pi-x1$, an output relation between $y1$ and $y2$: $y1=y2$. Therefore, there is a metamorphic relation $sin(x)=sin(\pi-x)$.
 
 ## Chat 3
 
