@@ -2,11 +2,11 @@
 Author: Radon
 Date: 2023-12-06 15:26:45
 LastEditors: Radon
-LastEditTime: 2023-12-08 15:03:34
+LastEditTime: 2023-12-08 15:40:38
 Description: Hi, say something
 """
 import openai
-import marko
+import marko, json
 import random, time
 import argparse, os
 
@@ -70,6 +70,12 @@ def gpt_3p5_turbo(list_prompt: list, output_dir: str):
         for msg in msgs:
             f.write("#### " + msg["role"] + "\n\n")
             f.write(msg["content"] + "\n\n")
+    print("finish!")
+
+    # 将聊天内容同时保存至json文件
+    print("Writing to the gpt3.5turbo.json ... ", end="")
+    with open("gpt3.5turbo.json", mode="w") as f:
+        json.dump(msgs, f, indent=4)
     print("finish!")
 
 
