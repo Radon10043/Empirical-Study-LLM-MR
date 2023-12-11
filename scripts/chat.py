@@ -2,7 +2,7 @@
 Author: Radon
 Date: 2023-12-06 15:26:45
 LastEditors: Radon
-LastEditTime: 2023-12-08 15:40:38
+LastEditTime: 2023-12-08 19:05:16
 Description: Hi, say something
 """
 import openai
@@ -74,7 +74,7 @@ def gpt_3p5_turbo(list_prompt: list, output_dir: str):
 
     # 将聊天内容同时保存至json文件
     print("Writing to the gpt3.5turbo.json ... ", end="")
-    with open("gpt3.5turbo.json", mode="w") as f:
+    with open(os.path.join(output_dir, "gpt3.5turbo.json"), mode="w") as f:
         json.dump(msgs, f, indent=4)
     print("finish!")
 
