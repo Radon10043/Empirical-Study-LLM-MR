@@ -1,3 +1,6 @@
+#ifndef _HAVE_FUNCTION_H
+#define _HAVE_FUNCTION_H
+
 #include<vector>
 #include<string>
 
@@ -12,3 +15,5 @@
         }
         return dp[n][m];
 }
+
+#endif
