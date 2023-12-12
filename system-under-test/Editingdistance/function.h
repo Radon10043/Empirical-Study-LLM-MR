@@ -1,3 +1,6 @@
+#ifndef _HAVE_FUNCTION_H
+#define _HAVE_FUNCTION_H
+
 #include<string>
   
 int min(int x, int y, int z) 
@@ -22,3 +25,5 @@ int editDist(std::string str1 ,std::string str2 , int m ,int n)
                      editDist(str1,  str2, m-1, n-1) 
                    ); 
 } 
+
+#endif
