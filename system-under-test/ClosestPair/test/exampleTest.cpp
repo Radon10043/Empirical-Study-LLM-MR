@@ -22,7 +22,7 @@ TEST_P(ClosestPairParamTest, MR1) {
 
     /* Get origin output */
     Point *ptr = &vec[0];
-    int origin_out = closest(ptr, vec.size());
+    float origin_out = closest(ptr, vec.size());
 
     /* Construct follow-up input */
     vector<Point> follow_vec = vec;
@@ -30,7 +30,7 @@ TEST_P(ClosestPairParamTest, MR1) {
 
     /* Get follow-up output */
     ptr = &follow_vec[0];
-    int follow_out = closest(ptr, follow_vec.size());
+    float follow_out = closest(ptr, follow_vec.size());
 
     /* Verification */
     EXPECT_GE(origin_out, follow_out);
