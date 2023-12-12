@@ -1,3 +1,5 @@
+#ifndef _HAVE_FUNCTION_H
+#define _HAVE_FUNCTION_H
 
 int max(int a,int c)
 {
@@ -22,3 +24,4 @@ int solve(int dp[],int num[],int n,int m)
 }
 
 
+#endif

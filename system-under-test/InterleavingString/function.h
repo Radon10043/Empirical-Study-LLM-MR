@@ -1,3 +1,5 @@
+#ifndef _HAVE_FUNCTION_H
+#define _HAVE_FUNCTION_H
 
 bool isInterleaved(char* A, char* B, char* C) 
 { 
@@ -11,4 +13,4 @@ bool isInterleaved(char* A, char* B, char* C)
            || ((*C == *B) && isInterleaved(A, B + 1, C + 1)); 
 } 
 
-
+#endif

@@ -1,3 +1,6 @@
+#ifndef _HAVE_FUNCTION_H
+#define _HAVE_FUNCTION_H
+
 // A C++ program to replace all 'O's with 'X''s if surrounded by 'X' 
 #include<iostream> 
 #include <limits.h>
@@ -58,5 +61,4 @@ for (int i=0; i<M; i++)
 
 } 
 
-
-
+#endif

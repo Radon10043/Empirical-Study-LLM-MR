@@ -1,3 +1,6 @@
+#ifndef _HAVE_FUNCTION_H
+#define _HAVE_FUNCTION_H
+
 #include <iostream>
 
 int firstMissingPositive(int nums[],int n) {
@@ -11,3 +14,5 @@ int firstMissingPositive(int nums[],int n) {
         }
         return n + 1;
 }
+
+#endif

@@ -1,3 +1,5 @@
+#ifndef _HAVE_FUNCTION_H
+#define _HAVE_FUNCTION_H
 
 void swap(int* a, int* c)
 {
@@ -39,3 +41,4 @@ int* quicksort(int a[], int p, int r)
     return a;
 }
 
+#endif

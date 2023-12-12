@@ -1,3 +1,6 @@
+#ifndef _HAVE_FUNCTION_H
+#define _HAVE_FUNCTION_H
+
 #include <iostream>
  
 int* HeapSort (int data[],int length)
@@ -40,3 +43,5 @@ int* HeapSort (int data[],int length)
  
 	return data;
 }
+
+#endif

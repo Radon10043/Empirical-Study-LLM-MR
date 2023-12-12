@@ -1,3 +1,6 @@
+#ifndef _HAVE_FUNCTION_H
+#define _HAVE_FUNCTION_H
+
 #include <iostream>
 
 int* Dijkstra(int matrix[][100],int source,int vertex_num)
@@ -18,28 +21,28 @@ int* Dijkstra(int matrix[][100],int source,int vertex_num)
     }
 
     
-    int min_cost;        // È¨Öµ×îÐ¡
-    int min_cost_index;  // È¨Öµ×îÐ¡µÄÏÂ±ê
+    int min_cost;        // È¨Öµï¿½ï¿½Ð¡
+    int min_cost_index;  // È¨Öµï¿½ï¿½Ð¡ï¿½ï¿½ï¿½Â±ï¿½
 
-    for (int i = 1; i < vertex_num; i++)  // ÕÒµ½Ô´µãµ½ÁíÍâ vertex_num-1 ¸öµãµÄ×î¶ÌÂ·¾¶
+    for (int i = 1; i < vertex_num; i++)  // ï¿½Òµï¿½Ô´ï¿½ãµ½ï¿½ï¿½ï¿½ï¿½ vertex_num-1 ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Â·ï¿½ï¿½
     {
         min_cost = 2147483647;
 		
         for (int j = 0; j < vertex_num; j++)
         {
-            if (visited[j] == false && dist[j] < min_cost)  // ÕÒµ½È¨Öµ×îÐ¡
+            if (visited[j] == false && dist[j] < min_cost)  // ï¿½Òµï¿½È¨Öµï¿½ï¿½Ð¡
             {
                 min_cost = dist[j];
                 min_cost_index = j;
             }
         }
         
-			visited[min_cost_index] = true;  // ¸ÃµãÒÑÕÒµ½£¬½øÐÐ±ê¼Ç
+			visited[min_cost_index] = true;  // ï¿½Ãµï¿½ï¿½ï¿½ï¿½Òµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð±ï¿½ï¿½
 
-        for (int j = 0; j < vertex_num; j++)  // ¸üÐÂ dist Êý×é
+        for (int j = 0; j < vertex_num; j++)  // ï¿½ï¿½ï¿½ï¿½ dist ï¿½ï¿½ï¿½ï¿½
         {
             if (visited[j] == false && min_cost != 2147483647 &&
-                matrix[min_cost_index][j] != 2147483647 &&  // È·±£Á½µãÖ®¼äÓÐ±ß
+                matrix[min_cost_index][j] != 2147483647 &&  // È·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö®ï¿½ï¿½ï¿½Ð±ï¿½
                 matrix[min_cost_index][j] + min_cost < dist[j])
             {
                 dist[j] = matrix[min_cost_index][j] + min_cost;
@@ -50,3 +53,5 @@ int* Dijkstra(int matrix[][100],int source,int vertex_num)
     }
     return dist;
 }
+
+#endif
