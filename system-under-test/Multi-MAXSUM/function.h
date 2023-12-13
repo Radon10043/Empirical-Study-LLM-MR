@@ -1,12 +1,20 @@
 #ifndef _HAVE_FUNCTION_H
 #define _HAVE_FUNCTION_H
 
+#include <iostream>
+#include <vector>
+using namespace std;
+
 int max(int a,int c)
 {
 	return a>c ? a:c;
 }
-int solve(int dp[],int num[],int n,int m)
+int solve(vector<int> num, int m)
 {
+	int n = num.size();
+	vector<int> dp(n);
+	n--;
+
 	for(int i=1;i<=m;i++)
 	{
 		int step=0;
