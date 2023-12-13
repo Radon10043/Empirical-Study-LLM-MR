@@ -2,10 +2,12 @@
 #define _HAVE_FUNCTION_H
 
 #include <iostream>
+#include <vector>
+using namespace std;
  
-int* HeapSort (int data[],int length)
+vector<int> HeapSort (vector<int> data,int length)
 {
-	if (data == NULL || length <= 0)
+	if (data.empty() || length <= 0)
 		return data;
 	for (int i=length/2-1; i>=0; --i) {
 		int k=i;
