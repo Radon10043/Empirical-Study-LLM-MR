@@ -38,4 +38,4 @@ TEST_P(RSAParamTest, MR1) {
     ASSERT_EQ(source_out, follow_out);
 }
 
-INSTANTIATE_TEST_CASE_P(TrueReturn, RSAParamTest, testing::Values(RSAInput(5, 7, 13, 17)));
+INSTANTIATE_TEST_CASE_P(TrueReturn, RSAParamTest, testing::Values(RSAInput(5, 3, 13, 17), RSAInput(17, 13, 47, 67)));
