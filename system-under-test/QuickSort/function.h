@@ -45,6 +45,12 @@ int* quicksort(int a[], int p, int r)
     return a;
 }
 
+/**
+ * @brief Quick sort
+ *
+ * @param vec
+ * @return vector<int>
+ */
 vector<int> quick_sort(vector<int> vec) {
     quicksort(&vec[0], 0, vec.size() - 1);
     return vec;
