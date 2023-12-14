@@ -26,13 +26,13 @@ TEST_P(RSAParamTest, MR1) {
     int source_m = input.m, source_e = input.e, source_p = input.p, source_q = input.q;
 
     /* Get source output */
-    int source_out = candp(source_m, source_e, source_p, source_q);
+    long long source_out = candp(source_m, source_e, source_p, source_q);
 
     /* Construct follow-up input */
     int follow_m = source_m + source_p * source_q;
 
     /* Get follow-up output */
-    int follow_out = candp(follow_m, source_e, source_p, source_q);
+    long long follow_out = candp(follow_m, source_e, source_p, source_q);
 
     /* Verification */
     ASSERT_EQ(source_out, follow_out);
