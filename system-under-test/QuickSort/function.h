@@ -1,6 +1,10 @@
 #ifndef _HAVE_FUNCTION_H
 #define _HAVE_FUNCTION_H
 
+#include <vector>
+#include <iostream>
+using namespace std;
+
 void swap(int* a, int* c)
 {
     int t = *a;
@@ -39,6 +43,11 @@ int* quicksort(int a[], int p, int r)
         quicksort(a, q+1, r);
     }
     return a;
+}
+
+vector<int> quick_sort(vector<int> vec) {
+    quicksort(&vec[0], 0, vec.size() - 1);
+    return vec;
 }
 
 #endif
