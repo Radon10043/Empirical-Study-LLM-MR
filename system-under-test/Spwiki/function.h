@@ -2,6 +2,9 @@
 #define _HAVE_FUNCTION_H
 
 #include <iostream>
+#include <vector>
+#include <cstring>
+using namespace std;
 
 int* Dijkstra(int matrix[][100],int source,int vertex_num)
 {
@@ -52,6 +55,27 @@ int* Dijkstra(int matrix[][100],int source,int vertex_num)
 
     }
     return dist;
+}
+
+/**
+ * @brief 求无向图中src到dst的最短路径长度
+ *
+ * @param edges 用于表示无向图的边的集合, 每个边包含三个元素: 起点, 终点, 权重
+ * @param src 起点
+ * @param dst 终点
+ * @param n 图中节点数量
+ * @return int src到dst的最短距离
+ */
+int shortest_path(vector<vector<int>> edges, int src, int dst, int n) {
+    int matrix[100][100];
+    memset(matrix, 0x3f, sizeof(matrix));
+    for (auto& edge : edges) {
+        matrix[edge[0]][edge[1]] = edge[2];
+        matrix[edge[1]][edge[0]] = edge[2];
+    }
+
+    int *dist = Dijkstra(matrix, src, n);
+    return *(dist + dst);
 }
 
 #endif
