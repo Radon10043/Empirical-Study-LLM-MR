@@ -61,4 +61,34 @@ for (int i=0; i<M; i++)
 
 } 
 
+/**
+ * @brief
+ *
+ * @param vec
+ * @return std::vector<std::string>
+ */
+std::vector<std::string> surrounded_region(std::vector<std::string> vec) {
+	int M = vec.size();
+	int N = vec[0].size();
+	char mat[M][900];
+	for (int i = 0; i < M; i++) {
+		for (int j = 0; j < N; j++) {
+			mat[i][j] = vec[i][j];
+		}
+	}
+
+	replaceSurrounded(M, N, mat);
+
+	std::vector<std::string> result;
+	for (int i = 0; i < M; i++) {
+		std::string temp;
+		for (int j = 0; j < N; j++) {
+			temp += mat[i][j];
+        }
+		result.push_back(temp);
+    }
+
+	return result;
+}
+
 #endif
