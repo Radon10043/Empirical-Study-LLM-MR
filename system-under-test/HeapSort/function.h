@@ -5,9 +5,9 @@
 #include <vector>
 using namespace std;
  
-vector<int> HeapSort (vector<int> data,int length)
+int* HeapSort (int data[],int length)
 {
-	if (data.empty() || length <= 0)
+	if (data == NULL || length <= 0)
 		return data;
 	for (int i=length/2-1; i>=0; --i) {
 		int k=i;
@@ -44,6 +44,17 @@ vector<int> HeapSort (vector<int> data,int length)
 	}
  
 	return data;
+}
+
+/**
+ * @brief Heap sort
+ *
+ * @param vec
+ * @return vector<int>
+ */
+vector<int> heap_sort(vector<int> vec) {
+	HeapSort(vec.data(), vec.size());
+	return vec;
 }
 
 #endif

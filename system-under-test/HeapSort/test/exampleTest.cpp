@@ -17,7 +17,8 @@ typedef struct HeapSortInput {
 class HeapSortParamTest : public ::testing::TestWithParam<HeapSortInput> {};
 
 /**
- * Metamorphic relation 1: Shuffling the elements in the input array, the output will be the same.
+ * @brief Metamorphic relation 1: Shuffling the elements in the input array, the output will be the same.
+ *
  */
 TEST_P(HeapSortParamTest, MR1) {
     /* Get source input */
@@ -25,22 +26,23 @@ TEST_P(HeapSortParamTest, MR1) {
     vector<int> source_vec = input.vec;
 
     /* Get source output */
-    vector<int> source_out = HeapSort(source_vec, source_vec.size());
+    vector<int> source_out = heap_sort(source_vec);
 
     /* Construct follow-up input */
     vector<int> follow_vec = source_vec;
     shuffle(follow_vec.begin(), follow_vec.end(), random_device());
 
     /* Get follow-up output */
-    vector<int> follow_out = HeapSort(follow_vec, follow_vec.size());
+    vector<int> follow_out = heap_sort(follow_vec);
 
     /* Verification */
     EXPECT_EQ(follow_out, source_out);
 }
 
 /**
- * Metamorphic Relation 2: Adding a constant to each element in the input array, then each element of the output array will be larger by the constant than the
- * element at the same location of the source input.
+ * @brief Metamorphic Relation 2: Adding a constant to each element in the input array, then each element of the output array will be larger by the constant
+ * than the element at the same location of the source input.
+ *
  */
 TEST_P(HeapSortParamTest, MR2) {
     int constant = 3;
@@ -50,7 +52,7 @@ TEST_P(HeapSortParamTest, MR2) {
     vector<int> source_vec = input.vec;
 
     /* Get source output */
-    vector<int> source_out = HeapSort(source_vec, source_vec.size());
+    vector<int> source_out = heap_sort(source_vec);
 
     /* Construct follow-up input */
     vector<int> follow_vec = source_vec;
@@ -58,7 +60,7 @@ TEST_P(HeapSortParamTest, MR2) {
         elem += constant;
 
     /* Get follow-up output */
-    vector<int> follow_out = HeapSort(follow_vec, follow_vec.size());
+    vector<int> follow_out = heap_sort(follow_vec);
 
     /* Verification */
     for (auto &elem : follow_out)
@@ -67,8 +69,9 @@ TEST_P(HeapSortParamTest, MR2) {
 }
 
 /**
- * Metamorphic Relation 3: Multiplying -1 to each element in the input array, then if we multiply -1 to each element of the output array, it should be the same
- * as the source output array, but in reverse order.
+ * @brief Metamorphic Relation 3: Multiplying -1 to each element in the input array, then if we multiply -1 to each element of the output array, it should be
+ * the same as the source output array, but in reverse order.
+ *
  */
 TEST_P(HeapSortParamTest, MR3) {
     /* Get source input */
@@ -76,7 +79,7 @@ TEST_P(HeapSortParamTest, MR3) {
     vector<int> source_vec = input.vec;
 
     /* Get source output */
-    vector<int> source_out = HeapSort(source_vec, source_vec.size());
+    vector<int> source_out = heap_sort(source_vec);
 
     /* Construct follow-up input */
     vector<int> follow_vec = source_vec;
@@ -84,7 +87,7 @@ TEST_P(HeapSortParamTest, MR3) {
         elem *= -1;
 
     /* Get follow-up output */
-    vector<int> follow_out = HeapSort(follow_vec, follow_vec.size());
+    vector<int> follow_out = heap_sort(follow_vec);
 
     /* Verification */
     for (auto &elem : follow_out)

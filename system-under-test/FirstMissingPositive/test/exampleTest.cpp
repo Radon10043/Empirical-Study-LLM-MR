@@ -1,7 +1,7 @@
-#include <gtest/gtest.h>
-#include <string>
 #include <algorithm>
+#include <gtest/gtest.h>
 #include <random>
+#include <string>
 
 #include "../function.h"
 
@@ -15,8 +15,9 @@ typedef struct FMPInput {
 class FMPInputParamTest : public ::testing::TestWithParam<FMPInput> {};
 
 /**
- * Metamorphic Relation 1: Adding one integer to the source array, which is identical to
+ * @brief Metamorphic Relation 1: Adding one integer to the source array, which is identical to
  * one element of the original array, the output should be the same.
+ *
  */
 TEST_P(FMPInputParamTest, MR1) {
     /* Get source input */
@@ -24,21 +25,22 @@ TEST_P(FMPInputParamTest, MR1) {
     vector<int> source_vec = input.vec;
 
     /* Get source output */
-    int source_out = firstMissingPositive(source_vec, source_vec.size());
+    int source_out = first_missing_positive(source_vec);
 
     /* Construct follow-up input */
     vector<int> follow_vec = source_vec;
     follow_vec.push_back(source_vec.front());
 
     /* Get follow-up output */
-    int follow_out = firstMissingPositive(follow_vec, follow_vec.size());
+    int follow_out = first_missing_positive(follow_vec);
 
     /* Verification */
     EXPECT_EQ(source_out, follow_out);
 }
 
 /**
- * Metamorphic Relation 2: Shuffling the elements in the input array, the output will be the same.
+ * @brief Metamorphic Relation 2: Shuffling the elements in the input array, the output will be the same.
+ *
  */
 TEST_P(FMPInputParamTest, MR2) {
     /* Get source input */
@@ -46,14 +48,14 @@ TEST_P(FMPInputParamTest, MR2) {
     vector<int> source_vec = input.vec;
 
     /* Get source output */
-    int source_out = firstMissingPositive(source_vec, source_vec.size());
+    int source_out = first_missing_positive(source_vec);
 
     /* Construct follow-up input */
     vector<int> follow_vec = source_vec;
     shuffle(follow_vec.begin(), follow_vec.end(), random_device());
 
     /* Get follow-up output */
-    int follow_out = firstMissingPositive(follow_vec, follow_vec.size());
+    int follow_out = first_missing_positive(follow_vec);
 
     /* Verification */
     EXPECT_EQ(source_out, follow_out);

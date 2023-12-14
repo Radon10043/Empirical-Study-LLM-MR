@@ -1,7 +1,11 @@
+#ifndef _HAVE_FUNCTION_H
+#define _HAVE_FUNCTION_H
+
+#include <iostream>
 #include <vector>
 using namespace std;
 
-int p(vector<int> a, int e, int len) {
+int p(int a[], int e, int len) {
 
     int l, h, mid, ret;
     l = 0;
@@ -23,3 +27,8 @@ int p(vector<int> a, int e, int len) {
     return ret;
 }
 
+bool bin_search(vector<int> vec, int x) {
+    return p(vec.data(), x, vec.size());
+}
+
+#endif

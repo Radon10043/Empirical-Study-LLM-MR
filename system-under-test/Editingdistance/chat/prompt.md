@@ -21,21 +21,22 @@ Please identify the metamorphic relations of this system as much as possible and
 
 ```cpp
 /**
- * Metamorphic relation 1: Add a character to the end of s, the output should be the same or larger.
+ * @brief Metamorphic relation 1: Add a character to the end of str1, the output should be the same or larger.
+ *
  */
-TEST_P(DistinctSubsequenceParamTest, MR1) {
+TEST_P(EditingdistanceParamTest, MR1) {
     /* Get source input */
-    DistinctSubseqenceInput input = GetParam();
-    string s = input.s, t = input.t;
+    EditingdistanceInput input = GetParam();
+    string str1 = input.str1, str2 = input.str2;
 
     /* Get source output */
-    int source_out = numDistinct(s, t);
+    int source_out = edit_dist(str1, str2);
 
     /* Construct follow-up input */
-    string follow_s = s.append("a");
+    string follow_str1 = str1.append("a");
 
     /* Get follow-up output */
-    int follow_out = numDistinct(follow_s, t);
+    int follow_out = edit_dist(follow_str1, str2);
 
     /* Verification */
     EXPECT_GE(follow_out, source_out);

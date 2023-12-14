@@ -22,27 +22,26 @@ Please identify the metamorphic relations of this system as much as possible and
 
 ```cpp
 /**
- * Metamorphic relation 1: Add a point to the array, the output should not be larger than before.
+ * @brief Metamorphic relation 1: Add a point to the array, the output should not be larger than before.
+ *
  */
 TEST_P(ClosestPairParamTest, MR1) {
-    /* Get input data */
+    /* Get source input */
     ClosestPairInput input = GetParam();
     vector<Point> vec = input.vec;
 
-    /* Get origin output */
-    Point *ptr = &vec[0];
-    float origin_out = closest(ptr, vec.size());
+    /* Get source output */
+    float source_out = closest_distance(vec);
 
     /* Construct follow-up input */
     vector<Point> follow_vec = vec;
     follow_vec.push_back({100, 100});
 
     /* Get follow-up output */
-    ptr = &follow_vec[0];
-    float follow_out = closest(ptr, follow_vec.size());
+    float follow_out = closest_distance(follow_vec);
 
     /* Verification */
-    EXPECT_GE(origin_out, follow_out);
+    EXPECT_GE(source_out, follow_out);
 }
 ```
 

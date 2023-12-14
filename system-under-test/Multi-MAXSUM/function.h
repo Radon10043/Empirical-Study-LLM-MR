@@ -9,12 +9,8 @@ int max(int a,int c)
 {
 	return a>c ? a:c;
 }
-int solve(vector<int> num, int m)
+int solve(int dp[],int num[],int n,int m)
 {
-	int n = num.size();
-	vector<int> dp(n);
-	n--;
-
 	for(int i=1;i<=m;i++)
 	{
 		int step=0;
@@ -31,5 +27,17 @@ int solve(vector<int> num, int m)
 	return dp[n];
 }
 
+/**
+ * @brief Find m contiguous mutex subarray with the largest sum
+ *
+ * @param nums
+ * @param m
+ * @return int
+ */
+int multi_maxsum(vector<int> nums, int m) {
+	int n = nums.size();
+	vector<int> dp(n);
+	return solve(dp.data(), nums.data(), n - 1, m);
+}
 
 #endif

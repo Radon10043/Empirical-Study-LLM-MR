@@ -15,7 +15,8 @@ typedef struct InterleavingStringInput {
 class InterleavingStringParamTest : public ::testing::TestWithParam<InterleavingStringInput> {};
 
 /**
- * Metamorphic Relation 1: Adding one same character to the end of A and C, the result will be the same.
+ * @brief Metamorphic Relation 1: Adding one same character to the end of A and C, the result will be the same.
+ *
  */
 TEST_P(InterleavingStringParamTest, MR1) {
     /* Get source input */
@@ -23,14 +24,14 @@ TEST_P(InterleavingStringParamTest, MR1) {
     string A = input.A, B = input.B, C = input.C;
 
     /* Get source output */
-    bool source_out = isInterleaved(&A[0], &B[0], &C[0]);
+    bool source_out = is_interleaved(A, B, C);
 
     /* Construct follow-up input */
     char ch = 'a';
     string follow_A = A + ch, follow_C = C + ch;
 
     /* Get follow-up output */
-    bool follow_out = isInterleaved(&follow_A[0], &B[0], &follow_C[0]);
+    bool follow_out = is_interleaved(follow_A, B, follow_C);
 
     /* Verification */
     EXPECT_EQ(source_out, follow_out);

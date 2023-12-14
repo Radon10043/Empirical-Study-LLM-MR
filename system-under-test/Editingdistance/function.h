@@ -26,4 +26,15 @@ int editDist(std::string str1 ,std::string str2 , int m ,int n)
                    ); 
 } 
 
+/**
+ * @brief Count the minimum number of operations required to transform str1 to str2
+ *
+ * @param str1
+ * @param str2
+ * @return int
+ */
+int edit_dist(std::string& str1, std::string& str2) {
+    return editDist(str1, str2, str1.length(), str2.length());
+}
+
 #endif

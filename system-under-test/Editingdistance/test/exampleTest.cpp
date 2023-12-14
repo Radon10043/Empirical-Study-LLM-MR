@@ -13,7 +13,8 @@ typedef struct EditingdistanceInput {
 class EditingdistanceParamTest : public ::testing::TestWithParam<EditingdistanceInput> {};
 
 /**
- * Metamorphic relation 1: Add a character to the end of str1, the output should be the same or larger.
+ * @brief Metamorphic relation 1: Add a character to the end of str1, the output should be the same or larger.
+ *
  */
 TEST_P(EditingdistanceParamTest, MR1) {
     /* Get source input */
@@ -21,20 +22,18 @@ TEST_P(EditingdistanceParamTest, MR1) {
     string str1 = input.str1, str2 = input.str2;
 
     /* Get source output */
-    int source_out = editDist(str1, str2, str1.length(), str2.length());
+    int source_out = edit_dist(str1, str2);
 
     /* Construct follow-up input */
     string follow_str1 = str1.append("a");
 
     /* Get follow-up output */
-    int follow_out = editDist(follow_str1, str2, str1.length(), str2.length());
+    int follow_out = edit_dist(follow_str1, str2);
 
     /* Verification */
     EXPECT_GE(follow_out, source_out);
 }
 
-INSTANTIATE_TEST_CASE_P(TrueReturn, EditingdistanceParamTest, testing::Values(
-    EditingdistanceInput("abbccc", "abc"),
-    EditingdistanceInput("rabbbit", "rabbit"),
-    EditingdistanceInput("babgbag", "bag")
-));
+INSTANTIATE_TEST_CASE_P(TrueReturn, EditingdistanceParamTest,
+                        testing::Values(EditingdistanceInput("abbccc", "abc"), EditingdistanceInput("rabbbit", "rabbit"),
+                                        EditingdistanceInput("babgbag", "bag")));
