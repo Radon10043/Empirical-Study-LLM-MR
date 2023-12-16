@@ -13,7 +13,9 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 public class TestExample {
     /**
-     * Metamorphic Relation 1: 向哈希表添加一个数据后, 将哈希表转为字符串后字符串的长度会变长
+     * Metamorphic Relation 1: The input is a hash table. Converting the hash table
+     * into string s1, after adding a piece of data to the hash table and converting
+     * it into string s2, the length of s2 is greater than s1.
      *
      * @param source_in
      */
@@ -36,7 +38,9 @@ public class TestExample {
     }
 
     /**
-     * Metamorphic Relation 2: 在输入字符串的结尾加上注释后, 转换为JSON对象的结果不变
+     * Metamorphic Relation 2: The input is a string representing the JSON file's
+     * content. Adding a comment to the string, the parse result of the string will
+     * be the same.
      *
      * @param source_in
      */
@@ -57,7 +61,9 @@ public class TestExample {
     }
 
     /**
-     * Metamorphic Relation 3: 将哈希表中的一对键值互换, 输出的字符串长度不变
+     * Metamorphic Relation 3: The input is a hash table. Swapping the value of a
+     * pair of key and value and converting the hash table to the string, the output
+     * length will be the same.
      *
      * @param source_in
      */
