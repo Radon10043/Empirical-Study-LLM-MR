@@ -8,3 +8,4 @@ api_key.txt
 .VSCodeCounter
 build/
 venv/
+system-under-test/Lucene/testcases/*/index
