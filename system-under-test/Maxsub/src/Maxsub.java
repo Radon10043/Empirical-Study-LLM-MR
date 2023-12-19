@@ -1,5 +1,6 @@
+package src;
 
-public class maxsub {
+public class Maxsub {
 	public static int maxsub(int[] A, int n) 
 	{  int ans = 0, cnt = 0; 
 	   for (int i = 0; i < n; i ++) { 
