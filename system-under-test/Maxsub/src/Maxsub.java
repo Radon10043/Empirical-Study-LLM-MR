@@ -1,5 +1,7 @@
 package src;
 
+import java.util.ArrayList;
+
 public class Maxsub {
 	public static int maxsub(int[] A, int n) 
 	{  int ans = 0, cnt = 0; 
@@ -12,4 +14,16 @@ public class Maxsub {
 		}  
 	    return ans; 
 	 } 	
+
+	/**
+	 * Call maxsub
+	 *
+	 * @param arr
+	 * @return
+	 */
+	public static int max_sub(ArrayList<Integer> arr) {
+		int[] A = new int[arr.size()];
+		int n = arr.size();
+		return maxsub(A, n);
+	}
 }
