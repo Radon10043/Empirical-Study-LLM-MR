@@ -1,10 +1,11 @@
 package src;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Stack;
 
 
 public class Superstring {
-	public String shortestSuperstring(String[] A) {
+	public static String shortestSuperstring(String[] A) {
         int N = A.length;
 
         // Populate overlaps
@@ -85,5 +86,19 @@ public class Superstring {
         }
 
         return ans.toString();
+    }
+
+    /**
+     * Shortest superstring
+     *
+     * @param arr
+     * @return
+     */
+    public static String shortest_superstring(ArrayList<String> arr) {
+        String[] A = new String[arr.size()];
+        for (int i = 0; i < arr.size(); i++) {
+            A[i] = arr.get(i);
+        }
+        return shortestSuperstring(A);
     }
 }
