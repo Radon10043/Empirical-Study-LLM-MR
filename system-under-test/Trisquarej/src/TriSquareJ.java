@@ -1,5 +1,7 @@
 package src;
 
+import org.apache.commons.lang3.tuple.Pair;
+
 public class TriSquareJ {
 
 	public static String TriangleSquare (int a, int b, int c) { 
@@ -74,5 +76,22 @@ public class TriSquareJ {
 			x = (x + c/x) / 2.0;
 		}
 		return x;
+	}
+
+	/**
+	 * Triangle square
+	 *
+	 * @param a
+	 * @param b
+	 * @param c
+	 * @return
+	 */
+	public static Pair<Integer, Double> triangle_square(int a, int b, int c) {
+		String result = TriangleSquare(a,b,c);
+		String[] split_text = result.split(" ");
+		Integer tri_type = Integer.parseInt(split_text[0]);
+		Double tri_area = Double.parseDouble(split_text[1]);
+		Pair<Integer, Double> pair = Pair.of(tri_type, tri_area);
+		return pair;
 	}
 }
