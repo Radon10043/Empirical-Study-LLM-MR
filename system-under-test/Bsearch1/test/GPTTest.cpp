@@ -3,7 +3,7 @@
 #include <gtest/gtest.h>
 #include <vector>
 
-#include "../function.h"
+#include "../src/function.h"
 
 using namespace std;
 
