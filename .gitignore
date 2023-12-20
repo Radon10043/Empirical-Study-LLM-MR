@@ -4,6 +4,7 @@
 
 api_key.txt
 
+__pycache__/
 .vscode/
 .VSCodeCounter
 build/
