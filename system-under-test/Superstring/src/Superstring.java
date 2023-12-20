@@ -1,8 +1,9 @@
+package src;
 import java.util.Arrays;
 import java.util.Stack;
 
 
-public class superstring {
+public class Superstring {
 	public String shortestSuperstring(String[] A) {
         int N = A.length;
 
