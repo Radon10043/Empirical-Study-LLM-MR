@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include <string>
 
-#include "../function.h"
+#include "../src/function.h"
 
 using namespace std;
 

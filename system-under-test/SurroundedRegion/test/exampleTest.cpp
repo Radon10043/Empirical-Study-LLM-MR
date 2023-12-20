@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 
-#include "../function.h"
+#include "../src/function.h"
 
 using namespace std;
 

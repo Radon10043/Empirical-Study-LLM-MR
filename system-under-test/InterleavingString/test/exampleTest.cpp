@@ -3,7 +3,7 @@
 #include <random>
 #include <string>
 
-#include "../function.h"
+#include "../src/function.h"
 
 using namespace std;
 
