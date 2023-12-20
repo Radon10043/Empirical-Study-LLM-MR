@@ -2,7 +2,7 @@
 Author: Radon
 Date: 2023-12-05 10:21:39
 LastEditors: Radon
-LastEditTime: 2023-12-05 14:15:51
+LastEditTime: 2023-12-20 17:36:46
 Description: Hi, say something
 """
 import unittest
@@ -43,18 +43,18 @@ class TestingClass(unittest.TestCase):
         -----
         _description_
         """
-        # Get origin output
-        origin_res = f_oneway(g1, g2).pvalue
+        # Get source output
+        source_out = f_oneway(g1, g2).pvalue
 
         # Construct follow-up input
         follow_g1 = np.random.permutation(g1)
         follow_g2 = np.random.permutation(g2)
 
         # Get follow-up output
-        follow_res = f_oneway(follow_g1, follow_g2).pvalue
+        follow_out = f_oneway(follow_g1, follow_g2).pvalue
 
         # Verification
-        self.assertEqual(origin_res, follow_res)
+        self.assertEqual(source_out, follow_out)
 
 
 if __name__ == "__main__":
