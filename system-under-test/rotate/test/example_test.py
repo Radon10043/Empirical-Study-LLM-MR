@@ -2,7 +2,7 @@
 Author: Radon
 Date: 2023-12-20 21:42:37
 LastEditors: Radon
-LastEditTime: 2023-12-20 22:05:43
+LastEditTime: 2023-12-21 09:58:50
 Description: Hi, say something
 """
 import unittest
@@ -25,7 +25,7 @@ def load_test_cases() -> list:
     -----
     _description_
     """
-    return [(datasets.ascent(), 45)]
+    return [(datasets.ascent(), 45), (datasets.face(), 60)]
 
 
 class TestingClass(unittest.TestCase):
