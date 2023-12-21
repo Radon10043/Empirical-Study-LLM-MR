@@ -2,7 +2,7 @@
 Author: Radon
 Date: 2023-12-21 16:15:08
 LastEditors: Radon
-LastEditTime: 2023-12-21 17:51:37
+LastEditTime: 2023-12-21 18:01:48
 Description: Hi, say something
 """
 import unittest
@@ -21,43 +21,43 @@ def load_test_cases() -> list:
 
     # 遍历存储了测试用例的文件夹, 读取测试用例的内容
     for dir in dirs:
-        search_term_path = os.path.join(dir, "search_term.txt")
+        pattern_path = os.path.join(dir, "pattern.txt")
 
         # 获取要进行搜索的文本路径
         text_path = os.path.join(dir, "text.txt")
 
         # 读取搜索项的内容
-        with open(search_term_path) as f:
-            search_term = f.readline().rstrip("\n")
+        with open(pattern_path) as f:
+            pattern = f.readline().rstrip("\n")
 
-        testcases.append((search_term, text_path))
+        testcases.append((pattern, text_path))
 
     return testcases
 
 
 class TestingClass(unittest.TestCase):
     @parameterized.expand(load_test_cases)
-    def test1(self, search_term: str, file: str):
+    def test1(self, pattern: str, file: str):
         """Metamorphic Relation 1: If a character is added to the end of the search term,
         the length of the output length should be the same as or less than the original.
 
         Parameters
         ----------
-        search_term : str
+        pattern : str
             _description_
         file : str
             _description_
         """
         # Get source output
-        process = os.popen(f"{GREP_PATH} {search_term} {file}")
+        process = os.popen(f"{GREP_PATH} {pattern} {file}")
         source_out = process.readlines()
         process.close()
 
         # Construct follow-up input
-        follow_search_term = search_term + "a"
+        follow_pattern = pattern + "a"
 
         # Get follow-up output
-        process = os.popen(f"{GREP_PATH} {follow_search_term} {file}")
+        process = os.popen(f"{GREP_PATH} {follow_pattern} {file}")
         follow_out = process.readlines()
         process.close()
 
@@ -65,27 +65,27 @@ class TestingClass(unittest.TestCase):
         self.assertLessEqual(len(follow_out), len(source_out))
 
     @parameterized.expand(load_test_cases)
-    def test2(self, search_term: str, file: str):
+    def test2(self, pattern: str, file: str):
         """Metamorphic Relation 2: If case distinctions are ignored, swap the case of search term,
         the output should be the same.
 
         Parameters
         ----------
-        search_term : str
+        pattern : str
             _description_
         file : str
             _description_
         """
         # Get source output
-        process = os.popen(f"{GREP_PATH} --ignore-case {search_term} {file}")
+        process = os.popen(f"{GREP_PATH} --ignore-case {pattern} {file}")
         source_out = process.readlines()
         process.close()
 
         # Construct follow-up input
-        follow_search_term = search_term.swapcase()
+        follow_pattern = pattern.swapcase()
 
         # Get follow-up output
-        process = os.popen(f"{GREP_PATH} --ignore-case {follow_search_term} {file}")
+        process = os.popen(f"{GREP_PATH} --ignore-case {follow_pattern} {file}")
         follow_out = process.readlines()
         process.close()
 
@@ -93,27 +93,27 @@ class TestingClass(unittest.TestCase):
         self.assertEqual(source_out, follow_out)
 
     @parameterized.expand(load_test_cases)
-    def test3(self, search_term, file):
+    def test3(self, pattern, file):
         """Metamorphic Relation 3: If regular expression matching is enabled, add an asterisk at
         the end of the search term, the output should be the same.
 
         Parameters
         ----------
-        search_term : str
+        pattern : str
             _description_
         file : str
             _description_
         """
         # Get source output
-        process = os.popen(f'{GREP_PATH} --regexp="{search_term}" {file}')
+        process = os.popen(f'{GREP_PATH} --regexp="{pattern}" {file}')
         source_out = process.readlines()
         process.close()
 
         # Construct follow-up input
-        follow_search_term = f"{search_term}*"
+        follow_pattern = f"{pattern}*"
 
         # Get follow-up output
-        process = os.popen(f'{GREP_PATH} --regexp="{follow_search_term}" {file}')
+        process = os.popen(f'{GREP_PATH} --regexp="{follow_pattern}" {file}')
         follow_out = process.readlines()
         process.close()
 
