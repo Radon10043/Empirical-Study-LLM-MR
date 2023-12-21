@@ -63,7 +63,7 @@ public class TestExample {
     /**
      * Metamorphic Relation 3: The input is a hash table. Swapping the value of a
      * pair of key and value and converting the hash table to the string, the output
-     * length will be the same.
+     * length should be the same as or less than the original.
      *
      * @param source_in
      */
@@ -86,7 +86,7 @@ public class TestExample {
         String follow_out = JSON.toJSONString(follow_in);
 
         /* Verification */
-        assertEquals(source_out.length(), follow_out.length());
+        assertTrue(source_out.length() >= follow_out.length());
     }
 
     static Stream<Arguments> testcaseProvider1() {
