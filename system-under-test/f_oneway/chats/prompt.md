@@ -10,7 +10,7 @@ For the function $sin(x)$, assuming there is an origin input $x1$, the correspon
 
 ## Chat 3
 
-Based on the above case, please identify the metamorphic relation of this system: There is a system that performs one-way ANOVA. The one-way ANOVA tests the null hypothesis that two or more groups have the same population mean. Its inputs are 2 groups of data, and its return value is an integer representing the p-value of the two groups of data.
+Based on the above case, please identify the metamorphic relation of the `f_oneway` function from `scipy.stats`. The `f_oneway` function performs one-way ANOVA. The one-way ANOVA tests the null hypothesis that two or more groups have the same population mean. Its inputs are 2 groups of data, and its return value is an integer representing the p-value of the two groups of data.
 
 Please identify the metamorphic relations of this system as much as possible and codify them as Python code. Here is an example:
 
