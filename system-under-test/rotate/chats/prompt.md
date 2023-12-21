@@ -10,31 +10,35 @@ For the function $sin(x)$, assuming there is an origin input $x1$, the correspon
 
 ## Chat 3
 
-Based on the above case, please identify the metamorphic relation of the `f_oneway` function from `scipy.stats`. The `f_oneway` function performs one-way ANOVA. The one-way ANOVA tests the null hypothesis that two or more groups have the same population mean. Its inputs are 2 groups of data, and its return value is an integer representing the p-value of the two groups of data.
-
-Please identify the metamorphic relations of this system as much as possible and codify them as Python code. Here is an example:
+Based on the above case, please identify the metamorphic relation of the `rotate` function from `scipy.ndimage`. The `rotate` function performs rotation to the input image by the specific degree. Its inputs mainly include an image to be rotated and a rotation angle, and its output  is an image which is rotated by the specific angle. Please identify the metamorphic relations of this system as much as possible and codify them as Python code. Here is an example:
 
 ```python
 @parameterized.expand(load_test_cases)
-def test1(self, g1, g2):
-    """MR1: Changing the order of the samples, the result should not change.
+def test1(self, img: np.array, angle: float):
+    """Rotating the same image by N degree and N+360 degree will output the same result.
+
+    Parameters
+    ----------
+    img : np.array
+        Input image.
+    angle : float
+        Rotation angle.
 
     Notes
     -----
     _description_
     """
-    # Get origin output
-    origin_res = f_oneway(g1, g2).pvalue
+    # Get source output
+    source_out = ndimage.rotate(img, angle)
 
     # Construct follow-up input
-    follow_g1 = np.random.permutation(g1)
-    follow_g2 = np.random.permutation(g2)
+    follow_angle = angle + 360
 
     # Get follow-up output
-    follow_res = f_oneway(follow_g1, follow_g2).pvalue
+    follow_out = ndimage.rotate(img, follow_angle)
 
     # Verification
-    self.assertEqual(origin_res, follow_res)
+    self.assertTrue(np.any(follow_out - source_out) == 0)
 ```
 
 ## Chat 4...n
