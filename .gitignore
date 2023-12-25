@@ -1,6 +1,7 @@
 *.class
 *.jar
 *.exe
+*.out
 
 api_key.txt
 
