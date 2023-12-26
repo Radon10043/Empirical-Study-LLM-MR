@@ -64,7 +64,8 @@ class TestingClass(unittest.TestCase):
         job_list : list
             _description_
         """
-        if int(job_list[2]) != 1:
+        high_priority_index = int(PRIORITY_LEVEL["HIGH"]) - 1
+        if int(job_list[high_priority_index]) != 1:
             return
 
         # Get source output
