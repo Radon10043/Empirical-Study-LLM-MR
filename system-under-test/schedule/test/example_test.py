@@ -49,7 +49,7 @@ def load_test_cases() -> list:
 class TestingClass(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        """Build print_tokens.out before starting testing."""
+        """Build schedule.out before starting testing."""
         cmd = "cd " + os.path.join(os.path.dirname(__file__), "..", "src") + " && make clean all"
         proc = os.popen(cmd)
         proc.readlines()
