@@ -10,9 +10,7 @@ For the function $sin(x)$, assuming there is an origin input $x1$, the correspon
 
 ## Chat 3
 
-Based on the above case, please identify the metamorphic relation of the program `schedule`. `schedule` is a priority scheduler from Simens programs. Its inputs are three priority job-lists $P_1, P_2, and P_3$ with priorities: $P_3>P_2>P_1$, and a set of operations on jobs. Its output is execution order of the jobs.
-
-Please identify the metamorphic relations of `schedule` as much as possible and codify them as Python code. Here are some examples:
+You are an expert on metamorphic testing. Based on the above case, please identify the metamorphic relation of the program `schedule`. `schedule` is a priority scheduler from Simens programs. Its inputs are three priority job-lists $P_1, P_2, and P_3$ with priorities: $P_3>P_2>P_1$, and a set of operations on jobs. Its output is execution order of the jobs. Please identify the metamorphic relations of `schedule` as much as possible and codify them as Python code. Here are some examples:
 
 ```python
 @parameterized.expand(load_test_cases)

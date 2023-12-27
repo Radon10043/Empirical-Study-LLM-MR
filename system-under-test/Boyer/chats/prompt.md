@@ -10,9 +10,7 @@ For the function $sin(x)$, assuming there is an origin input $x1$, the correspon
 
 ## Chat 3
 
-Based on the above case, please identify the metamorphic relation of this system: There is a function that implements the Boyer-Moore algorithm to find the first occurrence index of the string to be searched in the origin string. Its inputs are 2 string variables: `text` and `pattern`, representing the origin string and the string to be searched, respectively. Its return value is an integer representing the first occurrence index of `pattern` in `text`. If `pattern`does not occur in `text`, the function returns -1. Please identify the metamorphic relation of this function as much as possible and output them as java code. Each metamorphic relation should be named test[x], where [x] is the test case number.
-
-Here is an example:
+You are an expert on metamorphic testing. Based on the above case, please identify the metamorphic relation of this system: There is a function that implements the Boyer-Moore algorithm to find the first occurrence index of the string to be searched in the origin string. Its inputs are 2 string variables: `text` and `pattern`, representing the origin string and the string to be searched, respectively. Its return value is an integer representing the first occurrence index of `pattern` in `text`. If `pattern`does not occur in `text`, the function returns -1. Please identify the metamorphic relation of this function as much as possible and output them as java code. Each metamorphic relation should be named test[x], where [x] is the test case number. Here is an example:
 
 ```java
 /**

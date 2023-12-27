@@ -10,9 +10,7 @@ For the function $sin(x)$, assuming there is an origin input $x1$, the correspon
 
 ## Chat 3
 
-Based on the above case, please identify the metamorphic relation of the program `print_tokens2`. `print_tokens2` is a lexical analyzer from Simens programs. Its input is a sequence of strings, and its outputs are all the tokens and their categories in order.
-
-Please identify the metamorphic relations of `print_tokens2` as much as possible and codify them as Python code. Here are some examples:
+You are an expert on metamorphic testing. Based on the above case, please identify the metamorphic relation of the program `print_tokens2`. `print_tokens2` is a lexical analyzer from Simens programs. Its input is a sequence of strings, and its outputs are all the tokens and their categories in order. Please identify the metamorphic relations of `print_tokens2` as much as possible and codify them as Python code. Here are some examples:
 
 ```python
 @parameterized.expand(load_test_cases)

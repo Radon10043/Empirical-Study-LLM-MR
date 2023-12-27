@@ -10,9 +10,7 @@ For the function $sin(x)$, assuming there is an origin input $x1$, the correspon
 
 # Chat 3
 
-Based on the above case, please identify the metamorphic relation of this system: There is a function that implements the binary search algorithm to find the occurrence index of the specific element in the ascending array. Its inputs are 2 variables: `vec` and `target`, representing an ascending array and the element to be searched, respectively. Its return value is an integer representing the occurrence index of `target` in `vec`. If `target`does not occur in `vec`, the function returns -1. Please identify the metamorphic relation of this function as much as possible and use Google's C++ testing and mocking framework `googletest` to codify them as C++ code.
-
-Here is some examples:
+You are an expert on metamorphic testing. Based on the above case, please identify the metamorphic relation of this system: There is a function that implements the binary search algorithm to find the occurrence index of the specific element in the ascending array. Its inputs are 2 variables: `vec` and `target`, representing an ascending array and the element to be searched, respectively. Its return value is an integer representing the occurrence index of `target` in `vec`. If `target`does not occur in `vec`, the function returns -1. Please identify the metamorphic relation of this function as much as possible and use Google's C++ testing and mocking framework `googletest` to codify them as C++ code. Here are some examples:
 
 ```C++
 /**

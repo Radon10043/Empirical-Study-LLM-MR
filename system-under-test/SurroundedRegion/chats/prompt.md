@@ -10,7 +10,7 @@ For the function $sin(x)$, assuming there is an origin input $x1$, the correspon
 
 ## Chat 3
 
-Based on the above case, please identify the metamorphic relation of this program: There is a program that captures all regions surrounded by 'X', and all 'O's in these regions will be flipped into 'X's. Its input is a two-dim board containing 'X's and 'O's. We use a string array to represent this two-dim board. Its output is also a string array, but all 'O's in regions surrounded by 'X' is flipped to 'X's. Please identify the metamorphic relations of this program as much as possible and use Google's C++ testing and mocking framework `googletest` to codify them as C++ code. Here are some examples:
+You are an expert on metamorphic testing. Based on the above case, please identify the metamorphic relation of this program: There is a program that captures all regions surrounded by 'X', and all 'O's in these regions will be flipped into 'X's. Its input is a two-dim board containing 'X's and 'O's. We use a string array to represent this two-dim board. Its output is also a string array, but all 'O's in regions surrounded by 'X' is flipped to 'X's. Please identify the metamorphic relations of this program as much as possible and use Google's C++ testing and mocking framework `googletest` to codify them as C++ code. Here are some examples:
 
 ```cpp
 /**

@@ -10,7 +10,7 @@ For the function $sin(x)$, assuming there is an origin input $x1$, the correspon
 
 ## Chat 3
 
-Based on the above case, please identify the metamorphic relation of this system: There is a system whose inputs are two strings `s` and `t`, and its return value is an integer representing the number of distinct subsequences of `s` which equals `t`. Please identify the metamorphic relations of this system as much as possible and use Google's C++ testing and mocking framework `googletest` to codify them as C++ code. Here is an example:
+You are an expert on metamorphic testing. Based on the above case, please identify the metamorphic relation of this system: There is a system whose inputs are two strings `s` and `t`, and its return value is an integer representing the number of distinct subsequences of `s` which equals `t`. Please identify the metamorphic relations of this system as much as possible and use Google's C++ testing and mocking framework `googletest` to codify them as C++ code. Here are some examples:
 
 ```cpp
 /**

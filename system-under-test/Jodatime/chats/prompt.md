@@ -10,9 +10,7 @@ For the function $sin(x)$, assuming there is an origin input $x1$, the correspon
 
 ## Chat 3
 
-Based on the above case, please identify the metamorphic relation of Joda-Time. Joda-Time is a library designed as a complete alternative to the JDK date and time classes. It includes date, duration, time period and interval classes and has a pluggable API for various calendar systems.  Please identify the metamorphic relation of this function as much as possible and output them as java code. Each metamorphic relation should be named test[x], where [x] is the test case number.
-
-Here are some examples:
+You are an expert on metamorphic testing. Based on the above case, please identify the metamorphic relation of Joda-Time. Joda-Time is a library designed as a complete alternative to the JDK date and time classes. It includes date, duration, time period and interval classes and has a pluggable API for various calendar systems.  Please identify the metamorphic relation of this function as much as possible and output them as java code. Each metamorphic relation should be named test[x], where [x] is the test case number. Here are some examples:
 
 ```java
 /**

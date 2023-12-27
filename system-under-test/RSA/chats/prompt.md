@@ -10,10 +10,30 @@ For the function $sin(x)$, assuming there is an origin input $x1$, the correspon
 
 ## Chat 3
 
-Based on the above case, please identify the metamorphic relation of this program: There is a program that implements RSA encryption. Its input is four integers: `m`, `e`, `p`, and `q`. Its output value is a long integer representing the number that RSA encrypts. Please identify the metamorphic relations of this program as much as possible and use Google's C++ testing and mocking framework `googletest` to codify them as C++ code. Here are some examples:
+You are an expert on metamorphic testing. Based on the above case, please identify the metamorphic relation of this program: There is a program that implements RSA encryption. Its input is four integers: `m`, `e`, `p`, and `q`. Its output value is a long integer representing the number that RSA encrypts. Please identify the metamorphic relations of this program as much as possible and use Google's C++ testing and mocking framework `googletest` to codify them as C++ code. Here is an example:
 
 ```cpp
+/**
+ * @brief Metamorphic Relation 1: Keeping p, q and e the same, giving a new plaintext which is equals to m + p*q, the ciphertext is the same.
+ *
+ */
+TEST_P(RSAParamTest, MR1) {
+    /* Get source input */
+    RSAInput input = GetParam();
+    int source_m = input.m, source_e = input.e, source_p = input.p, source_q = input.q;
 
+    /* Get source output */
+    long long source_out = candp(source_m, source_e, source_p, source_q);
+
+    /* Construct follow-up input */
+    int follow_m = source_m + source_p * source_q;
+
+    /* Get follow-up output */
+    long long follow_out = candp(follow_m, source_e, source_p, source_q);
+
+    /* Verification */
+    ASSERT_EQ(source_out, follow_out);
+}
 ```
 
 ## Chat 4...n

@@ -10,7 +10,7 @@ For the function $sin(x)$, assuming there is an origin input $x1$, the correspon
 
 ## Chat 3
 
-Based on the above case, please identify the metamorphic relation of Aviation Consignment Management System (ACMS). ACMS is intended to provide services related to billing for airlines baggage. It can also be used to convert a JSON string to an equivalent Java object. The source code of ACMS is as follows:
+You are an expert on metamorphic testing. Based on the above case, please identify the metamorphic relation of Aviation Consignment Management System (ACMS). ACMS is intended to provide services related to billing for airlines baggage. The source code of ACMS is as follows:
 
 ```java
 public class AirlinesBaggageBillingService

@@ -10,16 +10,14 @@ For the function $sin(x)$, assuming there is an origin input $x1$, the correspon
 
 # Chat 1
 
-Based on the above case, please identify the metamorphic relation of the function `bin_search`. The specification of this function is as follows:
+You are an expert on metamorphic testing. Based on the above case, please identify the metamorphic relation of the function `bin_search`. The specification of this function is as follows:
 
 - The function implements the binary search algorithm to determine whether the specific element occurs in the ascending array.
 - The function's input is 2 variables: `vec` and `target`, representing an ascending array and the element to be searched, respectively.
 - The function's return value is a bool value representing whether `target` occurs in `vec`. If `target` does not occur in `vec`, the function returns `false`; otherwise returns `true`.
 - If elements in `vec` are changed, `vec` must also remain in ascending order.
 
-Please identify the metamorphic relation of this function as much as possible and use Google's C++ testing and mocking framework `googletest` to codify them as C++ code.
-
-Here are some examples:
+Please identify the metamorphic relation of this function as much as possible and use Google's C++ testing and mocking framework `googletest` to codify them as C++ code. Here are some examples:
 
 ```C++
 /**

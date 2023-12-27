@@ -10,9 +10,7 @@ For the function $sin(x)$, assuming there is an origin input $x1$, the correspon
 
 ## Chat 3
 
-Based on the above case, please identify the metamorphic relation of the Apache Lucene project. Apache Lucene is a high-performance, full-featured text search engine library written in Java. Please identify the metamorphic relation of this function as much as possible and output them as java code. Each metamorphic relation should be named test[x], where [x] is the test case number.
-
-Here is an example:
+You are an expert on metamorphic testing. Based on the above case, please identify the metamorphic relation of the Apache Lucene project. Apache Lucene is a high-performance, full-featured text search engine library written in Java. Please identify the metamorphic relation of this function as much as possible and output them as java code. Each metamorphic relation should be named test[x], where [x] is the test case number. Here are some examples:
 
 ```java
 /**

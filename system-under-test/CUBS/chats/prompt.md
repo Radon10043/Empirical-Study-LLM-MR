@@ -10,7 +10,7 @@ For the function $sin(x)$, assuming there is an origin input $x1$, the correspon
 
 ## Chat 3
 
-Based on the above case, please identify the metamorphic relation of China Unicom Billing System (CUBS). CUBS is designed to calculate a phone bill based on a plan's type and fee, along with user's talk time and data usage. The source code of CUBS is as follows:
+You are an expert on metamorphic testing. Based on the above case, please identify the metamorphic relation of China Unicom Billing System (CUBS). CUBS is designed to calculate a phone bill based on a plan's type and fee, along with user's talk time and data usage. The source code of CUBS is as follows:
 
 ```java
 import java.io.IOException;

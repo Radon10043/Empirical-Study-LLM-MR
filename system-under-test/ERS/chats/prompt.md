@@ -10,7 +10,7 @@ For the function $sin(x)$, assuming there is an origin input $x1$, the correspon
 
 ## Chat 3
 
-Based on the above case, please identify the metamorphic relation of Expense Reimbursement System (ACMS). ERS is  designed to calculate expense reimbursements for employees based on their sales staff level and several expense factors. The source code of ERS is as follows:
+You are an expert on metamorphic testing. Based on the above case, please identify the metamorphic relation of Expense Reimbursement System (ERS). ERS is designed to calculate expense reimbursements for employees based on their sales staff level and several expense factors. The source code of ERS is as follows:
 
 ```java
 import java.util.Scanner;
@@ -111,7 +111,7 @@ public class ExpenseReimbursementSystem {
 }
 ```
 
-Please identify the metamorphic relation of this function as much as possible and output them as java code. Each metamorphic relation should be named test[x], where [x] is the test case number. Here are some example:
+Please identify the metamorphic relation of this function as much as possible and output them as java code. Each metamorphic relation should be named test[x], where [x] is the test case number. Here are some examples:
 
 ```java
 /**

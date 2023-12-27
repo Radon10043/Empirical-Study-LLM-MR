@@ -10,7 +10,7 @@ For the function $sin(x)$, assuming there is an origin input $x1$, the correspon
 
 ## Chat 3
 
-Based on the above case, please identify the metamorphic relation of this program: There is a program whose input is three strings `A`, `B` and `C`, and it return a bool value representing whether `C` is the interleaving of `A` and `B`. Please identify the metamorphic relations of this program as much as possible and use Google's C++ testing and mocking framework `googletest` to codify them as C++ code. Here are some examples:
+You are an expert on metamorphic testing. Based on the above case, please identify the metamorphic relation of this program: There is a program whose input is three strings `A`, `B` and `C`, and it return a bool value representing whether `C` is the interleaving of `A` and `B`. Please identify the metamorphic relations of this program as much as possible and use Google's C++ testing and mocking framework `googletest` to codify them as C++ code. Here is an example:
 
 ```cpp
 /**

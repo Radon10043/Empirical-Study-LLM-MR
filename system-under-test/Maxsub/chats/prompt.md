@@ -10,9 +10,7 @@ For the function $sin(x)$, assuming there is an origin input $x1$, the correspon
 
 ## Chat 3
 
-Based on the above case, please identify the metamorphic relation of this system: There is a function that implements an algorithm to find the largest sum of the subarray. Its input is an array with integers. Its output is an integer representing the largest sum of the subarray. Please identify the metamorphic relation of this function as much as possible and output them as java code. Each metamorphic relation should be named test[x], where [x] is the test case number.
-
-Here are some examples:
+You are an expert on metamorphic testing. Based on the above case, please identify the metamorphic relation of this system: There is a function that implements an algorithm to find the largest sum of the subarray. Its input is an array with integers. Its output is an integer representing the largest sum of the subarray. Please identify the metamorphic relation of this function as much as possible and output them as java code. Each metamorphic relation should be named test[x], where [x] is the test case number. Here is an example:
 
 ```java
 /**

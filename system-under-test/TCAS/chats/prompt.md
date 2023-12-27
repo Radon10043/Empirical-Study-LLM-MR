@@ -10,9 +10,7 @@ For the function $sin(x)$, assuming there is an origin input $x1$, the correspon
 
 ## Chat 3
 
-Based on the above case, please identify the metamorphic relation of the program `tcas`. `tcas` is an aircraft collision avoidance system from Simens programs. Its inputs are 12 integers, include `Cur_Vertical_Sep`, `High_Confidence`, `Two_of_Three_Reports_Valid`, `Own_Tracked_Alt`, `Own_Tracked_Alt_Rate`, `Other_Tracked_Alt`, `Alt_Layer_Value`, `Up_Separation`, `Down_Separation`, `Other_RAC`, `Other_Capability`, and `Climb_Inhibit`. Its output is an integer indicating that the aircraft should climb(`1`), descend(`2`), or remain the current trajectory(`0`).
-
-Please identify the metamorphic relations of `tcas` as much as possible and codify them as Python code. Here are some examples:
+You are an expert on metamorphic testing. Based on the above case, please identify the metamorphic relation of the program `tcas`. `tcas` is an aircraft collision avoidance system from Simens programs. Its inputs are 12 integers, include `Cur_Vertical_Sep`, `High_Confidence`, `Two_of_Three_Reports_Valid`, `Own_Tracked_Alt`, `Own_Tracked_Alt_Rate`, `Other_Tracked_Alt`, `Alt_Layer_Value`, `Up_Separation`, `Down_Separation`, `Other_RAC`, `Other_Capability`, and `Climb_Inhibit`. Its output is an integer indicating that the aircraft should climb(`1`), descend(`2`), or remain the current trajectory(`0`). Please identify the metamorphic relations of `tcas` as much as possible and codify them as Python code. Here are some examples:
 
 ```python
 INDEX = {
