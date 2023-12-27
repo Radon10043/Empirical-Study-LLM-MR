@@ -1,17 +1,18 @@
+package src;
 public class AirlinesBaggageBillingService
 {
 
-    int airClass = 0; //�ɻ���λ
+    int airClass = 0;
 
-    int area = 0;//����
+    int area = 0;
 
-    double luggage = 0;//����
+    double luggage = 0;
 
-    double benchmark = 0;//����
+    double benchmark = 0;
 
-    double takealong = 0;//Я��
+    double takealong = 0;
 
-    double luggagefee = 0;//����
+    double luggagefee = 0;
 
     int tln = 0;
 
