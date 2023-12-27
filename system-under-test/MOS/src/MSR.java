@@ -1,3 +1,4 @@
+package src;
 public class MSR {
 	
 	public int numberOfFirstClassMeals;	
