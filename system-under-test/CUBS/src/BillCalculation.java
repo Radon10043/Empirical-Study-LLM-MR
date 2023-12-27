@@ -1,3 +1,4 @@
+package src;
 import java.io.IOException;
 
 public class BillCalculation
