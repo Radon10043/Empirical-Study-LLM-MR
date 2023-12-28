@@ -39,6 +39,7 @@
  *  1.5 2007-05-21 add pad, icon, pass IntelliJ lint, add ANT build.xml.
  */
 //package com.mindprod.boyer;
+package src;
 
 import java.io.File;
 import java.io.FileReader;
