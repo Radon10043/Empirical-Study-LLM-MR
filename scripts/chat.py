@@ -2,7 +2,7 @@
 Author: Radon
 Date: 2023-12-06 15:26:45
 LastEditors: Radon
-LastEditTime: 2023-12-28 13:47:01
+LastEditTime: 2023-12-28 19:09:26
 Description: Hi, say something
 """
 import openai
@@ -104,7 +104,7 @@ def gpt_3p5_turbo(list_prompt: list, output_dir: str, max_chat_count: int):
 
     # 将聊天内容输出到文件
     print("Writing to the gpt3.5turbo.md ... ", end="")
-    with open(os.path.join(output_dir, "gpt3.5turbo-" + cur_time + ".md"), mode="w") as f:
+    with open(os.path.join(output_dir, "gpt3.5turbo-" + cur_time + ".md"), mode="w", encoding="utf-8") as f:
         for msg in msgs:
             f.write("#### " + msg["role"] + "\n\n")
             f.write(msg["content"] + "\n\n")
@@ -112,7 +112,7 @@ def gpt_3p5_turbo(list_prompt: list, output_dir: str, max_chat_count: int):
 
     # 将聊天内容同时保存至json文件
     print("Writing to the gpt3.5turbo.json ... ", end="")
-    with open(os.path.join(output_dir, "gpt3.5turbo-" + cur_time + ".json"), mode="w") as f:
+    with open(os.path.join(output_dir, "gpt3.5turbo-" + cur_time + ".json"), mode="w", encoding="utf-8") as f:
         json.dump(msgs, f, indent=4)
     print("finish!")
 
