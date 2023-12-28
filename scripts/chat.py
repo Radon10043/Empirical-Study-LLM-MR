@@ -2,13 +2,13 @@
 Author: Radon
 Date: 2023-12-06 15:26:45
 LastEditors: Radon
-LastEditTime: 2023-12-11 17:10:56
+LastEditTime: 2023-12-28 13:47:01
 Description: Hi, say something
 """
 import openai
 import marko, json
 import random, time
-import argparse, os
+import argparse, os, re
 
 from marko.md_renderer import MarkdownRenderer
 
@@ -34,7 +34,7 @@ def get_cur_time() -> str:
     return cur_time
 
 
-def gpt_3p5_turbo(list_prompt: list, output_dir: str):
+def gpt_3p5_turbo(list_prompt: list, output_dir: str, max_chat_count: int):
     """向gpt-3.5-turbo发送信息, 让其识别蜕变关系并生成单元测试用例代码
 
     Parameters
@@ -43,6 +43,8 @@ def gpt_3p5_turbo(list_prompt: list, output_dir: str):
         提示词列表
     output_dir : str
         聊天内容要输出到的目录
+    max_chat_count : int
+        最大聊天次数
 
     Notes
     -----
@@ -50,14 +52,19 @@ def gpt_3p5_turbo(list_prompt: list, output_dir: str):
     """
     msgs = list()  # 聊天记录列表
 
-    try:
-        for prompt in list_prompt:
-            # 将提示词加入列表, 以让gpt记住历史聊天内容
-            msgs.append({"role": "user", "content": prompt})
+    i = 0
+    while i < max_chat_count:
+        # 将提示词加入列表, 以让gpt记住历史聊天内容
+        if i < len(list_prompt):
+            prompt = list_prompt[i]
+        else:
+            prompt = list_prompt[-1]
+        msgs.append({"role": "user", "content": prompt})
 
-            # 随机休息几秒, 防止报错
-            time.sleep(random.randint(1, 5))
+        # 随机休息几秒, 防止报错
+        time.sleep(random.randint(1, 5))
 
+        try:
             # 获取gpt的回复内容, 加入到answer中
             answer = str()
             response = openai.ChatCompletion.create(model="gpt-3.5-turbo", messages=msgs, stream=True)
@@ -77,8 +84,20 @@ def gpt_3p5_turbo(list_prompt: list, output_dir: str):
             # 将answer加入msgs, 以让gpt记住历史聊天内容
             msgs.append({"role": "assistant", "content": answer})
 
-    except BaseException as e:
-        print("出现错误: " + str(e))
+            # 如果输出内容中有Metamorphic Relation 50, 跳出循环
+            search_result = re.search("Metamorphic Relation 50", answer, flags=re.IGNORECASE)
+            if not search_result is None:
+                break
+
+        except BaseException as e:
+            # 如果出现了错误, 弹出刚刚加入的提示, 下标-1, 并休息一段时间后再开始
+            msgs.pop()
+            i -= 1
+            print("出现错误:", e)
+            print("休息一分钟后再继续...")
+            time.sleep(60)
+
+        i += 1
 
     # 获取当前时间
     cur_time = get_cur_time()
@@ -93,7 +112,7 @@ def gpt_3p5_turbo(list_prompt: list, output_dir: str):
 
     # 将聊天内容同时保存至json文件
     print("Writing to the gpt3.5turbo.json ... ", end="")
-    with open(os.path.join(output_dir, "gpt3.5turbo" + cur_time + ".json"), mode="w") as f:
+    with open(os.path.join(output_dir, "gpt3.5turbo-" + cur_time + ".json"), mode="w") as f:
         json.dump(msgs, f, indent=4)
     print("finish!")
 
@@ -180,10 +199,6 @@ def read_prompt(prompt_path: str) -> list:
     if not is_all_blank(sub_document):
         list_prompt.append(md_instance.render(sub_document).lstrip("\n"))
 
-    # 为了保证蜕变关系生成的数量至少有50个, 反复重复最后一个提示词, 直到list_prompt的长度到达指定值
-    while len(list_prompt) < 30:
-        list_prompt.append(list_prompt[-1])
-
     return list_prompt
 
 
@@ -199,13 +214,15 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="自动向大模型发送提示并输出内容至markdown文件")
     parser.add_argument("-p", "--prompt", nargs="*", required=True, help="prompt文件路径, 需要是markdown文件, 且遵循模板的规则, 可同时输入多个文件路径.")
     parser.add_argument("-m", "--model", choices=["gpt3.5turbo", "gpt4"], required=True, help="要使用的大模型")
+    parser.add_argument("-c", "--count", type=int, default=50, help="最大聊天次数")
     args = parser.parse_args()
 
     prompt_paths = args.prompt
+    max_chat_count = args.count
 
     for prompt_path in prompt_paths:
         # 聊天内容文件保存到prompt文件同目录下
         output_dir = os.path.dirname(prompt_path)
 
         list_prompt = read_prompt(prompt_path)
-        DICT_MODEL_FUNC[args.model](list_prompt, output_dir)
+        DICT_MODEL_FUNC[args.model](list_prompt, output_dir, max_chat_count)
