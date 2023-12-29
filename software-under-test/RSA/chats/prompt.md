@@ -2,7 +2,7 @@
 
 ## Chat 1
 
-Metamorphic testing is usually used to check whether the system under test satisfies specific properties. Among them, metamorphic relation is the core concept of metamorphic testing. The metamorphic relation can be considered a formal expression of the properties of the system under test and usually consists of two parts, namely the input relation and the output relation.
+Metamorphic testing is usually used to check whether the software under test satisfies specific properties. Among them, metamorphic relation is the core concept of metamorphic testing. The metamorphic relation can be considered a formal expression of the properties of the software under test and usually consists of two parts, namely the input relation and the output relation.
 
 ## Chat 2
 

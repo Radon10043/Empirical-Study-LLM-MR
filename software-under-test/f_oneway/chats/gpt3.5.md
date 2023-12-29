@@ -8,17 +8,17 @@
 
 #### User
 
-Metamorphic testing is usually used to check whether the system under test satisfies specific properties. Among them, metamorphic relation is the core concept of metamorphic testing. The metamorphic relation can be considered a formal expression of the properties of the system under test and usually consists of two parts, namely the input relation and the output relation.
+Metamorphic testing is usually used to check whether the software under test satisfies specific properties. Among them, metamorphic relation is the core concept of metamorphic testing. The metamorphic relation can be considered a formal expression of the properties of the software under test and usually consists of two parts, namely the input relation and the output relation.
 
 <br>
 
 #### ChatGPT
 
-Yes, you're correct! Metamorphic testing is a testing technique that is often used to verify the correctness of a system by leveraging metamorphic relations. Metamorphic relations are formal expressions of the expected relationships between inputs and outputs of the system under test. These relations help define how the system's output should change when the input undergoes a known transformation.
+Yes, you're correct! Metamorphic testing is a testing technique that is often used to verify the correctness of a system by leveraging metamorphic relations. Metamorphic relations are formal expressions of the expected relationships between inputs and outputs of the software under test. These relations help define how the system's output should change when the input undergoes a known transformation.
 
 The metamorphic relation typically consists of two main components:
 
-1. **Input Relation:** This describes how the inputs to the system under test should be related when a metamorphic transformation is applied. For example, it might specify that if you have two inputs, A and B, and there is a known transformation T, then A should be related to B in a specific way under the transformation T.
+1. **Input Relation:** This describes how the inputs to the software under test should be related when a metamorphic transformation is applied. For example, it might specify that if you have two inputs, A and B, and there is a known transformation T, then A should be related to B in a specific way under the transformation T.
 
 2. **Output Relation:** This component describes how the outputs of the system should be related when the corresponding input relation is applied. In other words, it specifies the expected relationship between the outputs of the system when the inputs undergo a defined transformation.
 
