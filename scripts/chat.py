@@ -2,7 +2,7 @@
 Author: Radon
 Date: 2023-12-06 15:26:45
 LastEditors: Radon
-LastEditTime: 2023-12-29 11:25:50
+LastEditTime: 2023-12-29 11:30:45
 Description: Hi, say something
 """
 import openai
@@ -228,4 +228,4 @@ if __name__ == "__main__":
         sut_name = os.path.basename(os.path.diranme(prompt_path))
 
         list_prompt = read_prompt(prompt_path)
-        DICT_MODEL_FUNC[args.model](list_prompt, output_dir, max_chat_count)
+        DICT_MODEL_FUNC[args.model](list_prompt, output_dir, max_chat_count, sut_name)
