@@ -2,7 +2,7 @@
 Author: Radon
 Date: 2023-12-06 15:26:45
 LastEditors: Radon
-LastEditTime: 2023-12-29 12:22:09
+LastEditTime: 2023-12-29 16:10:20
 Description: Hi, say something
 """
 import openai
@@ -96,8 +96,14 @@ def gpt_3p5_turbo(list_prompt: list, output_dir: str, max_chat_count: int, sut_n
             msgs.pop()
             i -= 1
             print("出现错误:", e)
-            print("休息一分钟后再继续...")
-            time.sleep(60)
+
+            # 随机休息一段时间后再继续
+            sleep_time = random.randint(60, 600)
+            while sleep_time > 0:
+                sleep_time -= 1
+                print("休息一下后再继续... %d秒" % sleep_time, end="\r")
+                time.sleep(1)
+            print()
 
         i += 1
 
