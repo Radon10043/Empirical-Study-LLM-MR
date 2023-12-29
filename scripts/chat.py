@@ -2,7 +2,7 @@
 Author: Radon
 Date: 2023-12-06 15:26:45
 LastEditors: Radon
-LastEditTime: 2023-12-29 12:01:34
+LastEditTime: 2023-12-29 12:22:09
 Description: Hi, say something
 """
 import openai
@@ -225,7 +225,7 @@ if __name__ == "__main__":
     for prompt_path in prompt_paths:
         # 聊天内容文件保存到prompt文件同目录下
         output_dir = os.path.dirname(prompt_path)
-        sut_name = os.path.basename(os.path.dirname(prompt_path))
+        sut_name = os.path.basename(os.path.dirname(os.path.dirname(prompt_path)))
 
         list_prompt = read_prompt(prompt_path)
         DICT_MODEL_FUNC[args.model](list_prompt, output_dir, max_chat_count, sut_name)
