@@ -2,7 +2,7 @@
 Author: Radon
 Date: 2023-12-06 15:26:45
 LastEditors: Radon
-LastEditTime: 2023-12-28 19:09:26
+LastEditTime: 2023-12-29 11:25:50
 Description: Hi, say something
 """
 import openai
@@ -34,7 +34,7 @@ def get_cur_time() -> str:
     return cur_time
 
 
-def gpt_3p5_turbo(list_prompt: list, output_dir: str, max_chat_count: int):
+def gpt_3p5_turbo(list_prompt: list, output_dir: str, max_chat_count: int, sut_name: str):
     """向gpt-3.5-turbo发送信息, 让其识别蜕变关系并生成单元测试用例代码
 
     Parameters
@@ -45,6 +45,8 @@ def gpt_3p5_turbo(list_prompt: list, output_dir: str, max_chat_count: int):
         聊天内容要输出到的目录
     max_chat_count : int
         最大聊天次数
+    sut_name : str
+        被测对象的名称
 
     Notes
     -----
@@ -104,7 +106,7 @@ def gpt_3p5_turbo(list_prompt: list, output_dir: str, max_chat_count: int):
 
     # 将聊天内容输出到文件
     print("Writing to the gpt3.5turbo.md ... ", end="")
-    with open(os.path.join(output_dir, "gpt3.5turbo-" + cur_time + ".md"), mode="w", encoding="utf-8") as f:
+    with open(os.path.join(output_dir, "gpt3.5turbo-" + sut_name + "-" + cur_time + ".md"), mode="w", encoding="utf-8") as f:
         for msg in msgs:
             f.write("#### " + msg["role"] + "\n\n")
             f.write(msg["content"] + "\n\n")
@@ -112,7 +114,7 @@ def gpt_3p5_turbo(list_prompt: list, output_dir: str, max_chat_count: int):
 
     # 将聊天内容同时保存至json文件
     print("Writing to the gpt3.5turbo.json ... ", end="")
-    with open(os.path.join(output_dir, "gpt3.5turbo-" + cur_time + ".json"), mode="w", encoding="utf-8") as f:
+    with open(os.path.join(output_dir, "gpt3.5turbo-" + sut_name + "-" + cur_time + ".json"), mode="w", encoding="utf-8") as f:
         json.dump(msgs, f, indent=4)
     print("finish!")
 
@@ -223,6 +225,7 @@ if __name__ == "__main__":
     for prompt_path in prompt_paths:
         # 聊天内容文件保存到prompt文件同目录下
         output_dir = os.path.dirname(prompt_path)
+        sut_name = os.path.basename(os.path.diranme(prompt_path))
 
         list_prompt = read_prompt(prompt_path)
         DICT_MODEL_FUNC[args.model](list_prompt, output_dir, max_chat_count)
