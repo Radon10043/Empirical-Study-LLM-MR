@@ -13,6 +13,22 @@ For the function $sin(x)$, assuming there is an origin input $x1$, the correspon
 You are an expert on metamorphic testing. Based on the above case, please identify the metamorphic relation of the program `schedule2`. `schedule2` is a priority scheduler from Simens programs. Its inputs are three priority job-lists $P_1, P_2, and P_3$ with priorities: $P_3>P_2>P_1$, and a set of operations on jobs. Its output is execution order of the jobs. Please identify the metamorphic relations of `schedule2` as much as possible and codify them as Python code. Here are some examples:
 
 ```python
+SCHEDULE_OPERATIONS = {
+    "NEW_JOB"       : "1",
+    "UPGRADE_PRIO"  : "2",
+    "BLOCK"         : "3",
+    "UNBLOCK"       : "4",
+    "QUANTUM_EXPIRE": "5",
+    "FINISH"        : "6",
+    "FLUSH"         : "7"
+}
+
+PRIORITY_LEVEL = {
+    "HIGH"  : "1",
+    "MEDIUM": "2",
+    "LOW"   : "3"
+}
+
 @parameterized.expand(load_test_cases)
 def test1(self, job_list: list):
     """Metamorphic Relation 1: If the size of a job-list is 1, then the operation that moving the job at the top of this list to the end will not affect the output.
