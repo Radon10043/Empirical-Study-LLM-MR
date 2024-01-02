@@ -2,7 +2,7 @@
 Author: Radon
 Date: 2023-12-06 15:26:45
 LastEditors: Radon
-LastEditTime: 2023-12-29 16:10:20
+LastEditTime: 2024-01-02 10:41:47
 Description: Hi, say something
 """
 import openai
@@ -34,8 +34,8 @@ def get_cur_time() -> str:
     return cur_time
 
 
-def gpt_3p5_turbo(list_prompt: list, output_dir: str, max_chat_count: int, sut_name: str):
-    """向gpt-3.5-turbo发送信息, 让其识别蜕变关系并生成单元测试用例代码
+def chat_with_gpt(list_prompt: list, output_dir: str, max_chat_count: int, sut_name: str, gpt_name: str):
+    """向GPT系的大模型发送信息, 让其识别蜕变关系并生成单元测试用例代码
 
     Parameters
     ----------
@@ -47,6 +47,8 @@ def gpt_3p5_turbo(list_prompt: list, output_dir: str, max_chat_count: int, sut_n
         最大聊天次数
     sut_name : str
         被测对象的名称
+    gpt_name : str
+        进行聊天的gpt系模型名称
 
     Notes
     -----
@@ -69,7 +71,7 @@ def gpt_3p5_turbo(list_prompt: list, output_dir: str, max_chat_count: int, sut_n
         try:
             # 获取gpt的回复内容, 加入到answer中
             answer = str()
-            response = openai.ChatCompletion.create(model="gpt-3.5-turbo", messages=msgs, stream=True)
+            response = openai.ChatCompletion.create(model=gpt_name, messages=msgs, stream=True)
             print("ChatGPT: ", end="")
 
             for event in response:
@@ -111,22 +113,20 @@ def gpt_3p5_turbo(list_prompt: list, output_dir: str, max_chat_count: int, sut_n
     cur_time = get_cur_time()
 
     # 将聊天内容输出到文件
-    print("Writing to the gpt3.5turbo.md ... ", end="")
-    with open(os.path.join(output_dir, "gpt3.5turbo-" + sut_name + "-" + cur_time + ".md"), mode="w", encoding="utf-8") as f:
+    fn_base = gpt_name.replace("-", "") + "-" + sut_name + "-" + cur_time
+
+    print("Writing to the " + fn_base + ".md ... ", end="")
+    with open(os.path.join(output_dir, fn_base + ".md"), mode="w", encoding="utf-8") as f:
         for msg in msgs:
             f.write("#### " + msg["role"] + "\n\n")
             f.write(msg["content"] + "\n\n")
     print("finish!")
 
     # 将聊天内容同时保存至json文件
-    print("Writing to the gpt3.5turbo.json ... ", end="")
-    with open(os.path.join(output_dir, "gpt3.5turbo-" + sut_name + "-" + cur_time + ".json"), mode="w", encoding="utf-8") as f:
+    print("Writing to the " + fn_base + ".json ... ", end="")
+    with open(os.path.join(output_dir, fn_base + ".json"), mode="w", encoding="utf-8") as f:
         json.dump(msgs, f, indent=4)
     print("finish!")
-
-
-def gpt4(list_prompt: list, output_dir: str):
-    print("待完成!")
 
 
 def is_all_blank(document: marko.block.Document) -> bool:
@@ -210,23 +210,16 @@ def read_prompt(prompt_path: str) -> list:
     return list_prompt
 
 
-# fmt:off
-DICT_MODEL_FUNC = {
-    "gpt3.5turbo": gpt_3p5_turbo,
-    "gpt4": gpt4
-}
-# fmt:on
-
-
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="自动向大模型发送提示并输出内容至markdown文件")
     parser.add_argument("-p", "--prompt", nargs="*", required=True, help="prompt文件路径, 需要是markdown文件, 且遵循模板的规则, 可同时输入多个文件路径.")
-    parser.add_argument("-m", "--model", choices=["gpt3.5turbo", "gpt4"], required=True, help="要使用的大模型")
+    parser.add_argument("-m", "--model", choices=["gpt-3.5-turbo", "gpt4"], required=True, help="要使用的大模型")
     parser.add_argument("-c", "--count", type=int, default=50, help="最大聊天次数")
     args = parser.parse_args()
 
     prompt_paths = args.prompt
     max_chat_count = args.count
+    gpt_name = args.model
 
     for prompt_path in prompt_paths:
         # 聊天内容文件保存到prompt文件同目录下
@@ -234,4 +227,4 @@ if __name__ == "__main__":
         sut_name = os.path.basename(os.path.dirname(os.path.dirname(prompt_path)))
 
         list_prompt = read_prompt(prompt_path)
-        DICT_MODEL_FUNC[args.model](list_prompt, output_dir, max_chat_count, sut_name)
+        chat_with_gpt(list_prompt, output_dir, max_chat_count, sut_name, gpt_name)
