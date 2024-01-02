@@ -2,7 +2,7 @@
 Author: Radon
 Date: 2023-12-06 15:26:45
 LastEditors: Radon
-LastEditTime: 2024-01-02 13:30:33
+LastEditTime: 2024-01-02 13:36:57
 Description: Hi, say something
 """
 import openai
@@ -88,8 +88,8 @@ def chat_with_gpt(list_prompt: list, output_dir: str, max_chat_count: int, sut_n
             # 将answer加入msgs, 以让gpt记住历史聊天内容
             msgs.append({"role": "assistant", "content": answer})
 
-            # 如果输出内容中有Metamorphic Relation 50, 跳出循环
-            search_result = re.search("Metamorphic Relation 50", answer, flags=re.IGNORECASE)
+            # 如果输出内容中有Metamorphic Relation 55, 跳出循环
+            search_result = re.search("(Metamorphic Relation 55|MR55)", answer, flags=re.IGNORECASE)
             if not search_result is None:
                 break
 
