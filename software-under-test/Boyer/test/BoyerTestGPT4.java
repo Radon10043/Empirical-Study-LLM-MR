@@ -2,12 +2,16 @@ package test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -32,6 +36,12 @@ public class BoyerTestGPT4 {
 
         /* Construct follow-up input */
         String prefix = "yyy";
+
+        /* Fix by Radon */
+        while (prefix.contains(pattern)) {
+            prefix = RandomStringUtils.randomAlphabetic(3);
+        }
+
         String follow_text = prefix + text;
 
         /* Get follow-up output */
@@ -170,7 +180,9 @@ public class BoyerTestGPT4 {
         /* Get origin output */
         int origin_res = Boyer.indexOf(text, pattern);
 
-        /* Construct follow-up pattern assuming the pattern is found and not at the end of text */
+        /*
+         * Construct follow-up pattern assuming the pattern is found and not at the end of text
+         */
         String follow_pattern = origin_res != -1 && origin_res + pattern.length() < text.length()
                 ? pattern + text.charAt(origin_res + pattern.length())
                 : pattern;
@@ -251,7 +263,9 @@ public class BoyerTestGPT4 {
         /* Get origin output */
         int origin_res = Boyer.indexOf(text, pattern);
 
-        /* Construct follow-up input, assuming sufficient length and that we found a match */
+        /*
+         * Construct follow-up input, assuming sufficient length and that we found a match
+         */
         String follow_text = text;
         if (origin_res > 0) {
             String shuffle_part = follow_text.substring(0, origin_res);
@@ -293,7 +307,8 @@ public class BoyerTestGPT4 {
         String repeat_text = StringUtils.repeat(text, 2);
         String repeat_pattern = StringUtils.repeat(pattern, 2);
 
-        // Only consider this MR valid if the pattern does not occur at end or is not repeated
+        // Only consider this MR valid if the pattern does not occur at end or is not
+        // repeated
         // within the text
         if (origin_res != -1 && origin_res + pattern.length() < text.length()
                 && text.indexOf(pattern, origin_res + pattern.length()) == -1) {
@@ -955,7 +970,8 @@ public class BoyerTestGPT4 {
 
         if (originalIndex != -1) {
             StringBuilder modifiedText = new StringBuilder(text);
-            // Loop over the text and substitute characters that are not in the pattern's match
+            // Loop over the text and substitute characters that are not in the pattern's
+            // match
             for (int i = 0; i < modifiedText.length(); i++) {
                 if ((i < originalIndex) || (i >= originalIndex + pattern.length())) {
                     modifiedText.setCharAt(i, '#'); // Substitute with a placeholder character
@@ -998,9 +1014,9 @@ public class BoyerTestGPT4 {
     }
 
     /**
-     * Metamorphic Relation 36: Trim whitespace or non-alphanumeric characters from the beginning
-     * and end of text and pattern. If the pattern is found, the occurrence index should be the same
-     * after trimming, provided the pattern did not include these characters.
+     * Metamorphic Relation 36: Trim whitespace or non-alphanumeric characters fromthe beginningand
+     * end of text and pattern. If the pattern is found, the occurrence indexshould be the sameafter
+     * trimming, provided the pattern did not include these characters.
      *
      * @param text
      * @param pattern
@@ -1263,11 +1279,13 @@ public class BoyerTestGPT4 {
         String reversePattern = new StringBuilder(pattern).reverse().toString();
         int reverseIndex = Boyer.indexOf(reverseText, reversePattern);
 
-        /* Adjust reverseIndex to the equivalent index in the original text orientation */
+        /*
+         * Adjust reverseIndex to the equivalent index in the original text orientation
+         */
         int adjustedReverseIndex = text.length() - reversePattern.length() - reverseIndex;
 
-        // Verification should ensure either the pattern is not found or the index is the one at the
-        // end of the text,
+        // Verification should ensure either the pattern is not found or the index is
+        // the one at the end of the text,
         // if it's present more than once this test case would not be valid.
         if (originalIndex != -1 && text.indexOf(pattern, originalIndex + 1) == -1) {
             assertEquals(originalIndex, adjustedReverseIndex);
@@ -1285,14 +1303,15 @@ public class BoyerTestGPT4 {
     @ParameterizedTest
     @MethodSource("testcaseProvider")
     public void test46(String text, String pattern) {
-        // Let's assume for simplicity that "ab" is our repeating substring in the pattern.
+        // Let's assume for simplicity that "ab" is our repeating substring in the
+        // pattern.
         String repeatedSubstring = "ab";
         String placeholder = "#"; // A unique placeholder not present in the text or pattern.
 
         // Check if our repeating substring occurs more than once.
         if (pattern.indexOf(repeatedSubstring) != pattern.lastIndexOf(repeatedSubstring)) {
-            // Replace all but the first occurrence of the repeated substring in pattern with a
-            // placeholder.
+            // Replace all but the first occurrence of the repeated substring in pattern
+            // with a placeholder.
             String modifiedPattern = pattern.replaceFirst(repeatedSubstring, "")
                     .replace(repeatedSubstring, placeholder);
             modifiedPattern = repeatedSubstring + modifiedPattern;
@@ -1329,8 +1348,8 @@ public class BoyerTestGPT4 {
         int newIndex = Boyer.indexOf(newText, pattern);
 
         /* Verification */
-        // If the pattern's occurrence is solely at the new location, the index should match the new
-        // location.
+        // If the pattern's occurrence is solely at the new location, the index should
+        // match the new location.
         assertEquals(newLocation, newIndex);
     }
 
@@ -1405,7 +1424,8 @@ public class BoyerTestGPT4 {
         String hexPattern = pattern.chars().mapToObj(c -> String.format("%02x", c))
                 .collect(Collectors.joining());
 
-        // Adjust original index by multiplying by 2 (since hex string is double the size)
+        // Adjust original index by multiplying by 2 (since hex string is double the
+        // size)
         int adjustedOriginalIndex = originalIndex * 2;
 
         int newHexIndex = Boyer.indexOf(hexText, hexPattern);
@@ -1451,7 +1471,7 @@ public class BoyerTestGPT4 {
         }
     }
 
-    static Stream<Arguments> testcaseProvider() {
-        return Stream.of(Arguments.of("abcdefg", "abc"), Arguments.of("abcdefg", "xyz"));
+    public static Stream<Arguments> testcaseProvider() throws IOException {
+        return testcaseGenerator.generate(1000);
     }
 }

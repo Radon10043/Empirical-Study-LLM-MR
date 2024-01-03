@@ -1,5 +1,7 @@
 package test;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.io.IOException;
 import java.util.stream.Stream;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -31,7 +33,7 @@ public class BoyerTestExample {
         assertTrue(follow_res >= origin_res);
     }
 
-    static Stream<Arguments> testcaseProvider() {
-        return Stream.of(Arguments.of("abcdefg", "abc"), Arguments.of("abcdefg", "xyz"));
+    static Stream<Arguments> testcaseProvider() throws IOException {
+        return testcaseGenerator.generate(1000);
     }
 }
