@@ -4,7 +4,7 @@
 *.out
 
 api_key.txt
-testcases.txt
+testcases*.txt
 
 __pycache__/
 .vscode/
