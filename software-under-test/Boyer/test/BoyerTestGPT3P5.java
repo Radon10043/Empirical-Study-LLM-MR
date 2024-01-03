@@ -3,10 +3,8 @@ package test;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
-import java.security.SecureRandom;
 import java.util.stream.Stream;
 
-import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -21,7 +19,7 @@ public class BoyerTestGPT3P5 {
      * @param pattern
      */
     @ParameterizedTest
-    @MethodSource("testcaseProvider1")
+    @MethodSource("testcaseProvider_ss")
     public void test1(String text, String pattern) {
         /* Get origin output */
         int origin_res = Boyer.indexOf(text, pattern);
@@ -45,7 +43,7 @@ public class BoyerTestGPT3P5 {
      * @param index
      */
     @ParameterizedTest
-    @MethodSource("testcaseProvider2")
+    @MethodSource("testcaseProvider_ssi")
     public void test2(String text, String pattern, int index) {
         /* Get origin output */
         int origin_res = Boyer.indexOf(text, pattern);
@@ -68,7 +66,7 @@ public class BoyerTestGPT3P5 {
      * @param pattern
      */
     @ParameterizedTest
-    @MethodSource("testcaseProvider1")
+    @MethodSource("testcaseProvider_ss")
     public void test3(String text, String pattern) {
         /* Get origin output */
         int origin_res = Boyer.indexOf(text, pattern);
@@ -91,7 +89,7 @@ public class BoyerTestGPT3P5 {
      * @param pattern
      */
     @ParameterizedTest
-    @MethodSource("testcaseProvider1")
+    @MethodSource("testcaseProvider_ss")
     public void test4(String text, String pattern) {
         /* Get origin output */
         int origin_res = Boyer.indexOf(text, pattern);
@@ -114,7 +112,7 @@ public class BoyerTestGPT3P5 {
      * @param pattern
      */
     @ParameterizedTest
-    @MethodSource("testcaseProvider1")
+    @MethodSource("testcaseProvider_ss")
     public void test5(String text, String pattern) {
         /* Get origin output */
         int origin_res = Boyer.indexOf(text, pattern);
@@ -136,7 +134,7 @@ public class BoyerTestGPT3P5 {
      * @param pattern
      */
     @ParameterizedTest
-    @MethodSource("testcaseProvider1")
+    @MethodSource("testcaseProvider_ss")
     public void test6(String text, String pattern) {
         /* Get origin output */
         int origin_res = Boyer.indexOf(text, pattern);
@@ -156,7 +154,7 @@ public class BoyerTestGPT3P5 {
      * @param pattern
      */
     @ParameterizedTest
-    @MethodSource("testcaseProvider1")
+    @MethodSource("testcaseProvider_ss")
     public void test7(String text, String pattern) {
         /* Get origin output */
         int origin_res = Boyer.indexOf(text, pattern);
@@ -177,7 +175,7 @@ public class BoyerTestGPT3P5 {
      * @param pattern
      */
     @ParameterizedTest
-    @MethodSource("testcaseProvider1")
+    @MethodSource("testcaseProvider_ss")
     public void test8(String text, String pattern) {
         /* Get origin output */
         int origin_res = Boyer.indexOf(text, pattern);
@@ -197,7 +195,7 @@ public class BoyerTestGPT3P5 {
      * @param pattern
      */
     @ParameterizedTest
-    @MethodSource("testcaseProvider1")
+    @MethodSource("testcaseProvider_ss")
     public void test9(String text, String pattern) {
         /* Get origin output */
         int origin_res = Boyer.indexOf(text, pattern);
@@ -220,7 +218,7 @@ public class BoyerTestGPT3P5 {
      * @param pattern
      */
     @ParameterizedTest
-    @MethodSource("testcaseProvider1")
+    @MethodSource("testcaseProvider_ss")
     public void test10(String text, String pattern) {
         /* Get origin output */
         int origin_res = Boyer.indexOf(text, pattern);
@@ -243,7 +241,7 @@ public class BoyerTestGPT3P5 {
      * @param pattern
      */
     @ParameterizedTest
-    @MethodSource("testcaseProvider1")
+    @MethodSource("testcaseProvider_ss")
     public void test11(String text, String pattern) {
         /* Get origin output */
         int origin_res = Boyer.indexOf(text, pattern);
@@ -266,7 +264,7 @@ public class BoyerTestGPT3P5 {
      * @param pattern
      */
     @ParameterizedTest
-    @MethodSource("testcaseProvider1")
+    @MethodSource("testcaseProvider_ss")
     public void test12(String text, String pattern) {
         /* Get follow-up output */
         int follow_res = Boyer.indexOf("", pattern);
@@ -283,7 +281,7 @@ public class BoyerTestGPT3P5 {
      * @param pattern
      */
     @ParameterizedTest
-    @MethodSource("testcaseProvider1")
+    @MethodSource("testcaseProvider_ss")
     public void test13(String text, String pattern) {
         /* Get origin output */
         int origin_res = Boyer.indexOf(text, pattern);
@@ -306,7 +304,7 @@ public class BoyerTestGPT3P5 {
      * @param pattern
      */
     @ParameterizedTest
-    @MethodSource("testcaseProvider1")
+    @MethodSource("testcaseProvider_ss")
     public void test14(String text, String pattern) {
         /* Get follow-up output */
         String follow_text =
@@ -326,7 +324,7 @@ public class BoyerTestGPT3P5 {
      * @param pattern
      */
     @ParameterizedTest
-    @MethodSource("testcaseProvider1")
+    @MethodSource("testcaseProvider_s")
     public void test15(String pattern) {
         /* Get follow-up output */
         String follow_text = pattern + pattern + pattern; // Replace entire text with pattern
@@ -346,7 +344,7 @@ public class BoyerTestGPT3P5 {
      * @param pattern
      */
     @ParameterizedTest
-    @MethodSource("testcaseProvider1")
+    @MethodSource("testcaseProvider_ss")
     public void test16(String text, String pattern) {
         /* Get origin output */
         int origin_res = Boyer.indexOf(text, pattern);
@@ -369,7 +367,7 @@ public class BoyerTestGPT3P5 {
      * @param pattern
      */
     @ParameterizedTest
-    @MethodSource("testcaseProvider1")
+    @MethodSource("testcaseProvider_ss")
     public void test17(String text, String pattern) {
         /* Get origin output */
         int origin_res = Boyer.indexOf(text, pattern);
@@ -391,7 +389,7 @@ public class BoyerTestGPT3P5 {
      * @param text
      */
     @ParameterizedTest
-    @MethodSource("testcaseProvider1")
+    @MethodSource("testcaseProvider_s")
     public void test18(String text) {
         String pattern = "";
         /* Get follow-up output */
@@ -408,7 +406,7 @@ public class BoyerTestGPT3P5 {
      * @param pattern
      */
     @ParameterizedTest
-    @MethodSource("testcaseProvider1")
+    @MethodSource("testcaseProvider_ss")
     public void test19(String text, String pattern) {
         /* Get origin output */
         int origin_res = Boyer.indexOf(text, pattern);
@@ -431,7 +429,7 @@ public class BoyerTestGPT3P5 {
      * @param pattern
      */
     @ParameterizedTest
-    @MethodSource("testcaseProvider1")
+    @MethodSource("testcaseProvider_ss")
     public void test20(String text, String pattern) {
         /* Get origin output */
         int origin_res = Boyer.indexOf(text, pattern);
@@ -454,7 +452,7 @@ public class BoyerTestGPT3P5 {
      * @param pattern
      */
     @ParameterizedTest
-    @MethodSource("testcaseProvider1")
+    @MethodSource("testcaseProvider_ss")
     public void test21(String text, String pattern) {
         /* Get origin output */
         int origin_res = Boyer.indexOf(text, pattern);
@@ -477,7 +475,7 @@ public class BoyerTestGPT3P5 {
      * @param pattern
      */
     @ParameterizedTest
-    @MethodSource("testcaseProvider1")
+    @MethodSource("testcaseProvider_ss")
     public void test22(String text, String pattern) {
         /* Get origin output */
         int origin_res = Boyer.indexOf(text, pattern);
@@ -500,7 +498,7 @@ public class BoyerTestGPT3P5 {
      * @param pattern
      */
     @ParameterizedTest
-    @MethodSource("testcaseProvider1")
+    @MethodSource("testcaseProvider_ss")
     public void test23(String text, String pattern) {
         /* Get origin output */
         int origin_res = Boyer.indexOf(text, pattern);
@@ -524,7 +522,7 @@ public class BoyerTestGPT3P5 {
      * @param n
      */
     @ParameterizedTest
-    @MethodSource("testcaseProvider1")
+    @MethodSource("testcaseProvider_ssi")
     public void test24(String text, String pattern, int n) {
         /* Get origin output */
         int origin_res = Boyer.indexOf(text, pattern);
@@ -547,7 +545,7 @@ public class BoyerTestGPT3P5 {
      * @param pattern
      */
     @ParameterizedTest
-    @MethodSource("testcaseProvider1")
+    @MethodSource("testcaseProvider_ss")
     public void test25(String text, String pattern) {
         /* Get origin output */
         int origin_res = Boyer.indexOf(text, pattern);
@@ -570,7 +568,7 @@ public class BoyerTestGPT3P5 {
      * @param pattern
      */
     @ParameterizedTest
-    @MethodSource("testcaseProvider1")
+    @MethodSource("testcaseProvider_ss")
     public void test26(String text, String pattern) {
         /* Get origin output */
         int origin_res = Boyer.indexOf(text, pattern);
@@ -593,7 +591,7 @@ public class BoyerTestGPT3P5 {
      * @param pattern
      */
     @ParameterizedTest
-    @MethodSource("testcaseProvider1")
+    @MethodSource("testcaseProvider_ss")
     public void test27(String text, String pattern) {
         /* Get origin output */
         int origin_res = Boyer.indexOf(text, pattern);
@@ -616,7 +614,7 @@ public class BoyerTestGPT3P5 {
      * @param pattern
      */
     @ParameterizedTest
-    @MethodSource("testcaseProvider1")
+    @MethodSource("testcaseProvider_ss")
     public void test28(String text, String pattern) {
         /* Get origin output */
         int origin_res = Boyer.indexOf(text, pattern);
@@ -639,7 +637,7 @@ public class BoyerTestGPT3P5 {
      * @param pattern
      */
     @ParameterizedTest
-    @MethodSource("testcaseProvider1")
+    @MethodSource("testcaseProvider_ss")
     public void test29(String text, String pattern) {
         /* Get origin output */
         int origin_res = Boyer.indexOf(text, pattern);
@@ -662,7 +660,7 @@ public class BoyerTestGPT3P5 {
      * @param pattern
      */
     @ParameterizedTest
-    @MethodSource("testcaseProvider1")
+    @MethodSource("testcaseProvider_ss")
     public void test30(String text, String pattern) {
         /* Get origin output */
         int origin_res = Boyer.indexOf(text, pattern);
@@ -685,7 +683,7 @@ public class BoyerTestGPT3P5 {
      * @param pattern
      */
     @ParameterizedTest
-    @MethodSource("testcaseProvider1")
+    @MethodSource("testcaseProvider_ss")
     public void test31(String text, String pattern) {
         /* Get origin output */
         int origin_res = Boyer.indexOf(text, pattern);
@@ -709,7 +707,7 @@ public class BoyerTestGPT3P5 {
      * @param pattern
      */
     @ParameterizedTest
-    @MethodSource("testcaseProvider1")
+    @MethodSource("testcaseProvider_ss")
     public void test32(String text, String pattern) {
         /* Get origin output */
         int origin_res = Boyer.indexOf(text, pattern);
@@ -732,7 +730,7 @@ public class BoyerTestGPT3P5 {
      * @param pattern
      */
     @ParameterizedTest
-    @MethodSource("testcaseProvider1")
+    @MethodSource("testcaseProvider_ss")
     public void test33(String text, String pattern) {
         /* Get origin output */
         int origin_res = Boyer.indexOf(text, pattern);
@@ -756,7 +754,7 @@ public class BoyerTestGPT3P5 {
      * @param pattern
      */
     @ParameterizedTest
-    @MethodSource("testcaseProvider1")
+    @MethodSource("testcaseProvider_ss")
     public void test34(String text, String pattern) {
         /* Get origin output */
         int origin_res = Boyer.indexOf(text, pattern);
@@ -779,7 +777,7 @@ public class BoyerTestGPT3P5 {
      * @param pattern
      */
     @ParameterizedTest
-    @MethodSource("testcaseProvider1")
+    @MethodSource("testcaseProvider_ss")
     public void test35(String text, String pattern) {
         /* Get origin output */
         int origin_res = Boyer.indexOf(text, pattern);
@@ -802,7 +800,7 @@ public class BoyerTestGPT3P5 {
      * @param pattern
      */
     @ParameterizedTest
-    @MethodSource("testcaseProvider1")
+    @MethodSource("testcaseProvider_ss")
     public void test36(String text, String pattern) {
         /* Get origin output */
         int origin_res = Boyer.indexOf(text, pattern);
@@ -827,7 +825,7 @@ public class BoyerTestGPT3P5 {
      * @param pattern
      */
     @ParameterizedTest
-    @MethodSource("testcaseProvider1")
+    @MethodSource("testcaseProvider_ss")
     public void test37(String text, String pattern) {
         /* Get origin output */
         int origin_res = Boyer.indexOf(text, pattern);
@@ -851,7 +849,7 @@ public class BoyerTestGPT3P5 {
      * @param pattern
      */
     @ParameterizedTest
-    @MethodSource("testcaseProvider1")
+    @MethodSource("testcaseProvider_ss")
     public void test38(String text, String pattern) {
         /* Construct follow-up input by reversing the original text */
         String follow_text = new StringBuilder(text).reverse().toString();
@@ -870,7 +868,7 @@ public class BoyerTestGPT3P5 {
      * @param pattern
      */
     @ParameterizedTest
-    @MethodSource("testcaseProvider1")
+    @MethodSource("testcaseProvider_s")
     public void test39(String pattern) {
         String emptyText = "";
         /* Get follow-up output */
@@ -888,7 +886,7 @@ public class BoyerTestGPT3P5 {
      * @param pattern
      */
     @ParameterizedTest
-    @MethodSource("testcaseProvider1")
+    @MethodSource("testcaseProvider_ss")
     public void test40(String text, String pattern) {
         /* Get follow-up output */
         String follow_text = text.replaceAll(".", "x");
@@ -910,7 +908,7 @@ public class BoyerTestGPT3P5 {
      * @param pattern
      */
     @ParameterizedTest
-    @MethodSource("testcaseProvider1")
+    @MethodSource("testcaseProvider_ss")
     public void test41(String text, String pattern) {
         // /* Get follow-up output */
         // String follow_text = new String(text.chars().mapToObj(c -> String.valueOf((char) c)).sorted().toArray(String[]::new));
@@ -930,7 +928,7 @@ public class BoyerTestGPT3P5 {
      * @param pattern
      */
     @ParameterizedTest
-    @MethodSource("testcaseProvider1")
+    @MethodSource("testcaseProvider_ss")
     public void test42(String text, String pattern) {
         /* Get follow-up output */
         String follow_text = text.replace(pattern, "");
@@ -950,7 +948,7 @@ public class BoyerTestGPT3P5 {
      * @param pattern
      */
     @ParameterizedTest
-    @MethodSource("testcaseProvider1")
+    @MethodSource("testcaseProvider_ss")
     public void test43(String text, String pattern) {
         /* Get origin output */
         int origin_res = Boyer.indexOf(text, pattern);
@@ -973,7 +971,7 @@ public class BoyerTestGPT3P5 {
      * @param pattern
      */
     @ParameterizedTest
-    @MethodSource("testcaseProvider1")
+    @MethodSource("testcaseProvider_ss")
     public void test44(String text, String pattern) {
         /* Get origin output */
         int origin_res = Boyer.indexOf(text, pattern);
@@ -996,7 +994,7 @@ public class BoyerTestGPT3P5 {
      * @param pattern
      */
     @ParameterizedTest
-    @MethodSource("testcaseProvider1")
+    @MethodSource("testcaseProvider_ss")
     public void test45(String text, String pattern) {
         /* Get origin output */
         int origin_res = Boyer.indexOf(text, pattern);
@@ -1019,7 +1017,7 @@ public class BoyerTestGPT3P5 {
      * @param pattern
      */
     @ParameterizedTest
-    @MethodSource("testcaseProvider1")
+    @MethodSource("testcaseProvider_ss")
     public void test46(String text, String pattern) {
         /* Get origin output */
         int origin_res = Boyer.indexOf(text, pattern);
@@ -1050,7 +1048,7 @@ public class BoyerTestGPT3P5 {
      * @param pattern
      */
     @ParameterizedTest
-    @MethodSource("testcaseProvider1")
+    @MethodSource("testcaseProvider_ss")
     public void test47(String text, String pattern) {
         /* Get origin output */
         int origin_res = Boyer.indexOf(text, pattern);
@@ -1074,7 +1072,7 @@ public class BoyerTestGPT3P5 {
      * @param pattern
      */
     @ParameterizedTest
-    @MethodSource("testcaseProvider1")
+    @MethodSource("testcaseProvider_ss")
     public void test48(String text, String pattern) {
         /* Get origin output */
         int origin_res = Boyer.indexOf(text, pattern);
@@ -1097,7 +1095,7 @@ public class BoyerTestGPT3P5 {
      * @param pattern
      */
     @ParameterizedTest
-    @MethodSource("testcaseProvider1")
+    @MethodSource("testcaseProvider_ss")
     public void test49(String text, String pattern) {
         /* Get origin output */
         int origin_res = Boyer.indexOf(text, pattern);
@@ -1120,7 +1118,7 @@ public class BoyerTestGPT3P5 {
      * @param pattern
      */
     @ParameterizedTest
-    @MethodSource("testcaseProvider1")
+    @MethodSource("testcaseProvider_ss")
     public void test50(String text, String pattern) {
         /* Get origin output */
         int origin_res = Boyer.indexOf(text, pattern);
@@ -1136,26 +1134,15 @@ public class BoyerTestGPT3P5 {
         assertTrue(follow_res == origin_res);
     }
 
-    static Stream<Arguments> testcaseProvider1() {
-        /* 随机生成10000条测试数据 */
-
-        int tcs_num = 100;
-        int lower = 1, upper = 101;     // Include lower but exclude upper
-        SecureRandom rand = new SecureRandom();
-        Arguments[] tcs = new Arguments[tcs_num];
-
-        for (int i = 0; i < tcs_num; i++) {
-            int len_text = rand.nextInt(lower, upper);
-            int len_pattern = rand.nextInt(lower, upper);
-            String text = RandomStringUtils.randomAscii(len_text);
-            String pattern = RandomStringUtils.randomAscii(len_pattern);
-            tcs[i] = Arguments.of(text, pattern);
-        }
-
-        return Stream.of(tcs);
+    public static Stream<Arguments> testcaseProvider_ss() throws IOException {
+        return testcaseGenerator.generate_ss(1000);
     }
 
-    static Stream<Arguments> testcaseProvider2() throws IOException {
-        return testcaseGenerator.generate(1000);
+    public static Stream<Arguments> testcaseProvider_ssi() throws IOException {
+        return testcaseGenerator.generate_ssi(1000);
+    }
+
+    public static Stream<Arguments> testcaseProvider_s() throws IOException {
+        return testcaseGenerator.generate_s(1000);
     }
 }

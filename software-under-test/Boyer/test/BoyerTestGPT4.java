@@ -1472,6 +1472,6 @@ public class BoyerTestGPT4 {
     }
 
     public static Stream<Arguments> testcaseProvider() throws IOException {
-        return testcaseGenerator.generate(1000);
+        return testcaseGenerator.generate_ss(1000);
     }
 }
