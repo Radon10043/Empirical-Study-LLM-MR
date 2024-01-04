@@ -48,7 +48,7 @@ vector<BSearch1Input> gen_tcs_randomly() {
         fout << "------------------------------" << endl;
         fout << "vec    : ";
         for (int j = 0; j < tcs[i].vec.size(); j++)
-            fout << tcs[i].vec[j] << " ";
+            fout << tcs[i].vec[j] << ",";
         fout << endl;
         fout << "target : " << tcs[i].target << endl << endl;;
     }
