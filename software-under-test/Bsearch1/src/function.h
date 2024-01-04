@@ -18,7 +18,7 @@ int BinSearch(int i_array[],int x,int i_start,int i_end)
 	 }
 }
 
-int* GetRange(int i_array[],int i,int i_end) 
+vector<int> GetRange(int i_array[],int i,int i_end) 
 {
 	 int i_val,i_min,i_max; 
 	 int all[2];
@@ -38,13 +38,11 @@ int* GetRange(int i_array[],int i,int i_end)
 	        i_min = i_min - 1; 
 	   else    break;   
 	   } 
-	   all[1]=i_max;
-       all[0]=i_min;
-	   return all; 
+	   return {all[0], all[1]};
 }
 
-int bin_search(vector<int> vec, int x) {
-	return BinSearch(vec.data(), x, 0, vec.size() - 1);
+vector<int> get_range(vector<int> vec, int x) {
+	return GetRange(vec.data(), x, vec.size() - 1);
 }
 
 #endif

@@ -10,11 +10,11 @@ using namespace std;
 /**
  * @brief 随机生成一定数量的测试用例
  *
- * @return vector<BSearch1Input>
+ * @return vector<GetRangeInput>
  */
-vector<BSearch1Input> gen_tcs_randomly() {
+vector<GetRangeInput> gen_tcs_randomly() {
     /* 存储测试用例用的数组 */
-    vector<BSearch1Input> tcs;
+    vector<GetRangeInput> tcs;
 
     /* Create a random number generator and seed it with a value */
     mt19937 rng(std::random_device{}());
@@ -38,7 +38,7 @@ vector<BSearch1Input> gen_tcs_randomly() {
         sort(vec.begin(), vec.end());
 
         /* 将创建好的测试数据加入tcs */
-        tcs.push_back(BSearch1Input(vec, target));
+        tcs.push_back(GetRangeInput(vec, target));
     }
 
     /* 将生成的测试用例写入文件, 方便调试用 */

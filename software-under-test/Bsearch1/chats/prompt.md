@@ -10,60 +10,62 @@ For the function $sin(x)$, assuming there is an origin input $x1$, the correspon
 
 # Chat 3
 
-You are an expert on metamorphic testing. Based on the above case, please identify the metamorphic relation of this system: There is a function that implements the binary search algorithm to find the occurrence index of the specific element in the ascending array. Its inputs are 2 variables: `vec` and `target`, representing an ascending array and the element to be searched, respectively. Its return value is an integer representing the occurrence index of `target` in `vec`. Note that values in `vec` may repeat. If multiple indexes in the `vec` point to the target value, whichever one is returned is correct. If `target` does not occur in `vec`, the function returns -1. Please identify the metamorphic relation of this function as much as possible and use Google's C++ testing and mocking framework `googletest` to codify them as C++ code. Here are some examples:
+You are an expert on metamorphic testing. Based on the above case, please identify the metamorphic relation of this system: There is a function that implements the algorithm to find the starting and ending indexes of the target number in the array. Its inputs are 2 variables: `vec` and `target`, representing an ascending array and the element to be searched, respectively. Its return value is an integer array whose length is always two. Among them, the first and second integers are the starting and ending index of `target` in `vec`, respectively. If `target` does not occur in `vec`, the function returns {-1,-1}. Please identify the metamorphic relation of this function as much as possible and use Google's C++ testing and mocking framework `googletest` to codify them as C++ code. Here are some examples:
 
 ```C++
 /**
- * @brief Metamorphic relation 1: Add an element to the end of the array and keep the array in
- * ascending order, the output should be unchanged or greater.
+ * @brief Metamorphic relation 1: Increasing the searching number by 1, if the original searching and this new searching number are both in the array, then the
+ * starting position of the new number should be larger by 1 than the ending position of the original number.
  *
  */
-TEST_P(BSearchParamTest, MR1) {
+TEST_P(GetRangeParamTest, MR1) {
     /* Get source input */
-    BSearch1Input input = GetParam();
+    GetRangeInput input = GetParam();
     vector<int> vec = input.vec;
     int target = input.target;
 
     /* Get source output */
-    int source_out = bin_search(vec, target);
+    vector<int> source_out = get_range(vec, target);
+
+    if (source_out[0] == -1 && source_out[1] == -1)
+        return;
 
     /* Construct follow-up input */
-    vector<int> follow_vec = vec;
-    follow_vec.emplace_back(vec.back() + 1);
+    int follow_target = target + 1;
 
     /* Get follow-up output */
-    int follow_out = bin_search(follow_vec, target);
+    vector<int> follow_out = get_range(vec, follow_target);
 
     /* Verification */
-    EXPECT_LE(source_out, follow_out);
+    EXPECT_LE(source_out[1] + 1, follow_out[0]);
 }
 
 /**
- * @brief Metamorphic relation 2: Multiply all elements in the array and the element to be located by a constant,
- * the output should remain the same.
- *
+ * @brief Metamorphic relation 2: Adding one small number to the head of the array, then the index of the searching number should also be increased by 1 (both
+ * the starting and ending positions) if it is contained in the array.
  */
-TEST_P(BSearchParamTest, MR2) {
+TEST_P(GetRangeParamTest, MR2) {
     /* Get source input */
-    BSearch1Input input = GetParam();
+    GetRangeInput input = GetParam();
     vector<int> vec = input.vec;
     int target = input.target;
 
     /* Get source output */
-    int source_out = bin_search(vec, target);
+    vector<int> source_out = get_range(vec, target);
+
+    if (source_out[0] == -1 && source_out[1] == -1)
+        return;
 
     /* Construct follow-up input */
-    int constant = 2;
     vector<int> follow_vec = vec;
-    for (int &val : follow_vec)
-        val *= constant;
-    int follow_target = target * constant;
+    follow_vec.insert(follow_vec.begin(), follow_vec.front() - 1);
 
     /* Get follow-up output */
-    int follow_out = bin_search(follow_vec, follow_target);
+    vector<int> follow_out = get_range(follow_vec, target);
 
     /* Verification */
-    EXPECT_EQ(source_out, follow_out);
+    EXPECT_EQ(source_out[0] + 1, follow_out[0]);
+    EXPECT_EQ(source_out[1] + 1, follow_out[1]);
 }
 ```
 

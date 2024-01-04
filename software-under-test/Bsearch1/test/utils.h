@@ -8,12 +8,12 @@ using namespace std;
 #define INVALID 0
 #define TESTCASE_NUM 1000
 
-typedef struct BSearch1Input {
-    BSearch1Input(vector<int> vec, int target) : vec(vec), target(target){};
+typedef struct GetRangeInput {
+    GetRangeInput(vector<int> vec, int target) : vec(vec), target(target){};
     vector<int> vec;
     int target;
-} BSearch1Input;
+} GetRangeInput;
 
-vector<BSearch1Input> gen_tcs_randomly();
+vector<GetRangeInput> gen_tcs_randomly();
 
 #endif
