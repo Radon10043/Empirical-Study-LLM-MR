@@ -22,8 +22,8 @@ vector<GetRangeInput> gen_tcs_randomly() {
     /* clang-format off */
     /* Create a distribution, which determines the range of the numbers that generator creates. */
     uniform_int_distribution<int> dist_size(1, 1000),       /* Vector's sise, [1, 1000]     */
-                                  dist_value(1, 10000),     /* Value's range, [1, 10000]    */
-                                  dist_target(1, 10000);    /* Target's range, [1, 10000]   */
+                                  dist_value(1, 1000),      /* Value's range, [1, 1000]    */
+                                  dist_target(1, 1000);     /* Target's range, [1, 1000]   */
     /* clang-format on */
 
     /* 构建测试用例 */
