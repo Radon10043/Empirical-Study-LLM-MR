@@ -25,21 +25,10 @@ check() {
     # 都存在的话, 通过检查
 }
 
-build() {
-    # 构建项目
-    rm -rf build
-    echo "Building ..."
-    mkdir build && cd build
-    cmake .. >/tmp/build.log 2>&1
-    make >/tmp/build.log 2>&1
-    cd ..
-}
-
 # $1 哪个测试
 # $2 第几个MR
 # $3 跑几次
 CUR_DIR=$(dirname $0)
 cd $CUR_DIR
-# build
 check $1 $2
 main $1 $2 $3
