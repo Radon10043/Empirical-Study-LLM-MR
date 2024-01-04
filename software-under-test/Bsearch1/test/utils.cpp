@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <iostream>
 #include <random>
+#include <fstream>
 
 #include "utils.h"
 
@@ -39,6 +40,19 @@ vector<BSearch1Input> gen_tcs_randomly() {
         /* 将创建好的测试数据加入tcs */
         tcs.push_back(BSearch1Input(vec, target));
     }
+
+    /* 将生成的测试用例写入文件, 方便调试用 */
+    ofstream fout("testcases.txt");
+    for (int i = 0; i < tcs.size(); i++) {
+        fout << "Testcase " << i << ": " << endl;
+        fout << "------------------------------" << endl;
+        fout << "vec    : ";
+        for (int j = 0; j < tcs[i].vec.size(); j++)
+            fout << tcs[i].vec[j] << " ";
+        fout << endl;
+        fout << "target : " << tcs[i].target << endl << endl;;
+    }
+    fout.close();
 
     return tcs;
 }
