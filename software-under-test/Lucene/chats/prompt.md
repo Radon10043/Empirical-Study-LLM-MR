@@ -120,4 +120,4 @@ public void test3(String index_dir, ArrayList<String> search_terms) throws Excep
 
 ## Chat 4...n
 
-Please identify more different metamorphic relations of this system.
+Please identify more different metamorphic relations of this program and codify them as java code.

@@ -78,4 +78,4 @@ TEST_P(BSearchParamTest, MR2) {
 
 # Chat 2
 
-Please generate more different metamorphic relations.
+Please identify more different metamorphic relations of this program and use Google's C++ testing and mocking framework `googletest` to codify them as C++ code.

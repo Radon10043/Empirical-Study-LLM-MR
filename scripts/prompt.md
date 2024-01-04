@@ -10,9 +10,9 @@ For the function $sin(x)$, assuming there is an origin input $x1$, the correspon
 
 ## Chat 3
 
-Based on the above case, please identify the metamorphic relation of this system: There is a system that performs one-way ANOVA. The one-way ANOVA tests the null hypothesis that two or more groups have the same population mean. Its inputs are 2 groups of data, and its return value is an integer representing the p-value of the two groups of data.
+Based on the above case, please identify the metamorphic relation of this program: There is a program that performs one-way ANOVA. The one-way ANOVA tests the null hypothesis that two or more groups have the same population mean. Its inputs are 2 groups of data, and its return value is an integer representing the p-value of the two groups of data.
 
-Please identify the metamorphic relations of this system as much as possible and codify them as Python code. Here is an example:
+Please identify the metamorphic relations of this program as much as possible and codify them as Python code. Here is an example:
 
 ```python
 @parameterized.expand(load_test_cases)
@@ -39,4 +39,4 @@ def test1(self, g1: list, g2: list):
 
 ## Chat 4...n
 
-Please identify more different metamorphic relations of this system.
+Please identify more different metamorphic relations of this program.

@@ -10,7 +10,7 @@ For the function $sin(x)$, assuming there is an origin input $x1$, the correspon
 
 # Chat 3
 
-You are an expert on metamorphic testing. Based on the above case, please identify the metamorphic relation of this system: There is a function that implements the algorithm to find the starting and ending indexes of the target number in the array. Its inputs are 2 variables: `vec` and `target`, representing an ascending array and the element to be searched, respectively. Its return value is an integer array whose length is always two. Among them, the first and second integers are the starting and ending index of `target` in `vec`, respectively. If `target` does not occur in `vec`, the function returns {-1,-1}. Please identify the metamorphic relation of this function as much as possible and use Google's C++ testing and mocking framework `googletest` to codify them as C++ code. Here are some examples:
+You are an expert on metamorphic testing. Based on the above case, please identify the metamorphic relation of this program: There is a function that implements the algorithm to find the starting and ending indexes of the target number in the array. Its inputs are 2 variables: `vec` and `target`, representing an ascending array and the element to be searched, respectively. Its return value is an integer array whose length is always two. Among them, the first and second integers are the starting and ending index of `target` in `vec`, respectively. If `target` does not occur in `vec`, the function returns {-1,-1}. Please identify the metamorphic relation of this function as much as possible and use Google's C++ testing and mocking framework `googletest` to codify them as C++ code. Here are some examples:
 
 ```C++
 /**
@@ -71,4 +71,4 @@ TEST_P(GetRangeParamTest, MR2) {
 
 # Chat 4...n
 
-Please identify more different metamorphic relations of this system.
+Please identify more different metamorphic relations of this program and use Google's C++ testing and mocking framework `googletest` to codify them as C++ code.

@@ -55,8 +55,10 @@ def chat_with_gpt(list_prompt: list, output_dir: str, max_chat_count: int, sut_n
     _description_
     """
     msgs = list()  # 聊天记录列表
+    msgs.append({"role": "system", "content": list_prompt[0]})
+    msgs.append({"role": "system", "content": list_prompt[1]})
 
-    i = 0
+    i = 2
     while i < max_chat_count:
         # 将提示词加入列表, 以让gpt记住历史聊天内容
         if i < len(list_prompt):

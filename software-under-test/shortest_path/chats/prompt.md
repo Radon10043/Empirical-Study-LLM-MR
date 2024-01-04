@@ -10,7 +10,7 @@ For the function $sin(x)$, assuming there is an origin input $x1$, the correspon
 
 ## Chat 3
 
-You are an expert on metamorphic testing. Based on the above case, please identify the metamorphic relation of the `shortest_path` function from `scipy.sparse.csgraph`. The `shortest_path` function performs a shortest-path graph search on a positive directed or undirected graph. Its inputs include four variables: a graph with positive edge weights, a source vertex, a destination vertex, and an algorithm (e.g., Dijkstra, Floyd-Warshell). Its output is the shortest path between the source and destination vertex. Please identify the metamorphic relations of this system as much as possible and codify them as Python code. Each metamorphic relation should be named test[x], where [x] is the test case number. Here is an example:
+You are an expert on metamorphic testing. Based on the above case, please identify the metamorphic relation of the `shortest_path` function from `scipy.sparse.csgraph`. The `shortest_path` function performs a shortest-path graph search on a positive directed or undirected graph. Its inputs include four variables: a graph with positive edge weights, a source vertex, a destination vertex, and an algorithm (e.g., Dijkstra, Floyd-Warshell). Its output is the shortest path between the source and destination vertex. Please identify the metamorphic relations of this program as much as possible and codify them as Python code. Each metamorphic relation should be named test[x], where [x] is the test case number. Here is an example:
 
 ```python
 @parameterized.expand(load_test_cases)
@@ -37,4 +37,4 @@ def test1(self, g1, g2):
 
 ## Chat 4...n
 
-Please identify more different metamorphic relations of this system.
+Please identify more different metamorphic relations of this program and codify them as java code.

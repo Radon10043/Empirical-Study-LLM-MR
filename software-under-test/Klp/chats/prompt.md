@@ -10,7 +10,7 @@ For the function $sin(x)$, assuming there is an origin input $x1$, the correspon
 
 # Chat 3
 
-You are an expert on metamorphic testing. Based on the above case, please identify the metamorphic relation of this system: There is a function that implements the KLP algorithm. Given a matrix `M`, `M[i][j]=1` indicates that the ith key can open the jth lock, and 0 otherwise. Its input is a matrix, which stores the relation between keys and locks. Its output is an array representing the smallest set of keys that can open all locks. Please identify the metamorphic relation of this function as much as possible and use Google's C++ testing and mocking framework `googletest` to codify them as C++ code. Here are some examples:
+You are an expert on metamorphic testing. Based on the above case, please identify the metamorphic relation of this program: There is a function that implements the KLP algorithm. Given a matrix `M`, `M[i][j]=1` indicates that the ith key can open the jth lock, and 0 otherwise. Its input is a matrix, which stores the relation between keys and locks. Its output is an array representing the smallest set of keys that can open all locks. Please identify the metamorphic relation of this function as much as possible and use Google's C++ testing and mocking framework `googletest` to codify them as C++ code. Here are some examples:
 
 ```C++
 /**
@@ -65,4 +65,4 @@ TEST_P(KLPParamTest, MR2) {
 
 # Chat 4...n
 
-Please identify more different metamorphic relations of this system.
+Please identify more different metamorphic relations of this program and use Google's C++ testing and mocking framework `googletest` to codify them as C++ code.

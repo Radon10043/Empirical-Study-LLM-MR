@@ -10,7 +10,7 @@ For the function $sin(x)$, assuming there is an origin input $x1$, the correspon
 
 ## Chat 3
 
-You are an expert on metamorphic testing. Based on the above case, please identify the metamorphic relation of this system: There is a function that calculates the determinant of a matrix. The function's name is `determinant` and comes from Michael Thomas Flanagan's Java Scientific Library. If a matrix `m` exists, its determinant value can be calculated by `m.determinant()`. The function's return value is a float number, representing the determinant value of the matrix. Please identify the metamorphic relation of this function as much as possible and output them as java code. Each metamorphic relation should be named test[x], where [x] is the test case number. Here are some examples:
+You are an expert on metamorphic testing. Based on the above case, please identify the metamorphic relation of this program: There is a function that calculates the determinant of a matrix. The function's name is `determinant` and comes from Michael Thomas Flanagan's Java Scientific Library. If a matrix `m` exists, its determinant value can be calculated by `m.determinant()`. The function's return value is a float number, representing the determinant value of the matrix. Please identify the metamorphic relation of this function as much as possible and output them as java code. Each metamorphic relation should be named test[x], where [x] is the test case number. Here are some examples:
 
 ```java
 package test;
@@ -81,4 +81,4 @@ public class Determinant1TestExample {
 
 ## Chat 4...n
 
-Please identify more different metamorphic relations of this system.
+Please identify more different metamorphic relations of this program and codify them as java code.

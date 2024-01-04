@@ -10,7 +10,7 @@ For the function $sin(x)$, assuming there is an origin input $x1$, the correspon
 
 ## Chat 3
 
-You are an expert on metamorphic testing. Based on the above case, please identify the metamorphic relation of the `rotate` function from `scipy.ndimage`. The `rotate` function performs rotation to the input image by the specific degree. Its inputs mainly include an image to be rotated and a rotation angle, and its output  is an image which is rotated by the specific angle. Please identify the metamorphic relations of this system as much as possible and codify them as Python code. Here is an example:
+You are an expert on metamorphic testing. Based on the above case, please identify the metamorphic relation of the `rotate` function from `scipy.ndimage`. The `rotate` function performs rotation to the input image by the specific degree. Its inputs mainly include an image to be rotated and a rotation angle, and its output  is an image which is rotated by the specific angle. Please identify the metamorphic relations of this program as much as possible and codify them as Python code. Here is an example:
 
 ```python
 @parameterized.expand(load_test_cases)
@@ -43,4 +43,4 @@ def test1(self, img: np.array, angle: float):
 
 ## Chat 4...n
 
-Please identify more different metamorphic relations of this system.
+Please identify more different metamorphic relations of this program and codify them as Python code.

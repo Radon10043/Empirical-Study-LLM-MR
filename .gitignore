@@ -12,7 +12,7 @@ __pycache__/
 build/
 venv/
 
-system-under-test/Lucene/testcases/*/index
+software-under-test/Lucene/testcases/*/index
 
-system-under-test/grep/src/*
-!system-under-test/grep/src/build.sh
+software-under-test/grep/src/*
+!software-under-test/grep/src/build.sh

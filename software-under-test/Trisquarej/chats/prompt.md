@@ -10,7 +10,7 @@ For the function $sin(x)$, assuming there is an origin input $x1$, the correspon
 
 ## Chat 3
 
-You are an expert on metamorphic testing. Based on the above case, please identify the metamorphic relation of this system: There is a function that implements an algorithm to identify the type of the triangle and calculate its area. Its inputs are 3 Integer variables: `a`, `b`, and `c`, representing the length of the three sides of the triangle, respectively. Its outputs are 2 values, representing the type of the triangle and the area of the triangle, respectively. Please identify the metamorphic relation of this function as much as possible and output them as java code. Each metamorphic relation should be named test[x], where [x] is the test case number. Here is an example:
+You are an expert on metamorphic testing. Based on the above case, please identify the metamorphic relation of this program: There is a function that implements an algorithm to identify the type of the triangle and calculate its area. Its inputs are 3 Integer variables: `a`, `b`, and `c`, representing the length of the three sides of the triangle, respectively. Its outputs are 2 values, representing the type of the triangle and the area of the triangle, respectively. Please identify the metamorphic relation of this function as much as possible and output them as java code. Each metamorphic relation should be named test[x], where [x] is the test case number. Here is an example:
 
 ```java
 /**
@@ -39,4 +39,4 @@ public void test1(String text, String pattern) {
 
 ## Chat 4...n
 
-Please identify more different metamorphic relations of this system.
+Please identify more different metamorphic relations of this program and codify them as Python code.
