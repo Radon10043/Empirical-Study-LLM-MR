@@ -10,7 +10,7 @@ For the function $sin(x)$, assuming there is an origin input $x1$, the correspon
 
 ## Chat 3
 
-You are an expert on metamorphic testing. Based on the above case, please identify the metamorphic relation of GNU Grep. Grep searches one or more input files for lines containing a match to a specified pattern. By default, Grep outputs the matching lines. In addition, documentation for Grep is avaliable online, which can be found at [https://www.gnu.org/software/grep/manual/grep.html](https://www.gnu.org/software/grep/manual/grep.html). Please identify the metamorphic relations of this system as much as possible and codify them as Python code. Here are some examples:
+You are an expert on metamorphic testing. Based on the above case, please identify the metamorphic relation of GNU Grep. Grep searches one or more input files for lines containing a match to a specified pattern. By default, Grep outputs the matching lines. In addition, documentation for Grep is avaliable online, which can be found at [https://www.gnu.org/software/grep/manual/grep.html](https://www.gnu.org/software/grep/manual/grep.html). Please identify the metamorphic relations of this program as much as possible and codify them as Python code. Here are some examples:
 
 ```python
 @parameterized.expand(load_test_cases)
@@ -100,4 +100,4 @@ def test3(self, pattern, file):
 
 ## Chat 4...n
 
-Please identify more different metamorphic relations of this system.
+Please identify more different metamorphic relations of this program and codify them as Python code.

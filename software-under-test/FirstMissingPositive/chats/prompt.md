@@ -63,4 +63,4 @@ TEST_P(FMPInputParamTest, MR2) {
 
 ## Chat 4...n
 
-Please identify more different metamorphic relations of this system.# Prompt
+Please identify more different metamorphic relations of this program and use Google's C++ testing and mocking framework `googletest` to codify them as C++ code.

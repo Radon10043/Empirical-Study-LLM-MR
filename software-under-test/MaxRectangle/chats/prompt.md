@@ -10,7 +10,7 @@ For the function $sin(x)$, assuming there is an origin input $x1$, the correspon
 
 ## Chat 3
 
-You are an expert on metamorphic testing. Based on the above case, please identify the metamorphic relation of this system: There is a function that implements an algorithm to find the largest rectangle containing all 1s. Its input is a binary matrix that is filled with 0s and 1s. Its output is an integer representing the largest rectangle area that contains all 1s. Please identify the metamorphic relation of this function as much as possible and output them as java code. Each metamorphic relation should be named test[x], where [x] is the test case number. Here are some examples:
+You are an expert on metamorphic testing. Based on the above case, please identify the metamorphic relation of this program: There is a function that implements an algorithm to find the largest rectangle containing all 1s. Its input is a binary matrix that is filled with 0s and 1s. Its output is an integer representing the largest rectangle area that contains all 1s. Please identify the metamorphic relation of this function as much as possible and output them as java code. Each metamorphic relation should be named test[x], where [x] is the test case number. Here are some examples:
 
 ```java
 /**
@@ -68,4 +68,4 @@ public void test2(ArrayList<ArrayList<Integer>> matrix) {
 
 ## Chat 4...n
 
-Please identify more different metamorphic relations of this system.
+Please identify more different metamorphic relations of this program and codify them as java code.

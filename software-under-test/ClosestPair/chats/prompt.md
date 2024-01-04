@@ -10,7 +10,7 @@ For the function $sin(x)$, assuming there is an origin input $x1$, the correspon
 
 ## Chat 3
 
-You are an expert on metamorphic testing. Based on the above case, please identify the metamorphic relation of this system: There is a system that calculates the distance of the closest pair of points in a set of given points. Its input is a set of points, and its return value is a float number representing the distance of the closest pair of points in the set. In addition, The definition of the struct `Point` is as follows:
+You are an expert on metamorphic testing. Based on the above case, please identify the metamorphic relation of this program: There is a program that calculates the distance of the closest pair of points in a set of given points. Its input is a set of points, and its return value is a float number representing the distance of the closest pair of points in the set. In addition, The definition of the struct `Point` is as follows:
 
 ```cpp
 struct Point {
@@ -18,7 +18,7 @@ struct Point {
 }
 ```
 
-Please identify the metamorphic relations of this system as much as possible and use Google's C++ testing and mocking framework `googletest` to codify them as C++ code. Here is an example:
+Please identify the metamorphic relations of this program as much as possible and use Google's C++ testing and mocking framework `googletest` to codify them as C++ code. Here is an example:
 
 ```cpp
 /**
@@ -47,4 +47,4 @@ TEST_P(ClosestPairParamTest, MR1) {
 
 ## Chat 4...n
 
-Please identify more different metamorphic relations of this system.
+Please identify more different metamorphic relations of this program and use Google's C++ testing and mocking framework `googletest` to codify them as C++ code.
