@@ -2,7 +2,7 @@
 Author: Radon
 Date: 2024-01-02 21:07:30
 LastEditors: Radon
-LastEditTime: 2024-01-02 21:54:30
+LastEditTime: 2024-01-04 21:18:39
 Description: Hi, say something
 """
 import openai
@@ -31,8 +31,23 @@ def resume_chat(json_path: str, resume_cnt: int, gpt_name: str):
 
     msgs = json.load(open(json_path))
 
+    # 读取最后一次user的内容
+    index = len(msgs) - 1
+    while index >= 0:
+        if msgs[index]["role"] == "user":
+            break
+        index -= 1
+
+    # 避免非user的情况
+    if index < 0:
+        print("聊天记录中没有user!")
+        return
+
+    # 最后一次user的内容作为提示词
+    prompt = msgs[index]["content"]
+
+    # 继续聊天...
     while resume_cnt > 0:
-        prompt = "Please identify more different metamorphic relations of this system."
         msgs.append({"role": "user", "content": prompt})
 
         # 随机休息几秒, 防止报错
