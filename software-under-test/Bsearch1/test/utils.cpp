@@ -1,7 +1,8 @@
 #include <algorithm>
+#include <fstream>
 #include <iostream>
 #include <random>
-#include <fstream>
+#include <unordered_set>
 
 #include "utils.h"
 
@@ -22,16 +23,23 @@ vector<BSearch1Input> gen_tcs_randomly() {
     /* clang-format off */
     /* Create a distribution, which determines the range of the numbers that generator creates. */
     uniform_int_distribution<int> dist_size(1, 1000),       /* Vector's sise, [1, 1000]     */
-                                  dist_value(1, 10000),     /* Value's range, [1, 10000]    */
-                                  dist_target(1, 10000);    /* Target's range, [1, 10000]   */
+                                  dist_value(1, 100000),     /* Value's range, [1, 10000]    */
+                                  dist_target(1, 100000);    /* Target's range, [1, 10000]   */
     /* clang-format on */
 
     /* 构建测试用例 */
     for (int i = 0; i < TESTCASE_NUM; i++) {
-        /* 生成随机大小的数组, 数组中的值和目标值也随机决定 */
-        vector<int> vec(dist_size(rng));
-        for (int j = 0; j < vec.size(); j++)
-            vec[j] = dist_value(rng);
+
+        vector<int> vec(dist_size(rng)); /* 生成随机大小的数组, 数组中的值和目标值也随机决定 */
+        unordered_set<int> ust;          /* 新建一个集合, 让数组中的数字不重复 */
+
+        for (int j = 0; j < vec.size(); j++) {
+            int val = dist_value(rng);
+            if (ust.insert(val).second)
+                vec[j] = val;
+            else
+                j--;
+        }
         int target = dist_target(rng);
 
         /* 由于测试二分搜索算法, 因此数组需要升序排序 */
@@ -50,7 +58,8 @@ vector<BSearch1Input> gen_tcs_randomly() {
         for (int j = 0; j < tcs[i].vec.size(); j++)
             fout << tcs[i].vec[j] << ",";
         fout << endl;
-        fout << "target : " << tcs[i].target << endl << endl;;
+        fout << "target : " << tcs[i].target << endl << endl;
+        ;
     }
     fout.close();
 
