@@ -2,7 +2,7 @@
 Author: Radon
 Date: 2023-12-06 15:26:45
 LastEditors: Radon
-LastEditTime: 2024-01-02 13:36:57
+LastEditTime: 2024-01-04 22:49:37
 Description: Hi, say something
 """
 import openai
@@ -115,7 +115,7 @@ def chat_with_gpt(list_prompt: list, output_dir: str, max_chat_count: int, sut_n
     cur_time = get_cur_time()
 
     # 将聊天内容输出到文件
-    fn_base = gpt_name + "_" + sut_name + "_" + cur_time
+    fn_base = gpt_name + "." + sut_name + "." + cur_time
 
     print("Writing to the " + fn_base + ".md ... ", end="")
     with open(os.path.join(output_dir, fn_base + ".md"), mode="w", encoding="utf-8") as f:
@@ -223,9 +223,49 @@ if __name__ == "__main__":
     max_chat_count = args.count
     gpt_name = args.model
 
+    prompt_paths = [
+        # "D:\\project\\Empirical-Study-LLM-MR\\software-under-test\\ACMS\\chats\\prompt.md",
+        "D:\\project\\Empirical-Study-LLM-MR\\software-under-test\\Boyer\\chats\\prompt.md",
+        # "D:\\project\\Empirical-Study-LLM-MR\\software-under-test\\Bsearch1\\chats\\prompt.md",
+        # "D:\\project\\Empirical-Study-LLM-MR\\software-under-test\\Bsearch2\\chats\\prompt.md",
+        # "D:\\project\\Empirical-Study-LLM-MR\\software-under-test\\ClosestPair\\chats\\prompt.md",
+        # "D:\\project\\Empirical-Study-LLM-MR\\software-under-test\\CUBS\\chats\\prompt.md",
+        # "D:\\project\\Empirical-Study-LLM-MR\\software-under-test\\Determinant1\\chats\\prompt.md",
+        # "D:\\project\\Empirical-Study-LLM-MR\\software-under-test\\DistinctSubsequence\\chats\\prompt.md",
+        # "D:\\project\\Empirical-Study-LLM-MR\\software-under-test\\Editingdistance\\chats\\prompt.md",
+        # "D:\\project\\Empirical-Study-LLM-MR\\software-under-test\\ERS\\chats\\prompt.md",
+        # "D:\\project\\Empirical-Study-LLM-MR\\software-under-test\\FastJson\\chats\\prompt.md",
+        # "D:\\project\\Empirical-Study-LLM-MR\\software-under-test\\FirstMissingPositive\\chats\\prompt.md",
+        # "D:\\project\\Empirical-Study-LLM-MR\\software-under-test\\f_oneway\\chats\\prompt.md",
+        # "D:\\project\\Empirical-Study-LLM-MR\\software-under-test\\grep\\chats\\prompt.md",
+        # "D:\\project\\Empirical-Study-LLM-MR\\software-under-test\\HeapSort\\chats\\prompt.md",
+        # "D:\\project\\Empirical-Study-LLM-MR\\software-under-test\\InterleavingString\\chats\\prompt.md",
+        # "D:\\project\\Empirical-Study-LLM-MR\\software-under-test\\JAMA\\chats\\prompt.md",
+        # "D:\\project\\Empirical-Study-LLM-MR\\software-under-test\\Jodatime\\chats\\prompt.md",
+        # "D:\\project\\Empirical-Study-LLM-MR\\software-under-test\\Klp\\chats\\prompt.md",
+        # "D:\\project\\Empirical-Study-LLM-MR\\software-under-test\\Lucene\\chats\\prompt.md",
+        # "D:\\project\\Empirical-Study-LLM-MR\\software-under-test\\MaxRectangle\\chats\\prompt.md",
+        # "D:\\project\\Empirical-Study-LLM-MR\\software-under-test\\Maxsub\\chats\\prompt.md",
+        # "D:\\project\\Empirical-Study-LLM-MR\\software-under-test\\MOS\\chats\\prompt.md",
+        # "D:\\project\\Empirical-Study-LLM-MR\\software-under-test\\Multi-MAXSUM\\chats\\prompt.md",
+        # "D:\\project\\Empirical-Study-LLM-MR\\software-under-test\\Printtokens\\chats\\prompt.md",
+        # "D:\\project\\Empirical-Study-LLM-MR\\software-under-test\\Printtokens2\\chats\\prompt.md",
+        # "D:\\project\\Empirical-Study-LLM-MR\\software-under-test\\QuickSort\\chats\\prompt.md",
+        # "D:\\project\\Empirical-Study-LLM-MR\\software-under-test\\rotate\\chats\\prompt.md",
+        # "D:\\project\\Empirical-Study-LLM-MR\\software-under-test\\RSA\\chats\\prompt.md",
+        # "D:\\project\\Empirical-Study-LLM-MR\\software-under-test\\schedule\\chats\\prompt.md",
+        # "D:\\project\\Empirical-Study-LLM-MR\\software-under-test\\schedule2\\chats\\prompt.md",
+        # "D:\\project\\Empirical-Study-LLM-MR\\software-under-test\\shortest_path\\chats\\prompt.md",
+        # "D:\\project\\Empirical-Study-LLM-MR\\software-under-test\\Spwiki\\chats\\prompt.md",
+        # "D:\\project\\Empirical-Study-LLM-MR\\software-under-test\\Superstring\\chats\\prompt.md",
+        # "D:\\project\\Empirical-Study-LLM-MR\\software-under-test\\SurroundedRegion\\chats\\prompt.md",
+        # "D:\\project\\Empirical-Study-LLM-MR\\software-under-test\\TCAS\\chats\\prompt.md",
+        # "D:\\project\\Empirical-Study-LLM-MR\\software-under-test\\Trisquarej\\chats\\prompt.md",
+    ]
+
     for prompt_path in prompt_paths:
         # 聊天内容文件保存到prompt文件同目录下
-        output_dir = os.path.dirname(prompt_path)
+        output_dir = r"C:\Users\r7725\OneDrive\博士\科研工作\实证研究-大模型识别蜕变关系\raw_data"
         sut_name = os.path.basename(os.path.dirname(os.path.dirname(prompt_path)))
 
         list_prompt = read_prompt(prompt_path)
