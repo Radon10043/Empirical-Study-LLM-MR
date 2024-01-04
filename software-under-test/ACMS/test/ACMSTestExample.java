@@ -21,12 +21,6 @@ public class ACMSTestExample {
     /**
      * Metamorphic Relation 1: Changing the isStudent flag from false to true should not increase
      * the fee and may decrease it in certain scenarios.
-     *
-     * @param airClass
-     * @param area
-     * @param isStudent
-     * @param luggage
-     * @param economicfee
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
@@ -53,12 +47,6 @@ public class ACMSTestExample {
     /**
      * Metamorphic Relation 2: If the luggage weight is 0, changing area should not affect the
      * luggagefee.
-     *
-     * @param airClass
-     * @param area
-     * @param isStudent
-     * @param luggage
-     * @param economicfee
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
@@ -85,12 +73,6 @@ public class ACMSTestExample {
     /**
      * Metamorphic Relation 3: If isStudent is false, changing the area should not affect the
      * luggage fee.
-     *
-     * @param airClass
-     * @param area
-     * @param isStudent
-     * @param luggage
-     * @param economicfee
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")

@@ -115,101 +115,83 @@ public class AirlinesBaggageBillingService
 Please identify the metamorphic relation of this function as much as possible and output them as java code. Each metamorphic relation should be named test[x], where [x] is the test case number. Here are some example:
 
 ```java
-/**
- * Metamorphic Relation 1: Changing the isStudent flag from false to true should not increase
- * the fee and may decrease it in certain scenarios.
- *
- * @param airClass
- * @param area
- * @param isStudent
- * @param luggage
- * @param economicfee
- */
-@ParameterizedTest
-@MethodSource("testcaseProvider")
-public void test1(int airClass, int area, boolean isStudent, double luggage,
-        double economicfee) {
-    if (isStudent)
-        return;
+    /**
+     * Metamorphic Relation 1: Changing the isStudent flag from false to true should not increase
+     * the fee and may decrease it in certain scenarios.
+     */
+    @ParameterizedTest
+    @MethodSource("testcaseProvider")
+    public void test1(int airClass, int area, boolean isStudent, double luggage,
+            double economicfee) {
+        if (isStudent)
+            return;
 
-    /* Get source output */
-    AirlinesBaggageBillingService ACMS = new AirlinesBaggageBillingService();
-    double source_out = ACMS.feeCalculation(airClass, area, isStudent, luggage, economicfee);
+        /* Get source output */
+        AirlinesBaggageBillingService ACMS = new AirlinesBaggageBillingService();
+        double source_out = ACMS.feeCalculation(airClass, area, isStudent, luggage, economicfee);
 
-    /* Construct follow-up input */
-    Boolean follow_isStudent = true;
+        /* Construct follow-up input */
+        Boolean follow_isStudent = true;
 
-    /* Get follow-up output */
-    double follow_out =
-            ACMS.feeCalculation(airClass, area, follow_isStudent, luggage, economicfee);
+        /* Get follow-up output */
+        double follow_out =
+                ACMS.feeCalculation(airClass, area, follow_isStudent, luggage, economicfee);
 
-    /* Verification */
-    assertTrue(follow_out <= source_out);
-}
+        /* Verification */
+        assertTrue(follow_out <= source_out);
+    }
 
-/**
- * Metamorphic Relation 2: If the luggage weight is 0, changing area should not affect the
- * luggagefee.
- *
- * @param airClass
- * @param area
- * @param isStudent
- * @param luggage
- * @param economicfee
- */
-@ParameterizedTest
-@MethodSource("testcaseProvider")
-public void test2(int airClass, int area, boolean isStudent, double luggage,
-        double economicfee) {
-    if (luggage != 0)
-        return;
+    /**
+     * Metamorphic Relation 2: If the luggage weight is 0, changing area should not affect the
+     * luggagefee.
+     */
+    @ParameterizedTest
+    @MethodSource("testcaseProvider")
+    public void test2(int airClass, int area, boolean isStudent, double luggage,
+            double economicfee) {
+        if (luggage != 0)
+            return;
 
-    /* Get source output */
-    AirlinesBaggageBillingService ACMS = new AirlinesBaggageBillingService();
-    double source_out = ACMS.feeCalculation(airClass, area, isStudent, luggage, economicfee);
+        /* Get source output */
+        AirlinesBaggageBillingService ACMS = new AirlinesBaggageBillingService();
+        double source_out = ACMS.feeCalculation(airClass, area, isStudent, luggage, economicfee);
 
-    /* Construct follow-up input */
-    int follow_area = area + 1;
+        /* Construct follow-up input */
+        int follow_area = area + 1;
 
-    /* Get follow-up output */
-    double follow_out =
-            ACMS.feeCalculation(airClass, follow_area, isStudent, luggage, economicfee);
+        /* Get follow-up output */
+        double follow_out =
+                ACMS.feeCalculation(airClass, follow_area, isStudent, luggage, economicfee);
 
-    /* Verification */
-    assertEquals(source_out, follow_out, 1e-6);
-}
+        /* Verification */
+        assertEquals(source_out, follow_out, 1e-6);
+    }
 
-/**
- * Metamorphic Relation 3: If isStudent is false, changing the area should not affect the
- * luggage fee.
- *
- * @param airClass
- * @param area
- * @param isStudent
- * @param luggage
- * @param economicfee
- */
-@ParameterizedTest
-@MethodSource("testcaseProvider")
-public void test3(int airClass, int area, boolean isStudent, double luggage,
-        double economicfee) {
-    if (isStudent)
-        return;
+    /**
+     * Metamorphic Relation 3: If isStudent is false, changing the area should not affect the
+     * luggage fee.
+     */
+    @ParameterizedTest
+    @MethodSource("testcaseProvider")
+    public void test3(int airClass, int area, boolean isStudent, double luggage,
+            double economicfee) {
+        if (isStudent)
+            return;
 
-    /* Get source output */
-    AirlinesBaggageBillingService ACMS = new AirlinesBaggageBillingService();
-    double source_out = ACMS.feeCalculation(airClass, area, isStudent, luggage, economicfee);
+        /* Get source output */
+        AirlinesBaggageBillingService ACMS = new AirlinesBaggageBillingService();
+        double source_out = ACMS.feeCalculation(airClass, area, isStudent, luggage, economicfee);
 
-    /* Construct follow-up input */
-    int follow_area = area + 1;
+        /* Construct follow-up input */
+        int follow_area = area + 1;
 
-    /* Get follow-up output */
-    double follow_out =
-            ACMS.feeCalculation(airClass, follow_area, isStudent, luggage, economicfee);
+        /* Get follow-up output */
+        double follow_out =
+                ACMS.feeCalculation(airClass, follow_area, isStudent, luggage, economicfee);
 
-    /* Verification */
-    assertEquals(source_out, follow_out, 1e-6);
-}
+        /* Verification */
+        assertEquals(source_out, follow_out, 1e-6);
+    }
 ```
 
 ## Chat 4...n
