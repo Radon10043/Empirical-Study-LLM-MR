@@ -2,20 +2,12 @@
 #include <cmath>
 #include <gtest/gtest.h>
 #include <vector>
-
-#include "../src/function.h"
 #include <climits>
 
+#include "../src/function.h"
+#include "utils.h"
+
 using namespace std;
-
-#define SKIP_CRASH
-#define INVALID 0
-
-typedef struct BSearch1Input {
-    BSearch1Input(vector<int> vec, int target) : vec(vec), target(target){};
-    vector<int> vec;
-    int target;
-} BSearch1Input;
 
 class BSearchParamTest : public ::testing::TestWithParam<BSearch1Input> {};
 
@@ -1166,4 +1158,4 @@ TEST_P(BSearchParamTest, MR52) {
 }
 
 INSTANTIATE_TEST_CASE_P(TreuReturn, BSearchParamTest,
-                        testing::Values(BSearch1Input({1, 2, 3, 4, 5}, 3), BSearch1Input({1, 2, 3, 4, 5}, 1), BSearch1Input({1, 2, 3, 4, 5}, 99)));
+                        testing::ValuesIn(gen_tcs_randomly()));

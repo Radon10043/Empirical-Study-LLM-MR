@@ -1,0 +1,44 @@
+#include <algorithm>
+#include <iostream>
+#include <random>
+
+#include "utils.h"
+
+using namespace std;
+
+/**
+ * @brief 随机生成一定数量的测试用例
+ *
+ * @return vector<BSearch1Input>
+ */
+vector<BSearch1Input> gen_tcs_randomly() {
+    /* 存储测试用例用的数组 */
+    vector<BSearch1Input> tcs;
+
+    /* Create a random number generator and seed it with a value */
+    mt19937 rng(std::random_device{}());
+
+    /* clang-format off */
+    /* Create a distribution, which determines the range of the numbers that generator creates. */
+    uniform_int_distribution<int> dist_size(1, 1000),       /* Vector's sise, [1, 1000]     */
+                                  dist_value(1, 10000),     /* Value's range, [1, 10000]    */
+                                  dist_target(1, 10000);    /* Target's range, [1, 10000]   */
+    /* clang-format on */
+
+    /* 构建测试用例 */
+    for (int i = 0; i < TESTCASE_NUM; i++) {
+        /* 生成随机大小的数组, 数组中的值和目标值也随机决定 */
+        vector<int> vec(dist_size(rng));
+        for (int j = 0; j < vec.size(); j++)
+            vec[j] = dist_value(rng);
+        int target = dist_target(rng);
+
+        /* 由于测试二分搜索算法, 因此数组需要升序排序 */
+        sort(vec.begin(), vec.end());
+
+        /* 将创建好的测试数据加入tcs */
+        tcs.push_back(BSearch1Input(vec, target));
+    }
+
+    return tcs;
+}
