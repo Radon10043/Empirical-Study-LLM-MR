@@ -18,14 +18,6 @@ public class MOSTestExample {
      * Metamorphic Relation 1: keeping other attributes unchanged, double the
      * numberofrequestedbundlesofflowers input, the numberOfRequestedBundlesOfFlowers attributes in
      * output should also double.
-     *
-     * @param aircraftmodel
-     * @param changeinthenumberofcrewmembers
-     * @param newnumberofcrewmembers
-     * @param changeinthenumberofpilots
-     * @param newnumberofpilots
-     * @param numberofchildpassengers
-     * @param numberofrequestedbundlesofflowers
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
@@ -54,14 +46,6 @@ public class MOSTestExample {
      * Metamorphic Relation 2: If the aircraftmodel parameter remains the same while other
      * parameters change, the values related to seat configuration (numberOfFirstClassMeals,
      * numberOfBusinessClassMeals, numberOfEconomicClassMeals) should remain constant.
-     *
-     * @param aircraftmodel
-     * @param changeinthenumberofcrewmembers
-     * @param newnumberofcrewmembers
-     * @param changeinthenumberofpilots
-     * @param newnumberofpilots
-     * @param numberofchildpassengers
-     * @param numberofrequestedbundlesofflowers
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")

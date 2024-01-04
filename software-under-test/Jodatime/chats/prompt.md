@@ -16,9 +16,6 @@ You are an expert on metamorphic testing. Based on the above case, please identi
 /**
  * Metamorphic Relation 1: Add the number of days and seconds with the same length of time to
  * the input time, the output will be the same.
- *
- * @param time
- * @param days
  */
 @ParameterizedTest
 @MethodSource("testcaseProvider1")
@@ -39,9 +36,6 @@ public void test1(DateTime time, int days) {
 /**
  * Metamorphic Relation 2: Add the number of weeks and seconds with the same length of time to
  * the input time, the output will be the same.
- *
- * @param time
- * @param days
  */
 @ParameterizedTest
 @MethodSource("testcaseProvider2")

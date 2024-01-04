@@ -16,10 +16,6 @@ public class TriSquareTestExample {
     /**
      * Metamorphic Relation 1: Assume a', b', c' is the second triangle, if (a,b,c)=(b',a',c'), the
      * output will not change.
-     *
-     * @param a
-     * @param b
-     * @param c
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
@@ -40,10 +36,6 @@ public class TriSquareTestExample {
     /**
      * Metamorphic Relation 2: Assume a', b', c' is the second triangle, if (a,b,c)=(a',c',b'), the
      * output will not change.
-     *
-     * @param a
-     * @param b
-     * @param c
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
@@ -64,10 +56,6 @@ public class TriSquareTestExample {
     /**
      * Metamorphic Relation 3: Assume a', b', c' is the second triangle, if (a,b,c)=(c',b',a'), the
      * output will not change.
-     *
-     * @param a
-     * @param b
-     * @param c
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
@@ -89,10 +77,6 @@ public class TriSquareTestExample {
      * Metamorphic Relation 4: Assume a', b', c' is the second triangle, if (a,b,c)=(2a',2b',2c'),
      * then the type will not change, but the area of the first triangle is four times the second
      * triangle.
-     *
-     * @param a
-     * @param b
-     * @param c
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")

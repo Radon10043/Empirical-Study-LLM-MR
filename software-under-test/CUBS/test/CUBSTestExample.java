@@ -17,11 +17,6 @@ import src.BillCalculation;
 public class CUBSTestExample {
     /**
      * Metamorphic Relation 1: If the talk time increases, the bill should not decrease.
-     *
-     * @param planType
-     * @param planFee
-     * @param talkTime
-     * @param flow
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
@@ -42,11 +37,6 @@ public class CUBSTestExample {
 
     /**
      * Metamorphic Relation 2: If the talk time decreases, the bill should not increase.
-     *
-     * @param planType
-     * @param planFee
-     * @param talkTime
-     * @param flow
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")

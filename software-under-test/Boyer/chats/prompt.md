@@ -14,11 +14,8 @@ You are an expert on metamorphic testing. Based on the above case, please identi
 
 ```java
 /**
- * Metamorphic Relation 1: Add a string to the end of the origin string, the output of the
- * algorithm should be same or greater.
- *
- * @param text
- * @param pattern
+ * Metamorphic Relation 1: Add a string to the end of the origin string, the
+ * output of the algorithm should be same or greater.
  */
 @ParameterizedTest
 @MethodSource("testcaseProvider")

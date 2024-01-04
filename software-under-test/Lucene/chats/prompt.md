@@ -14,12 +14,20 @@ You are an expert on metamorphic testing. Based on the above case, please identi
 
 ```java
 /**
+ * 为测试用例中要全文检索的文件生成索引
+ *
+ * @throws Exception
+ */
+@BeforeAll
+public static void generateIndex() throws Exception {
+    for (String root : testcase_roots) {
+        Utils.generateIndex(root);
+    }
+}
+
+/**
  * Metamorphic Relation 1: Swapping the terms of a OR or AND operator in the
  * query should not affect the results.
- *
- * @param index_dir
- * @param search_terms
- * @throws Exception
  */
 @ParameterizedTest
 @MethodSource("testcaseProvider")
@@ -44,10 +52,6 @@ public void test1(String index_dir, ArrayList<String> search_terms) throws Excep
 /**
  * Metamorphic Relation 2: Inserting an OR term in the query that does not exist
  * in the text should not affect the results.
- *
- * @param index_dir
- * @param search_terms
- * @throws Exception
  */
 @ParameterizedTest
 @MethodSource("testcaseProvider")
@@ -81,10 +85,6 @@ public void test2(String index_dir, ArrayList<String> search_terms) throws Excep
 /**
  * Metamorphic Relation 3: Excluding an OR term in the query that does not exist
  * in the text should not affect the results.
- *
- * @param index_dir
- * @param search_terms
- * @throws Exception
  */
 @ParameterizedTest
 @MethodSource("testcaseProvider")

@@ -16,8 +16,6 @@ You are an expert on metamorphic testing. Based on the above case, please identi
 /**
  * Metamorphic Relation 1: Adding one row, the output should be the same as or larger than the
  * original one.
- *
- * @param matrix A binary matrix filled with 0s and 1s.
  */
 @ParameterizedTest
 @MethodSource("testcaseProvider")
@@ -42,8 +40,6 @@ public void test1(ArrayList<ArrayList<Integer>> matrix) {
 /**
  * Mrtamorphic Relation 2: Adding one column, the output should be the same as or larger than
  * the original one.
- *
- * @param matrix A binary matrix filled with 0s and 1s.
  */
 @ParameterizedTest
 @MethodSource("testcaseProvider")

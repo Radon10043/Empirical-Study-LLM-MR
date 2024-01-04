@@ -17,8 +17,6 @@ public class MaxRectangleTestExample {
     /**
      * Metamorphic Relation 1: Adding one row, the output should be the same as or larger than the
      * original one.
-     *
-     * @param matrix A binary matrix filled with 0s and 1s.
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
@@ -43,8 +41,6 @@ public class MaxRectangleTestExample {
     /**
      * Mrtamorphic Relation 2: Adding one column, the output should be the same as or larger than
      * the original one.
-     *
-     * @param matrix A binary matrix filled with 0s and 1s.
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")

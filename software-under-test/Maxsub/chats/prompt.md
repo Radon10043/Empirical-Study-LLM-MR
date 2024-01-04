@@ -15,8 +15,6 @@ You are an expert on metamorphic testing. Based on the above case, please identi
 ```java
 /**
  * Metamorphic Relation 1: Reversing input array, the output should be same.
- *
- * @param arr
  */
 @ParameterizedTest
 @MethodSource("testcaseProvider")

@@ -16,8 +16,6 @@ public class TestExample {
      * Metamorphic Relation 1: The input is a hash table. Converting the hash table
      * into string s1, after adding a piece of data to the hash table and converting
      * it into string s2, the length of s2 is greater than s1.
-     *
-     * @param source_in
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider1")
@@ -41,8 +39,6 @@ public class TestExample {
      * Metamorphic Relation 2: The input is a string representing the JSON file's
      * content. Adding a comment to the string, the parse result of the string will
      * be the same.
-     *
-     * @param source_in
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider2")
@@ -64,8 +60,6 @@ public class TestExample {
      * Metamorphic Relation 3: The input is a hash table. Swapping the value of a
      * pair of key and value and converting the hash table to the string, the output
      * length should be the same as or less than the original.
-     *
-     * @param source_in
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider1")

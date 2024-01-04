@@ -42,13 +42,7 @@ OTHER_CAPABILITY_VALUES = {
 @parameterized.expand(load_test_cases)
 def test1(self, vals: list):
     """Metamorphic Relation 1: If the relation of the Own_Tracked_Alt and Other_Tracked_Alt is not changed,
-    meanwhile other parameter values are not changed too, then the outputs of the TCAS should be the same.
-
-    Parameters
-    ----------
-    vals : list
-        _description_
-    """
+    meanwhile other parameter values are not changed too, then the outputs of the TCAS should be the same."""
     # Get source output
     cmd_list = [TCAS_PATH]
     tmp_list = [str(x) for x in vals]
@@ -72,13 +66,7 @@ def test1(self, vals: list):
 @parameterized.expand(load_test_cases)
 def test2(self, vals: list):
     """Given that the intruder aircraft does not have the TCAS system, if we change the state that the intruder
-    aircraft has an intention or not, the output should not change.
-
-    Parameters
-    ----------
-    vals : list
-        _description_
-    """
+    aircraft has an intention or not, the output should not change."""
     if vals[INDEX["Other_Capability"]] != OTHER_CAPABILITY_VALUES["TCAS_TA"]:
         return
 
@@ -105,13 +93,7 @@ def test2(self, vals: list):
 def test3(self, vals: list):
     """Metamorphic Relation 3: Given that the intruder aircraft does not have the TCAS system,
     if we change the state that the report describing the presence of any intruder is valid or
-    not, the output should not change.
-
-    Parameters
-    ----------
-    vals : list
-        _description_
-    """
+    not, the output should not change."""
     if vals[INDEX["Other_Capability"]] != OTHER_CAPABILITY_VALUES["TCAS_TA"]:
         return
 
@@ -141,13 +123,7 @@ def test3(self, vals: list):
 def test4(self, vals: list):
     """Given that the intruder aircraft does not have any intention, and the report describing the presence of
     any intruder is valid, if we change the state that the intruder aircraft has the TCAS system or not, the
-    output should not change.
-
-    Parameters
-    ----------
-    vals : list
-        _description_
-    """
+    output should not change."""
     if vals[INDEX["Other_RAC"]] != 0 or vals[INDEX["Two_of_Three_Reports_Valid"]] != 1:
         return
 

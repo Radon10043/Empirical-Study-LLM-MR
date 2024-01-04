@@ -37,12 +37,7 @@ def load_test_cases() -> list:
 class TestingClass(unittest.TestCase):
     @parameterized.expand(load_test_cases)
     def test1(self, g1, g2):
-        """MR1: Changing the order of the samples, the result should not change.
-
-        Notes
-        -----
-        _description_
-        """
+        """MR1: Changing the order of the samples, the result should not change."""
         # Get source output
         source_out = f_oneway(g1, g2).pvalue
 

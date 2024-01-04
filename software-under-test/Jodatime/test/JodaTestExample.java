@@ -9,9 +9,6 @@ public class JodaTestExample {
     /**
      * Metamorphic Relation 1: Add the number of days and seconds with the same length of time to
      * the input time, the output will be the same.
-     *
-     * @param time
-     * @param days
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider1")
@@ -32,9 +29,6 @@ public class JodaTestExample {
     /**
      * Metamorphic Relation 2: Add the number of weeks and seconds with the same length of time to
      * the input time, the output will be the same.
-     *
-     * @param time
-     * @param days
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider2")

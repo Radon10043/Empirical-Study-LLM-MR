@@ -40,13 +40,6 @@ class TestingClass(unittest.TestCase):
     def test1(self, pattern: str, file: str):
         """Metamorphic Relation 1: If a character is added to the end of the search term,
         the length of the output length should be the same as or less than the original.
-
-        Parameters
-        ----------
-        pattern : str
-            _description_
-        file : str
-            _description_
         """
         # Get source output
         process = os.popen(f"{GREP_PATH} {pattern} {file}")
@@ -68,13 +61,6 @@ class TestingClass(unittest.TestCase):
     def test2(self, pattern: str, file: str):
         """Metamorphic Relation 2: If case distinctions are ignored, swap the case of search term,
         the output should be the same.
-
-        Parameters
-        ----------
-        pattern : str
-            _description_
-        file : str
-            _description_
         """
         # Get source output
         process = os.popen(f"{GREP_PATH} --ignore-case {pattern} {file}")
@@ -96,13 +82,6 @@ class TestingClass(unittest.TestCase):
     def test3(self, pattern, file):
         """Metamorphic Relation 3: If regular expression matching is enabled, add an asterisk at
         the end of the search term, the output should be the same.
-
-        Parameters
-        ----------
-        pattern : str
-            _description_
-        file : str
-            _description_
         """
         # Get source output
         process = os.popen(f'{GREP_PATH} --regexp="{pattern}" {file}')

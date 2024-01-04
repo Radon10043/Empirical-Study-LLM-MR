@@ -1,4 +1,5 @@
 package test;
+
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
@@ -8,14 +9,10 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import src.Boyer;
 
-
 public class BoyerTestExample {
     /**
-     * Metamorphic Relation 1: Add a string to the end of the origin string, the output of the
-     * algorithm should be same or greater.
-     *
-     * @param text
-     * @param pattern
+     * Metamorphic Relation 1: Add a string to the end of the origin string, the
+     * output of the algorithm should be same or greater.
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")

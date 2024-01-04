@@ -40,10 +40,6 @@ public class LucenceEampleTest {
     /**
      * Metamorphic Relation 1: Swapping the terms of a OR or AND operator in the
      * query should not affect the results.
-     *
-     * @param index_dir
-     * @param search_terms
-     * @throws Exception
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
@@ -68,10 +64,6 @@ public class LucenceEampleTest {
     /**
      * Metamorphic Relation 2: Inserting an OR term in the query that does not exist
      * in the text should not affect the results.
-     *
-     * @param index_dir
-     * @param search_terms
-     * @throws Exception
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
@@ -105,10 +97,6 @@ public class LucenceEampleTest {
     /**
      * Metamorphic Relation 3: Excluding an OR term in the query that does not exist
      * in the text should not affect the results.
-     *
-     * @param index_dir
-     * @param search_terms
-     * @throws Exception
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")

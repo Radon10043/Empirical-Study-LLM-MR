@@ -44,23 +44,7 @@ class TestingClass(unittest.TestCase):
     @parameterized.expand(load_test_cases)
     def test1(self, graph: csr_matrix, src: int, dst: int, method: str):
         """Metamorphic Relation 1: Given the same graph, the same source and destination vertices,
-        but with different algorithms, the output should be the same.
-
-        Parameters
-        ----------
-        graph : csr_matrix
-            Directed graph.
-        src : int
-            Source vertex.
-        dst : int
-            Destination vertex.
-        method : str
-            The shortest path algorithm to be used.
-
-        Notes
-        -----
-        _description_
-        """
+        but with different algorithms, the output should be the same."""
         # Get source output
         source_out = shortest_path(graph, method=method)[src][dst]
 

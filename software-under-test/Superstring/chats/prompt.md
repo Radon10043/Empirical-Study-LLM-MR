@@ -16,8 +16,6 @@ You are an expert on metamorphic testing. Based on the above case, please identi
 /**
  * Metamorphic Relation 1: Adding one string A to the array, and A must be contained in the
  * original array, then the output should be the same.
- *
- * @param arr
  */
 @ParameterizedTest
 @MethodSource("testcaseProvider")

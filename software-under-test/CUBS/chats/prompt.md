@@ -126,99 +126,43 @@ Please identify the metamorphic relation of this function as much as possible an
 
 ```java
 /**
- * Metamorphic Relation 1: Changing the isStudent flag from false to true should not increase
- * the fee and may decrease it in certain scenarios.
- *
- * @param airClass
- * @param area
- * @param isStudent
- * @param luggage
- * @param economicfee
+ * Metamorphic Relation 1: If the talk time increases, the bill should not decrease.
  */
 @ParameterizedTest
 @MethodSource("testcaseProvider")
-public void test1(int airClass, int area, boolean isStudent, double luggage,
-        double economicfee) {
-    if (isStudent)
-        return;
-
+public void test1(String planType, int planFee, int talkTime, int flow) {
     /* Get source output */
-    AirlinesBaggageBillingService ACMS = new AirlinesBaggageBillingService();
-    double source_out = ACMS.feeCalculation(airClass, area, isStudent, luggage, economicfee);
+    BillCalculation CUBS = new BillCalculation();
+    double source_out = CUBS.phoneBillCalculation(planType, planFee, talkTime, flow);
 
     /* Construct follow-up input */
-    Boolean follow_isStudent = true;
+    int follow_talkTime = talkTime * 2;
 
     /* Get follow-up output */
-    double follow_out =
-            ACMS.feeCalculation(airClass, area, follow_isStudent, luggage, economicfee);
+    double follow_out = CUBS.phoneBillCalculation(planType, planFee, follow_talkTime, flow);
+
+    /* Verification */
+    assertTrue(follow_out >= source_out);
+}
+
+/**
+ * Metamorphic Relation 2: If the talk time decreases, the bill should not increase.
+ */
+@ParameterizedTest
+@MethodSource("testcaseProvider")
+public void test2(String planType, int planFee, int talkTime, int flow) {
+    /* Get source output */
+    BillCalculation CUBS = new BillCalculation();
+    double source_out = CUBS.phoneBillCalculation(planType, planFee, talkTime, flow);
+
+    /* Construct follow-up input */
+    int follow_talkTime = talkTime / 2;
+
+    /* Get follow-up output */
+    double follow_out = CUBS.phoneBillCalculation(planType, planFee, follow_talkTime, flow);
 
     /* Verification */
     assertTrue(follow_out <= source_out);
-}
-
-/**
- * Metamorphic Relation 2: If the luggage weight is 0, changing area should not affect the
- * luggagefee.
- *
- * @param airClass
- * @param area
- * @param isStudent
- * @param luggage
- * @param economicfee
- */
-@ParameterizedTest
-@MethodSource("testcaseProvider")
-public void test2(int airClass, int area, boolean isStudent, double luggage,
-        double economicfee) {
-    if (luggage != 0)
-        return;
-
-    /* Get source output */
-    AirlinesBaggageBillingService ACMS = new AirlinesBaggageBillingService();
-    double source_out = ACMS.feeCalculation(airClass, area, isStudent, luggage, economicfee);
-
-    /* Construct follow-up input */
-    int follow_area = area + 1;
-
-    /* Get follow-up output */
-    double follow_out =
-            ACMS.feeCalculation(airClass, follow_area, isStudent, luggage, economicfee);
-
-    /* Verification */
-    assertEquals(source_out, follow_out, 1e-6);
-}
-
-/**
- * Metamorphic Relation 3: If isStudent is false, changing the area should not affect the
- * luggage fee.
- *
- * @param airClass
- * @param area
- * @param isStudent
- * @param luggage
- * @param economicfee
- */
-@ParameterizedTest
-@MethodSource("testcaseProvider")
-public void test3(int airClass, int area, boolean isStudent, double luggage,
-        double economicfee) {
-    if (isStudent)
-        return;
-
-    /* Get source output */
-    AirlinesBaggageBillingService ACMS = new AirlinesBaggageBillingService();
-    double source_out = ACMS.feeCalculation(airClass, area, isStudent, luggage, economicfee);
-
-    /* Construct follow-up input */
-    int follow_area = area + 1;
-
-    /* Get follow-up output */
-    double follow_out =
-            ACMS.feeCalculation(airClass, follow_area, isStudent, luggage, economicfee);
-
-    /* Verification */
-    assertEquals(source_out, follow_out, 1e-6);
 }
 ```
 

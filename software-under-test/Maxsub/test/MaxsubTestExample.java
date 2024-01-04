@@ -17,8 +17,6 @@ import src.Maxsub;
 public class MaxsubTestExample {
     /**
      * Metamorphic Relation 1: Reversing input array, the output should be same.
-     *
-     * @param arr
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")

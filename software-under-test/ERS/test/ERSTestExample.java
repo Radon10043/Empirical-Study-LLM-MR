@@ -16,12 +16,6 @@ public class ERSTestExample {
     /**
      * Metamorphic Relation 1: If stafflevel is changed from "seniormanager" to "manager", with
      * other inputs constant, the total reimbursement amount should not increase.
-     *
-     * @param stafflevel
-     * @param actualmonthlymileage
-     * @param monthlysalesamount
-     * @param airfareamount
-     * @param otherexpensesamount
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
@@ -49,12 +43,6 @@ public class ERSTestExample {
     /**
      * Metamorphic Relation 2: If monthlysalesamount is increased, the total reimbursement amount
      * should either stay the same or increase.
-     *
-     * @param stafflevel
-     * @param actualmonthlymileage
-     * @param monthlysalesamount
-     * @param airfareamount
-     * @param otherexpensesamount
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")

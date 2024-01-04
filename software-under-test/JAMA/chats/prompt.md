@@ -30,8 +30,6 @@ public class JamaExampleTest {
     /**
      * Metamorphic Relation 1: The determinant of the matrix is equal to the determinant of the
      * transposed matrix, i.e., det(A)=det(A^T)
-     *
-     * @param m Source input
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
@@ -52,8 +50,6 @@ public class JamaExampleTest {
     /**
      * Metamorphic Relation 2: The determinant of the matrix multiply a constant equals to the
      * determinant of the matrix which elements in a row multiply the same constant.
-     *
-     * @param m
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")

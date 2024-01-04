@@ -17,8 +17,6 @@ You are an expert on metamorphic testing. Based on the above case, please identi
  * Metamorphic Relation 1: The input is a hash table. Converting the hash table
  * into string s1, after adding a piece of data to the hash table and converting
  * it into string s2, the length of s2 is greater than s1.
- *
- * @param source_in
  */
 @ParameterizedTest
 @MethodSource("testcaseProvider1")
@@ -42,8 +40,6 @@ public void test1(HashMap<Object, Object> source_in) {
  * Metamorphic Relation 2: The input is a string representing the JSON file's
  * content. Adding a comment to the string, the parse result of the string will
  * be the same.
- *
- * @param source_in
  */
 @ParameterizedTest
 @MethodSource("testcaseProvider2")
@@ -64,9 +60,7 @@ public void test2(String source_in) {
 /**
  * Metamorphic Relation 3: The input is a hash table. Swapping the value of a
  * pair of key and value and converting the hash table to the string, the output
- * length will be the same.
- *
- * @param source_in
+ * length should be the same as or less than the original.
  */
 @ParameterizedTest
 @MethodSource("testcaseProvider1")
@@ -87,7 +81,7 @@ public void test3(HashMap<Object, Object> source_in) {
     String follow_out = JSON.toJSONString(follow_in);
 
     /* Verification */
-    assertEquals(source_out.length(), follow_out.length());
+    assertTrue(source_out.length() >= follow_out.length());
 }
 ```
 

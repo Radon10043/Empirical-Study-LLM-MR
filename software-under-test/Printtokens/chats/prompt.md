@@ -15,13 +15,7 @@ You are an expert on metamorphic testing. Based on the above case, please identi
 ```python
 @parameterized.expand(load_test_cases)
 def test1(self, tc: str):
-    """Metamorphic Relation 1: Adding a new line that only includes a comma, the follow-up output's rows equals the source output's rows plus one.
-
-    Parameters
-    ----------
-    tc : str
-        _description_
-    """
+    """Metamorphic Relation 1: Adding a new line that only includes a comma, the follow-up output's rows equals the source output's rows plus one."""
     # Get source output
     source_out = subprocess.check_output(PRINT_TOKENS_PATH, input=tc, text=True).split("\n")
 
@@ -36,13 +30,7 @@ def test1(self, tc: str):
 
 @parameterized.expand(load_test_cases)
 def test2(self, tc: str):
-    """Metamorphic Relation 2: Deleting the comments, the output should not change
-
-    Parameters
-    ----------
-    tc : str
-        _description_
-    """
+    """Metamorphic Relation 2: Deleting the comments, the output should not change"""
     # Get source output
     source_out = subprocess.check_output(PRINT_TOKENS_PATH, input=tc, text=True).split("\n")
 
@@ -60,13 +48,7 @@ def test2(self, tc: str):
 
 @parameterized.expand(load_test_cases)
 def test3(self, tc: str):
-    """Metamorphic Relation 3: Adding the comment, the output should not change
-
-    Parameters
-    ----------
-    tc : str
-        _description_
-    """
+    """Metamorphic Relation 3: Adding the comment, the output should not change"""
     # Get source output
     source_out = subprocess.check_output(PRINT_TOKENS_PATH, input=tc, text=True).split("\n")
 
