@@ -31,8 +31,20 @@ sudo make install
 
 # Run
 
-## Run specified test case
+Run specified test case:
 
 ```sh
 build/test/GPT4Test --gtest_filter=TrueReturn/BSearchParamTest.20/* > testcases.output.txt
+```
+
+Run all test cases of GPT3P5Test, each test case is repeated five times:
+
+```sh
+for i in {3..42}; do ./run.sh GPT3P5Test MR$i 5; done | tee testcases.validate.md
+```
+
+Run all test cases of GPT4Test, each test case is repeated five times:
+
+```sh
+for i in {3..42}; do ./run.sh GPT4Test MR$i 5; done | tee testcases.validate.md
 ```
