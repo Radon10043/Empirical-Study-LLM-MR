@@ -746,6 +746,11 @@ TEST_P(GetRangeParamTest, MR28) {
     vector<int> complement_vec;
     // Logic to fill complement_vec
 
+    /* Fix by Radon */
+    int max_elem = vec.back();
+    for (int i = 0; i < vec.size(); i++)
+        complement_vec.emplace_back(max_elem + vec[i]);
+
     /* Get source output */
     vector<int> source_out = get_range(vec, target);
 
