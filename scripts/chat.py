@@ -2,7 +2,7 @@
 Author: Radon
 Date: 2023-12-06 15:26:45
 LastEditors: Radon
-LastEditTime: 2024-01-04 23:12:32
+LastEditTime: 2024-01-04 23:42:25
 Description: Hi, say something
 """
 import openai
@@ -215,7 +215,7 @@ def read_prompt(prompt_path: str) -> list:
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="自动向大模型发送提示并输出内容至markdown文件")
     parser.add_argument("-p", "--prompt", nargs="*", required=True, help="prompt文件路径, 需要是markdown文件, 且遵循模板的规则, 可同时输入多个文件路径.")
-    parser.add_argument("-m", "--model", choices=["gpt-3.5-turbo", "gpt-4-1106-preview"], required=True, help="要使用的大模型")
+    parser.add_argument("-m", "--model", required=True, help="要使用的大模型")
     parser.add_argument("-c", "--count", type=int, default=50, help="最大聊天次数")
     args = parser.parse_args()
 
