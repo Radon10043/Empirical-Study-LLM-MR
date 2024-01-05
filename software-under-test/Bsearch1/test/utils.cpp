@@ -34,7 +34,7 @@ vector<GetRangeInput> gen_tcs_randomly() {
             vec[j] = dist_value(rng);
         int target = dist_target(rng);
 
-        /* 由于测试二分搜索算法, 因此数组需要升序排序 */
+        /* 由于被测对象要求数组升序, 因此对数组进行排序 */
         sort(vec.begin(), vec.end());
 
         /* 将创建好的测试数据加入tcs */
