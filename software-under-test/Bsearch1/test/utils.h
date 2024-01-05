@@ -1,5 +1,5 @@
-#ifndef _HAVE_CONFIG_H
-#define _HAVE_CONFIG_H
+#ifndef _HAVE_UTILS_H
+#define _HAVE_UTILS_H
 
 #include <vector>
 using namespace std;
