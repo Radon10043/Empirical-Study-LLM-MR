@@ -5,6 +5,7 @@
 
 api_key.txt
 testcases*.txt
+testcases*.md
 
 __pycache__/
 .vscode/
