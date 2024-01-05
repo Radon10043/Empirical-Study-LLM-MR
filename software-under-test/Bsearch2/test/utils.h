@@ -7,6 +7,7 @@ using namespace std;
 
 #define CRASH 0
 #define INVALID 0
+#define NOT_SATISFIED 0
 #define TESTCASE_NUM 1000
 
 typedef struct BSearch2Input {
