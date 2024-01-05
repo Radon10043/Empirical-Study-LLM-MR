@@ -10,8 +10,23 @@ from scipy.sparse import csr_matrix
 from utils import gen_tcs_randomly
 
 
+def load_test_cases() -> list:
+    """加载测试用例
+
+    Returns
+    -------
+    list
+        存储测试用例的列表
+
+    Notes
+    -----
+    _description_
+    """
+    return gen_tcs_randomly()
+
+
 class TestingClass(unittest.TestCase):
-    @parameterized.expand(gen_tcs_randomly)
+    @parameterized.expand(load_test_cases)
     def test1(self, graph: csr_matrix, src: int, dst: int, method: str):
         """Metamorphic Relation 1: Given the same graph, the same source and destination vertices,
         but with different algorithms, the output should be the same."""
