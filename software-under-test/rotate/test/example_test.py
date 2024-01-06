@@ -31,7 +31,7 @@ def load_test_cases() -> list:
 class TestingClass(unittest.TestCase):
     @parameterized.expand(load_test_cases)
     def test1(self, img: np.array, angle: float):
-        """Rotating the same image by N degree and N+360 degree will output the same result."""
+        """Metamorphic Relation 1: Rotating the same image by N degree and N+360 degree will output the same result."""
         # Get source output
         source_out = ndimage.rotate(img, angle)
 
