@@ -2,7 +2,7 @@
 Author: Radon
 Date: 2023-12-06 15:26:45
 LastEditors: Radon
-LastEditTime: 2024-01-04 23:42:25
+LastEditTime: 2024-01-05 20:29:56
 Description: Hi, say something
 """
 import openai
@@ -91,7 +91,7 @@ def chat_with_gpt(list_prompt: list, output_dir: str, max_chat_count: int, sut_n
             msgs.append({"role": "assistant", "content": answer})
 
             # 如果输出内容中有Metamorphic Relation 55, 跳出循环
-            search_result = re.search("(Metamorphic Relation 55|MR55)", answer, flags=re.IGNORECASE)
+            search_result = re.search("(Metamorphic Relation 45|MR45)", answer, flags=re.IGNORECASE)
             if not search_result is None:
                 break
 
@@ -103,10 +103,14 @@ def chat_with_gpt(list_prompt: list, output_dir: str, max_chat_count: int, sut_n
 
             # 随机休息一段时间后再继续
             sleep_time = random.randint(60, 600)
-            while sleep_time > 0:
-                sleep_time -= 1
-                print("休息一下后再继续... %d秒" % sleep_time, end="\r")
-                time.sleep(1)
+            try:
+                while sleep_time > 0:
+                    sleep_time -= 1
+                    print("休息一下后再继续... %d秒" % sleep_time, end="\r")
+                    time.sleep(1)
+            except KeyboardInterrupt:
+                print("KeyboardInterrupt, exit!")
+                break
             print()
 
         i += 1
@@ -178,7 +182,7 @@ def read_prompt(prompt_path: str) -> list:
 
     # 读取markdown文件的原始内容, 存入md_text
     md_text = str()
-    with open(prompt_path) as f:
+    with open(prompt_path, encoding="utf-8") as f:
         md_text = f.read()
 
     # 解析markdown文件
