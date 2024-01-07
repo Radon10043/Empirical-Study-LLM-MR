@@ -2,7 +2,7 @@
 Author: Radon
 Date: 2023-12-06 15:26:45
 LastEditors: Radon
-LastEditTime: 2024-01-05 20:29:56
+LastEditTime: 2024-01-07 12:10:31
 Description: Hi, say something
 """
 import openai
@@ -221,6 +221,7 @@ if __name__ == "__main__":
     parser.add_argument("-p", "--prompt", nargs="*", required=True, help="prompt文件路径, 需要是markdown文件, 且遵循模板的规则, 可同时输入多个文件路径.")
     parser.add_argument("-m", "--model", required=True, help="要使用的大模型")
     parser.add_argument("-c", "--count", type=int, default=50, help="最大聊天次数")
+    parser.add_argument("-o", "--output", default="", help="聊天内容输出目录, 默认为prompt文件同目录下")
     args = parser.parse_args()
 
     prompt_paths = args.prompt
@@ -228,8 +229,12 @@ if __name__ == "__main__":
     gpt_name = args.model
 
     for prompt_path in prompt_paths:
-        # 聊天内容文件保存到prompt文件同目录下
-        output_dir = os.path.dirname(prompt_path)
+        # 如果命令行参数中指定的输出文件夹为空, 则将聊天内容文件保存到prompt文件同目录下
+        output_dir = args.output
+        if len(output_dir) == 0:
+            output_dir = os.path.dirname(prompt_path)
+
+        # 获取被测对象的名称
         sut_name = os.path.basename(os.path.dirname(os.path.dirname(prompt_path)))
 
         list_prompt = read_prompt(prompt_path)
