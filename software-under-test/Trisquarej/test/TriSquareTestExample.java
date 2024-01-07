@@ -1,5 +1,6 @@
 package test;
 
+import java.io.IOException;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang3.tuple.Pair;
@@ -100,12 +101,7 @@ public class TriSquareTestExample {
         assertTrue(Math.abs(source_area - follow_area * 4) < 1e-6);
     }
 
-    public static Stream<Arguments> testcaseProvider() {
-        /* @formatter:off */
-        return Stream.of(
-            Arguments.of(10, 20, 20),
-            Arguments.of(20, 20, 20)
-        );
-        /* @formatter:on */
+    public static Stream<Arguments> testcaseProvider() throws IOException {
+        return testcaseGenerator.generate(1000);
     }
 }
