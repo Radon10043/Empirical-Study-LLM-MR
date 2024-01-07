@@ -1,7 +1,9 @@
 package test;
 
+import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.stream.Stream;
+import java.io.IOException;
 import java.util.Random;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -58,9 +60,7 @@ public class Determinant1TestExample {
         assertEquals(source_res, follow_res, 1e-6);
     }
 
-    static Stream<Arguments> testcaseProvider() {
-        Matrix m1 = new Matrix(new int[][] {{1, 2}, {3, 4}});
-        Matrix m2 = new Matrix(new int[][] {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}});
-        return Stream.of(Arguments.of(m1), Arguments.of(m2));
+    static Stream<Arguments> testcaseProvider() throws IOException {
+        return testcaseGenerator.generate(10);
     }
 }
