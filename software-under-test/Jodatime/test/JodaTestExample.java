@@ -1,5 +1,6 @@
 import org.joda.time.DateTime;
 import static org.junit.Assert.assertTrue;
+import java.io.IOException;
 import java.util.stream.Stream;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -46,19 +47,11 @@ public class JodaTestExample {
         assertTrue(source_out.equals(follow_out));
     }
 
-    static Stream<Arguments> testcaseProvider1() {
-        /* Testcase 1 */
-        DateTime time = new DateTime(2023, 12, 18, 11, 10);
-        int days = 3;
-
-        return Stream.of(Arguments.of(time, days));
+    static Stream<Arguments> testcaseProvider1() throws IOException {
+        return testcaseGenerator.generate(1000);
     }
 
-    static Stream<Arguments> testcaseProvider2() {
-        /* Testcase 1 */
-        DateTime time = new DateTime(2023, 12, 18, 11, 10);
-        int weeks = 3;
-
-        return Stream.of(Arguments.of(time, weeks));
+    static Stream<Arguments> testcaseProvider2() throws IOException {
+        return testcaseGenerator.generate(1000);
     }
 }
