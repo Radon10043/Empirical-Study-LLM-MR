@@ -69,34 +69,6 @@ public class MaxRectangleTestExample {
      * @throws Exception
      */
     public static Stream<Arguments> testcaseProvider() throws Exception {
-        /* @formatter:off */
-        File        tc_dir      = new File(System.getProperty("user.dir") + File.separator + "testcases");  /* 测试用例文件所在根目录 */
-        File[]      files       = tc_dir.listFiles();                                                           /* 测试用例文件 */
-        Arguments[] testcases   = new Arguments[files.length];
-        int         cnt         = 0;                                                                            /* 计数用 */
-        /* @formatter:on */
-
-        /* 依次读取测试用例并存入testcases */
-        for (File file : files) {
-
-            BufferedReader buf = new BufferedReader(new FileReader(file));
-            ArrayList<ArrayList<Integer>> matrix = new ArrayList<>();
-            String line;
-
-            while ((line = buf.readLine()) != null) {
-                String[] tmp = line.split(",");
-                ArrayList<Integer> row = new ArrayList<Integer>();
-                for (String val : tmp) {
-                    row.add(Integer.parseInt(val));
-                }
-                matrix.add(row);
-            }
-
-            testcases[cnt++] = Arguments.of(matrix);
-            buf.close();
-
-        }
-
-        return Stream.of(testcases);
+        return testcaseGenerator.generate(1000);
     }
 }
