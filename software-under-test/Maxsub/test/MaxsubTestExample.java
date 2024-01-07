@@ -37,32 +37,6 @@ public class MaxsubTestExample {
     }
 
     public static Stream<Arguments> testcaseProvider() throws Exception {
-        /* @formatter:off */
-        File        tc_dir      = new File(System.getProperty("user.dir") + File.separator + "testcases");  /* 测试用例文件所在根目录 */
-        File[]      files       = tc_dir.listFiles();                                                           /* 测试用例文件 */
-        Arguments[] testcases   = new Arguments[files.length];                                                  /* 所有测试用例 */
-        int         cnt         = 0;                                                                            /* 计数用 */
-        /* @formatter:on */
-
-        /* 依次读取测试用例的内容, 存入testcases */
-        for (File file : files) {
-
-            BufferedReader buf = new BufferedReader(new FileReader(file));
-            ArrayList<Integer> arr = new ArrayList<Integer>();
-            String line;
-
-            while ((line = buf.readLine()) != null) {
-                String[] tmp = line.split(",");
-                for (String val : tmp) {
-                    arr.add(Integer.parseInt(val));
-                }
-            }
-
-            testcases[cnt++] = Arguments.of(arr);
-            buf.close();
-
-        }
-
-        return Stream.of(testcases);
+        return testcaseGenerator.generate(1000);
     }
 }
