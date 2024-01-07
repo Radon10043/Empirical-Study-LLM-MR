@@ -1,9 +1,6 @@
 package test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.stream.Stream;
 
@@ -37,21 +34,6 @@ public class SuperstringTestExample {
     }
 
     public static Stream<Arguments> testcaseProvider() throws Exception {
-        File tc_dir = new File(System.getProperty("user.dir") + File.separator + "testcases");
-        File[] files = tc_dir.listFiles();
-        Arguments[] testcases = new Arguments[files.length];
-
-        for (int i = 0; i < files.length; i++) {
-            BufferedReader buf = new BufferedReader(new FileReader(files[i]));
-            String line;
-            ArrayList<String> arr = new ArrayList<String>();
-            while ((line = buf.readLine()) != null) {
-                arr.add(line);
-            }
-            testcases[i] = Arguments.of(arr);
-            buf.close();
-        }
-
-        return Stream.of(testcases);
+        return testcaseGenerator.generate(1000);
     }
 }
