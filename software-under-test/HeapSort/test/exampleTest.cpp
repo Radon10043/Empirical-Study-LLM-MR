@@ -6,13 +6,9 @@
 #include <vector>
 
 #include "../src/function.h"
+#include "utils.h"
 
 using namespace std;
-
-typedef struct HeapSortInput {
-    HeapSortInput(vector<int> vec) : vec(vec){};
-    vector<int> vec;
-} HeapSortInput;
 
 class HeapSortParamTest : public ::testing::TestWithParam<HeapSortInput> {};
 
@@ -96,5 +92,4 @@ TEST_P(HeapSortParamTest, MR3) {
     EXPECT_EQ(follow_out, source_out);
 }
 
-INSTANTIATE_TEST_CASE_P(TrueReturn, HeapSortParamTest,
-                        testing::Values(HeapSortInput({2, 3, 1, 4, 5}), HeapSortInput({99, 999, 9, 10}), HeapSortInput({2, 4, 6, 8, 1, 2, 4, 2, 64})));
+INSTANTIATE_TEST_CASE_P(TrueReturn, HeapSortParamTest, testing::ValuesIn(gen_tcs_randomly()));
