@@ -4,13 +4,9 @@
 #include <vector>
 
 #include "../src/function.h"
+#include "utils.h"
 
 using namespace std;
-
-typedef struct SurroundedRegionInput {
-    SurroundedRegionInput(vector<string> vec) : vec(vec){};
-    vector<string> vec;
-} SurroundedRegionInput;
 
 class SurroundedRegionParamTest : public ::testing::TestWithParam<SurroundedRegionInput> {};
 
@@ -63,30 +59,4 @@ TEST_P(SurroundedRegionParamTest, MR2) {
     EXPECT_EQ(follow_out, source_out);
 }
 
-vector<string> testcase1() {
-    /* clang-format off */
-    vector<string> vec = {
-        "XXXXX",
-        "XOOOX",
-        "XOOOX",
-        "XOOOX",
-        "XXXXX"
-    };
-    /* clang-format on */
-    return vec;
-}
-
-vector<string> testcase2() {
-    /* clang-format off */
-    vector<string> vec = {
-        "OOOOOOOXXX",
-        "XXXXXXXXXX",
-        "XXOOOOOXOO",
-        "XXXXXXXXOO",
-        "XOXOXOXOXO"
-    };
-    /* clang-format on */
-    return vec;
-}
-
-INSTANTIATE_TEST_CASE_P(TrueReturn, SurroundedRegionParamTest, testing::Values(SurroundedRegionInput(testcase1()), SurroundedRegionInput(testcase2())));
+INSTANTIATE_TEST_CASE_P(TrueReturn, SurroundedRegionParamTest, testing::ValuesIn(gen_tcs_randomly()));
