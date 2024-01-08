@@ -100,6 +100,21 @@ float closest(Point P[], int n) {
 }
 
 /**
+ * @brief 枚举计算两点间最短距离
+ *
+ * @param vec
+ * @return float
+ */
+float closest_distance_simple(vector<pair<int,int>> vec) {
+    float mn = FLT_MAX;
+    for (int i = 0; i < vec.size(); i++)
+        for (int j = i + 1; j < vec.size();++ j)
+            if (dist({vec[i].first, vec[i].second}, {vec[j].first, vec[j].second}) < mn)
+                mn = dist({vec[i].first, vec[i].second}, {vec[j].first, vec[j].second});
+    return mn;
+}
+
+/**
  * @brief Calculate the distance of two closest points.
  *
  * @param P
