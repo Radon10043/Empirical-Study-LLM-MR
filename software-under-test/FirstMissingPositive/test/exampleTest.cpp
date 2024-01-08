@@ -4,13 +4,9 @@
 #include <string>
 
 #include "../src/function.h"
+#include "utils.h"
 
 using namespace std;
-
-typedef struct FMPInput {
-    FMPInput(vector<int> vec) : vec(vec){};
-    vector<int> vec;
-} FMPInput;
 
 class FMPInputParamTest : public ::testing::TestWithParam<FMPInput> {};
 
@@ -61,4 +57,4 @@ TEST_P(FMPInputParamTest, MR2) {
     EXPECT_EQ(source_out, follow_out);
 }
 
-INSTANTIATE_TEST_CASE_P(TrueReturn, FMPInputParamTest, testing::Values(FMPInput({1, 2, 3, 4, 5}), FMPInput({1, 2, 4, 5, 6, 7}), FMPInput({1, 3, 5, 7, 9})));
+INSTANTIATE_TEST_CASE_P(TrueReturn, FMPInputParamTest, testing::ValuesIn(gen_tcs_randomly()));
