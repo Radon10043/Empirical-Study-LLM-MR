@@ -6,19 +6,9 @@
 #include <vector>
 
 #include "../src/function.h"
+#include "utils.h"
 
 using namespace std;
-
-typedef struct SpwikiInput {
-    SpwikiInput(tuple<vector<vector<int>>, int, int, int> testcase) {
-        edges = get<0>(testcase);
-        src = get<1>(testcase);
-        dst = get<2>(testcase);
-        n = get<3>(testcase);
-    };
-    vector<vector<int>> edges;
-    int src, dst, n;
-} SpwikiInput;
 
 class SpwikiParamTest : public ::testing::TestWithParam<SpwikiInput> {};
 
@@ -70,16 +60,4 @@ TEST_P(SpwikiParamTest, MR2) {
     EXPECT_EQ(follow_out, source_out * 2);
 }
 
-tuple<vector<vector<int>>, int, int, int> testcase1() {
-    vector<vector<int>> edges = {{0, 1, 9}, {1, 2, 1}, {2, 3, 2}, {3, 4, 3}, {4, 5, 4}, {5, 6, 5}, {6, 1, 6}};
-    int src = 1, dst = 6, n = 7;
-    return make_tuple(edges, src, dst, n);
-}
-
-tuple<vector<vector<int>>, int, int, int> testcase2() {
-    vector<vector<int>> edges = {{0, 1, 1}, {0, 2, 2}, {1, 3, 6}, {2, 3, 5}};
-    int src = 0, dst = 3, n = 4;
-    return make_tuple(edges, src, dst, n);
-}
-
-INSTANTIATE_TEST_CASE_P(TrueReturn, SpwikiParamTest, testing::Values(testcase1(), testcase2()));
+INSTANTIATE_TEST_CASE_P(TrueReturn, SpwikiParamTest, testing::ValuesIn(gen_tcs_randomly()));
