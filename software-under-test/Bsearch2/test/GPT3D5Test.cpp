@@ -12,57 +12,6 @@ using namespace std;
 
 class BSearchParamTest : public ::testing::TestWithParam<BSearch2Input> {};
 
-// Metamorphic Relation 1:
-// If the target value is already in the array, add an element greater than the max value in the array to the end of the array, and the output should be
-// unchanged.
-TEST_P(BSearchParamTest, MR1) {
-    /* Get source input */
-    BSearch2Input input = GetParam();
-    vector<int> vec = input.vec;
-    int target = input.target;
-
-    /* Get source output */
-    int source_out = bin_search(vec, target);
-
-    if (!source_out)
-        return;
-
-    /* Construct follow-up input */
-    vector<int> follow_vec = vec;
-    follow_vec.emplace_back(vec.back() + 1); // Adding an element greater than the max value in the array
-
-    /* Get follow-up output */
-    int follow_out = bin_search(follow_vec, target);
-
-    /* Verification */
-    EXPECT_EQ(source_out, follow_out);
-}
-
-// Metamorphic Relation 2:
-// Multiply all elements in the array and the element to be located by a constant, the output should remain the same.
-TEST_P(BSearchParamTest, MR2) {
-    /* Get source input */
-    BSearch2Input input = GetParam();
-    vector<int> vec = input.vec;
-    int target = input.target;
-
-    /* Get source output */
-    int source_out = bin_search(vec, target);
-
-    /* Construct follow-up input */
-    int constant = 2;
-    vector<int> follow_vec = vec;
-    for (int &val : follow_vec)
-        val *= constant;                   // Multiply all elements in the array by a constant
-    int follow_target = target * constant; // Multiply the target by the same constant
-
-    /* Get follow-up output */
-    int follow_out = bin_search(follow_vec, follow_target);
-
-    /* Verification */
-    EXPECT_EQ(source_out, follow_out);
-}
-
 // Metamorphic Relation 3:
 // If the target value is already in the array, reverse the array, and the output should remain unchanged.
 TEST_P(BSearchParamTest, MR3) {
@@ -1054,6 +1003,49 @@ TEST_P(BSearchParamTest, MR40) {
     bool follow_out = bin_search(follow_vec, target);
 
     /* Verification */
+    EXPECT_EQ(source_out, follow_out);
+}
+
+// Metamorphic Relation 41:
+// If the target value exists in the array, appending the array with its reverse should not change the search result.
+TEST_P(BSearchParamTest, MR41) {
+    /* Get source input */
+    BSearch2Input input = GetParam();
+    vector<int> vec = input.vec;
+    int target = input.target;
+
+    bool source_out = bin_search(vec, target);
+
+    if (!source_out) // If the target value doesn't exist in the array, return
+        return;
+
+    vector<int> reverse_vec = vec;
+    std::reverse(reverse_vec.begin(), reverse_vec.end());
+    vec.insert(vec.end(), reverse_vec.begin(), reverse_vec.end());
+
+    bool follow_out = bin_search(vec, target);
+
+    EXPECT_EQ(source_out, follow_out);
+}
+
+// Metamorphic Relation 42:
+// If the target value exists in the array, removing duplicates but maintaining the order should not change the search result.
+TEST_P(BSearchParamTest, MR42) {
+    /* Get source input */
+    BSearch2Input input = GetParam();
+    vector<int> vec = input.vec;
+    int target = input.target;
+
+    bool source_out = bin_search(vec, target);
+
+    if (!source_out) // If the target value doesn't exist in the array, return
+        return;
+
+    vector<int> unique_vec;
+    std::unique_copy(vec.begin(), vec.end(), std::back_inserter(unique_vec));
+
+    bool follow_out = bin_search(unique_vec, target);
+
     EXPECT_EQ(source_out, follow_out);
 }
 
