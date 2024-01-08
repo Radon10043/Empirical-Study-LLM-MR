@@ -10,11 +10,11 @@ using namespace std;
 #define INVALID 0
 #define TESTCASE_NUM 1000
 
-typedef struct DistinctSubseqenceInput {
-    DistinctSubseqenceInput(string s, string t) : s(s), t(t){};
+typedef struct DistinctSubsequenceInput {
+    DistinctSubsequenceInput(string s, string t) : s(s), t(t){};
     string s, t;
-} DistinctSubseqenceInput;
+} DistinctSubsequenceInput;
 
-vector<DistinctSubseqenceInput> gen_tcs_randomly();
+vector<DistinctSubsequenceInput> gen_tcs_randomly();
 
 #endif

@@ -6,14 +6,14 @@
 
 using namespace std;
 
-class DistinctSubsequenceParamTest : public ::testing::TestWithParam<DistinctSubseqenceInput> {};
+class DistinctSubsequenceParamTest : public ::testing::TestWithParam<DistinctSubsequenceInput> {};
 
 /**
  * Metamorphic relation 1: Add a character to the end of s, the output should be the same or larger.
  */
 TEST_P(DistinctSubsequenceParamTest, MR1) {
     /* Get source input */
-    DistinctSubseqenceInput input = GetParam();
+    DistinctSubsequenceInput input = GetParam();
     string s = input.s, t = input.t;
 
     /* Get source output */
