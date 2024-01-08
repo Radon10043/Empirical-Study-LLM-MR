@@ -4,13 +4,9 @@
 #include <string>
 
 #include "../src/function.h"
+#include "utils.h"
 
 using namespace std;
-
-typedef struct InterleavingStringInput {
-    InterleavingStringInput(string A, string B, string C) : A(A), B(B), C(C){};
-    string A, B, C;
-} InterleavingStringInput;
 
 class InterleavingStringParamTest : public ::testing::TestWithParam<InterleavingStringInput> {};
 
@@ -37,6 +33,4 @@ TEST_P(InterleavingStringParamTest, MR1) {
     EXPECT_EQ(source_out, follow_out);
 }
 
-INSTANTIATE_TEST_CASE_P(TrueReturn, InterleavingStringParamTest,
-                        testing::Values(InterleavingStringInput("abc", "def", "adbecf"), InterleavingStringInput("abc", "xyz", "abcxyz"),
-                                        InterleavingStringInput("leet", "code", "github")));
+INSTANTIATE_TEST_CASE_P(TrueReturn, InterleavingStringParamTest, testing::ValuesIn(gen_tcs_randomly()));
