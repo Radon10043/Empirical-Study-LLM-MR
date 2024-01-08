@@ -6,13 +6,9 @@
 #include <vector>
 
 #include "../src/function.h"
+#include "utils.h"
 
 using namespace std;
-
-typedef struct RSAInput {
-    RSAInput(int m, int e, int p, int q) : m(m), e(e), p(p), q(q) {}
-    int m, e, p, q;
-} RSAInput;
 
 class RSAParamTest : public ::testing::TestWithParam<RSAInput> {};
 
@@ -38,4 +34,4 @@ TEST_P(RSAParamTest, MR1) {
     ASSERT_EQ(source_out, follow_out);
 }
 
-INSTANTIATE_TEST_CASE_P(TrueReturn, RSAParamTest, testing::Values(RSAInput(5, 3, 13, 17), RSAInput(17, 13, 47, 67)));
+INSTANTIATE_TEST_CASE_P(TrueReturn, RSAParamTest, testing::ValuesIn(gen_tcs_randomly()));
