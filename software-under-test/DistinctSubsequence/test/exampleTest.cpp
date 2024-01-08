@@ -2,13 +2,9 @@
 #include <string>
 
 #include "../src/function.h"
+#include "utils.h"
 
 using namespace std;
-
-typedef struct DistinctSubseqenceInput {
-    DistinctSubseqenceInput(string s, string t) : s(s), t(t){};
-    string s, t;
-} DistinctSubseqenceInput;
 
 class DistinctSubsequenceParamTest : public ::testing::TestWithParam<DistinctSubseqenceInput> {};
 
@@ -33,8 +29,4 @@ TEST_P(DistinctSubsequenceParamTest, MR1) {
     EXPECT_GE(follow_out, source_out);
 }
 
-INSTANTIATE_TEST_CASE_P(TrueReturn, DistinctSubsequenceParamTest, testing::Values(
-    DistinctSubseqenceInput("abbccc", "abc"),
-    DistinctSubseqenceInput("rabbbit", "rabbit"),
-    DistinctSubseqenceInput("babgbag", "bag")
-));
+INSTANTIATE_TEST_CASE_P(TrueReturn, DistinctSubsequenceParamTest, testing::ValuesIn(gen_tcs_randomly()));
