@@ -6,13 +6,9 @@
 #include <vector>
 
 #include "../src/function.h"
+#include "utils.h"
 
 using namespace std;
-
-typedef struct QuickSortInput {
-    QuickSortInput(vector<int> vec) : vec(vec){};
-    vector<int> vec;
-} QuickSortInput;
 
 class QuickSortParamTest : public ::testing::TestWithParam<QuickSortInput> {};
 
@@ -96,5 +92,4 @@ TEST_P(QuickSortParamTest, MR3) {
     EXPECT_EQ(follow_out, source_out);
 }
 
-INSTANTIATE_TEST_CASE_P(TrueReturn, QuickSortParamTest,
-                        testing::Values(QuickSortInput({2, 3, 1, 4, 5}), QuickSortInput({99, 999, 9, 10}), QuickSortInput({2, 4, 6, 8, 1, 2, 4, 2, 64})));
+INSTANTIATE_TEST_CASE_P(TrueReturn, QuickSortParamTest, testing::ValuesIn(gen_tcs_randomly()));
