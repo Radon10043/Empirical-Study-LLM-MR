@@ -105,7 +105,9 @@ float closest(Point P[], int n) {
  * @param P
  * @return float
  */
-float closest_distance(vector<Point> P) {
+float closest_distance(vector<pair<int, int>> vec) {
+    vector<Point> P;
+    for (auto& v : vec) P.push_back({v.first, v.second});
     return closest(P.data(), P.size());
 }
 

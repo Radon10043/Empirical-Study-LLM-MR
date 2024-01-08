@@ -28,13 +28,13 @@ Please identify the metamorphic relations of this program as much as possible an
 TEST_P(ClosestPairParamTest, MR1) {
     /* Get source input */
     ClosestPairInput input = GetParam();
-    vector<Point> vec = input.vec;
+    vector<pair<int, int>> vec = input.vec;
 
     /* Get source output */
     float source_out = closest_distance(vec);
 
     /* Construct follow-up input */
-    vector<Point> follow_vec = vec;
+    vector<pair<int, int>> follow_vec = vec;
     follow_vec.push_back({100, 100});
 
     /* Get follow-up output */
