@@ -2,14 +2,9 @@
 #include <vector>
 
 #include "../src/function.h"
+#include "utils.h"
 
 using namespace std;
-
-typedef struct MultiMAXSUMInput {
-    MultiMAXSUMInput(vector<int> vec, int m) : vec(vec), m(m){};
-    vector<int> vec;
-    int m;
-} MultiMAXSUMInput;
 
 class MultiMAXSUMParamTest : public ::testing::TestWithParam<MultiMAXSUMInput> {};
 
@@ -37,5 +32,4 @@ TEST_P(MultiMAXSUMParamTest, MR1) {
     EXPECT_GE(follow_out, source_out);
 }
 
-INSTANTIATE_TEST_CASE_P(TrueReturn, MultiMAXSUMParamTest,
-                        testing::Values(MultiMAXSUMInput({1, 2, 3, 4, 5}, 3), MultiMAXSUMInput({1, 2, 4, 5, 6, 7}, 4), MultiMAXSUMInput({1, 3, 5, 7, 9}, 2)));
+INSTANTIATE_TEST_CASE_P(TrueReturn, MultiMAXSUMParamTest, testing::ValuesIn(gen_tcs_randomly()));
