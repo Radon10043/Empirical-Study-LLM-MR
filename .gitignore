@@ -18,3 +18,9 @@ software-under-test/Lucene/*/index
 software-under-test/grep/src/*
 !software-under-test/grep/src/build.sh
 software-under-test/grep/testcases
+
+software-under-test/Printtokens/testcases
+software-under-test/Printtokens2/testcases
+software-under-test/schedule/testcases
+software-under-test/schedule2/testcases
+software-under-test/TCAS/testcases
