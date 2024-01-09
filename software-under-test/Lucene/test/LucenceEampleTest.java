@@ -1,5 +1,6 @@
 package test;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.stream.Stream;
@@ -12,34 +13,41 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.Assert.assertEquals;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
-
 public class LucenceEampleTest {
-    /* 存储了多个测试用例的根目录 */
-    private static String[] testcase_roots = {
-            "testcases\\tc1",
-            "testcases\\tc2",
-            "testcases\\tc3"
-    };
+    private static String full_text_root; /* 存储了要检索的全文的根目录 */
 
     /**
-     * 为测试用例中要全文检索的文件生成索引
+     * 设置要检索的全文的根目录
+     *
+     * @param full_text_root
+     */
+    public static void setFullTextRoot(String full_text_root) {
+        LucenceEampleTest.full_text_root = full_text_root;
+    }
+
+    /**
+     * 获取药检所的全文的根目录
+     *
+     * @return
+     */
+    public static String getFullTextRoot() {
+        return full_text_root;
+    }
+
+    /**
+     * 设置要检索的全文根目录, 为文件生成索引
      *
      * @throws Exception
      */
     @BeforeAll
-    public static void generateIndex() throws Exception {
-        for (String root : testcase_roots) {
-            Utils.generateIndex(root);
-        }
+    public static void prepare() throws Exception {
+        setFullTextRoot(System.getProperty("user.dir") + File.separator + "full_text");
+        Utils.generateIndex(full_text_root);
     }
 
     /**
-     * Metamorphic Relation 1: Swapping the terms of a OR or AND operator in the
-     * query should not affect the results.
+     * Metamorphic Relation 1: Swapping the terms of a OR or AND operator in the query should not
+     * affect the results.
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
@@ -62,8 +70,8 @@ public class LucenceEampleTest {
     }
 
     /**
-     * Metamorphic Relation 2: Inserting an OR term in the query that does not exist
-     * in the text should not affect the results.
+     * Metamorphic Relation 2: Inserting an OR term in the query that does not exist in the text
+     * should not affect the results.
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
@@ -95,8 +103,8 @@ public class LucenceEampleTest {
     }
 
     /**
-     * Metamorphic Relation 3: Excluding an OR term in the query that does not exist
-     * in the text should not affect the results.
+     * Metamorphic Relation 3: Excluding an OR term in the query that does not exist in the text
+     * should not affect the results.
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
@@ -136,34 +144,7 @@ public class LucenceEampleTest {
      * @throws Exception
      */
     public static Stream<Arguments> testcaseProvider() throws Exception {
-
-        int n = testcase_roots.length;
-        Arguments[] testcases = new Arguments[n];
-
-        /* 依次构建测试输入 */
-        for (int i = 0; i < n; i++) {
-
-            /* @formatter:off */
-            String              index_dir           = testcase_roots[i] + File.separator + "index";
-            File                search_terms_file   = new File(testcase_roots[i] + File.separator + "search_terms.txt");
-            InputStreamReader   read                = new InputStreamReader(new FileInputStream(search_terms_file), "UTF-8");
-            BufferedReader      buf                 = new BufferedReader(read);
-            String              line                = new String();
-            ArrayList<String>   search_terms        = new ArrayList<String>();
-            /* @formatter:on */
-
-            /* 读取搜索项的内容, 存入search_terms */
-            while ((line = buf.readLine()) != null) {
-                search_terms.add(line);
-            }
-            buf.close();
-
-            testcases[i] = Arguments.of(index_dir, search_terms);
-
-        }
-
-        return Stream.of(testcases);
-
+        return tetscaseGenerator.generate(full_text_root, 1000);
     }
 
 }
