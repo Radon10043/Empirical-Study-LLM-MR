@@ -2,7 +2,7 @@
 Author: Radon
 Date: 2023-12-21 16:15:08
 LastEditors: Radon
-LastEditTime: 2023-12-21 18:01:48
+LastEditTime: 2024-01-09 17:22:23
 Description: Hi, say something
 """
 import unittest
@@ -15,7 +15,20 @@ GREP_PATH = os.path.join(os.path.dirname(__file__), "..", "src", "grep-3.11", "o
 
 
 def load_test_cases() -> list:
+    """加载测试用例
+
+    Returns
+    -------
+    list
+        text文件和pattern文件的地址
+    """
     tc_dir = os.path.join(os.path.dirname(__file__), "..", "testcases")  # 文件系统中存储所有测试用例的根目录
+
+    # 提示测试用例要先创建才能测试
+    if not os.path.exists(tc_dir):
+        print("Oops, no testcases? Please run generate.py to generate testcases first.")
+        exit(1)
+
     dirs = [os.path.join(tc_dir, dir) for dir in os.listdir(tc_dir)]  # 存储了测试用例文件路径的列表
     testcases = list()  # 用于存储所有测试用例的列表
 
@@ -26,11 +39,7 @@ def load_test_cases() -> list:
         # 获取要进行搜索的文本路径
         text_path = os.path.join(dir, "text.txt")
 
-        # 读取搜索项的内容
-        with open(pattern_path) as f:
-            pattern = f.readline().rstrip("\n")
-
-        testcases.append((pattern, text_path))
+        testcases.append((pattern_path, text_path))
 
     return testcases
 
