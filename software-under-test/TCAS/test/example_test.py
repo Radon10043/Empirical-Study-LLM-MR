@@ -48,6 +48,10 @@ def load_test_cases() -> list:
     tcs_dir = os.path.join(os.path.dirname(__file__), "..", "testcases")
     tcs = list()
 
+    if not os.path.exists(tcs_dir):
+        print("Oops, no testcases? Please run generate.py first!")
+        exit(1)
+
     # 遍历存储测试用例的根目录, 依次读取文件
     for file in os.listdir(tcs_dir):
         with open(os.path.join(tcs_dir, file), "r") as f:
