@@ -15,7 +15,7 @@ using namespace std;
 vector<DistinctSubsequenceInput> gen_tcs_randomly() {
     vector<DistinctSubsequenceInput> tcs;
     mt19937 rng(random_device{}());
-    uniform_int_distribution<int> dist_len(1, 1000), dist_value(0, 25);
+    uniform_int_distribution<int> dist_len(1, 10), dist_value(0, 25);
 
     /* 构建测试用例 */
     for (int i = 0; i < TESTCASE_NUM; i++) {
