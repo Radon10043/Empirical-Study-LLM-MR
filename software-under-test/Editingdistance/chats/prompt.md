@@ -21,7 +21,7 @@ Please identify the metamorphic relations of this program as much as possible an
 
 ```cpp
 /**
- * @brief Metamorphic relation 1: Add a character to the end of str1, the output should be the same or larger.
+ * @brief Metamorphic relation 1: Add a character to the end of str1 (the character is not exist in str2), the output should be the same or larger.
  *
  */
 TEST_P(EditingdistanceParamTest, MR1) {
@@ -33,7 +33,12 @@ TEST_P(EditingdistanceParamTest, MR1) {
     int source_out = edit_dist(str1, str2);
 
     /* Construct follow-up input */
-    string follow_str1 = str1.append("a");
+    char c = 'a';
+    while (c <= 'z' && str2.find(c) != string::npos)
+        c++;
+    if (c > 'z')
+        return;
+    string follow_str1 = str1 + c;
 
     /* Get follow-up output */
     int follow_out = edit_dist(follow_str1, str2);
