@@ -98,7 +98,7 @@ class TestingClass(unittest.TestCase):
     def test2(self, vals: list):
         """Given that the intruder aircraft does not have the TCAS system, if we change the state that the intruder
         aircraft has an intention or not, the output should not change."""
-        if vals[INDEX["Other_Capability"]] != OTHER_CAPABILITY_VALUES["TCAS_TA"]:
+        if vals[INDEX["Other_Capability"]] != OTHER_CAPABILITY_VALUES["OTHER"]:
             return
 
         # Get source output
@@ -125,7 +125,7 @@ class TestingClass(unittest.TestCase):
         """Metamorphic Relation 3: Given that the intruder aircraft does not have the TCAS system,
         if we change the state that the report describing the presence of any intruder is valid or
         not, the output should not change."""
-        if vals[INDEX["Other_Capability"]] != OTHER_CAPABILITY_VALUES["TCAS_TA"]:
+        if vals[INDEX["Other_Capability"]] != OTHER_CAPABILITY_VALUES["OTHER"]:
             return
 
         # Get source output
