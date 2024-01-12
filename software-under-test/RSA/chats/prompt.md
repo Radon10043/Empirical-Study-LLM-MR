@@ -10,7 +10,7 @@ For the function $sin(x)$, assuming there is an origin input $x1$, the correspon
 
 ## Chat 3
 
-You are an expert on metamorphic testing. Based on the above case, please identify the metamorphic relation of this program: There is a program that implements RSA encryption. Its input is four integers: `m`, `e`, `p`, and `q`. Its output value is a long integer representing the number that RSA encrypts. Please identify the metamorphic relations of this program as much as possible and use Google's C++ testing and mocking framework `googletest` to codify them as C++ code. Here is an example:
+You are an expert on metamorphic testing. Based on the above case, please identify the metamorphic relation of this program: There is a program that implements RSA encryption. Its input are four integers: $m$, $e$, $p$, and $q$. Among them, $p$ and $q$ are two prime number, $e$ is an integer which coprime to $(p-1)*(q-1)$, $m$ is a plaintext to be encrypted. Its output value is a long integer representing the result of $m$ being encrypted by RSA. Please identify the metamorphic relations of this program as much as possible and use Google's C++ testing and mocking framework `googletest` to codify them as C++ code. Here is an example:
 
 ```cpp
 /**
