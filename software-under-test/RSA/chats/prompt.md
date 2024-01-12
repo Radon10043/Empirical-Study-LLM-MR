@@ -20,16 +20,16 @@ You are an expert on metamorphic testing. Based on the above case, please identi
 TEST_P(RSAParamTest, MR1) {
     /* Get source input */
     RSAInput input = GetParam();
-    int source_m = input.m, source_e = input.e, source_p = input.p, source_q = input.q;
+    int m = input.m, e = input.e, p = input.p, q = input.q;
 
     /* Get source output */
-    long long source_out = candp(source_m, source_e, source_p, source_q);
+    long long source_out = candp(m, e, p, q);
 
     /* Construct follow-up input */
-    int follow_m = source_m + source_p * source_q;
+    int follow_m = m + p * q;
 
     /* Get follow-up output */
-    long long follow_out = candp(follow_m, source_e, source_p, source_q);
+    long long follow_out = candp(follow_m, e, p, q);
 
     /* Verification */
     ASSERT_EQ(source_out, follow_out);
