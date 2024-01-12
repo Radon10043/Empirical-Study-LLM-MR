@@ -2,7 +2,7 @@
 Author: Radon
 Date: 2024-01-11 19:31:12
 LastEditors: Radon
-LastEditTime: 2024-01-11 20:23:29
+LastEditTime: 2024-01-12 15:56:50
 Description: 从md文件中提取代码片段
 """
 import argparse, os, marko
@@ -23,7 +23,9 @@ def extract(md_file: str, out_dir: str):
     md_ast = md_instance.parse(md_text)
 
     # 代码文件路径
+    code_file = os.path.basename(md_file)
     code_file = os.path.splitext(md_file)[0] + ".code.txt"
+    code_file = os.path.join(out_dir, code_file)
     f = open(code_file, mode="w", encoding="utf-8")
 
     # 遍历AST, 获取代码片段, 写入文件
@@ -71,7 +73,8 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # 检查命令行参数是否合法
-    check_valid(args)
+    if not check_valid(args):
+        exit(1)
 
     # 遍历所有md文件, 提取代码片段
     for md_file in args.input:
