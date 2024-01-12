@@ -4,9 +4,14 @@ main() {
     # 跑几次测试, 查看测试结果
     echo -e "# Test $2\n"
     for ((i = 1; i <= $3; i++)); do
-        $CUR_DIR/build/test/$1 --gtest_filter=TrueReturn/QuickSortParamTest.$2/* >testcases.output.txt
-        if [ $? -eq 0 ]; then
+        timeout 10 $CUR_DIR/build/test/$1 --gtest_filter=TrueReturn/QuickSortParamTest.$2/* >testcases.output.txt
+        retcode=$?
+
+        if [ $retcode -eq 0 ]; then
             echo -e "$2 Test $i success  "
+        elif [ $retcode -eq 124 ]; then
+            echo -e "$2 Test $i timeout  "
+            break
         else
             echo -e "$2 Test $i failed  "
             break
