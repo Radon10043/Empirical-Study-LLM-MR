@@ -18,8 +18,8 @@ public class testcaseGenerator {
      */
     public static Stream<Arguments> generate(int num) throws IOException {
         int tcs_num = num;
-        int[] range1 = {0, 1001};
-        double[] range2 = {0, 1001};
+        int[] range1 = { 0, 1001 };
+        double[] range2 = { 0, 1001 };
         SecureRandom rand = new SecureRandom();
         Arguments[] tcs = new Arguments[tcs_num];
 
@@ -43,7 +43,11 @@ public class testcaseGenerator {
         for (int i = 0; i < tcs_num; i++) {
             writer.write("Testcase " + String.valueOf(i) + ":\n");
             writer.write("----------------------------------------------------------------\n");
-            writer.write(tcs[i].toString() + "\n");
+            writer.write("airClass   : " + tcs[i].get()[0].toString() + "\n");
+            writer.write("area       : " + tcs[i].get()[1].toString() + "\n");
+            writer.write("isStudent  : " + tcs[i].get()[2].toString() + "\n");
+            writer.write("luggage    : " + tcs[i].get()[3].toString() + "\n");
+            writer.write("economicFee: " + tcs[i].get()[4].toString() + "\n\n");
         }
         writer.close();
 
