@@ -63,13 +63,12 @@ public class ACMSTestExample {
     }
 
     /**
-     * 读取测试用例
+     * 随机生成一定数量的测试用例
      *
      * @return
      * @throws Exception
      */
     public static Stream<Arguments> testcaseProvider() throws Exception {
-        /* 读取存储了测试用例的json文件 */
         return testcaseGenerator.generate(1000);
     }
 }
