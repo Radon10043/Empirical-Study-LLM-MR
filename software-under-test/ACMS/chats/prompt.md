@@ -116,33 +116,7 @@ Please identify the metamorphic relation of this function as much as possible an
 
 ```java
     /**
-     * Metamorphic Relation 1: Changing the isStudent flag from false to true should not increase
-     * the fee and may decrease it in certain scenarios.
-     */
-    @ParameterizedTest
-    @MethodSource("testcaseProvider")
-    public void test1(int airClass, int area, boolean isStudent, double luggage,
-            double economicfee) {
-        if (isStudent)
-            return;
-
-        /* Get source output */
-        AirlinesBaggageBillingService ACMS = new AirlinesBaggageBillingService();
-        double source_out = ACMS.feeCalculation(airClass, area, isStudent, luggage, economicfee);
-
-        /* Construct follow-up input */
-        Boolean follow_isStudent = true;
-
-        /* Get follow-up output */
-        double follow_out =
-                ACMS.feeCalculation(airClass, area, follow_isStudent, luggage, economicfee);
-
-        /* Verification */
-        assertTrue(follow_out <= source_out);
-    }
-
-    /**
-     * Metamorphic Relation 2: If the luggage weight is 0, changing area should not affect the
+     * Metamorphic Relation 1: If the luggage weight is 0, changing area should not affect the
      * luggagefee.
      */
     @ParameterizedTest
@@ -168,7 +142,7 @@ Please identify the metamorphic relation of this function as much as possible an
     }
 
     /**
-     * Metamorphic Relation 3: If isStudent is false, changing the area should not affect the
+     * Metamorphic Relation 2: If isStudent is false, changing the area should not affect the
      * luggage fee.
      */
     @ParameterizedTest
