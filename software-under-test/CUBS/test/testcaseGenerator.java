@@ -40,8 +40,8 @@ public class testcaseGenerator {
             writer.write(String.valueOf(i)
                     + "\n----------------------------------------------------------------\n");
             writer.write("planType: " + tcs[i].get()[0].toString() + "\n");
-            writer.write("planFee : " + tcs[i].get()[1].toString() + "\n\n");
-            writer.write("talkTime: " + tcs[i].get()[2].toString() + "\n\n");
+            writer.write("planFee : " + tcs[i].get()[1].toString() + "\n");
+            writer.write("talkTime: " + tcs[i].get()[2].toString() + "\n");
             writer.write("flow    : " + tcs[i].get()[3].toString() + "\n\n");
         }
         writer.close();
