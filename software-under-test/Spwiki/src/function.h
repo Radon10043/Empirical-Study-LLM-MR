@@ -4,6 +4,7 @@
 #include <iostream>
 #include <vector>
 #include <cstring>
+#include <climits>
 using namespace std;
 
 int* Dijkstra(int matrix[][100],int source,int vertex_num)
@@ -68,7 +69,10 @@ int* Dijkstra(int matrix[][100],int source,int vertex_num)
  */
 int shortest_path(vector<vector<int>> edges, int src, int dst, int n) {
     int matrix[100][100];
-    memset(matrix, 0x3f, sizeof(matrix));
+    for (int i = 0; i < 100; i++)
+        for (int j = 0; j < 100; j++)
+            matrix[i][j] = INT_MAX;
+
     for (auto& edge : edges) {
         matrix[edge[0]][edge[1]] = edge[2];
         matrix[edge[1]][edge[0]] = edge[2];
