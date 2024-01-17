@@ -13,65 +13,50 @@ For the function $sin(x)$, assuming there is an origin input $x1$, the correspon
 You are an expert on metamorphic testing. Based on the above case, please identify the metamorphic relation of this program: There is a function that calculates the determinant of a matrix. The function's name is `determinant` and comes from Michael Thomas Flanagan's Java Scientific Library. If a matrix `m` exists, its determinant value can be calculated by `m.determinant()`. The function's return value is a float number, representing the determinant value of the matrix. Please identify the metamorphic relation of this function as much as possible and output them as java code. Each metamorphic relation should be named test[x], where [x] is the test case number. Here are some examples:
 
 ```java
-package test;
+/**
+ * Metamorphic Relation 1: The determinant of the matrix is equal to the determinant of the
+ * transposed matrix, i.e., det(A)=det(A^T)
+ */
+@ParameterizedTest
+@MethodSource("testcaseProvider")
+public void test1(Matrix m) {
+    /* Get source output */
+    double source_res = m.determinant();
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import java.util.stream.Stream;
-import java.util.Random;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
+    /* Construct follow-up input */
+    Matrix follow_m = m.transpose();
 
-import flanagan.math.Matrix;
+    /* Get follow-up output */
+    double follow_res = follow_m.determinant();
 
-public class Determinant1TestExample {
-    private Random rand = new Random(System.currentTimeMillis());
+    /* Verification */
+    assertEquals(source_res, follow_res, 1e-6);
+}
 
-    /**
-     * Metamorphic Relation 1: The determinant of the matrix is equal to the determinant of the
-     * transposed matrix, i.e., det(A)=det(A^T)
-     */
-    @ParameterizedTest
-    @MethodSource("testcaseProvider")
-    public void test1(Matrix m) {
-        /* Get source output */
-        double source_res = m.determinant();
+/**
+ * Metamorphic Relation 2: The determinant of the matrix multiply a constant equals to the
+ * determinant of the matrix which elements in a row multiply the same constant.
+ */
+@ParameterizedTest
+@MethodSource("testcaseProvider")
+public void test2(Matrix m) {
+    int constant = 3;
 
-        /* Construct follow-up input */
-        Matrix follow_m = m.transpose();
+    /* Get source output */
+    double source_res = constant * m.determinant();
 
-        /* Get follow-up output */
-        double follow_res = follow_m.determinant();
+    /* Construct follow-up input */
+    Matrix follow_m = m.copy();
+    double[][] ref = follow_m.getArrayReference();
+    int k = rand.nextInt(m.getNumberOfRows()); // Select a row randomly
+    for (int i = 0; i < follow_m.getNumberOfColumns(); i++)
+        ref[k][i] *= constant;
 
-        /* Verification */
-        assertEquals(source_res, follow_res, 1e-6);
-    }
+    /* Get follow-up output */
+    double follow_res = follow_m.determinant();
 
-    /**
-     * Metamorphic Relation 2: The determinant of the matrix multiply a constant equals to the
-     * determinant of the matrix which elements in a row multiply the same constant.
-     */
-    @ParameterizedTest
-    @MethodSource("testcaseProvider")
-    public void test2(Matrix m) {
-        int constant = 3;
-
-        /* Get source output */
-        double source_res = constant * m.determinant();
-
-        /* Construct follow-up input */
-        Matrix follow_m = m.copy();
-        double[][] ref = follow_m.getArrayReference();
-        int k = rand.nextInt(m.getNumberOfRows()); // Select a row randomly
-        for (int i = 0; i < follow_m.getNumberOfColumns(); i++)
-            ref[k][i] *= constant;
-
-        /* Get follow-up output */
-        double follow_res = follow_m.determinant();
-
-        /* Verification */
-        assertEquals(source_res, follow_res, 1e-6);
-    }
+    /* Verification */
+    assertEquals(source_res, follow_res, 1e-6);
 }
 ```
 

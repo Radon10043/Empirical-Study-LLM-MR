@@ -1,10 +1,9 @@
 package test;
 
-import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.stream.Stream;
 import java.io.IOException;
-import java.util.Random;
+import java.security.SecureRandom;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -12,7 +11,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import flanagan.math.Matrix;
 
 public class Determinant1TestExample {
-    private Random rand = new Random(System.currentTimeMillis());
+    SecureRandom rand = new SecureRandom();
 
     /**
      * Metamorphic Relation 1: The determinant of the matrix is equal to the determinant of the
