@@ -14,7 +14,7 @@ You are an expert on metamorphic testing. Based on the above case, please identi
 
 ```python
 @parameterized.expand(load_test_cases)
-def test1(self, g1, g2):
+def test1(self, g1: list, g2: list):
     """MR1: Changing the order of the samples, the result should not change."""
     # Get source output
     source_out = f_oneway(g1, g2).pvalue
@@ -27,7 +27,7 @@ def test1(self, g1, g2):
     follow_out = f_oneway(follow_g1, follow_g2).pvalue
 
     # Verification
-    self.assertEqual(source_out, follow_out)
+    self.assertAlmostEqual(source_out, follow_out)
 ```
 
 ## Chat 4...n
