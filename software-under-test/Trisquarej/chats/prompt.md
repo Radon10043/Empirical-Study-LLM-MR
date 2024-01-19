@@ -103,4 +103,4 @@ public void test4(int a, int b, int c) {
 
 ## Chat 4...n
 
-Please identify more different metamorphic relations of this program and codify them as Python code.
+Please identify more different metamorphic relations of this program and codify them as java code.
