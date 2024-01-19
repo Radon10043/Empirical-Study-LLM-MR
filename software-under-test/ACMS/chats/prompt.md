@@ -116,8 +116,8 @@ Please identify the metamorphic relation of this function as much as possible an
 
 ```java
     /**
-     * Metamorphic Relation 1: Changing the isStudent flag from false to true should not increase
-     * the fee and may decrease it in certain scenarios.
+     * Metamorphic Relation 1: Keep other parameters fixed, if the luggage weight is
+     * increased, the luggage fee should be greater
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
@@ -131,18 +131,18 @@ Please identify the metamorphic relation of this function as much as possible an
         double source_out = ACMS.feeCalculation(airClass, area, isStudent, luggage, economicfee);
 
         /* Construct follow-up input */
-        Boolean follow_isStudent = true;
+        double follow_luggage = luggage * 2;
 
         /* Get follow-up output */
-        double follow_out =
-                ACMS.feeCalculation(airClass, area, follow_isStudent, luggage, economicfee);
+        double follow_out = ACMS.feeCalculation(airClass, area, isStudent, follow_luggage, economicfee);
 
         /* Verification */
-        assertTrue(follow_out <= source_out);
+        assertTrue(follow_out >= source_out);
     }
 
     /**
-     * Metamorphic Relation 2: If the luggage weight is 0, changing area should not affect the
+     * Metamorphic Relation 2: If the luggage weight is 0, changing area should not
+     * affect the
      * luggagefee.
      */
     @ParameterizedTest
@@ -160,15 +160,15 @@ Please identify the metamorphic relation of this function as much as possible an
         int follow_area = area + 1;
 
         /* Get follow-up output */
-        double follow_out =
-                ACMS.feeCalculation(airClass, follow_area, isStudent, luggage, economicfee);
+        double follow_out = ACMS.feeCalculation(airClass, follow_area, isStudent, luggage, economicfee);
 
         /* Verification */
         assertEquals(source_out, follow_out, 1e-6);
     }
 
     /**
-     * Metamorphic Relation 3: If isStudent is false, changing the area should not affect the
+     * Metamorphic Relation 3: If isStudent is false, changing the area should not
+     * affect the
      * luggage fee.
      */
     @ParameterizedTest
@@ -186,8 +186,7 @@ Please identify the metamorphic relation of this function as much as possible an
         int follow_area = area + 1;
 
         /* Get follow-up output */
-        double follow_out =
-                ACMS.feeCalculation(airClass, follow_area, isStudent, luggage, economicfee);
+        double follow_out = ACMS.feeCalculation(airClass, follow_area, isStudent, luggage, economicfee);
 
         /* Verification */
         assertEquals(source_out, follow_out, 1e-6);

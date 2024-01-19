@@ -2,7 +2,7 @@
 Author: Radon
 Date: 2023-12-05 10:21:39
 LastEditors: Radon
-LastEditTime: 2024-01-09 11:09:54
+LastEditTime: 2024-01-18 17:49:41
 Description: Hi, say something
 """
 import unittest
@@ -32,23 +32,7 @@ def load_test_cases() -> list:
 
 class TestingClass(unittest.TestCase):
     @parameterized.expand(load_test_cases)
-    def test1(self, g1, g2):
-        """MR1: Changing the order of the samples, the result should not change."""
-        # Get source output
-        source_out = f_oneway(g1, g2).pvalue
-
-        # Construct follow-up input
-        follow_g1 = np.random.permutation(g1)
-        follow_g2 = np.random.permutation(g2)
-
-        # Get follow-up output
-        follow_out = f_oneway(follow_g1, follow_g2).pvalue
-
-        # Verification
-        self.assertAlmostEqual(source_out, follow_out)
-
-    @parameterized.expand(load_test_cases)
-    def test2(self, g1, g2):
+    def test1(self, g1: list, g2: list):
         """MR1: Changing the order of the samples, the result should not change."""
         # Get source output
         source_out = f_oneway(g1, g2).pvalue

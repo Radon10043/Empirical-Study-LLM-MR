@@ -116,4 +116,38 @@ public class ExpenseReimbursementSystem {
 		System.out.println("total reimbursement amount: " + String.valueOf(amount));
 		
 	}	
+
+	/* Writtern by Radon */
+	public double calculateOveruseFee(String stafflevel, double actualmonthlymileage, double monthlysalesamount) {
+		double feeForOverUseOfCar;
+
+		if(stafflevel.equals("seniormanager")){
+
+			allowableMileage = 4000;
+			costPerKilometer = 5;
+			if (actualmonthlymileage < allowableMileage) {
+				actualmonthlymileage = allowableMileage;
+			}
+
+		} else if (stafflevel.equals("manager")) {
+			allowableMileage = 3000;
+			costPerKilometer = 8;
+			if(actualmonthlymileage < allowableMileage){
+				actualmonthlymileage = allowableMileage;
+			}
+		} else if (stafflevel.equals("supervisor")) {
+
+			allowableMileage = 0;
+			costPerKilometer = 0;
+
+		} else {
+
+			new java.io.IOException( "Invalid stafflevel" );
+
+		}
+
+		feeForOverUseOfCar = costPerKilometer*(actualmonthlymileage - allowableMileage);
+
+		return feeForOverUseOfCar;
+	}
 }

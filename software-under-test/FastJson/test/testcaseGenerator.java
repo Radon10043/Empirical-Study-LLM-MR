@@ -48,6 +48,42 @@ public class testcaseGenerator {
         return Stream.of(tcs);
     }
 
+    public static Stream<Arguments> generate_s_arr(int num) throws IOException {
+        int tcs_num = num;
+        int[] range_size = {1, 101};
+        int[] range_len = {1, 101};
+        SecureRandom rand = new SecureRandom();
+        Arguments[] tcs = new Arguments[tcs_num];
+
+        /* 构建测试用例 */
+        for (int i = 0; i < tcs_num; i++) {
+            int size = rand.nextInt(range_size[0], range_size[1]);
+            String json_s = "[";
+            for (int j = 0; j < size; j++) {
+                int len = rand.nextInt(range_len[0], range_len[1]);
+                String val = RandomStringUtils.randomAlphanumeric(len);
+                json_s = json_s + "\"" + val + "\"";
+                if (j < size - 1) {
+                    json_s = json_s + ",";
+                }
+            }
+            json_s += "]";
+            tcs[i] = Arguments.of(json_s);
+        }
+
+        /* 保存到文件, 方便调试 */
+        File file = new File("testcases.s.arr.txt");
+        FileWriter writer = new FileWriter(file);
+        for (int i = 0; i < tcs_num; i++) {
+            writer.write("Testcase " + String.valueOf(i) + "\n");
+            writer.write("------------------------------\n");
+            writer.write(tcs[i].get()[0].toString() + "\n\n");
+        }
+        writer.close();
+
+        return Stream.of(tcs);
+    }
+
     public static Stream<Arguments> generate_hm(int num) throws IOException {
         int tcs_num = num;
         int[] range_size = {1, 101};
