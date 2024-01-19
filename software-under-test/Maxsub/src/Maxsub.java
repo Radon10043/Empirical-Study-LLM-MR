@@ -23,6 +23,9 @@ public class Maxsub {
 	 */
 	public static int max_sub(ArrayList<Integer> arr) {
 		int[] A = new int[arr.size()];
+		for (int i = 0; i < arr.size(); i++) {
+			A[i] = arr.get(i);
+		}
 		int n = arr.size();
 		return maxsub(A, n);
 	}
