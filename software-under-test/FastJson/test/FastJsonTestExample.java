@@ -89,7 +89,6 @@ public class FastJsonTestExample {
     }
 
     static Stream<Arguments> testcaseProvider1() throws IOException {
-        /* Testcase 1 */
         return testcaseGenerator.generate_hm(1000);
     }
 
