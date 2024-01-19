@@ -13,64 +13,49 @@ For the function $sin(x)$, assuming there is an origin input $x1$, the correspon
 You are an expert on metamorphic testing. Based on the above case, please identify the metamorphic relation of this program: There is a function that calculates the determinant of a matrix. The function's name is `det` and comes from JAMA. JAMA is a basic linear algebra package for Java which can be downloaded from [https://math.nist.gov/javanumerics/jama/](https://math.nist.gov/javanumerics/jama/). If a matrix `m` exists, its determinant value can be calculated by `m.det()`. The function's return value is a float number, representing the determinant value of the matrix. Please identify the metamorphic relation of this function as much as possible and output them as java code. Each metamorphic relation should be named test[x], where [x] is the test case number. Here is an example:
 
 ```java
-package test;
+/**
+ * Metamorphic Relation 1: The determinant of the matrix is equal to the determinant of the
+ * transposed matrix, i.e., det(A)=det(A^T)
+ */
+@ParameterizedTest
+@MethodSource("testcaseProvider")
+public void test1(Matrix m) {
+    /* Get source output */
+    double source_out = m.det();
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import java.util.stream.Stream;
-import java.util.Random;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
+    /* Construct follow-up input */
+    Matrix follow_m = m.transpose();
 
-import Jama.Matrix;
+    /* Get follow-up output */
+    double follow_out = follow_m.det();
 
-public class JamaExampleTest {
-    private Random rand = new Random(System.currentTimeMillis());
+    /* Verification */
+    assertEquals(source_out, follow_out, 1e-6);
+}
 
-    /**
-     * Metamorphic Relation 1: The determinant of the matrix is equal to the determinant of the
-     * transposed matrix, i.e., det(A)=det(A^T)
-     */
-    @ParameterizedTest
-    @MethodSource("testcaseProvider")
-    public void test1(Matrix m) {
-        /* Get source output */
-        double source_out = m.det();
+/**
+ * Metamorphic Relation 2: The determinant of the matrix multiply a constant equals to the
+ * determinant of the matrix which elements in a row multiply the same constant.
+ */
+@ParameterizedTest
+@MethodSource("testcaseProvider")
+public void test2(Matrix m) {
+    int constant = 3;
 
-        /* Construct follow-up input */
-        Matrix follow_m = m.transpose();
+    /* Get source output */
+    double source_out = constant * m.det();
 
-        /* Get follow-up output */
-        double follow_out = follow_m.det();
+    /* Construct follow-up input */
+    Matrix follow_m = m.copy();
+    int k = rand.nextInt(m.getRowDimension()); // Select a row randomly
+    for (int i = 0; i < follow_m.getRowDimension(); i++)
+        follow_m.set(k, i, follow_m.get(k, i) * constant);
 
-        /* Verification */
-        assertEquals(source_out, follow_out, 1e-6);
-    }
+    /* Get follow-up output */
+    double follow_out = follow_m.det();
 
-    /**
-     * Metamorphic Relation 2: The determinant of the matrix multiply a constant equals to the
-     * determinant of the matrix which elements in a row multiply the same constant.
-     */
-    @ParameterizedTest
-    @MethodSource("testcaseProvider")
-    public void test2(Matrix m) {
-        int constant = 3;
-
-        /* Get source output */
-        double source_out = constant * m.det();
-
-        /* Construct follow-up input */
-        Matrix follow_m = m.copy();
-        int k = rand.nextInt(m.getRowDimension()); // Select a row randomly
-        for (int i = 0; i < follow_m.getRowDimension(); i++)
-            follow_m.set(k, i, follow_m.get(k, i) * constant);
-
-        /* Get follow-up output */
-        double follow_out = follow_m.det();
-
-        /* Verification */
-        assertEquals(source_out, follow_out, 1e-6);
-    }
+    /* Verification */
+    assertEquals(source_out, follow_out, 1e-6);
 }
 ```
 
