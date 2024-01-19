@@ -2,13 +2,13 @@
 Author: Radon
 Date: 2024-01-09 15:59:19
 LastEditors: Radon
-LastEditTime: 2024-01-09 17:23:08
+LastEditTime: 2024-01-19 15:34:58
 Description: Hi, say something
 """
 import os
 
 from random import randint
-from string import ascii_letters, digits, whitespace
+from string import ascii_letters, digits
 
 
 # fmt:off
@@ -35,7 +35,7 @@ def gen_str_randomly(length: int) -> str:
         _description_
     """
     s = str()
-    candidate = ascii_letters + digits + whitespace
+    candidate = ascii_letters + digits + " \t"
     for _ in range(length):
         s += candidate[randint(0, len(candidate) - 1)]
     return s
@@ -96,7 +96,7 @@ def gen_tcs_randomly():
 
         tc_dir = os.path.join(tcs_dir, "tc" + str(i).zfill(3))
         if not os.path.exists(tc_dir):
-            os.mkdir(os.path.join(tcs_dir, tc_dir))
+            os.mkdir(os.path.join(tc_dir))
 
         # 生成文本文件
         text_path = os.path.join(tc_dir, "text.txt")
