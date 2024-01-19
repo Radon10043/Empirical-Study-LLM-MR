@@ -14,11 +14,11 @@ for ((i=1; i<=$3; i++)); do
         echo "$2.py Test $i failed  "
         exit 1
     fi
-
-    count=$(cat testcases.output.txt | grep "Ran 1000" | wc -l)
-    if [ $count -eq 0 ]; then
-        echo "Oops, maybe something wrong when testing $2.py? Please check it."
-    fi
-
-    echo ""
 done
+
+count=$(cat testcases.output.txt | grep "Ran 1000" | wc -l)
+if [ $count -eq 0 ]; then
+    echo "Oops, maybe something wrong when testing $2.py? Please check it."
+fi
+
+echo ""
