@@ -12,7 +12,7 @@ public class testcaseGenerator {
     public static Stream<Arguments> generate(int num) throws IOException {
         int tcs_num = num;
         int[] range_size = {1, 1001};   // 数组长度, [1, 1001)
-        int[] range_value = {1, 1001};  // 数组元素值, [1, 1001)
+        int[] range_value = {-1001, 1001};  // 数组元素值, [1, 1001)
         SecureRandom rand = new SecureRandom();
         Arguments[] tcs = new Arguments[tcs_num];
 
