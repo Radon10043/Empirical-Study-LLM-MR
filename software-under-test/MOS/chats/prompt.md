@@ -109,6 +109,16 @@ public class MealOrderingSystem {
 
 	}
 }
+
+public class MSR {
+	public int numberOfFirstClassMeals;
+	public int numberOfBusinessClassMeals;
+	public int numberOfEconomicClassMeals;
+	public int numberOfMealsForCrewMembers;
+	public int numberOfMealsForPilots;
+	public int numberOfChildMeals;
+	public int numberOfBundlesOfFlowers;
+}
 ```
 
 Please identify the metamorphic relation of this function as much as possible and output them as java code. Each metamorphic relation should be named test[x], where [x] is the test case number. Here are some examples:
