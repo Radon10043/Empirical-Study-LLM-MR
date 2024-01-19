@@ -48,10 +48,10 @@ public class JodaTestExample {
     }
 
     static Stream<Arguments> testcaseProvider1() throws IOException {
-        return testcaseGenerator.generate(1000);
+        return testcaseGenerator.generate_di(1000);
     }
 
     static Stream<Arguments> testcaseProvider2() throws IOException {
-        return testcaseGenerator.generate(1000);
+        return testcaseGenerator.generate_di(1000);
     }
 }
