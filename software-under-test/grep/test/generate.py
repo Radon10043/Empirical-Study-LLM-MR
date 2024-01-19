@@ -2,10 +2,10 @@
 Author: Radon
 Date: 2024-01-09 15:59:19
 LastEditors: Radon
-LastEditTime: 2024-01-19 15:34:58
+LastEditTime: 2024-01-19 16:26:23
 Description: Hi, say something
 """
-import os
+import os, shutil
 
 from random import randint
 from string import ascii_letters, digits
@@ -87,9 +87,9 @@ def gen_tcs_randomly():
     """
     tcs_dir = os.path.join(os.path.dirname(__file__), "..", "testcases")
 
-    # 创建存储测试用例的文件夹
-    if not os.path.exists(tcs_dir):
-        os.mkdir(tcs_dir)
+    # 删除旧的测试用例, 新创建一个存储测试用例的文件夹
+    shutil.rmtree(tcs_dir, ignore_errors=True)
+    os.mkdir(tcs_dir)
 
     for i in range(TESTCASE_NUM):
         print("Creating testcase " + str(i).zfill(3) + "...", end="\r")
@@ -101,6 +101,39 @@ def gen_tcs_randomly():
         # 生成文本文件
         text_path = os.path.join(tc_dir, "text.txt")
         gen_text_randomly(text_path)
+
+        pattern_path = os.path.join(tc_dir, "pattern.txt")
+        gen_pattern_randomly(pattern_path)
+
+    print(f"{TESTCASE_NUM} testcases are created!")
+
+
+def gen_tcs_randomly_combination():
+    """随机生成测试用例 (combination)
+
+    Returns
+    -------
+    list
+        _description_
+    """
+    tcs_dir = os.path.join(os.path.dirname(__file__), "..", "testcases")
+
+    # 删除旧的测试用例, 新创建一个存储测试用例的文件夹
+    shutil.rmtree(tcs_dir, ignore_errors=True)
+    os.mkdir(tcs_dir)
+
+    for i in range(TESTCASE_NUM):
+        print("Creating testcase " + str(i).zfill(3) + "...", end="\r")
+
+        tc_dir = os.path.join(tcs_dir, "tc" + str(i).zfill(3))
+        if not os.path.exists(tc_dir):
+            os.mkdir(os.path.join(tc_dir))
+
+        # 生成文本文件
+        text1_path = os.path.join(tc_dir, "text1.txt")
+        text2_path = os.path.join(tc_dir, "text2.txt")
+        gen_text_randomly(text1_path)
+        gen_text_randomly(text2_path)
 
         pattern_path = os.path.join(tc_dir, "pattern.txt")
         gen_pattern_randomly(pattern_path)
