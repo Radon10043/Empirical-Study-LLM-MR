@@ -1,13 +1,11 @@
 package test;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.stream.Stream;
 
-import static org.junit.Assert.assertTrue;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -63,7 +61,7 @@ public class MaxRectangleTestExample {
     }
 
     /**
-     * 从文件读取测试用例内容
+     * 随机生成测试用例
      *
      * @return
      * @throws Exception
