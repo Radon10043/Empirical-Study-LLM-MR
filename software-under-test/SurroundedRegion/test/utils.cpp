@@ -11,7 +11,7 @@ vector<SurroundedRegionInput> gen_tcs_randomly() {
     vector<SurroundedRegionInput> tcs;
     vector<char> chars = {'X', 'O'};
     mt19937 rng(random_device{}());
-    uniform_int_distribution<int> dist_size(3, 100);
+    uniform_int_distribution<int> dist_size(1, 100);
     uniform_int_distribution<int> dist_char(0, chars.size() - 1);
 
     /* 构建测试用例 */
