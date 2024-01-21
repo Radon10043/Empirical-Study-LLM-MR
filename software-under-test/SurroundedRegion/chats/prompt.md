@@ -61,6 +61,30 @@ TEST_P(SurroundedRegionParamTest, MR2) {
     for (auto& row : source_out) row.push_back('O');
     EXPECT_EQ(follow_out, source_out);
 }
+
+/**
+ * @brief Metamorphic Relation 3: Reversing the order of rows in the matrix, if the order of rows in output also be reversed, the output should be unchanged.
+ *
+ */
+TEST_P(SurroundedRegionParamTest, MR3) {
+    /* Get source input */
+    SurroundedRegionInput input = GetParam();
+    vector<string> source_vec = input.vec;
+
+    /* Get source output */
+    vector<string> source_out = surrounded_region(source_vec);
+
+    /* Construct follow-up input */
+    vector<string> follow_vec = source_vec;
+    reverse(follow_vec.begin(), follow_vec.end());
+
+    /* Get follow-up output */
+    vector<string> follow_out = surrounded_region(follow_vec);
+
+    /* Verification */
+    reverse(follow_out.begin(), follow_out.end());
+    EXPECT_EQ(follow_out, source_out);
+}
 ```
 
 ## Chat 4...n
