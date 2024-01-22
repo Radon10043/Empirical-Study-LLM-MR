@@ -27,7 +27,7 @@ def load_test_cases() -> list:
 
 class TestingClass(unittest.TestCase):
     @parameterized.expand(load_test_cases)
-    def test1(self, graph: csr_matrix, src: int, dst: int, method: str):
+    def test1(self, graph: list, src: int, dst: int, method: str):
         """Metamorphic Relation 1: Given the same graph, the same source and destination vertices,
         but with different algorithms, the output should be the same."""
         # Get source output
@@ -45,7 +45,7 @@ class TestingClass(unittest.TestCase):
         self.assertEqual(source_out, follow_out)
 
     @parameterized.expand(load_test_cases)
-    def test2(self, graph: csr_matrix, src: int, dst: int, method: str):
+    def test2(self, graph: list, src: int, dst: int, method: str):
         """Metamorphic Relation 2: Given the same graph, the same source and destination vertices,
         but weights scaled 2 times, the output should also be scaled 2 times."""
         # Get source output

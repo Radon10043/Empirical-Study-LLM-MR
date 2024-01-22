@@ -14,7 +14,7 @@ You are an expert on metamorphic testing. Based on the above case, please identi
 
 ```python
 @parameterized.expand(load_test_cases)
-def test1(self, graph: csr_matrix, src: int, dst: int, method: str):
+def test1(self, graph: list, src: int, dst: int, method: str):
     """Metamorphic Relation 1: Given the same graph, the same source and destination vertices,
     but with different algorithms, the output should be the same."""
     # Get source output
@@ -32,7 +32,7 @@ def test1(self, graph: csr_matrix, src: int, dst: int, method: str):
     self.assertEqual(source_out, follow_out)
 
 @parameterized.expand(load_test_cases)
-def test2(self, graph: csr_matrix, src: int, dst: int, method: str):
+def test2(self, graph: list, src: int, dst: int, method: str):
     """Metamorphic Relation 2: Given the same graph, the same source and destination vertices,
     but weights scaled 2 times, the output should also be scaled 2 times."""
     # Get source output
