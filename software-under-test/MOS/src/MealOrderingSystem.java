@@ -137,4 +137,68 @@ public static void main(String args[]){
 		System.out.println("Number of child meals : " + String.valueOf(order.numberOfChildMeals + "\n"));
 		System.out.println("Number of bundles of flowers : " + String.valueOf(order.numberOfBundlesOfFlowers + "\n"));
 	}
+
+	public int getNumberOfRequestedBundlesOfFlowers() {
+		return numberOfRequestedBundlesOfFlowers;
+	}
+
+	public void setNumberOfRequestedBundlesOfFlowers(int numberOfRequestedBundlesOfFlowers) {
+		this.numberOfRequestedBundlesOfFlowers = numberOfRequestedBundlesOfFlowers;
+	}
+
+	public int getNumberOfChildPassengers() {
+		return numberOfChildPassengers;
+	}
+
+	public void setNumberOfChildPassengers(int numberOfChildPassengers) {
+		this.numberOfChildPassengers = numberOfChildPassengers;
+	}
+
+	public int getNumberOfFirstClassSeats() {
+		return numberOfFirstClassSeats;
+	}
+
+	public void setNumberOfFirstClassSeats(int numberOfFirstClassSeats) {
+		this.numberOfFirstClassSeats = numberOfFirstClassSeats;
+	}
+
+	public int getNumberOfBusinessClassSeats() {
+		return numberOfBusinessClassSeats;
+	}
+
+	public void setNumberOfBusinessClassSeats(int numberOfBusinessClassSeats) {
+		this.numberOfBusinessClassSeats = numberOfBusinessClassSeats;
+	}
+
+	public int getNumberOfEconomicClassSeats() {
+		return numberOfEconomicClassSeats;
+	}
+
+	public void setNumberOfEconomicClassSeats(int numberOfEconomicClassSeats) {
+		this.numberOfEconomicClassSeats = numberOfEconomicClassSeats;
+	}
+
+	public int getNumberOfCrewMembers() {
+		return numberOfCrewMembers;
+	}
+
+	public void setNumberOfCrewMembers(int numberOfCrewMembers) {
+		this.numberOfCrewMembers = numberOfCrewMembers;
+	}
+
+	public int getNumberOfPilots() {
+		return numberOfPilots;
+	}
+
+	public void setNumberOfPilots(int numberOfPilots) {
+		this.numberOfPilots = numberOfPilots;
+	}
+
+	public MSR getMsr() {
+		return msr;
+	}
+
+	public void setMsr(MSR msr) {
+		this.msr = msr;
+	}
 }
