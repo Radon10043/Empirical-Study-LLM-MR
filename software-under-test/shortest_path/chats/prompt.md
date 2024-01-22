@@ -30,8 +30,25 @@ def test1(self, graph: csr_matrix, src: int, dst: int, method: str):
 
     # Verification
     self.assertEqual(source_out, follow_out)
+
+@parameterized.expand(load_test_cases)
+def test2(self, graph: csr_matrix, src: int, dst: int, method: str):
+    """Metamorphic Relation 2: Given the same graph, the same source and destination vertices,
+    but weights scaled 2 times, the output should also be scaled 2 times."""
+    # Get source output
+    source_out = shortest_path(graph, method=method)[src][dst]
+
+    follow_graph = list()
+    for row in graph:
+        follow_graph.append([x * 2 for x in row])
+
+    # Get folllow-up output
+    follow_out = shortest_path(follow_graph, method)[src][dst]
+
+    # Verification
+    self.assertEqual(source_out * 2, follow_out)
 ```
 
 ## Chat 4...n
 
-Please identify more different metamorphic relations of this program and codify them as java code.
+Please identify more different metamorphic relations of this program and codify them as Python code.
