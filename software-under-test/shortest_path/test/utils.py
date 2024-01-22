@@ -1,5 +1,7 @@
+import numpy as np
+
 from random import randint, choice
-from time import time
+from copy import deepcopy
 
 # fmt:off
 # ========== GLOBAL VARIABLES =========
