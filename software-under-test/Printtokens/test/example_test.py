@@ -42,7 +42,7 @@ class TestingClass(unittest.TestCase):
 
     @parameterized.expand(load_test_cases)
     def test1(self, tc: str):
-        """Metamorphic Relation 1: Adding a new line that only includes a comma, the follow-up output's rows equals the source output's rows plus one."""
+        """Metamorphic Relation 1: Adding a new line that only includes a comma, the number of follow-up output's rows equals the number of source output's rows plus one."""
         # Get source output
         source_out = subprocess.check_output(PRINT_TOKENS_PATH, input=tc, text=True).split("\n")
 
