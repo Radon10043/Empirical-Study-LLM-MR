@@ -2,7 +2,7 @@
 Author: Radon
 Date: 2024-01-10 21:23:15
 LastEditors: Radon
-LastEditTime: 2024-01-10 21:45:10
+LastEditTime: 2024-01-24 19:50:01
 Description: Hi, say something
 """
 import os
@@ -29,7 +29,7 @@ def gen_tcs_randomly():
         os.mkdir(tcs_dir)
 
     for i in range(TETSCASE_NUM):
-        print("\rGenerating testcase {i}", end="")
+        print(f"\rGenerating testcase {i}", end="")
         Cur_Vertical_Sep = randint(*RANGE_VALUE)
         High_Confidence = randint(*RANGE_VALUE)
         Two_of_Three_Reports_Valid = randint(*RANGE_VALUE)
