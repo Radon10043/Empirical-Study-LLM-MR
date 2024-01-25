@@ -18,8 +18,8 @@ public class testcaseGenerator {
      */
     public static Stream<Arguments> generate(int num) throws IOException {
         int tcs_num = num;
-        int[] range_size = { 1, 5 }; // 矩阵大小的范围, [1, 11)
-        int[] range_value = { 1, 5 }; // 矩阵元素的范围, [1, 6)
+        int[] range_size = { 1, 5 }; // 矩阵大小的范围, [1, 5)
+        int[] range_value = { 1, 5 }; // 矩阵元素的范围, [1, 5)
         SecureRandom rand = new SecureRandom();
         Arguments[] tcs = new Arguments[tcs_num];
 
