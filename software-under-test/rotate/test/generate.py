@@ -3,7 +3,7 @@ import numpy as np
 
 # fmt:off
 # ========== GLOBAL VARIABLES =========
-TESTCASE_NUM = 10     # 测试用例的数量
+TESTCASE_NUM = 1000     # 测试用例的数量
 IMAGE_HEIGHT = 256      # 图像高度
 IMAGE_WIDTH = 256       # 图像宽度
 RANGE_ANGLE = (-360, 360)   # 旋转角度的范围
