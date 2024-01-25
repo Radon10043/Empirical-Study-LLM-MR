@@ -13,7 +13,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.Assert.assertEquals;
 
-public class LucenceEampleTest {
+public class LucenceExampleTest {
     private static String full_text_root; /* 存储了要检索的全文的根目录 */
 
     /**
@@ -22,7 +22,7 @@ public class LucenceEampleTest {
      * @param full_text_root
      */
     public static void setFullTextRoot(String full_text_root) {
-        LucenceEampleTest.full_text_root = full_text_root;
+        LucenceExampleTest.full_text_root = full_text_root;
     }
 
     /**
