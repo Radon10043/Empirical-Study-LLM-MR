@@ -60,6 +60,6 @@ public class Determinant1TestExample {
     }
 
     static Stream<Arguments> testcaseProvider() throws IOException {
-        return testcaseGenerator.generate(10);
+        return testcaseGenerator.generate_m(1000);
     }
 }
