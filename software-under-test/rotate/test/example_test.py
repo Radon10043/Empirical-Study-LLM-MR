@@ -2,7 +2,7 @@
 Author: Radon
 Date: 2023-12-20 21:42:37
 LastEditors: Radon
-LastEditTime: 2024-01-24 21:46:07
+LastEditTime: 2023-12-21 09:58:50
 Description: Hi, say something
 """
 import unittest
@@ -10,8 +10,8 @@ import unittest
 import numpy as np
 
 from parameterized import parameterized
-from scipy import ndimage
-from generate import *
+from scipy import ndimage, datasets
+
 
 def load_test_cases() -> list:
     """加载测试用例
@@ -25,7 +25,7 @@ def load_test_cases() -> list:
     -----
     _description_
     """
-    return gen_tcs_randomly()
+    return [(datasets.ascent(), 45), (datasets.face(), 60)]
 
 
 class TestingClass(unittest.TestCase):
@@ -33,13 +33,13 @@ class TestingClass(unittest.TestCase):
     def test1(self, img: np.array, angle: float):
         """Metamorphic Relation 1: Rotating the same image by N degree and N+360 degree will output the same result."""
         # Get source output
-        source_out = ndimage.rotate(img, angle, reshape=False)
+        source_out = ndimage.rotate(img, angle)
 
         # Construct follow-up input
         follow_angle = angle + 360
 
         # Get follow-up output
-        follow_out = ndimage.rotate(img, follow_angle, reshape=False)
+        follow_out = ndimage.rotate(img, follow_angle)
 
         # Verification
         self.assertTrue(np.any(follow_out - source_out) == 0)
