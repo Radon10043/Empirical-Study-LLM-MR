@@ -8,6 +8,8 @@ import java.util.stream.Stream;
 
 import org.junit.jupiter.params.provider.Arguments;
 
+import flanagan.complex.Complex;
+import flanagan.complex.ComplexMatrix;
 import flanagan.math.Matrix;
 
 public class testcaseGenerator {
@@ -89,6 +91,49 @@ public class testcaseGenerator {
             for (int r = 0; r < size; r++) {
                 for (int c = 0; c < size; c++) {
                     writer.write(String.valueOf((int) m.getElement(r, c)) + ",");
+                }
+                writer.write("\n");
+            }
+            writer.write("\n");
+        }
+        writer.close();
+
+        return Stream.of(tcs);
+    }
+
+    public static Stream<Arguments> generate_cm(int num) throws IOException {
+        int tcs_num = num;
+        int[] range_size = { 1, 5 }; // 矩阵大小的范围, [1, 11)
+        int[] range_value = { 1, 5 }; // 矩阵元素的范围, [0, 5)
+        SecureRandom rand = new SecureRandom();
+        Arguments[] tcs = new Arguments[tcs_num];
+
+        /* 随机生成方阵 */
+        for (int i = 0; i < tcs_num; i++) {
+            int size = rand.nextInt(range_size[0], range_size[1]);
+            ComplexMatrix m = new ComplexMatrix(size, size);
+            for (int r = 0; r < size; r++) {
+                for (int c = 0; c < size; c++) {
+                    Complex val = new Complex(rand.nextInt(range_value[0], range_value[1]),
+                            rand.nextInt(range_value[0], range_value[1]));
+                    m.setElement(r, c, val);
+                }
+            }
+            tcs[i] = Arguments.of(m);
+        }
+
+        /* 将生成的测试用例保存到文件, 方便调试 */
+        File file = new File("testcases.txt");
+        FileWriter writer = new FileWriter(file);
+        for (int i = 0; i < tcs_num; i++) {
+            ComplexMatrix m = (ComplexMatrix) tcs[i].get()[0];
+            int size = m.getNrow();
+            writer.write("Testcase " + String.valueOf(i) + ":\n");
+            writer.write("----------------------------------------------------------------\n");
+            for (int r = 0; r < size; r++) {
+                for (int c = 0; c < size; c++) {
+                    Complex val = m.getElementCopy(r, c);
+                    writer.write(String.valueOf("(" + val.getReal() + "," + val.getImag() + ")" + ","));
                 }
                 writer.write("\n");
             }

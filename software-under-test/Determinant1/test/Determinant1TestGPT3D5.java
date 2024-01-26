@@ -10,6 +10,10 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.stream.Stream;
 
+import org.apache.commons.math3.linear.Array2DRowRealMatrix;
+import org.apache.commons.math3.linear.EigenDecomposition;
+import org.apache.commons.math3.linear.RealMatrix;
+import org.apache.commons.math3.linear.SingularValueDecomposition;
 import org.junit.Assume;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -25,8 +29,7 @@ import flanagan.math.Matrix;
 
 public class Determinant1TestGPT3D5 {
     /**
-     * Metamorphic Relation 3: The determinant of the inverse of the matrix is the
-     * reciprocal of the
+     * Metamorphic Relation 3: The determinant of the inverse of the matrix is the reciprocal of the
      * determinant of the original matrix, i.e., det(A^-1) = 1 / det(A)
      */
     @ParameterizedTest
@@ -46,10 +49,8 @@ public class Determinant1TestGPT3D5 {
     }
 
     /**
-     * Metamorphic Relation 4: The determinant of the sum of two matrices is less
-     * than or equal to
-     * the sum of the determinants of the individual matrices, i.e., det(A + B) <=
-     * det(A) + det(B)
+     * Metamorphic Relation 4: The determinant of the sum of two matrices is less than or equal to
+     * the sum of the determinants of the individual matrices, i.e., det(A + B) <= det(A) + det(B)
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider2")
@@ -71,10 +72,8 @@ public class Determinant1TestGPT3D5 {
     }
 
     /**
-     * Metamorphic Relation 5: The determinant of the product of two matrices is
-     * equal to the
-     * product of the determinants of the individual matrices, i.e., det(AB) =
-     * det(A) * det(B)
+     * Metamorphic Relation 5: The determinant of the product of two matrices is equal to the
+     * product of the determinants of the individual matrices, i.e., det(AB) = det(A) * det(B)
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider2")
@@ -95,10 +94,8 @@ public class Determinant1TestGPT3D5 {
     }
 
     /**
-     * Metamorphic Relation 6: The determinant of a triangular matrix is equal to
-     * the product of its
-     * diagonal elements, i.e., det(A) = a11 * a22 * ... * ann for an upper or lower
-     * triangular
+     * Metamorphic Relation 6: The determinant of a triangular matrix is equal to the product of its
+     * diagonal elements, i.e., det(A) = a11 * a22 * ... * ann for an upper or lower triangular
      * matrix A
      */
     @ParameterizedTest
@@ -132,8 +129,7 @@ public class Determinant1TestGPT3D5 {
     }
 
     /**
-     * Metamorphic Relation 7: The determinant of the identity matrix is equal to 1,
-     * i.e., det(I) =
+     * Metamorphic Relation 7: The determinant of the identity matrix is equal to 1, i.e., det(I) =
      * 1
      */
     @ParameterizedTest
@@ -155,8 +151,7 @@ public class Determinant1TestGPT3D5 {
     }
 
     /**
-     * Metamorphic Relation 8: The determinant of a matrix and its transpose matrix
-     * are equal, i.e.,
+     * Metamorphic Relation 8: The determinant of a matrix and its transpose matrix are equal, i.e.,
      * det(A) = det(A^T)
      */
     @ParameterizedTest
@@ -178,8 +173,7 @@ public class Determinant1TestGPT3D5 {
     }
 
     /**
-     * Metamorphic Relation 9: The determinant of the sum of a matrix and its
-     * inverse is greater
+     * Metamorphic Relation 9: The determinant of the sum of a matrix and its inverse is greater
      * than or equal to zero, i.e., det(A + A^-1) >= 0
      */
     @ParameterizedTest
@@ -228,8 +222,8 @@ public class Determinant1TestGPT3D5 {
     }
 
     /**
-     * Metamorphic Relation 10: Swapping two rows of a matrix changes the sign of
-     * the determinant, i.e., det(PA) = -det(A) where P is a permutation matrix
+     * Metamorphic Relation 10: Swapping two rows of a matrix changes the sign of the determinant,
+     * i.e., det(PA) = -det(A) where P is a permutation matrix
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider1")
@@ -250,8 +244,7 @@ public class Determinant1TestGPT3D5 {
     }
 
     /**
-     * Metamorphic Relation 11: The determinant of the sum of two identical matrices
-     * is equal to
+     * Metamorphic Relation 11: The determinant of the sum of two identical matrices is equal to
      * twice the determinant of the original matrix, i.e., det(A + A) = 2 * det(A)
      */
     @ParameterizedTest
@@ -271,8 +264,7 @@ public class Determinant1TestGPT3D5 {
     }
 
     /**
-     * Metamorphic Relation 12: The determinant of a matrix and its negative matrix
-     * have opposite
+     * Metamorphic Relation 12: The determinant of a matrix and its negative matrix have opposite
      * signs, i.e., det(-A) = (-1)^n * det(A) where n is the order of the matrix
      */
     @ParameterizedTest
@@ -294,10 +286,8 @@ public class Determinant1TestGPT3D5 {
     }
 
     /**
-     * Metamorphic Relation 13: Scaling all elements in a matrix by a constant
-     * scales the
-     * determinant by the same constant raised to the power of the matrix order,
-     * i.e., det(kA) = k^n
+     * Metamorphic Relation 13: Scaling all elements in a matrix by a constant scales the
+     * determinant by the same constant raised to the power of the matrix order, i.e., det(kA) = k^n
      * det(A) where n is the order of the matrix
      */
     @ParameterizedTest
@@ -321,9 +311,8 @@ public class Determinant1TestGPT3D5 {
     }
 
     /**
-     * Metamorphic Relation 14: The determinant of a diagonal matrix is the product
-     * of its diagonal elements, i.e., det(A) = a11 * a22 * ... * ann for a diagonal
-     * matrix A
+     * Metamorphic Relation 14: The determinant of a diagonal matrix is the product of its diagonal
+     * elements, i.e., det(A) = a11 * a22 * ... * ann for a diagonal matrix A
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider1")
@@ -356,8 +345,8 @@ public class Determinant1TestGPT3D5 {
     }
 
     /**
-     * Metamorphic Relation 15: Permuting rows in a matrix changes the sign of the
-     * determinant, i.e., det(PA) = -det(A) where P is a permutation matrix
+     * Metamorphic Relation 15: Permuting rows in a matrix changes the sign of the determinant,
+     * i.e., det(PA) = -det(A) where P is a permutation matrix
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider1")
@@ -384,8 +373,8 @@ public class Determinant1TestGPT3D5 {
     }
 
     /**
-     * Metamorphic Relation 16: The determinant of a matrix is not affected by
-     * scaling any row or column by a non-zero constant.
+     * Metamorphic Relation 16: The determinant of a matrix is not affected by scaling any row or
+     * column by a non-zero constant.
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider1")
@@ -454,8 +443,8 @@ public class Determinant1TestGPT3D5 {
     }
 
     /**
-     * Metamorphic Relation 17: The determinant of a matrix and its adjoint matrix
-     * have a specific mathematical relation, i.e., det(A) = det(adjoint(A))
+     * Metamorphic Relation 17: The determinant of a matrix and its adjoint matrix have a specific
+     * mathematical relation, i.e., det(A) = det(adjoint(A))
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider1")
@@ -499,9 +488,9 @@ public class Determinant1TestGPT3D5 {
     }
 
     /**
-     * Metamorphic Relation 18: For a square matrix A, the determinant of A and its
-     * cofactor matrix have a specific mathematical relation, i.e., det(A) = sum of
-     * products of A and its cofactor matrix
+     * Metamorphic Relation 18: For a square matrix A, the determinant of A and its cofactor matrix
+     * have a specific mathematical relation, i.e., det(A) = sum of products of A and its cofactor
+     * matrix
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider1")
@@ -522,9 +511,9 @@ public class Determinant1TestGPT3D5 {
     }
 
     /**
-     * Metamorphic Relation 19: If matrix B is obtained by interchanging two rows or
-     * columns of matrix A, then det(B) equals det(A) multiplied by -1 raised to the
-     * power of the number of interchanges
+     * Metamorphic Relation 19: If matrix B is obtained by interchanging two rows or columns of
+     * matrix A, then det(B) equals det(A) multiplied by -1 raised to the power of the number of
+     * interchanges
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider1")
@@ -550,45 +539,43 @@ public class Determinant1TestGPT3D5 {
         double follow_res = follow_m.determinant();
 
         /* Calculate the expected follow-up output using the mathematical relation */
-        double expected_follow_res = Math.pow(-1, Math.abs(row1 - row2)) *
-                source_res;
+        double expected_follow_res = Math.pow(-1, Math.abs(row1 - row2)) * source_res;
 
         /* Verification */
         assertEquals(expected_follow_res, follow_res, 1e-6);
     }
 
     /**
-     * Metamorphic Relation 20: The determinant of a block matrix is related to
-     * the determinants of its submatrices according to specific mathematical rules
+     * Metamorphic Relation 20: The determinant of a block matrix is related to the determinants of
+     * its submatrices according to specific mathematical rules
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider1")
     public void test20(Matrix m) {
-        assumeThat(m.getNumberOfRows(), is(4)); // Assuming a block matrix of size 4x4 for this example
+        assumeThat(m.getNumberOfRows(), is(4)); // Assuming a block matrix of size 4x4 for this
+                                                // example
         assumeThat(m.getNumberOfColumns(), is(4));
 
         /* Split the matrix into submatrices. Fix by Radon */
-        Matrix A = m.getSubMatrix(new int[] { 0, 1 }, new int[] { 0, 1 }); // Top-left submatrix
-        Matrix B = m.getSubMatrix(new int[] { 0, 1 }, new int[] { 2, 3 }); // Top-right submatrix
-        Matrix C = m.getSubMatrix(new int[] { 2, 3 }, new int[] { 0, 1 }); // Bottom-left submatrix
-        Matrix D = m.getSubMatrix(new int[] { 2, 3 }, new int[] { 2, 3 }); // Bottom-right submatrix
+        Matrix A = m.getSubMatrix(new int[] {0, 1}, new int[] {0, 1}); // Top-left submatrix
+        Matrix B = m.getSubMatrix(new int[] {0, 1}, new int[] {2, 3}); // Top-right submatrix
+        Matrix C = m.getSubMatrix(new int[] {2, 3}, new int[] {0, 1}); // Bottom-left submatrix
+        Matrix D = m.getSubMatrix(new int[] {2, 3}, new int[] {2, 3}); // Bottom-right submatrix
 
         /* Get source output */
         double source_res = m.determinant();
 
         /* Calculate follow-up output using the mathematical relation */
         // Assuming the block matrix is partitioned as [[A, B], [C, D]]
-        double follow_res = A.determinant() * D.determinant() - B.determinant() *
-                C.determinant();
+        double follow_res = A.determinant() * D.determinant() - B.determinant() * C.determinant();
 
         /* Verification */
         assertEquals(source_res, follow_res, 1e-6);
     }
 
     /**
-     * Metamorphic Relation 21: The determinant of an upper triangular matrix is the
-     * product of its diagonal elements, i.e., det(A) = a11 * a22 * ... * ann for an
-     * upper triangular matrix A
+     * Metamorphic Relation 21: The determinant of an upper triangular matrix is the product of its
+     * diagonal elements, i.e., det(A) = a11 * a22 * ... * ann for an upper triangular matrix A
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider1")
@@ -614,9 +601,8 @@ public class Determinant1TestGPT3D5 {
     }
 
     /**
-     * Metamorphic Relation 22: The determinant of a lower triangular matrix is the
-     * product of its diagonal elements, i.e., det(A) = a11 * a22 * ... * ann for a
-     * lower triangular matrix A
+     * Metamorphic Relation 22: The determinant of a lower triangular matrix is the product of its
+     * diagonal elements, i.e., det(A) = a11 * a22 * ... * ann for a lower triangular matrix A
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider1")
@@ -671,32 +657,29 @@ public class Determinant1TestGPT3D5 {
     }
 
     /**
-     * Metamorphic Relation 23: The determinant of a matrix is equal to the
-     * determinant of its conjugate transpose, i.e., det(A) = det(A*) where A* is
-     * the conjugate transpose of A
+     * Metamorphic Relation 23: The determinant of a matrix is equal to the determinant of its
+     * conjugate transpose, i.e., det(A) = det(A*) where A* is the conjugate transpose of A
      */
     @ParameterizedTest
-    @MethodSource("testcaseProvider1")
-    public void test23(Matrix m) {
-        // TODO
-        // assumeThat(m.isSquare(), is(true));
+    @MethodSource("testcaseProvider3")
+    public void test23(ComplexMatrix m) {
+        /* Fix by Radon */
+        /* Get source output */
+        Complex source_res = m.determinant();
 
-        // /* Get source output */
-        // double source_res = m.determinant();
+        /* Construct follow-up input */
+        ComplexMatrix follow_m = m.conjugate().transpose();
 
-        // /* Construct follow-up input */
-        // ComplexMatrix follow_m = conjugateTranspose(m);
+        /* Get follow-up output */
+        Complex follow_res = follow_m.determinant();
 
-        // /* Get follow-up output */
-        // double follow_res = follow_m.determinant();
-
-        // /* Verification */
-        // assertEquals(source_res, follow_res, 1e-6);
+        /* Verification */
+        assertTrue(source_res.equals(follow_res));
     }
 
     /**
-     * Metamorphic Relation 24: The determinant of a matrix and its symmetric part
-     * have a specific mathematical relation, i.e., det(A) = det((A + A^T) / 2)
+     * Metamorphic Relation 24: The determinant of a matrix and its symmetric part have a specific
+     * mathematical relation, i.e., det(A) = det((A + A^T) / 2)
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider1")
@@ -716,84 +699,75 @@ public class Determinant1TestGPT3D5 {
         assertEquals(source_res, follow_res, 1e-6);
     }
 
-    public static ComplexMatrix calculateHermitianTranspose(Matrix input) {
-        double[][] matrix = input.getArrayCopy();
-
-        // Convert the real matrix to a complex matrix
-        Complex[][] complexData = new Complex[matrix.length][matrix[0].length];
-        for (int i = 0; i < matrix.length; i++) {
-            for (int j = 0; j < matrix[i].length; j++) {
-                complexData[i][j] = new Complex(matrix[i][j], 0.0);
+    /**
+     * Calculate the Hermitian transpose of a complex matrix
+     *
+     * @param matrix
+     * @return
+     */
+    public static ComplexMatrix genHermitianMatrix(ComplexMatrix matrix) {
+        ComplexMatrix hermitianMatrix = new ComplexMatrix(matrix.getNrow(), matrix.getNcol());
+        for (int i = 0; i < matrix.getNrow(); i++) {
+            for (int j = 0; j <= i; j++) {
+                Complex element = matrix.getElementCopy(i, j);
+                hermitianMatrix.setElement(i, j, element);
+                hermitianMatrix.setElement(j, i, element.conjugate());
             }
         }
-
-        // Create a ComplexMatrix object
-        ComplexMatrix complexMatrix = new ComplexMatrix(complexData);
-
-        // Transpose the matrix
-        ComplexMatrix transposedMatrix = complexMatrix.transpose();
-
-        // Conjugate the transposed matrix
-        ComplexMatrix hermitianMatrix = transposedMatrix.conjugate();
-
         return hermitianMatrix;
     }
 
     /**
-     * Metamorphic Relation 25: The determinant of a matrix and the determinant of
-     * its Hermitian part have a specific mathematical relation, i.e., det(A) =
-     * det((A + A^H) / 2)
+     * Metamorphic Relation 25: The determinant of a matrix and the determinant of its Hermitian
+     * part have a specific mathematical relation, i.e., det(A) = det((A + A^H) / 2)
      */
     @ParameterizedTest
-    @MethodSource("testcaseProvider1")
-    public void test25(Matrix m) {
-        // TODO
-        // assumeThat(m.isSquare(), is(true));
+    @MethodSource("testcaseProvider3")
+    public void test25(ComplexMatrix m) {
+        /* Fix by Radon */
 
-        // /* Get source output */
-        // double source_res = m.determinant();
+        /* Get source output */
+        Complex source_res = m.determinant();
 
-        // /* Construct follow-up input */
-        // Matrix follow_m = m.plus(m.hermitianTranspose()).times(0.5); // Hermitian
-        // part of the matrix
+        /* Construct follow-up input */
+        ComplexMatrix follow_m = m.plus(genHermitianMatrix(m).transpose()).times(0.5); // Hermitian
+                                                                                       // part of
+                                                                                       // the matrix
 
-        // /* Get follow-up output */
-        // double follow_res = follow_m.determinant();
+        /* Get follow-up output */
+        Complex follow_res = follow_m.determinant();
 
-        // /* Verification */
-        // assertEquals(source_res, follow_res, 1e-6);
+        /* Verification */
+        assertTrue(source_res.equals(follow_res));
     }
 
     /**
-     * Metamorphic Relation 26: The determinant of a matrix and the determinant of
-     * its skew-Hermitian part have a specific mathematical relation, i.e., det(A) =
-     * i^n det((A - A^H) / 2)
+     * Metamorphic Relation 26: The determinant of a matrix and the determinant of its
+     * skew-Hermitian part have a specific mathematical relation, i.e., det(A) = i^n det((A - A^H) /
+     * 2)
      */
     @ParameterizedTest
-    @MethodSource("testcaseProvider1")
-    public void test26(Matrix m) {
-        // TODO
-        // assumeThat(m.isSquare(), is(true));
+    @MethodSource("testcaseProvider3")
+    public void test26(ComplexMatrix m) {
+        /* Fix by Radon */
 
-        // /* Get source output */
-        // double source_res = m.determinant();
+        /* Get source output */
+        Complex source_res = m.determinant();
 
-        // /* Construct follow-up input */
-        // Matrix follow_m = m.minus(m.hermitianTranspose()).times(0.5); //
-        // Skew-Hermitian part of the matrix
+        /* Construct follow-up input, Skew-Hermitian part of the matrix */
+        ComplexMatrix follow_m = m.minus(genHermitianMatrix(m).transpose()).times(0.5);
 
-        // /* Get follow-up output */
-        // double follow_res = Math.pow(Math.sqrt(-1), m.getNumberOfRows()) *
-        // follow_m.determinant();
+        /* Get follow-up output */
+        Complex comp = new Complex(0, 1);
+        Complex follow_res = follow_m.determinant().times(comp.pow(m.getNrow()));
 
-        // /* Verification */
-        // assertEquals(source_res, follow_res, 1e-6);
+        /* Verification */
+        assertTrue(source_res.equals(follow_res));
     }
 
     /**
-     * Metamorphic Relation 27: The determinant of a matrix and the determinant of
-     * its inverse transpose have a specific mathematical relation, i.e., det(A) = 1
-     * / det(A^T)^{-1}
+     * Metamorphic Relation 27: The determinant of a matrix and the determinant of its inverse
+     * transpose have a specific mathematical relation, i.e., det(A) = 1 / det(A^T)^{-1}
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider1")
@@ -815,86 +789,86 @@ public class Determinant1TestGPT3D5 {
     }
 
     /**
-     * Metamorphic Relation 28: The determinant of a unitary matrix has a specific
-     * mathematical
+     * Metamorphic Relation 28: The determinant of a unitary matrix has a specific mathematical
      * relation, i.e., |det(A)| = 1 for a unitary matrix A
      */
     @ParameterizedTest
-    @MethodSource("testcaseProvider1")
-    public void test28(Matrix m) {
-        // TODO
-        // assumeThat(m.isSquare(), is(true));
-        // assumeThat(m.times(m.hermitianTranspose()),
-        // is(closeTo(Matrix.identityMatrix(m.getNumberOfRows()), 1e-6))); // Ensure
-        // matrix is unitary
+    @MethodSource("testcaseProvider3")
+    public void test28(ComplexMatrix m) {
+        ComplexMatrix cm = m.times(genHermitianMatrix(m)).transpose(); // Ensure matrix is unitary
+        if (!cm.equals(ComplexMatrix.identityMatrix(m.getNrow())))
+            return;
 
-        // /* Get source output */
-        // double source_res = m.determinant();
+        /* Get source output */
+        Complex source_res = m.determinant();
 
-        // /* Get the absolute value of the determinant */
-        // double abs_source_res = Math.abs(source_res);
+        System.out.println(source_res.abs() - 1.0);
 
-        // /* Verification */
-        // assertTrue(abs_source_res, closeTo(1.0, 1e-6));
+        /* Verification */
+        assertEquals(source_res.abs(), 1.0, 1e-6);
     }
 
     /**
-     * Metamorphic Relation 29: The determinant of a matrix and the determinant of
-     * its singular value decomposition (SVD) have a specific mathematical relation,
-     * i.e., det(A) = product of singular values of A
+     * Metamorphic Relation 29: The determinant of a matrix and the determinant of its singular
+     * value decomposition (SVD) have a specific mathematical relation, i.e., det(A) = product of
+     * singular values of A
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider1")
     public void test29(Matrix m) {
-        // TODO
-        // assumeThat(m.isSquare(), is(true));
-        // SingularValueDecomposition svd = m.singularValueDecomposition();
+        /* Fix */
+        assumeThat(m.isSquare(), is(true));
 
-        // /* Get source output */
-        // double source_res = m.determinant();
+        RealMatrix rm = new Array2DRowRealMatrix(m.getArrayCopy());
+        SingularValueDecomposition svd = new SingularValueDecomposition(rm);
 
-        // /* Construct follow-up output using the singular values from the SVD */
-        // double follow_res = 1.0;
-        // for (double singularValue : svd.getSingularValues()) {
-        // follow_res *= singularValue;
-        // }
+        /* Get source output */
+        double source_res = m.determinant();
 
-        // /* Verification */
-        // assertEquals(source_res, follow_res, 1e-6);
+        /* Construct follow-up output using the singular values from the SVD */
+        double follow_res = 1.0;
+        for (double singularValue : svd.getSingularValues()) {
+            follow_res *= singularValue;
+        }
+
+        /* Verification */
+        assertEquals(source_res, follow_res, 1e-6);
     }
 
     /**
-     * Metamorphic Relation 30: The determinant of a positive definite matrix is
-     * always positive, i.e., det(A) > 0 for a positive definite matrix A
+     * Metamorphic Relation 30: The determinant of a positive definite matrix is always positive,
+     * i.e., det(A) > 0 for a positive definite matrix A
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider1")
     public void test30(Matrix m) {
-        // assumeThat(m.isSquare(), is(true));
-        // assumeThat(m.isSymmetric(), is(true));
-        // EigenvalueDecomposition evd = m.eigenvalueDecomposition();
+        /* Fix */
+        assumeThat(m.isSquare(), is(true));
+        assumeThat(m.isSymmetric(), is(true));
 
-        // /* Get source output */
-        // double source_res = m.determinant();
+        RealMatrix rm = new Array2DRowRealMatrix(m.getArrayCopy());
+        EigenDecomposition ed = new EigenDecomposition(rm);
 
-        // /*
-        // * Construct follow-up output by extracting the eigenvalues from the
-        // * Eigenvalue Decomposition
-        // */
-        // double follow_res = 1.0;
-        // for (double eigenvalue : evd.getRealEigenvalues()) {
-        // follow_res *= eigenvalue;
-        // }
+        /* Get source output */
+        double source_res = m.determinant();
 
-        // /* Verification */
-        // assertTrue(follow_res > 0);
-        // assertEquals(source_res > 0, follow_res > 0);
+        /*
+         * Construct follow-up output by extracting the eigenvalues from the Eigenvalue
+         * Decomposition
+         */
+        double follow_res = 1.0;
+        for (double eigenvalue : ed.getRealEigenvalues()) {
+            follow_res *= eigenvalue;
+        }
+
+        /* Verification */
+        assertTrue(follow_res > 0);
+        assertEquals(source_res > 0, follow_res > 0);
     }
 
     /**
-     * Metamorphic Relation 31: The determinant of a square matrix and its trace
-     * raised to the power of the matrix order have a specific mathematical
-     * relation, i.e., det(A) = trace(A)^n
+     * Metamorphic Relation 31: The determinant of a square matrix and its trace raised to the power
+     * of the matrix order have a specific mathematical relation, i.e., det(A) = trace(A)^n
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider1")
@@ -913,34 +887,36 @@ public class Determinant1TestGPT3D5 {
     }
 
     /**
-     * Metamorphic Relation 32: The determinant of a matrix and the determinant of
-     * its Jordan normal form have a specific mathematical relation, i.e., det(A) =
-     * det(J) where J is the Jordan normal form of A
+     * Metamorphic Relation 32: The determinant of a matrix and the determinant of its Jordan normal
+     * form have a specific mathematical relation, i.e., det(A) = det(J) where J is the Jordan
+     * normal form of A
      */
     @ParameterizedTest
-    @MethodSource("testcaseProvider")
+    @MethodSource("testcaseProvider1")
     public void test32(Matrix m) {
-        // assumeThat(m.isSquare(), is(true));
+        /* Fix */
+        assumeThat(m.isSquare(), is(true));
 
-        // /* Get source output */
-        // double source_res = m.determinant();
+        /* Get source output */
+        double source_res = m.determinant();
 
-        // /* Construct follow-up input */
-        // EigenvalueDecomposition evd = m.eigenvalueDecomposition();
-        // Matrix jordanMatrix =
-        // evd.getV().times(evd.getD()).times(evd.getV().inverse());
+        /* Construct follow-up input */
+        RealMatrix rm = new Array2DRowRealMatrix(m.getArrayCopy());
+        EigenDecomposition ed = new EigenDecomposition(rm);
+        RealMatrix tmp = ed.getV().multiply(ed.getD()).multiply(ed.getV());
+        Matrix mat = new Matrix(tmp.getData());
+        Matrix jordanMatrix = mat.inverse();
 
-        // /* Get follow-up output */
-        // double follow_res = jordanMatrix.determinant();
+        /* Get follow-up output */
+        double follow_res = jordanMatrix.determinant();
 
-        // /* Verification */
-        // assertEquals(source_res, follow_res, 1e-6);
+        /* Verification */
+        assertEquals(source_res, follow_res, 1e-6);
     }
 
     /**
-     * Metamorphic Relation 33: The determinant of a matrix and the determinant of
-     * its exponential have a specific mathematical relation, i.e., det(A) =
-     * exp(trace(A))
+     * Metamorphic Relation 33: The determinant of a matrix and the determinant of its exponential
+     * have a specific mathematical relation, i.e., det(A) = exp(trace(A))
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider1")
@@ -959,33 +935,49 @@ public class Determinant1TestGPT3D5 {
     }
 
     /**
-     * Metamorphic Relation 34: The determinant of a matrix and the determinant of
-     * its adjugate have a specific mathematical relation, i.e., det(A) =
-     * det(Adj(A))
+     * Calculate the adjugate of a matrix
+     * 
+     * @param matrix
+     * @return
      */
-    @ParameterizedTest
-    @MethodSource("testcaseProvider")
-    public void test34(Matrix m) {
-        // TODO
-        // assumeThat(m.isSquare(), is(true));
+    public Matrix genAdjugate(Matrix matrix) {
+        int size = matrix.getNrow();
 
-        // /* Get source output */
-        // double source_res = m.determinant();
+        double[][] adjugateMatrix = new double[size][size];
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
+                adjugateMatrix[j][i] = getCofactor(matrix, i, j);
+            }
+        }
 
-        // /* Construct follow-up input */
-        // Matrix follow_m = m.adjugate();
-
-        // /* Get follow-up output */
-        // double follow_res = follow_m.determinant();
-
-        // /* Verification */
-        // assertEquals(source_res, follow_res, 1e-6);
+        return new Matrix(adjugateMatrix);
     }
 
     /**
-     * Metamorphic Relation 35: The determinant of a matrix and the determinant of
-     * its inverse
-     * have a specific mathematical relation, i.e., det(A) * det(A^-1) = 1
+     * Metamorphic Relation 34: The determinant of a matrix and the determinant of its adjugate have
+     * a specific mathematical relation, i.e., det(A) = det(Adj(A))
+     */
+    @ParameterizedTest
+    @MethodSource("testcaseProvider1")
+    public void test34(Matrix m) {
+        assumeThat(m.isSquare(), is(true));
+
+        /* Get source output */
+        double source_res = m.determinant();
+
+        /* Construct follow-up input */
+        Matrix follow_m = genAdjugate(m);
+
+        /* Get follow-up output */
+        double follow_res = follow_m.determinant();
+
+        /* Verification */
+        assertEquals(source_res, follow_res, 1e-6);
+    }
+
+    /**
+     * Metamorphic Relation 35: The determinant of a matrix and the determinant of its inverse have
+     * a specific mathematical relation, i.e., det(A) * det(A^-1) = 1
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider1")
@@ -1010,33 +1002,31 @@ public class Determinant1TestGPT3D5 {
     }
 
     /**
-     * Metamorphic Relation 36: The determinant of a matrix and the determinant of
-     * its Hermitian conjugate have a specific mathematical relation, i.e., det(A) =
-     * det(A^H)
+     * Metamorphic Relation 36: The determinant of a matrix and the determinant of its Hermitian
+     * conjugate have a specific mathematical relation, i.e., det(A) = det(A^H)
      */
     @ParameterizedTest
-    @MethodSource("testcaseProvider")
-    public void test36(Matrix m) {
-        // TODO
-        // assumeThat(m.isSquare(), is(true));
+    @MethodSource("testcaseProvider3")
+    public void test36(ComplexMatrix m) {
+        /* Fix */
 
-        // /* Get source output */
-        // double source_res = m.determinant();
+        /* Get source output */
+        Complex source_res = m.determinant();
 
-        // /* Construct follow-up input */
-        // Matrix follow_m = m.hermitianTranspose();
+        /* Construct follow-up input */
+        ComplexMatrix follow_m = genHermitianMatrix(m).transpose();
 
-        // /* Get follow-up output */
-        // double follow_res = follow_m.determinant();
+        /* Get follow-up output */
+        Complex follow_res = follow_m.determinant();
 
-        // /* Verification */
-        // assertEquals(source_res, follow_res, 1e-6);
+        /* Verification */
+        assertTrue(source_res.equals(follow_res));
     }
 
     /**
-     * Metamorphic Relation 37: The determinant of a matrix and the determinant of
-     * its orthogonal projection have a specific mathematical relation, i.e., det(A)
-     * = det(P), where P is the orthogonal projection matrix of A
+     * Metamorphic Relation 37: The determinant of a matrix and the determinant of its orthogonal
+     * projection have a specific mathematical relation, i.e., det(A) = det(P), where P is the
+     * orthogonal projection matrix of A
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider1")
@@ -1057,10 +1047,10 @@ public class Determinant1TestGPT3D5 {
     }
 
     /**
-     * Metamorphic Relation 38: The determinant of a matrix and the determinant of
-     * its principal submatrix have a specific mathematical relation, i.e., det(A) =
-     * det(Ai) * det(Aii), where Ai is the ith principal submatrix of A, and
-     * det(Aii) is the additional element of A used to form Ai
+     * Metamorphic Relation 38: The determinant of a matrix and the determinant of its principal
+     * submatrix have a specific mathematical relation, i.e., det(A) = det(Ai) * det(Aii), where Ai
+     * is the ith principal submatrix of A, and det(Aii) is the additional element of A used to form
+     * Ai
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider1")
@@ -1075,9 +1065,12 @@ public class Determinant1TestGPT3D5 {
         double source_res = m.determinant();
 
         /* Construct follow-up input */
-        Matrix follow_m = m.getSubMatrix(0, n - 2, 0, n - 2); // Get the principal submatrix excluding the last row and
-                                                              // column
-        double additionalElement = m.getElement(n - 1, n - 1); // Additional element for the last row and column
+
+        // Get the principal submatrix excluding the last row and column
+        Matrix follow_m = m.getSubMatrix(0, n - 2, 0, n - 2);
+
+        // Additional element for the last row and column
+        double additionalElement = m.getElement(n - 1, n - 1);
 
         /* Get follow-up output */
         double follow_res = follow_m.determinant() * additionalElement;
@@ -1087,10 +1080,8 @@ public class Determinant1TestGPT3D5 {
     }
 
     /**
-     * Metamorphic Relation 39: The determinant of a matrix and the determinant of
-     * its permutation
-     * have a specific mathematical relation, i.e., det(A) = det(PA), where P is a
-     * permutation
+     * Metamorphic Relation 39: The determinant of a matrix and the determinant of its permutation
+     * have a specific mathematical relation, i.e., det(A) = det(PA), where P is a permutation
      * matrix
      */
     @ParameterizedTest
@@ -1112,41 +1103,44 @@ public class Determinant1TestGPT3D5 {
     }
 
     /**
-     * Metamorphic Relation 40: The determinant of a column-wise concatenated matrix
-     * and the determinant of its constituent matrices have a specific mathematical
-     * relation, i.e., det(A) = det([A1 A2 ... An]), where [A1 A2 ... An] denotes
-     * the column-wise concatenation of matrices A1, A2, ..., An
+     * Metamorphic Relation 40: The determinant of a column-wise concatenated matrix and the
+     * determinant of its constituent matrices have a specific mathematical relation, i.e., det(A) =
+     * det([A1 A2 ... An]), where [A1 A2 ... An] denotes the column-wise concatenation of matrices
+     * A1, A2, ..., An
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider1")
     public void test40(Matrix m) {
-        // TODO
-        // assumeThat(m.isSquare(), is(true));
+        // Fix
+        assumeThat(m.isSquare(), is(true));
 
-        // int n = m.getNumberOfColumns();
-        // if (n < 2)
-        // return; // Ensure at least two columns for concatenation
+        int n = m.getNumberOfColumns();
+        if (n < 2)
+            return; // Ensure at least two columns for concatenation
 
-        // /* Get source output */
-        // double source_res = m.determinant();
+        /* Get source output */
+        double source_res = m.determinant();
 
-        // /* Split the matrix into individual constituent matrices */
-        // Matrix[] matrices = m.splitColumns();
+        /* Split the matrix into individual constituent matrices */
+        double[][] tmp = new double[m.getNumberOfRows()][];
+        for (int i = 0; i < m.getNumberOfColumns(); i++) {
+            double[] col = m.getColumnCopy(i);
+            tmp[i] = col;
+        }
 
-        // /* Concatenate the constituent matrices */
-        // Matrix concatenatedMatrix = Matrix.constructWithCopy(matrices);
+        /* Concatenate the constituent matrices */
+        Matrix concatenatedMatrix = new Matrix(tmp).transpose();
 
-        // /* Get follow-up output */
-        // double follow_res = concatenatedMatrix.determinant();
+        /* Get follow-up output */
+        double follow_res = concatenatedMatrix.determinant();
 
-        // /* Verification */
-        // assertEquals(source_res, follow_res, 1e-6);
+        /* Verification */
+        assertEquals(source_res, follow_res, 1e-6);
     }
 
     /**
-     * Metamorphic Relation 41: The determinant of a matrix and the determinant of
-     * its truncated diagonal matrix have a specific relation, i.e., det(A) =
-     * det(A_{1:k, 1:k})
+     * Metamorphic Relation 41: The determinant of a matrix and the determinant of its truncated
+     * diagonal matrix have a specific relation, i.e., det(A) = det(A_{1:k, 1:k})
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider1")
@@ -1167,33 +1161,36 @@ public class Determinant1TestGPT3D5 {
     }
 
     /**
-     * Metamorphic Relation 42: The determinant of a block diagonal matrix and the
-     * determinant of
-     * its block matrices have a specific relation, i.e., det(A) is the product of
-     * the determinants
+     * Metamorphic Relation 42: The determinant of a block diagonal matrix and the determinant of
+     * its block matrices have a specific relation, i.e., det(A) is the product of the determinants
      * of the block matrices
      */
     @ParameterizedTest
-    @MethodSource("testcaseProvider")
+    @MethodSource("testcaseProvider1")
     public void test42(Matrix m) {
-        // assumeThat(m.isSquare(), is(true));
-        // if (m.getNumberOfColumns() < 2)
-        //     return; // Ensure at least two blocks for block diagonal
+        /* Fix, just for 4x4 matrix */
+        assumeThat(m.isSquare(), is(true));
+        if (m.getNumberOfColumns() != 4)
+            return; // Ensure at least two blocks for block diagonal
 
-        // /* Get block matrices along the diagonal */
-        // Matrix[] blocks = m.splitBlockDiagonal();
+        /* Get block matrices along the diagonal */
+        Matrix[] blocks = new Matrix[4];
+        blocks[0] = m.getSubMatrix(new int[] {0, 1}, new int[] {0, 1});
+        blocks[1] = m.getSubMatrix(new int[] {0, 1}, new int[] {2, 3});
+        blocks[2] = m.getSubMatrix(new int[] {2, 3}, new int[] {0, 1});
+        blocks[3] = m.getSubMatrix(new int[] {2, 3}, new int[] {2, 3});
 
-        // /* Get source output */
-        // double source_res = m.determinant();
+        /* Get source output */
+        double source_res = m.determinant();
 
-        // /* Calculate the product of the determinants of the block matrices */
-        // double follow_res = 1.0;
-        // for (Matrix block : blocks) {
-        //     follow_res *= block.determinant();
-        // }
+        /* Calculate the product of the determinants of the block matrices */
+        double follow_res = 1.0;
+        for (Matrix block : blocks) {
+            follow_res *= block.determinant();
+        }
 
-        // /* Verification */
-        // assertEquals(source_res, follow_res, 1e-6);
+        /* Verification */
+        assertEquals(source_res, follow_res, 1e-6);
     }
 
     static Stream<Arguments> testcaseProvider1() throws IOException {
@@ -1202,5 +1199,9 @@ public class Determinant1TestGPT3D5 {
 
     static Stream<Arguments> testcaseProvider2() throws IOException {
         return testcaseGenerator.generate_mm(1000);
+    }
+
+    static Stream<Arguments> testcaseProvider3() throws IOException {
+        return testcaseGenerator.generate_cm(1000);
     }
 }
