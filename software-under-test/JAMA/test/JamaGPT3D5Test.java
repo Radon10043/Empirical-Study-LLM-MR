@@ -3,17 +3,23 @@ package test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
+
 import java.io.IOException;
 import java.util.stream.Stream;
+
+import org.apache.commons.math3.linear.Array2DRowRealMatrix;
+import org.apache.commons.math3.linear.RealMatrix;
 
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+
 import Jama.CholeskyDecomposition;
 import Jama.EigenvalueDecomposition;
 import Jama.LUDecomposition;
 import Jama.Matrix;
 import Jama.QRDecomposition;
+import Jama.SingularValueDecomposition;
 
 public class JamaGPT3D5Test {
 
@@ -51,7 +57,7 @@ public class JamaGPT3D5Test {
 
         /* Construct follow-up input. Fix by Radon */
         Matrix follow_m = Matrix.identity(m.getRowDimension(), m.getColumnDimension()); // Create an
-                                                                                // identity matrix
+        // identity matrix
 
         /* Get follow-up output */
         double follow_out = follow_m.det();
@@ -167,27 +173,45 @@ public class JamaGPT3D5Test {
     }
 
     /**
+     * Calculate conjugate transpose matrix
+     *
+     * @param matrix
+     * @return
+     */
+    public static Matrix conjugateTranspose(Matrix matrix) {
+        Matrix conjTranspose = matrix.transpose();
+        for (int i = 0; i < conjTranspose.getRowDimension(); i++) {
+            for (int j = 0; j < conjTranspose.getColumnDimension(); j++) {
+                double real = conjTranspose.get(i, j);
+                // Assuming the imaginary part is 0 for this example, as JAMA handles real matrices.
+                double imaginary = 0;
+                conjTranspose.set(i, j, real - imaginary); // Set the complex conjugate
+            }
+        }
+        return conjTranspose;
+    }
+
+    /**
      * Metamorphic Relation 10: The determinant of a matrix and its conjugate transpose are related
      * by det(A^H) = det(conj(A)), where A^H represents the conjugate transpose of A and conj(A)
      * represents the element-wise complex conjugate of A.
      */
     @ParameterizedTest
-    @MethodSource("testcaseProvider")
+    @MethodSource("testcaseProvider1")
     public void test10(Matrix m) {
-        // TODO
-        // assumeTrue(m.getColumnDimension() == m.getRowDimension()); // Ensure the matrix is square
+        assumeTrue(m.getColumnDimension() == m.getRowDimension()); // Ensure the matrix is square
 
-        // /* Get source output */
-        // double source_out = m.det();
+        /* Get source output */
+        double source_out = m.det();
 
-        // /* Construct follow-up input (Get the conjugate matrix) */
-        // Matrix follow_m = m.arrayConjugate();
+        /* Construct follow-up input (Get the conjugate matrix) */
+        Matrix follow_m = conjugateTranspose(m);
 
-        // /* Get follow-up output */
-        // double follow_out = follow_m.det();
+        /* Get follow-up output */
+        double follow_out = follow_m.det();
 
-        // /* Verification */
-        // assertEquals(source_out, follow_out, 1e-6);
+        /* Verification */
+        assertEquals(source_out, follow_out, 1e-6);
     }
 
     /**
@@ -224,26 +248,76 @@ public class JamaGPT3D5Test {
     }
 
     /**
+     * Swap rows
+     * 
+     * @param matrix
+     * @param row1
+     * @param row2
+     */
+    public static void swapRows(Matrix matrix, int row1, int row2) {
+        int cols = matrix.getColumnDimension();
+        for (int i = 0; i < cols; i++) {
+            double temp = matrix.get(row1, i);
+            matrix.set(row1, i, matrix.get(row2, i));
+            matrix.set(row2, i, temp);
+        }
+    }
+
+    /**
+     *
+     * @param matrix
+     * @return
+     */
+    public static Matrix toRowEchelonForm(Matrix matrix) {
+        Matrix rowEchelon = matrix.copy();
+        int rows = rowEchelon.getRowDimension();
+        int cols = rowEchelon.getColumnDimension();
+
+        for (int p = 0; p < Math.min(rows, cols); p++) {
+            int max = p;
+            for (int i = p + 1; i < rows; i++) {
+                if (Math.abs(rowEchelon.get(i, p)) > Math.abs(rowEchelon.get(max, p))) {
+                    max = i;
+                }
+            }
+
+            swapRows(rowEchelon, p, max);
+
+            if (rowEchelon.get(p, p) == 0) {
+                continue;
+            }
+
+            for (int i = p + 1; i < rows; i++) {
+                double alpha = rowEchelon.get(i, p) / rowEchelon.get(p, p);
+                for (int j = p; j < cols; j++) {
+                    rowEchelon.set(i, j, rowEchelon.get(i, j) - alpha * rowEchelon.get(p, j));
+                }
+            }
+        }
+
+        return rowEchelon;
+    }
+
+    /**
      * Metamorphic Relation 12: The determinant of a matrix and its row echelon form are related by
      * det(A) = det(R), where R is the row echelon form of A.
      */
     @ParameterizedTest
-    @MethodSource("testcaseProvider")
+    @MethodSource("testcaseProvider1")
     public void test12(Matrix m) {
-        // TODO
-        // assumeTrue(m.getColumnDimension() == m.getRowDimension()); // Ensure the matrix is square
+        assumeTrue(m.getColumnDimension() == m.getRowDimension()); // Ensure the matrix is square
 
-        // /* Get source output */
-        // double source_out = m.det();
+        /* Get source output */
+        double source_out = m.det();
 
-        // /* Construct follow-up input (Get the row echelon form of the matrix) */
-        // Matrix follow_m = m.ech();
+        /* Construct follow-up input (Get the row echelon form of the matrix) */
+        Matrix follow_m = toRowEchelonForm(m);
 
-        // /* Get follow-up output */
-        // double follow_out = follow_m.det();
+        /* Get follow-up output */
+        double follow_out = follow_m.det();
 
-        // /* Verification */
-        // assertEquals(source_out, follow_out, 1e-6);
+        /* Verification */
+        assertEquals(source_out, follow_out, 1e-6);
     }
 
     /**
@@ -268,21 +342,20 @@ public class JamaGPT3D5Test {
      * elements d1, d2, ..., dn.
      */
     @ParameterizedTest
-    @MethodSource("testcaseProvider")
+    @MethodSource("testcaseProvider1")
     public void test14(Matrix m) {
-        // TODO
-        // assumeTrue(m.getColumnDimension() == m.getRowDimension()); // Ensure the matrix is square
-        // assumeTrue(m.rank() == m.getRowDimension()); // Ensure the matrix is full rank
+        /* Fix */
+        assumeTrue(m.getColumnDimension() == m.getRowDimension()); // Ensure the matrix is square
+        assumeTrue(m.rank() == m.getRowDimension()); // Ensure the matrix is full rank
 
-        // /* Construct follow-up input (Get the diagonal matrix) */
-        // double[] diag = m.getDiagonal();
-        // double follow_out = 1.0;
-        // for (double d : diag) {
-        //     follow_out *= d;
-        // }
+        /* Construct follow-up input (Get the diagonal matrix) */
+        double follow_out = 1.0;
+        for (int i = 0; i < m.getRowDimension(); i++) {
+            follow_out *= m.get(i, i);
+        }
 
-        // /* Verification */
-        // assertEquals(m.det(), follow_out, 1e-6);
+        /* Verification */
+        assertEquals(m.det(), follow_out, 1e-6);
     }
 
     /**
@@ -360,25 +433,24 @@ public class JamaGPT3D5Test {
      * related by det(A) = λ1 * λ2 * ... * λn where λ1, λ2, ..., λn are the eigenvalues of A.
      */
     @ParameterizedTest
-    @MethodSource("testcaseProvider")
+    @MethodSource("testcaseProvider1")
     public void test18(Matrix m) {
-        // TODO
-        // assumeTrue(m.getColumnDimension() == m.getRowDimension()); // Ensure the matrix is square
+        assumeTrue(m.getColumnDimension() == m.getRowDimension()); // Ensure the matrix is square
 
-        // EigenvalueDecomposition eigenDecomposition = new EigenvalueDecomposition(m);
-        // Complex[] eigenvalues = eigenDecomposition.getRealEigenvalues();
+        EigenvalueDecomposition eigenDecomposition = new EigenvalueDecomposition(m);
+        double[] eigenvalues = eigenDecomposition.getRealEigenvalues();
 
-        // /* Get source output */
-        // double source_out = m.det();
+        /* Get source output */
+        double source_out = m.det();
 
-        // /* Calculate product of eigenvalues */
-        // double follow_out = 1.0;
-        // for (Complex eigenvalue : eigenvalues) {
-        //     follow_out *= eigenvalue.getReal();
-        // }
+        /* Calculate product of eigenvalues */
+        double follow_out = 1.0;
+        for (double eigenvalue : eigenvalues) {
+            follow_out *= eigenvalue;
+        }
 
-        // /* Verification */
-        // assertEquals(source_out, follow_out, 1e-6);
+        /* Verification */
+        assertEquals(source_out, follow_out, 1e-6);
     }
 
     /**
@@ -410,7 +482,6 @@ public class JamaGPT3D5Test {
     @ParameterizedTest
     @MethodSource("testcaseProvider")
     public void test20(Matrix m) {
-        // TODO
         // assumeTrue(m.getColumnDimension() == m.getRowDimension()); // Ensure the matrix is square
 
         // /* Get source output */
@@ -456,7 +527,6 @@ public class JamaGPT3D5Test {
     @ParameterizedTest
     @MethodSource("testcaseProvider")
     public void test22(Matrix m) {
-        // TODO
         // assumeTrue(m.getColumnDimension() == m.getRowDimension()); // Ensure the matrix is square
 
         // /* Get source output */
@@ -506,21 +576,21 @@ public class JamaGPT3D5Test {
     @ParameterizedTest
     @MethodSource("testcaseProvider1")
     public void test24(Matrix m) {
-        // TODO
-        // SVD svd = new SVD(m);
-        // double[] singularValues = svd.getSingularValues();
+        /* Fix */
+        SingularValueDecomposition svd = new SingularValueDecomposition(m);
+        double[] singularValues = svd.getSingularValues();
 
-        // /* Get source output */
-        // double source_out = m.det();
+        /* Get source output */
+        double source_out = m.det();
 
-        // /* Calculate product of singular values */
-        // double follow_out = 1.0;
-        // for (double sv : singularValues) {
-        //     follow_out *= sv;
-        // }
+        /* Calculate product of singular values */
+        double follow_out = 1.0;
+        for (double sv : singularValues) {
+            follow_out *= sv;
+        }
 
-        // /* Verification */
-        // assertEquals(source_out, follow_out, 1e-6);
+        /* Verification */
+        assertEquals(source_out, follow_out, 1e-6);
     }
 
     /**
@@ -626,21 +696,21 @@ public class JamaGPT3D5Test {
     @ParameterizedTest
     @MethodSource("testcaseProvider1")
     public void test29(Matrix m) {
-        // assumeTrue(m.getColumnDimension() == m.getRowDimension()); // Ensure the matrix is square
-        // assumeTrue(m.det() > 0); // Ensure the matrix is positive definite
+        /* Fix */
+        assumeTrue(m.getColumnDimension() == m.getRowDimension()); // Ensure the matrix is square
+        assumeTrue(m.det() > 0); // Ensure the matrix is positive definite
 
-        // PivotedCholeskyDecomposition pivotedCholeskyDecomposition =
-        //         new PivotedCholeskyDecomposition(m);
-        // Matrix L = pivotedCholeskyDecomposition.getL();
+        CholeskyDecomposition cd = new CholeskyDecomposition(m);
+        Matrix L = cd.getL();
 
-        // // Get source output
-        // double source_out = m.det();
+        // Get source output
+        double source_out = m.det();
 
-        // // Calculate determinant of pivoted Cholesky decomposition
-        // double follow_out = L.det() * L.transpose().det();
+        // Calculate determinant of pivoted Cholesky decomposition
+        double follow_out = L.det() * L.transpose().det();
 
-        // // Verification
-        // assertEquals(source_out, follow_out, 1e-6);
+        // Verification
+        assertEquals(source_out, follow_out, 1e-6);
     }
 
     /**
@@ -695,20 +765,20 @@ public class JamaGPT3D5Test {
     @ParameterizedTest
     @MethodSource("testcaseProvider1")
     public void test32(Matrix m) {
-        // EigenvalueDecomposition eigenDecomposition = new EigenvalueDecomposition(m);
-        // Complex[] eigenvalues = eigenDecomposition.getComplexEigenvalues();
+        EigenvalueDecomposition eigenDecomposition = new EigenvalueDecomposition(m);
+        double[] eigenvalues = eigenDecomposition.getRealEigenvalues();
 
-        // // Get source output
-        // double source_out = m.det();
+        // Get source output
+        double source_out = m.det();
 
-        // // Calculate product of eigenvalues
-        // double follow_out = 1.0;
-        // for (Complex eigenvalue : eigenvalues) {
-        //     follow_out *= eigenvalue.abs();
-        // }
+        // Calculate product of eigenvalues
+        double follow_out = 1.0;
+        for (double eigenvalue : eigenvalues) {
+            follow_out *= eigenvalue;
+        }
 
-        // // Verification
-        // assertEquals(source_out, follow_out, 1e-6);
+        // Verification
+        assertEquals(source_out, follow_out, 1e-6);
     }
 
     /**
@@ -718,20 +788,20 @@ public class JamaGPT3D5Test {
     @ParameterizedTest
     @MethodSource("testcaseProvider1")
     public void test33(Matrix m) {
-        // SVD svd = new SVD(m);
-        // double[] singularValues = svd.getSingularValues();
+        SingularValueDecomposition svd = new SingularValueDecomposition(m);
+        double[] singularValues = svd.getSingularValues();
 
-        // // Get source output
-        // double source_out = m.det();
+        // Get source output
+        double source_out = m.det();
 
-        // // Calculate product of singular values
-        // double follow_out = 1.0;
-        // for (double sv : singularValues) {
-        //     follow_out *= sv;
-        // }
+        // Calculate product of singular values
+        double follow_out = 1.0;
+        for (double sv : singularValues) {
+            follow_out *= sv;
+        }
 
-        // // Verification
-        // assertEquals(source_out, follow_out, 1e-6);
+        // Verification
+        assertEquals(source_out, follow_out, 1e-6);
     }
 
     /**
@@ -741,7 +811,8 @@ public class JamaGPT3D5Test {
     @ParameterizedTest
     @MethodSource("testcaseProvider1")
     public void test34(Matrix m) {
-        assumeTrue(m.det() != 0); // Ensure the matrix is invertible
+        /* Fix */
+        assumeTrue(Math.abs(m.det()) > 1e-6); // Ensure the matrix is invertible
 
         // Get source output
         double source_out = m.det();
@@ -755,23 +826,70 @@ public class JamaGPT3D5Test {
     }
 
     /**
+     * Computes the minor of a matrix excluding a specific row and column.
+     *
+     * @param matrix the matrix to compute the minor for
+     * @param row the row to exclude
+     * @param column the column to exclude
+     * @return the minor matrix
+     */
+    public static Matrix minor(Matrix matrix, int row, int column) {
+        int size = matrix.getRowDimension();
+        Matrix minor = new Matrix(size - 1, size - 1);
+
+        for (int i = 0, mi = 0; i < size; i++) {
+            if (i == row)
+                continue;
+            for (int j = 0, mj = 0; j < size; j++) {
+                if (j == column)
+                    continue;
+                minor.set(mi, mj, matrix.get(i, j));
+                mj++;
+            }
+            mi++;
+        }
+
+        return minor;
+    }
+
+    /**
+     * Computes the adjugate (or adjoint) of a matrix.
+     *
+     * @param matrix the matrix to compute the adjugate for
+     * @return the adjugate matrix
+     */
+    public static Matrix adjugate(Matrix matrix) {
+        int size = matrix.getRowDimension();
+        Matrix cofactorMatrix = new Matrix(size, size);
+
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
+                cofactorMatrix.set(i, j, Math.pow(-1, i + j) * minor(matrix, i, j).det());
+            }
+        }
+
+        return cofactorMatrix.transpose();
+    }
+
+    /**
      * Metamorphic Relation 35: The determinant of a matrix A is equal to the determinant of its
      * adjugate, i.e., det(A) = det(adj(A)).
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider1")
     public void test35(Matrix m) {
-        // assumeTrue(m.getColumnDimension() == m.getRowDimension()); // Ensure the matrix is square
+        /* Fix */
+        assumeTrue(m.getColumnDimension() == m.getRowDimension()); // Ensure the matrix is square
 
-        // // Get source output
-        // double source_out = m.det();
+        // Get source output
+        double source_out = m.det();
 
-        // // Calculate determinant of the adjugate
-        // Matrix adjugate = m.adjoint();
-        // double follow_out = adjugate.det();
+        // Calculate determinant of the adjugate
+        Matrix adj = adjugate(m);
+        double follow_out = adj.det();
 
-        // // Verification
-        // assertEquals(source_out, follow_out, 1e-6);
+        // Verification
+        assertEquals(source_out, follow_out, 1e-6);
     }
 
     /**
@@ -800,6 +918,7 @@ public class JamaGPT3D5Test {
     @ParameterizedTest
     @MethodSource("testcaseProvider1")
     public void test37(Matrix m) {
+        // /* Fix */
         // assumeTrue(m.getColumnDimension() == m.getRowDimension()); // Ensure the matrix is square
 
         // // Get source output
@@ -833,23 +952,63 @@ public class JamaGPT3D5Test {
     }
 
     /**
+     * Computes the square root of a diagonal matrix. Each diagonal element is the square root of
+     * the corresponding element in the original matrix. This method is only accurate for diagonal
+     * matrices.
+     *
+     * @param matrix the diagonal matrix to compute the square root for
+     * @return the square root matrix
+     */
+    public static Matrix matrixSqrt(Matrix matrix) {
+        int size = matrix.getRowDimension();
+        Matrix sqrtMatrix = new Matrix(size, size);
+
+        for (int i = 0; i < size; i++) {
+            sqrtMatrix.set(i, i, Math.sqrt(matrix.get(i, i)));
+        }
+
+        return sqrtMatrix;
+    }
+
+    /**
      * Metamorphic Relation 39: The determinant of a matrix is equal to the determinant of its
      * positive square root, i.e., det(A) = det(sqrt(A) * sqrt(A)).
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider1")
     public void test39(Matrix m) {
-        // assumeTrue(m.getColumnDimension() == m.getRowDimension()); // Ensure the matrix is square
+        /* Fix */
+        assumeTrue(m.getColumnDimension() == m.getRowDimension()); // Ensure the matrix is square
 
-        // // Get source output
-        // double source_out = m.det();
+        // Get source output
+        double source_out = m.det();
 
-        // // Calculate determinant of the positive square root
-        // double follow_out = m.sqrt().times(m.sqrt()).det();
+        // Calculate determinant of the positive square root
+        double follow_out = matrixSqrt(m).times(matrixSqrt(m)).det();
 
-        // // Verification
-        // assertEquals(source_out, follow_out, 1e-6);
+        // Verification
+        assertEquals(source_out, follow_out, 1e-6);
     }
+
+    /**
+     * Computes the exponential of a matrix using series expansion.
+     * @param matrix the matrix to compute the exponential for
+     * @return the exponential matrix
+     */
+    public static Matrix matrixExp(Matrix matrix) {
+        final int terms = 20; // Number of terms in the series expansion
+        int size = matrix.getRowDimension();
+        Matrix result = Matrix.identity(size, size); // Start with the identity matrix
+        Matrix term = Matrix.identity(size, size); // The current term, starting with I
+
+        for (int i = 1; i <= terms; i++) {
+            term = term.times(matrix).times(1.0 / i); // Compute A^i / i!
+            result = result.plus(term);
+        }
+
+        return result;
+    }
+
 
     /**
      * Metamorphic Relation 40: The determinant of a matrix is equal to the determinant of its
@@ -858,16 +1017,16 @@ public class JamaGPT3D5Test {
     @ParameterizedTest
     @MethodSource("testcaseProvider1")
     public void test40(Matrix m) {
-        // assumeTrue(m.getColumnDimension() == m.getRowDimension()); // Ensure the matrix is square
+        assumeTrue(m.getColumnDimension() == m.getRowDimension()); // Ensure the matrix is square
 
-        // // Get source output
-        // double source_out = m.det();
+        // Get source output
+        double source_out = m.det();
 
-        // // Calculate determinant of the exponential
-        // double follow_out = m.exp().det();
+        // Calculate determinant of the exponential
+        double follow_out = matrixExp(m).det();
 
-        // // Verification
-        // assertEquals(source_out, follow_out, 1e-6);
+        // Verification
+        assertEquals(source_out, follow_out, 1e-6);
     }
 
     /**

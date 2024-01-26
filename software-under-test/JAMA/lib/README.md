@@ -4,6 +4,8 @@ junit5: [download](https://central.sonatype.com/artifact/org.junit.platform/juni
 
 commons-lang3: [download](https://central.sonatype.com/artifact/org.apache.commons/commons-lang3/versions)
 
+commons-math3:
+
 # Commands
 
 ```sh
