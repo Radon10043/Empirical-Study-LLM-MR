@@ -8,7 +8,7 @@ long long candp(int m,int e,int p,int q)
 	for(int i=0;i<e;i++)
 	{
 		long long temp=result*(m%n);
-		result=result%n;
+		result=temp%n;	/* Fix? */
 	}
 	return result;
 }
