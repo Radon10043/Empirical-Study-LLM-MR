@@ -46,7 +46,7 @@ venv\Scripts\python.exe chat.py --template .\data\template\prompt.template.md --
 
 venv\Scripts\python.exe chat.py --template .\data\template\prompt.template.md --spec .\data\specification\specification.MOS.md --demo .\data\demo\demo.MOS.md --model gpt-3.5-turbo-1106 --count 30 --name MOS
 
-venv\Scripts\python.exe chat.py --template .\data\template\prompt.template.md --spec .\data\specification\specification.MultiM-MAXSUM.md --demo .\data\demo\demo.Multi-MAXSUM.md --model gpt-3.5-turbo-1106 --count 30 --name Multi-MAXSUM
+venv\Scripts\python.exe chat.py --template .\data\template\prompt.template.md --spec .\data\specification\specification.Multi-MAXSUM.md --demo .\data\demo\demo.Multi-MAXSUM.md --model gpt-3.5-turbo-1106 --count 30 --name Multi-MAXSUM
 
 venv\Scripts\python.exe chat.py --template .\data\template\prompt.template.md --spec .\data\specification\specification.Printtokens.md --demo .\data\demo\demo.Printtokens.md --model gpt-3.5-turbo-1106 --count 30 --name Printtokens
 
