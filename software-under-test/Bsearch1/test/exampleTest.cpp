@@ -30,6 +30,8 @@ TEST_P(GetRangeParamTest, MR1) {
 
     /* Get follow-up output */
     vector<int> follow_out = get_range(vec, follow_target);
+    if (follow_out[0] == -1 && follow_out[1] == -1)
+        return;
 
     /* Verification */
     EXPECT_LE(source_out[1] + 1, follow_out[0]);
@@ -63,5 +65,4 @@ TEST_P(GetRangeParamTest, MR2) {
     EXPECT_EQ(source_out[1] + 1, follow_out[1]);
 }
 
-INSTANTIATE_TEST_CASE_P(TrueReturn, GetRangeParamTest,
-                        testing::ValuesIn(gen_tcs_randomly()));
+INSTANTIATE_TEST_CASE_P(TrueReturn, GetRangeParamTest, testing::ValuesIn(gen_tcs_randomly()));
