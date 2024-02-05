@@ -2,9 +2,10 @@
 Author: Radon
 Date: 2023-12-06 15:26:45
 LastEditors: Radon
-LastEditTime: 2024-01-07 12:10:31
+LastEditTime: 2024-02-05 11:14:20
 Description: Hi, say something
 """
+
 import openai
 import marko, json
 import random, time
@@ -34,7 +35,7 @@ def get_cur_time() -> str:
     return cur_time
 
 
-def chat_with_gpt(list_prompt: list, output_dir: str, max_chat_count: int, sut_name: str, gpt_name: str):
+def chat_with_gpt(list_prompt: list, gpt_name: str, output_dir: str, max_chat_count: int, sut_name: str):
     """向GPT系的大模型发送信息, 让其识别蜕变关系并生成单元测试用例代码
 
     Parameters
@@ -55,17 +56,21 @@ def chat_with_gpt(list_prompt: list, output_dir: str, max_chat_count: int, sut_n
     _description_
     """
     msgs = list()  # 聊天记录列表
-    msgs.append({"role": "system", "content": list_prompt[0]})
-    msgs.append({"role": "system", "content": list_prompt[1]})
 
-    i = 2
+    i = 0
+    while list_prompt[i][0] == "system":
+        msgs.append({"role": "system", "content": list_prompt[i][1]})
+        i += 1
+
     while i < max_chat_count:
         # 将提示词加入列表, 以让gpt记住历史聊天内容
         if i < len(list_prompt):
-            prompt = list_prompt[i]
+            role = list_prompt[i][0]
+            prompt = list_prompt[i][1]
         else:
-            prompt = list_prompt[-1]
-        msgs.append({"role": "user", "content": prompt})
+            role = list_prompt[-1][0]
+            prompt = list_prompt[-1][1]
+        msgs.append({"role": role, "content": prompt})
 
         # 随机休息几秒, 防止报错
         time.sleep(random.randint(1, 5))
@@ -74,7 +79,7 @@ def chat_with_gpt(list_prompt: list, output_dir: str, max_chat_count: int, sut_n
             # 获取gpt的回复内容, 加入到answer中
             answer = str()
             response = openai.ChatCompletion.create(model=gpt_name, messages=msgs, stream=True)
-            print("ChatGPT: ", end="")
+            print("ChatGPT\n--------------")
 
             for event in response:
                 if event["choices"][0]["finish_reason"] == "stop":
@@ -160,36 +165,44 @@ def is_all_blank(document: marko.block.Document) -> bool:
     return b_all_blank
 
 
-def read_prompt(prompt_path: str) -> list:
-    """解析存储了提示词的文件, 并返回存有提示词内容的列表
+def read_prompt(template_path: str, spec_path: str, demo_path: str) -> list:
+    """读取模板文件, 规格说明文件, 已编码的初始MR文件, 并返回prompt的列表
 
     Parameters
     ----------
-    prompt_path : str
-        存储提示内容的文件路径
+    template_path : str
+        模板文件路径 (markdown)
+    spec_path : str
+        规格说明文件路径 (markdown)
+    demo_path : str
+        存储已编码MR的文件路径 (markdown)
 
     Returns
     -------
     list
-        存储提示词内容的列表
-
-    Notes
-    -----
-    _description_
+        _description_
     """
     # 由于使用render函数会默认呈现为HTML的文本, 因此构造一个MarkDown实例, 使用MarkdownRenderer, 使AST可呈现为md文本
     md_instance = marko.Markdown(renderer=MarkdownRenderer)
 
-    # 读取markdown文件的原始内容, 存入md_text
-    md_text = str()
-    with open(prompt_path, encoding="utf-8") as f:
-        md_text = f.read()
+    # 读取template, spec, demo文件的原始内容, 组合并存入md_text
+    template_text = str()
+    spec_text = str()
+    demo_text = str()
+    with open(template_path, encoding="utf-8") as f:
+        template_text = f.read()
+    with open(spec_path, encoding="utf-8") as f:
+        spec_text = f.read()
+    with open(demo_path, encoding="utf-8") as f:
+        demo_text = f.read()
+    md_text = template_text.replace("[specification]", spec_text).replace("[demo]", demo_text)
 
     # 解析markdown文件
     md_ast = md_instance.parse(md_text)
 
     list_prompt = list()  # 存储prompt的列表
     sub_document = marko.block.Document()  # 存储markdown文件AST子节点的列表
+    role = "system"  # 用于存储当前提示词的角色, 默认为系统
 
     # 遍历AST, 获取文本
     for child in md_ast.children:
@@ -197,13 +210,18 @@ def read_prompt(prompt_path: str) -> list:
         child_type = child.get_type()
 
         # FIXME: 现在没有对markdown的注释作判断, 可能会向list_prompt中多加内容
-        # 如果是标题, 根据情况决定是否要将sub_document转换为文本并加入list_prompt
+        # 如果是标题, 根据情况决定是否要将sub_document转换为文本并加入list_prompt, 并更新角色信息
         if child_type == "Heading":
+
             # 判断sub_document中的节点是否都是空行的节点, 如果都是空行的节点就不加到list_prompt里了
-            # 如果存在非空行节点, 加入list_prompt
             if not is_all_blank(sub_document):
-                list_prompt.append(md_instance.render(sub_document).lstrip("\n"))
+                list_prompt.append((role, md_instance.render(sub_document).lstrip("\n")))
+
+            # 如果存在非空行节点, 加入list_prompt
             sub_document.children = []
+
+            # 更新角色信息
+            role = child.children[0].children
 
         # 如果不是标题, 将节点加入到sub_document中
         else:
@@ -211,31 +229,32 @@ def read_prompt(prompt_path: str) -> list:
 
     # 为防止遗漏最后一段, 判断结尾的paragraph是否全为BlankLine, 如果不是, 加入到list_prompt中
     if not is_all_blank(sub_document):
-        list_prompt.append(md_instance.render(sub_document).lstrip("\n"))
+        list_prompt.append((role, md_instance.render(sub_document).lstrip("\n")))
 
     return list_prompt
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="自动向大模型发送提示并输出内容至markdown文件")
-    parser.add_argument("-p", "--prompt", nargs="*", required=True, help="prompt文件路径, 需要是markdown文件, 且遵循模板的规则, 可同时输入多个文件路径.")
-    parser.add_argument("-m", "--model", required=True, help="要使用的大模型")
-    parser.add_argument("-c", "--count", type=int, default=50, help="最大聊天次数")
-    parser.add_argument("-o", "--output", default="", help="聊天内容输出目录, 默认为prompt文件同目录下")
+    parser.add_argument("--template", required=True, help="prompt模板文件路径, 需要是markdown文件.")
+    parser.add_argument("--spec", required=True, help="被测对象的规格说明文件路径, 需要是markdown文件.")
+    parser.add_argument("--demo", required=True, help="存有已编码的初始MR的markdown文件.")
+    parser.add_argument("--model", required=True, help="要使用的大模型")
+    parser.add_argument("--name", default="", help="SUT名称.")
+    parser.add_argument("--count", type=int, default=50, help="最大聊天次数")
+    parser.add_argument("--output", default="", help="聊天内容输出目录, 默认当前工作目录下")
     args = parser.parse_args()
 
-    prompt_paths = args.prompt
+    template_path = args.template
+    spec_path = args.spec
+    demo_path = args.demo
     max_chat_count = args.count
-    gpt_name = args.model
+    model_name = args.model
+    sut_name = args.name
+    output_dir = args.output
 
-    for prompt_path in prompt_paths:
-        # 如果命令行参数中指定的输出文件夹为空, 则将聊天内容文件保存到prompt文件同目录下
-        output_dir = args.output
-        if len(output_dir) == 0:
-            output_dir = os.path.dirname(prompt_path)
+    if output_dir == "":
+        output_dir = os.path.dirname(__file__)
 
-        # 获取被测对象的名称
-        sut_name = os.path.basename(os.path.dirname(os.path.dirname(prompt_path)))
-
-        list_prompt = read_prompt(prompt_path)
-        chat_with_gpt(list_prompt, output_dir, max_chat_count, sut_name, gpt_name)
+    list_prompt = read_prompt(template_path, spec_path, demo_path)
+    chat_with_gpt(list_prompt, model_name, output_dir, max_chat_count, sut_name)
