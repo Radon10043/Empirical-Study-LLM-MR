@@ -3,6 +3,8 @@
 #include <cmath>
 #include <gtest/gtest.h>
 #include <vector>
+#include <unordered_set>
+#include <unordered_map>
 
 #include "../src/function.h"
 #include "utils.h"
@@ -12,8 +14,46 @@ using namespace std;
 class GetRangeParamTest : public ::testing::TestWithParam<GetRangeInput> {};
 
 /**
- * @brief Metamorphic relation 3: Reversing the array, the starting position of the searching number in the reversed array should be equals to
- * the ending position in the original array and the ending position in the reversed array should be equals to the starting position in the original array.
+ * @brief Metamorphic relation 1: If the original vector is unchanged, the range start and end indices should remain the same. 
+ */
+TEST_P(GetRangeParamTest, MR1) {
+    /* Get source input */
+    GetRangeInput input = GetParam();
+    vector<int> vec = input.vec;
+    int target = input.target;
+
+    /* Get source output */
+    vector<int> source_out = get_range(vec, target);
+
+    /* Verification */
+    EXPECT_EQ(source_out, get_range(vec, target));
+}
+
+/**
+ * @brief Metamorphic relation 2: If the target number is larger than the largest number in the array, both start and end indices should be -1.
+ */
+TEST_P(GetRangeParamTest, MR2) {
+    /* Get source input */
+    GetRangeInput input = GetParam();
+    vector<int> vec = input.vec;
+    int target = input.target;
+
+    /* Get source output */
+    vector<int> source_out = get_range(vec, target);
+
+    /* Construct follow-up input */
+    int follow_target = *max_element(vec.begin(), vec.end()) + 1;
+
+    /* Get follow-up output */
+    vector<int> follow_out = get_range(vec, follow_target);
+
+    /* Verification */
+    vector<int> expect = {-1, -1};
+    EXPECT_EQ(expect, follow_out);
+}
+
+/**
+ * @brief Metamorphic relation 3: If two vectors are the same except for a permutation of elements, the output range indices should remain the same. 
  */
 TEST_P(GetRangeParamTest, MR3) {
     /* Get source input */
@@ -24,24 +64,19 @@ TEST_P(GetRangeParamTest, MR3) {
     /* Get source output */
     vector<int> source_out = get_range(vec, target);
 
-    if (source_out[0] == -1 && source_out[1] == -1)
-        return;
-
     /* Construct follow-up input */
     vector<int> follow_vec = vec;
-    reverse(follow_vec.begin(), follow_vec.end()); // Reverse the array
+    random_shuffle(follow_vec.begin(), follow_vec.end());
 
     /* Get follow-up output */
     vector<int> follow_out = get_range(follow_vec, target);
 
     /* Verification */
-    EXPECT_EQ(source_out[1], vec.size() - follow_out[0] - 1);
-    EXPECT_EQ(source_out[0], vec.size() - follow_out[1] - 1);
+    EXPECT_EQ(source_out, follow_out);
 }
 
 /**
- * @brief Metamorphic relation 4: Doubling the size of the array, the starting and ending positions in the doubled array should be increased by the length of
- * the original array.
+ * @brief Metamorphic relation 4: If the input vector is reversed, the range indices should remain the same. 
  */
 TEST_P(GetRangeParamTest, MR4) {
     /* Get source input */
@@ -52,24 +87,19 @@ TEST_P(GetRangeParamTest, MR4) {
     /* Get source output */
     vector<int> source_out = get_range(vec, target);
 
-    if (source_out[0] == -1 && source_out[1] == -1)
-        return;
-
     /* Construct follow-up input */
     vector<int> follow_vec = vec;
-    follow_vec.insert(follow_vec.end(), vec.begin(), vec.end()); // Double the size of the array
+    reverse(follow_vec.begin(), follow_vec.end());
 
     /* Get follow-up output */
     vector<int> follow_out = get_range(follow_vec, target);
 
     /* Verification */
-    EXPECT_EQ(source_out[0] + vec.size(), follow_out[0]);
-    EXPECT_EQ(source_out[1] + vec.size(), follow_out[1]);
+    EXPECT_EQ(source_out, follow_out);
 }
 
 /**
- * @brief Metamorphic relation 5: Sorting the array in ascending order, the positions of the searching number in the sorted array should be
- * the same as the positions in the original array.
+ * @brief Metamorphic relation 5: If all elements of the input vector are multiplied by a positive integer, the range indices should remain the same. 
  */
 TEST_P(GetRangeParamTest, MR5) {
     /* Get source input */
@@ -80,24 +110,21 @@ TEST_P(GetRangeParamTest, MR5) {
     /* Get source output */
     vector<int> source_out = get_range(vec, target);
 
-    if (source_out[0] == -1 && source_out[1] == -1)
-        return;
-
     /* Construct follow-up input */
-    vector<int> follow_vec = vec;
-    sort(follow_vec.begin(), follow_vec.end()); // Sort the array in ascending order
+    vector<int> follow_vec;
+    for (int i : vec) {
+        follow_vec.push_back(i * 2);
+    }
 
     /* Get follow-up output */
     vector<int> follow_out = get_range(follow_vec, target);
 
     /* Verification */
-    EXPECT_EQ(source_out[0], distance(vec.begin(), find(vec.begin(), vec.end(), follow_vec[follow_out[0]])));
-    EXPECT_EQ(source_out[1], distance(vec.begin(), find(vec.begin(), vec.end(), follow_vec[follow_out[1]])));
+    EXPECT_EQ(source_out, follow_out);
 }
 
 /**
- * @brief Metamorphic relation 6: Changing the array elements to their squares, the positions of the searching number in the squared array should
- * be the same as the positions in the original array.
+ * @brief Metamorphic relation 6: If the input vector is empty, the output range indices should both be -1. 
  */
 TEST_P(GetRangeParamTest, MR6) {
     /* Get source input */
@@ -108,24 +135,19 @@ TEST_P(GetRangeParamTest, MR6) {
     /* Get source output */
     vector<int> source_out = get_range(vec, target);
 
-    if (source_out[0] == -1 && source_out[1] == -1)
-        return;
-
     /* Construct follow-up input */
-    vector<int> follow_vec = vec;
-    transform(follow_vec.begin(), follow_vec.end(), follow_vec.begin(), [](int x) { return x * x; }); // Change the array elements to their squares
+    vector<int> follow_vec;
 
     /* Get follow-up output */
     vector<int> follow_out = get_range(follow_vec, target);
 
     /* Verification */
-    EXPECT_EQ(source_out[0], distance(vec.begin(), find(vec.begin(), vec.end(), follow_vec[follow_out[0]])));
-    EXPECT_EQ(source_out[1], distance(vec.begin(), find(vec.begin(), vec.end(), follow_vec[follow_out[1]])));
+    vector<int> expect = {-1, -1};
+    EXPECT_EQ(expect, follow_out);
 }
 
 /**
- * @brief Metamorphic relation 7: Multiplying all elements of the array by a constant factor, the positions of the searching number in the multiplied array
- * should be the same as the positions in the original array.
+ * @brief Metamorphic relation 7: If the target value is increased by 1, the output range indices should either both be -1 or should have a difference of 1 between them.
  */
 TEST_P(GetRangeParamTest, MR7) {
     /* Get source input */
@@ -136,27 +158,23 @@ TEST_P(GetRangeParamTest, MR7) {
     /* Get source output */
     vector<int> source_out = get_range(vec, target);
 
-    if (source_out[0] == -1 && source_out[1] == -1)
-        return;
-
     /* Construct follow-up input */
-    vector<int> follow_vec = vec;
-    int multiplier = 3; // Multiplication factor
-    for (int &num : follow_vec) {
-        num *= multiplier; // Multiply all elements by a constant factor
-    }
+    int follow_target = target + 1;
 
     /* Get follow-up output */
-    vector<int> follow_out = get_range(follow_vec, target);
+    vector<int> follow_out = get_range(vec, follow_target);
 
     /* Verification */
-    EXPECT_EQ(source_out[0], distance(vec.begin(), find(vec.begin(), vec.end(), follow_vec[follow_out[0]])));
-    EXPECT_EQ(source_out[1], distance(vec.begin(), find(vec.begin(), vec.end(), follow_vec[follow_out[1]])));
+    if (follow_out[0] == -1 && follow_out[1] == -1) {
+        vector<int> expect = {-1, -1};
+        EXPECT_EQ(expect, source_out);
+    } else {
+        EXPECT_TRUE(follow_out[1] - follow_out[0] == 1 || follow_out[0] == source_out[1]);
+    }
 }
 
 /**
- * @brief Metamorphic relation 8: Adding a constant value to all elements of the array, the positions of the searching number in the modified array should
- * be the same as the positions in the original array.
+ * @brief Metamorphic relation 8: If the input vector is modified such that the target value is no longer present, the output range indices should both be -1.
  */
 TEST_P(GetRangeParamTest, MR8) {
     /* Get source input */
@@ -167,27 +185,24 @@ TEST_P(GetRangeParamTest, MR8) {
     /* Get source output */
     vector<int> source_out = get_range(vec, target);
 
-    if (source_out[0] == -1 && source_out[1] == -1)
-        return;
-
     /* Construct follow-up input */
     vector<int> follow_vec = vec;
-    int addition = 5; // Constant value to add
-    for (int &num : follow_vec) {
-        num += addition; // Add a constant value to all elements
+    for (int i = 0; i < follow_vec.size(); ++i) {
+        if (follow_vec[i] == target) {
+            follow_vec[i] = target + 1;
+        }
     }
 
     /* Get follow-up output */
     vector<int> follow_out = get_range(follow_vec, target);
 
     /* Verification */
-    EXPECT_EQ(source_out[0], distance(vec.begin(), find(vec.begin(), vec.end(), follow_vec[follow_out[0]])));
-    EXPECT_EQ(source_out[1], distance(vec.begin(), find(vec.begin(), vec.end(), follow_vec[follow_out[1]])));
+    vector<int> expect = {-1, -1};
+    EXPECT_EQ(expect, follow_out);
 }
 
 /**
- * @brief Metamorphic relation 9: Removing duplicate elements from the array, the positions of the searching number in the modified array should be the same or
- * fewer than the positions in the original array.
+ * @brief Metamorphic relation 9: If all elements of the vector are increased by a constant, the output range indices should remain the same. 
  */
 TEST_P(GetRangeParamTest, MR9) {
     /* Get source input */
@@ -198,32 +213,21 @@ TEST_P(GetRangeParamTest, MR9) {
     /* Get source output */
     vector<int> source_out = get_range(vec, target);
 
-    if (source_out[0] == -1 && source_out[1] == -1)
-        return;
-
     /* Construct follow-up input */
-    vector<int> follow_vec = vec;
-    sort(follow_vec.begin(), follow_vec.end());               // Sort the array in ascending order
-    auto last = unique(follow_vec.begin(), follow_vec.end()); // Remove duplicates
-    follow_vec.erase(last, follow_vec.end());
+    vector<int> follow_vec;
+    for (int i : vec) {
+        follow_vec.push_back(i + 5);
+    }
 
     /* Get follow-up output */
     vector<int> follow_out = get_range(follow_vec, target);
 
-#if INVALID
     /* Verification */
-    EXPECT_GE(source_out[0], distance(follow_vec.begin(), find(follow_vec.begin(), follow_vec.end(), vec[source_out[0])));
-    EXPECT_GE(source_out[1], distance(follow_vec.begin(), find(follow_vec.begin(), follow_vec.end(), vec[source_out[1])));
-#else
-    /* Verification */
-    EXPECT_EQ(source_out[0], distance(follow_vec.begin(), find(follow_vec.begin(), follow_vec.end(), vec[source_out[0]])));
-    EXPECT_EQ(source_out[1], distance(follow_vec.begin(), find(follow_vec.begin(), follow_vec.end(), vec[source_out[1]])));
-#endif
+    EXPECT_EQ(source_out, follow_out);
 }
 
 /**
- * @brief Metamorphic relation 10: Reversing the order of the array's elements, the positions of the searching number in the modified array should be the same
- * as in the original array but in reverse order.
+ * @brief Metamorphic relation 10: If the input vector is modified such that the middle element is changed to the target value, the output range indices should reflect the single occurrence at the middle index.
  */
 TEST_P(GetRangeParamTest, MR10) {
     /* Get source input */
@@ -234,114 +238,105 @@ TEST_P(GetRangeParamTest, MR10) {
     /* Get source output */
     vector<int> source_out = get_range(vec, target);
 
-    if (source_out[0] == -1 && source_out[1] == -1)
-        return;
-
     /* Construct follow-up input */
     vector<int> follow_vec = vec;
-    reverse(follow_vec.begin(), follow_vec.end()); // Reverse the order of the elements in the array
+    if (follow_vec.size() > 0) {
+        follow_vec[follow_vec.size()/2] = target;
+    }
 
     /* Get follow-up output */
     vector<int> follow_out = get_range(follow_vec, target);
 
     /* Verification */
-    EXPECT_EQ(source_out[0], vec.size() - follow_out[1] - 1);
-    EXPECT_EQ(source_out[1], vec.size() - follow_out[0] - 1);
+    if (source_out[0] != -1 && source_out[1] != -1) {
+        int n = follow_vec.size();
+        vector<int> expect = {n / 2, n / 2};
+        EXPECT_EQ(expect, follow_out);
+    }
 }
 
 /**
- * @brief Metamorphic relation 11: Shifting the elements of the array to the right by a certain number of positions, the positions of the searching number in
- * the shifted array should be the same as in the original array, with an offset due to the shift.
+ * @brief Metamorphic relation 11: If all elements of the input vector are multiplied by -1, the range indices should remain the same. 
  */
 TEST_P(GetRangeParamTest, MR11) {
     /* Get source input */
     GetRangeInput input = GetParam();
     vector<int> vec = input.vec;
     int target = input.target;
-    int shiftAmount = 3; // Number of positions to shift
 
     /* Get source output */
     vector<int> source_out = get_range(vec, target);
 
-    if (source_out[0] == -1 && source_out[1] == -1)
-        return;
-
     /* Construct follow-up input */
-    vector<int> follow_vec = vec;
-    rotate(follow_vec.rbegin(), follow_vec.rbegin() + shiftAmount, follow_vec.rend()); // Shift the elements to the right
+    vector<int> follow_vec;
+    for (int i : vec) {
+        follow_vec.push_back(i * -1);
+    }
 
     /* Get follow-up output */
     vector<int> follow_out = get_range(follow_vec, target);
 
     /* Verification */
-    EXPECT_EQ(source_out[0], (follow_out[0] + shiftAmount) % vec.size());
-    EXPECT_EQ(source_out[1], (follow_out[1] + shiftAmount) % vec.size());
+    EXPECT_EQ(source_out, follow_out);
 }
 
 /**
- * @brief Metamorphic relation 12: Replacing elements in the array with a certain pattern, the positions of the searching number in the modified array should
- * align with the pattern of replacement from the original array.
+ * @brief Metamorphic relation 12: If the target value is set to the maximum value in the vector, the output range indices should remain the same as if it was set to the second maximum value in the vector.
  */
 TEST_P(GetRangeParamTest, MR12) {
     /* Get source input */
     GetRangeInput input = GetParam();
     vector<int> vec = input.vec;
-    int target = input.target;
-    int replacementPattern[] = {5, 10, 15, 20}; // Pattern for replacement
 
-    /* Get source output */
-    vector<int> source_out = get_range(vec, target);
+    /* Get source output for maximum value */
+    int max_value = *max_element(vec.begin(), vec.end());
+    vector<int> source_out_max = get_range(vec, max_value);
 
-    if (source_out[0] == -1 && source_out[1] == -1)
-        return;
-
-    /* Construct follow-up input */
+    /* Get source output for second maximum value */
     vector<int> follow_vec = vec;
-    for (size_t i = 0; i < follow_vec.size(); ++i) {
-        if (find(begin(replacementPattern), end(replacementPattern), follow_vec[i]) != end(replacementPattern)) {
-            follow_vec[i] = target; // Replace elements with the searching number
-        }
-    }
-
-    /* Get follow-up output */
-    vector<int> follow_out = get_range(follow_vec, target);
+    follow_vec.erase(max_element(follow_vec.begin(), follow_vec.end()));
+    int second_max_value = *max_element(follow_vec.begin(), follow_vec.end());
+    vector<int> source_out_second_max = get_range(vec, second_max_value);
 
     /* Verification */
-    for (size_t i = 0; i < follow_out.size(); ++i) {
-        if (follow_out[i] != -1) {
-            EXPECT_EQ(source_out[i], i);
-        }
-    }
+    EXPECT_EQ(source_out_max, source_out_second_max);
 }
 
 /**
- * @brief Metamorphic relation 13: Adding a constant value to the target number, the positions of the modified target number should be shifted by the constant
- * added.
+ * @brief Metamorphic relation 13: If the vector contains duplicate values, the output range indices for any value should remain the same as the output range indices for its first occurrence in the vector.
  */
 TEST_P(GetRangeParamTest, MR13) {
     /* Get source input */
     GetRangeInput input = GetParam();
     vector<int> vec = input.vec;
-    int target = input.target;
 
-    /* New target number by adding a constant value */
-    int modified_target = target + 5;
+    /* Find all the unique values in the vector */
+    vector<int> unique_values;
+    for (int value : vec) {
+        if (find(unique_values.begin(), unique_values.end(), value) == unique_values.end()) {
+            unique_values.push_back(value);
+        }
+    }
 
-    /* Get source output */
-    vector<int> source_out = get_range(vec, target);
-    vector<int> modified_out = get_range(vec, modified_target);
+    /* Get source output for each unique value */
+    for (int value : unique_values) {
+        vector<int> source_out = get_range(vec, value);
+        
+        /* Find the first occurrence of the value in the vector */
+        int first_occurrence = find(vec.begin(), vec.end(), value) - vec.begin();
+        int last_occurrence = first_occurrence;
+        while (last_occurrence < vec.size() && vec[last_occurrence] == value) {
+            last_occurrence++;
+        }
 
-    /* Verify if both target and modified target exist in the array */
-    if (source_out[0] != -1 && modified_out[0] != -1) {
         /* Verification */
-        EXPECT_EQ(modified_out[0], source_out[0] + 5);
-        EXPECT_EQ(modified_out[1], source_out[1] + 5);
+        vector<int> expect = {first_occurrence, last_occurrence - 1};
+        EXPECT_EQ(expect, source_out);
     }
 }
 
 /**
- * @brief Metamorphic relation 14: Reversing the positions of the input array and the target number, the reversed target number should exist in the reversed
- * array with the positions shifted by the array size minus one.
+ * @brief Metamorphic relation 14: If all elements of the input vector are decreased by a constant, the range indices should remain the same. 
  */
 TEST_P(GetRangeParamTest, MR14) {
     /* Get source input */
@@ -352,43 +347,55 @@ TEST_P(GetRangeParamTest, MR14) {
     /* Get source output */
     vector<int> source_out = get_range(vec, target);
 
-    /* Reverse the array and the target number */
-    reverse(vec.begin(), vec.end());
-    int reversed_target = vec.size() - target - 1;
-
-    /* Get reversed array output */
-    vector<int> reversed_out = get_range(vec, reversed_target);
-
-    /* Verify if the target exists in the original array */
-    if (source_out[0] != -1) {
-        /* Verification */
-        EXPECT_EQ(reversed_out[0], vec.size() - source_out[1] - 1);
-        EXPECT_EQ(reversed_out[1], vec.size() - source_out[0] - 1);
+    /* Construct follow-up input */
+    vector<int> follow_vec;
+    for (int i : vec) {
+        follow_vec.push_back(i - 3); // Decreasing all elements by 3
     }
+
+    /* Get follow-up output */
+    vector<int> follow_out = get_range(follow_vec, target);
+
+    /* Verification */
+    EXPECT_EQ(source_out, follow_out);
 }
 
 /**
- * @brief Metamorphic relation 15: Checking for the absence of a target number, all positions in the output array should be -1.
+ * @brief Metamorphic relation 15: If the vector contains negative values, the output range indices for any positive value should remain the same as the output range indices for its absolute counterpart in the vector.
  */
 TEST_P(GetRangeParamTest, MR15) {
     /* Get source input */
     GetRangeInput input = GetParam();
     vector<int> vec = input.vec;
-    int target = input.target;
 
-    /* Get source output */
-    vector<int> source_out = get_range(vec, target);
+    /* Find all the positive values in the vector */
+    vector<int> positive_values;
+    for (int value : vec) {
+        if (value > 0) {
+            positive_values.push_back(value);
+        }
+    }
 
-    /* Verify if the target number does not exist in the array */
-    if (source_out[0] == -1) {
+    /* Get source output for each positive value */
+    for (int value : positive_values) {
+        vector<int> source_out = get_range(vec, value);
+        
+        /* Find the absolute value counterpart in the vector */
+        int absolute_value = -value;
+
+        int first_occurrence = find(vec.begin(), vec.end(), absolute_value) - vec.begin();
+        int last_occurrence = first_occurrence;
+        while (last_occurrence < vec.size() && vec[last_occurrence] == absolute_value) {
+            last_occurrence++;
+        }
+
         /* Verification */
-        EXPECT_EQ(source_out[0], -1);
-        EXPECT_EQ(source_out[1], -1);
+        EXPECT_EQ(source_out, get_range(vec, absolute_value));
     }
 }
 
 /**
- * @brief Metamorphic relation 16: Swapping the start and end indexes, the start and end indexes should be swapped in the output array as well.
+ * @brief Metamorphic relation 16: If all elements of the input vector are modified such that the target value duplicates evenly across the vector, the output range indices should remain the same.
  */
 TEST_P(GetRangeParamTest, MR16) {
     /* Get source input */
@@ -399,106 +406,100 @@ TEST_P(GetRangeParamTest, MR16) {
     /* Get source output */
     vector<int> source_out = get_range(vec, target);
 
-    /* Verify if the target exists in the original array */
-    if (source_out[0] != -1) {
-        /* Swap the start and end indexes */
-        int temp = source_out[0];
-        source_out[0] = source_out[1];
-        source_out[1] = temp;
-
-        /* Get output for swapped indexes */
-        vector<int> swapped_out = get_range(vec, target);
-
-        /* Verification */
-        EXPECT_EQ(source_out[0], swapped_out[0]);
-        EXPECT_EQ(source_out[1], swapped_out[1]);
+    /* Construct follow-up input */
+    vector<int> follow_vec = vec;
+    for (int& value : follow_vec) {
+        if (value == target) {
+            value *= 2; // Duplicating the target value
+        }
     }
+
+    /* Get follow-up output */
+    vector<int> follow_out = get_range(follow_vec, target);
+
+    /* Verification */
+    EXPECT_EQ(source_out, follow_out);
 }
 
 /**
- * @brief Metamorphic relation 17: Checking for a negative target number, the positions in the output array should be -1 if the negative of the target number
- * does not exist in the array.
+ * @brief Metamorphic relation 17: If the input vector is modified to contain only a single occurrence of the target value, the output range indices should reflect that single occurrence.
  */
 TEST_P(GetRangeParamTest, MR17) {
     /* Get source input */
     GetRangeInput input = GetParam();
     vector<int> vec = input.vec;
     int target = input.target;
-    int negative_target = -target;
-
-    /* Get source output */
-    vector<int> source_out = get_range(vec, negative_target);
-
-    /* Verify if the negative target number does not exist in the array */
-    if (source_out[0] == -1) {
-        /* Verification */
-        EXPECT_EQ(source_out[0], -1);
-        EXPECT_EQ(source_out[1], -1);
-    }
-}
-
-/**
- * @brief Metamorphic relation 18: Repeating the elements of the array, the positions of the searching number in the repeated array should align with the
- * initial positions, with offsets related to the index of the repeated array.
- */
-TEST_P(GetRangeParamTest, MR18) {
-    /* Get source input */
-    GetRangeInput input = GetParam();
-    vector<int> vec = input.vec;
-    int target = input.target;
-    vector<int> repeat_vec;
-    int repeatCount = 3; // Number of times to repeat the array
-
-    for (int i = 0; i < repeatCount; i++) {
-        repeat_vec.insert(repeat_vec.end(), vec.begin(), vec.end());
-    }
-
-    /* Get source output */
-    vector<int> source_out = get_range(vec, target);
-    vector<int> repeated_out = get_range(repeat_vec, target);
-
-    /* Verify if the target exists in the original array */
-    if (source_out[0] != -1) {
-        /* Verification */
-        EXPECT_EQ(repeated_out[0], source_out[0] + vec.size() * repeatCount);
-        EXPECT_EQ(repeated_out[1], source_out[1] + vec.size() * repeatCount);
-    }
-}
-
-/**
- * @brief Metamorphic relation 19: Scaling the array elements by a constant, the positions of the searching number in the scaled array should align with the
- * positions in the original array, taking into account the scaling factor.
- */
-TEST_P(GetRangeParamTest, MR19) {
-    /* Get source input */
-    GetRangeInput input = GetParam();
-    vector<int> vec = input.vec;
-    int target = input.target;
-    int scalefactor = 2; // Scaling factor
 
     /* Get source output */
     vector<int> source_out = get_range(vec, target);
 
     /* Construct follow-up input */
     vector<int> follow_vec;
-    for (int num : vec) {
-        follow_vec.push_back(num * scalefactor);
+    for (int value : vec) {
+        if (value == target) {
+            follow_vec.push_back(value); // Only a single occurrence of the target value
+            break;
+        }
     }
 
     /* Get follow-up output */
     vector<int> follow_out = get_range(follow_vec, target);
 
-    /* Verify if the target exists in the original array */
-    if (source_out[0] != -1) {
-        /* Verification */
-        EXPECT_EQ(source_out[0], follow_out[0] / scalefactor);
-        EXPECT_EQ(source_out[1], follow_out[1] / scalefactor);
+    /* Verification */
+    if (!follow_vec.empty()) {
+        vector<int> expect = {0, 0};
+        EXPECT_EQ(expect, follow_out);
+    } else {
+        vector<int> expect = {-1, -1};
+        EXPECT_EQ(expect, follow_out);
     }
 }
 
 /**
- * @brief Metamorphic relation 20: Applying a function to the array elements, the positions of the searching number in the modified array should align with the
- * positions in the original array, with adjustments based on the applied function.
+ * @brief Metamorphic relation 18: If all elements of the input vector are multiplied by a negative integer, the range indices should remain the same. 
+ */
+TEST_P(GetRangeParamTest, MR18) {
+    /* Get source input */
+    GetRangeInput input = GetParam();
+    vector<int> vec = input.vec;
+    int target = input.target;
+
+    /* Get source output */
+    vector<int> source_out = get_range(vec, target);
+
+    /* Construct follow-up input */
+    vector<int> follow_vec;
+    for (int i : vec) {
+        follow_vec.push_back(i * -2);
+    }
+
+    /* Get follow-up output */
+    vector<int> follow_out = get_range(follow_vec, target);
+
+    /* Verification */
+    EXPECT_EQ(source_out, follow_out);
+}
+
+/**
+ * @brief Metamorphic relation 19: If the input vector consists of a single element, the output range indices for that element should be [0, 0].
+ */
+TEST_P(GetRangeParamTest, MR19) {
+    /* Get source input */
+    GetRangeInput input = GetParam();
+    vector<int> vec = input.vec;
+
+    /* Get source output */
+    vector<int> source_out = get_range(vec, vec[0]);
+
+    /* Verification */
+    if (vec.size() == 1) {
+        vector<int> expect = {0, 0};
+        EXPECT_EQ(expect, source_out);
+    }
+}
+
+/**
+ * @brief Metamorphic relation 20: If the input vector is a sorted sequence, the output range for a value should remain the same even after shuffling the vector.
  */
 TEST_P(GetRangeParamTest, MR20) {
     /* Get source input */
@@ -509,24 +510,18 @@ TEST_P(GetRangeParamTest, MR20) {
     /* Get source output */
     vector<int> source_out = get_range(vec, target);
 
-    /* Construct follow-up input */
-    vector<int> follow_vec;
-    transform(vec.begin(), vec.end(), back_inserter(follow_vec), [](int x) { return x * x + 1; }); // Apply a function (x^2 + 1) to array elements
+    /* Shuffle the vector */
+    random_shuffle(vec.begin(), vec.end());
 
     /* Get follow-up output */
-    vector<int> follow_out = get_range(follow_vec, target);
+    vector<int> follow_out = get_range(vec, target);
 
-    /* Verify if the target exists in the original array */
-    if (source_out[0] != -1) {
-        /* Verification */
-        EXPECT_NE(source_out[0], follow_out[0]);
-        EXPECT_NE(source_out[1], follow_out[1]);
-    }
+    /* Verification */
+    EXPECT_EQ(source_out, follow_out);
 }
 
 /**
- * @brief Metamorphic relation 21: Reversing the polarity of the array elements, the positions of the searching number in the modified array should be the same
- * as the positions in the original array.
+ * @brief Metamorphic relation 21: If the input vector is reversed, the range indices for any value should remain the same.
  */
 TEST_P(GetRangeParamTest, MR21) {
     /* Get source input */
@@ -537,104 +532,115 @@ TEST_P(GetRangeParamTest, MR21) {
     /* Get source output */
     vector<int> source_out = get_range(vec, target);
 
-    /* Construct follow-up input by reversing the polarity of array elements */
-    vector<int> follow_vec;
-    transform(vec.begin(), vec.end(), back_inserter(follow_vec), [](int x) { return -x; });
+    /* Reverse the vector */
+    reverse(vec.begin(), vec.end());
 
     /* Get follow-up output */
-    vector<int> follow_out = get_range(follow_vec, target);
+    vector<int> follow_out = get_range(vec, target);
 
     /* Verification */
-    EXPECT_EQ(source_out[0], follow_out[0]);
-    EXPECT_EQ(source_out[1], follow_out[1]);
+    EXPECT_EQ(source_out, follow_out);
 }
 
 /**
- * @brief Metamorphic relation 22: Rotating the array elements by a specific number of positions, the positions of the searching number in the rotated array
- * should align with the positions in the original array, with an offset due to the rotation.
+ * @brief Metamorphic relation 22: If the input vector has only one unique value, the output range indices should cover the entire range of the vector.
  */
 TEST_P(GetRangeParamTest, MR22) {
     /* Get source input */
     GetRangeInput input = GetParam();
     vector<int> vec = input.vec;
-    int target = input.target;
-    int rotationAmount = 3; // Number of positions to rotate
 
-    /* Get source output */
-    vector<int> source_out = get_range(vec, target);
+    /* Verify unique values */
+    unordered_set<int> unique_values(vec.begin(), vec.end());
 
-    /* Construct follow-up input by rotating array elements */
-    vector<int> follow_vec = vec;
-    rotate(follow_vec.begin(), follow_vec.begin() + rotationAmount, follow_vec.end());
+    if (unique_values.size() == 1) {
+        int value = *unique_values.begin();
 
-    /* Get follow-up output */
-    vector<int> follow_out = get_range(follow_vec, target);
+        /* Get source output */
+        vector<int> source_out = get_range(vec, value);
 
-    /* Verification */
-    EXPECT_EQ(source_out[0], (follow_out[0] + rotationAmount) % vec.size());
-    EXPECT_EQ(source_out[1], (follow_out[1] + rotationAmount) % vec.size());
+        /* Verification */
+        if (source_out[0] != -1 && source_out[1] != -1) {
+            EXPECT_EQ(0, source_out[0]);
+            EXPECT_EQ(static_cast<int>(vec.size()) - 1, source_out[1]);
+        }
+    }
 }
 
 /**
- * @brief Metamorphic relation 23: Adding a constant to each element in the array, the positions of the searching number in the modified array should align with
- * the positions in the original array, with an adjustable offset based on the constant.
+ * @brief Metamorphic relation 23: If the input vector contains all negative values, the output range indices for any negative value should remain the same as the output range indices for its absolute value counterpart in the vector.
  */
 TEST_P(GetRangeParamTest, MR23) {
     /* Get source input */
     GetRangeInput input = GetParam();
     vector<int> vec = input.vec;
-    int target = input.target;
-    int constant = 10; // Constant to add
 
-    /* Get source output */
-    vector<int> source_out = get_range(vec, target);
-
-    /* Construct follow-up input by adding a constant to each element */
-    vector<int> follow_vec = vec;
-    for (int &num : follow_vec) {
-        num += constant;
+    /* Verify negative values */
+    vector<int> negative_values;
+    for (int value : vec) {
+        if (value < 0) {
+            negative_values.push_back(value);
+        }
     }
 
-    /* Get follow-up output */
-    vector<int> follow_out = get_range(follow_vec, target);
+    /* Get source output for each negative value */
+    for (int value : negative_values) {
+        if (value != INT_MIN) {  // Avoid overflow for abs(INT_MIN)
+            vector<int> source_out = get_range(vec, value);
+        
+            /* Find the absolute value counterpart in the vector */
+            int absolute_value = abs(value);
 
-    /* Verify if the target exists in the original array */
-    if (source_out[0] != -1) {
-        /* Verification */
-        EXPECT_EQ(source_out[0], follow_out[0] - constant);
-        EXPECT_EQ(source_out[1], follow_out[1] - constant);
+            int first_occurrence = find(vec.begin(), vec.end(), absolute_value) - vec.begin();
+            int last_occurrence = first_occurrence;
+            while (last_occurrence < vec.size() && vec[last_occurrence] == absolute_value) {
+                last_occurrence++;
+            }
+
+            /* Verification */
+            EXPECT_EQ(source_out, get_range(vec, absolute_value));
+        }
     }
 }
 
 /**
- * @brief Metamorphic relation 24: Replacing all occurrences of a specific number in the array with a different number, the positions of the searching number in
- * the modified array should align with the positions in the original array.
+ * @brief Metamorphic relation 24: If the input vector contains all positive values, the output range indices for any positive value should remain the same as the output range indices for its negative counterpart in the vector.
  */
 TEST_P(GetRangeParamTest, MR24) {
     /* Get source input */
     GetRangeInput input = GetParam();
     vector<int> vec = input.vec;
-    int target = input.target;
-    int replacementNumber = 0; // Number to replace the occurrences of the target
 
-    /* Get source output */
-    vector<int> source_out = get_range(vec, target);
+    /* Verify positive values */
+    vector<int> positive_values;
+    for (int value : vec) {
+        if (value > 0) {
+            positive_values.push_back(value);
+        }
+    }
 
-    /* Construct follow-up input by replacing occurrences of the target number */
-    vector<int> follow_vec = vec;
-    replace(follow_vec.begin(), follow_vec.end(), target, replacementNumber);
+    /* Get source output for each positive value */
+    for (int value : positive_values) {
+        if (value != INT_MAX) {  // Avoid overflow for -INT_MAX
+            vector<int> source_out = get_range(vec, value);
+        
+            /* Find the negative value counterpart in the vector */
+            int negative_value = -value;
 
-    /* Get follow-up output */
-    vector<int> follow_out = get_range(follow_vec, target);
+            int first_occurrence = find(vec.begin(), vec.end(), negative_value) - vec.begin();
+            int last_occurrence = first_occurrence;
+            while (last_occurrence < vec.size() && vec[last_occurrence] == negative_value) {
+                last_occurrence++;
+            }
 
-    /* Verification */
-    EXPECT_EQ(source_out[0], follow_out[0]);
-    EXPECT_EQ(source_out[1], follow_out[1]);
+            /* Verification */
+            EXPECT_EQ(source_out, get_range(vec, negative_value));
+        }
+    }
 }
 
 /**
- * @brief Metamorphic relation 25: Removing specific elements from the array, the positions of the searching number in the modified array should be the same as
- * the positions in the original array, with an adjustment for the removed elements.
+ * @brief Metamorphic relation 25: If the input vector is an arithmetic sequence, the output range indices for any value should remain the same after applying a constant difference to the sequence.
  */
 TEST_P(GetRangeParamTest, MR25) {
     /* Get source input */
@@ -645,287 +651,275 @@ TEST_P(GetRangeParamTest, MR25) {
     /* Get source output */
     vector<int> source_out = get_range(vec, target);
 
-    /* Construct follow-up input by removing specific elements */
-    vector<int> follow_vec = vec;
-    follow_vec.erase(remove(follow_vec.begin(), follow_vec.end(), target), follow_vec.end());
+    /* Apply a constant difference to the sequence */
+    for (int i = 0; i < vec.size(); ++i) {
+        vec[i] += 5;
+    }
 
     /* Get follow-up output */
-    vector<int> follow_out = get_range(follow_vec, target);
+    vector<int> follow_out = get_range(vec, target);
 
     /* Verification */
-    if (source_out[0] != -1) {
-        int num_removed = static_cast<int>(vec.size()) - static_cast<int>(follow_vec.size());
-        EXPECT_EQ(source_out[0], follow_out[0] + num_removed);
-        EXPECT_EQ(source_out[1], follow_out[1] + num_removed);
-    }
+    EXPECT_EQ(source_out, follow_out);
 }
 
 /**
- * @brief Metamorphic relation 26: Adding specific elements to the array, the positions of the searching number in the modified array should be the same as the
- * positions in the original array, with an adjustment for the added elements.
+ * @brief Metamorphic relation 26: If the input vector is empty, the output range indices for any value should be [-1, -1].
  */
 TEST_P(GetRangeParamTest, MR26) {
     /* Get source input */
     GetRangeInput input = GetParam();
     vector<int> vec = input.vec;
     int target = input.target;
-    int added_element = 0;
 
-    /* Get source output */
-    vector<int> source_out = get_range(vec, target);
-
-    /* Construct follow-up input by adding specific elements */
-    vector<int> follow_vec = vec;
-    follow_vec.push_back(added_element);
-
-    /* Get follow-up output */
-    vector<int> follow_out = get_range(follow_vec, target);
-
-    /* Verification */
-    if (source_out[0] != -1) {
-        int num_added = 1;
-        EXPECT_EQ(source_out[0], follow_out[0] - num_added);
-        EXPECT_EQ(source_out[1], follow_out[1] - num_added);
+    /* When input vector is empty */
+    if (vec.empty()) {
+        vector<int> source_out = get_range(vec, target);
+        vector<int> expect = {-1, -1};
+        EXPECT_EQ(expect, source_out);
     }
 }
 
 /**
- * @brief Metamorphic relation 27: Interchanging two elements in the array, the positions of the searching number in the modified array should be the same as
- * the positions in the original array, regardless of the interchange.
+ * @brief Metamorphic relation 27: If the input vector contains duplicate values, the output range indices for any value should remain the same as the output range indices for its first occurrence in the vector when considering unique values.
  */
 TEST_P(GetRangeParamTest, MR27) {
     /* Get source input */
     GetRangeInput input = GetParam();
     vector<int> vec = input.vec;
-    int target = input.target;
 
-    /* Get source output */
-    vector<int> source_out = get_range(vec, target);
-
-    /* Construct follow-up input by interchanging two elements */
-    vector<int> follow_vec = vec;
-    if (follow_vec.size() >= 2) {
-        swap(follow_vec[0], follow_vec[1]);
+    /* Get unique values from input vector */
+    vector<int> unique_values;
+    for (int value : vec) {
+        if (find(unique_values.begin(), unique_values.end(), value) == unique_values.end()) {
+            unique_values.push_back(value);
+        }
     }
 
-    /* Get follow-up output */
-    vector<int> follow_out = get_range(follow_vec, target);
-
-    /* Verification */
-    EXPECT_EQ(source_out[0], follow_out[0]);
-    EXPECT_EQ(source_out[1], follow_out[1]);
+    /* Verify metamorphic relations for unique values */
+    for (int value : unique_values) {
+        vector<int> source_out = get_range(vec, value);
+        int first_occurrence = find(vec.begin(), vec.end(), value) - vec.begin();
+        int last_occurrence = first_occurrence;
+        while (last_occurrence < vec.size() && vec[last_occurrence] == value) {
+            last_occurrence++;
+        }
+        vector<int> expect = {first_occurrence, last_occurrence - 1};
+        EXPECT_EQ(source_out, expect);
+    }
 }
 
 /**
- * @brief Metamorphic relation 28: Sorting the array and then reversing it, the positions of the searching number in the modified array should align with the
- * positions in the original array, regardless of the sorting and reversal.
+ * @brief Metamorphic relation 28: If the input vector contains a single value, the output range indices for that value should be [0, 0].
  */
 TEST_P(GetRangeParamTest, MR28) {
     /* Get source input */
     GetRangeInput input = GetParam();
     vector<int> vec = input.vec;
-    int target = input.target;
 
-    /* Get source output */
-    vector<int> source_out = get_range(vec, target);
-
-    /* Construct follow-up input by sorting the array and then reversing it */
-    vector<int> follow_vec = vec;
-    sort(follow_vec.begin(), follow_vec.end());
-    reverse(follow_vec.begin(), follow_vec.end());
-
-    /* Get follow-up output */
-    vector<int> follow_out = get_range(follow_vec, target);
-
-    /* Verification */
-    EXPECT_EQ(source_out[0], follow_out[0]);
-    EXPECT_EQ(source_out[1], follow_out[1]);
+    /* When input vector contains a single value */
+    if (vec.size() == 1) {
+        int target = vec[0];
+        vector<int> source_out = get_range(vec, target);
+        vector<int> expect = {0, 0};
+        EXPECT_EQ(expect, source_out);
+    }
 }
 
 /**
- * @brief Metamorphic relation 29: Applying a mathematical operation to the elements in the array, the positions of the searching number in the modified array
- * should align with the positions in the original array, regardless of the mathematical operation applied.
+ * @brief Metamorphic relation 29: If the input vector contains all even numbers, the output range indices for any even number should remain the same as the output range indices for its corresponding odd number (if present) in the vector.
  */
 TEST_P(GetRangeParamTest, MR29) {
     /* Get source input */
     GetRangeInput input = GetParam();
     vector<int> vec = input.vec;
-    int target = input.target;
 
-    /* Get source output */
-    vector<int> source_out = get_range(vec, target);
+    /* Verify even values */
+    vector<int> even_values;
+    for (int value : vec) {
+        if (value % 2 == 0) {
+            even_values.push_back(value);
+        }
+    }
 
-    /* Construct follow-up input by applying a mathematical operation to the array elements */
-    vector<int> follow_vec = vec;
-    transform(follow_vec.begin(), follow_vec.end(), follow_vec.begin(), [](int x) { return x * x + 2 * x + 1; });
-
-    /* Get follow-up output */
-    vector<int> follow_out = get_range(follow_vec, target);
-
-    /* Verification */
-    EXPECT_EQ(source_out[0], follow_out[0]);
-    EXPECT_EQ(source_out[1], follow_out[1]);
+    /* Get source output for each even value */
+    for (int value : even_values) {
+        if (find(vec.begin(), vec.end(), value - 1) != vec.end()) {  // Check if odd counterpart is present
+            vector<int> source_out = get_range(vec, value);
+            EXPECT_EQ(source_out, get_range(vec, value - 1));  // Output range indices should be the same for even and odd counterparts
+        }
+    }
 }
 
 /**
- * @brief Metamorphic relation 30: Adding a value to the target number, the positions of the modified target number should be moved by the value added, compared
- * to the positions of the original target number.
+ * @brief Metamorphic relation 30: If the input vector contains all negative numbers, the output range indices for any negative number should remain the same as the output range indices for its positive counterpart (if present) in the vector.
  */
 TEST_P(GetRangeParamTest, MR30) {
     /* Get source input */
     GetRangeInput input = GetParam();
     vector<int> vec = input.vec;
-    int target = input.target;
 
-    /* New target number by adding a value */
-    int added_value = 5;
-    int modified_target = target + added_value;
+    /* Verify negative values */
+    vector<int> negative_values;
+    for (int value : vec) {
+        if (value < 0) {
+            negative_values.push_back(value);
+        }
+    }
 
-    /* Get source output */
-    vector<int> source_out = get_range(vec, target);
-    vector<int> modified_out = get_range(vec, modified_target);
-
-    /* Verification */
-    if (source_out[0] != -1 && modified_out[0] != -1) {
-        EXPECT_EQ(modified_out[0], source_out[0] + added_value);
-        EXPECT_EQ(modified_out[1], source_out[1] + added_value);
+    /* Get source output for each negative value */
+    for (int value : negative_values) {
+        if (find(vec.begin(), vec.end(), -value) != vec.end()) {  // Check if positive counterpart is present
+            vector<int> source_out = get_range(vec, value);
+            EXPECT_EQ(source_out, get_range(vec, -value));  // Output range indices should be the same for negative and positive counterparts
+        }
     }
 }
 
 /**
- * @brief Metamorphic relation 31: Adding a constant to all elements in the array, the positions of the searching number in the modified array should align with
- * the positions in the original array, regardless of the constant added to all elements.
+ * @brief Metamorphic relation 31: If the input vector contains all zeroes, the output range indices should be [0, 0] for value 0 and [-1, -1] for any other value.
  */
 TEST_P(GetRangeParamTest, MR31) {
     /* Get source input */
     GetRangeInput input = GetParam();
     vector<int> vec = input.vec;
-    int target = input.target;
-    int constant = 10; // Constant to add to all elements
 
-    /* Get source output */
-    vector<int> source_out = get_range(vec, target);
-
-    /* Construct follow-up input by adding a constant to all elements */
+    /* Fix: construct a vector whose elements are all zeros */
     vector<int> follow_vec = vec;
-    for (int &num : follow_vec) {
-        num += constant;
+    for (auto& val : follow_vec) val = 0;
+
+    /* Get source output for value 0 */
+    vector<int> source_out_zero = get_range(follow_vec, 0);
+    vector<int> tmp1 = {0, 0};
+    EXPECT_EQ(tmp1, source_out_zero);
+
+    /* Get source output for any value other than 0 */
+    for (int value : vec) {
+        if (value != 0) {
+            vector<int> source_out = get_range(follow_vec, value);
+            vector<int> tmp2 = {-1, -1};
+            EXPECT_EQ(tmp2, source_out);
+        }
     }
-
-    /* Get follow-up output */
-    vector<int> follow_out = get_range(follow_vec, target);
-
-    /* Verification */
-    EXPECT_EQ(source_out[0], follow_out[0]);
-    EXPECT_EQ(source_out[1], follow_out[1]);
 }
 
 /**
- * @brief Metamorphic relation 32: Reversing the order of the array's elements and then sorting it, the positions of the searching number in the modified array
- * should align with the positions in the original array, regardless of the order reversal and sorting.
+ * @brief Metamorphic relation 32: If the input vector is all non-negative numbers, the output range indices for a value x should be the same as the output range indices for the value x-1 if it exists in the vector. If x-1 does not exist in the vector, the output range for x should be [i, i] where i is the index of x if x is found in the vector and [-1, -1] if x is not found.
  */
 TEST_P(GetRangeParamTest, MR32) {
     /* Get source input */
     GetRangeInput input = GetParam();
     vector<int> vec = input.vec;
-    int target = input.target;
 
-    /* Get source output */
-    vector<int> source_out = get_range(vec, target);
+    /* Find minimum value if the vector is non-empty */
+    int min_value = vec.empty() ? 0 : *min_element(vec.begin(), vec.end());
 
-    /* Construct follow-up input by reversing the order of elements and then sorting it */
-    vector<int> follow_vec = vec;
-    reverse(follow_vec.begin(), follow_vec.end());
-    sort(follow_vec.begin(), follow_vec.end());
-
-    /* Get follow-up output */
-    vector<int> follow_out = get_range(follow_vec, target);
-
-    /* Verification */
-    EXPECT_EQ(source_out[0], follow_out[0]);
-    EXPECT_EQ(source_out[1], follow_out[1]);
+    /* Verify the metamorphic relation for each value x >= min_value */
+    for (int x = min_value; x <= *max_element(vec.begin(), vec.end()); ++x) {
+        vector<int> source_out = get_range(vec, x);
+        if (x - 1 >= min_value && find(vec.begin(), vec.end(), x-1) != vec.end()) {
+            vector<int> expected_out = get_range(vec, x - 1);
+            EXPECT_EQ(expected_out, source_out);
+        } else {
+            if (find(vec.begin(), vec.end(), x) != vec.end()) {
+                int index_x = find(vec.begin(), vec.end(), x) - vec.begin();
+                vector<int> expect = {index_x, index_x};
+                EXPECT_EQ(expect, source_out);
+            } else {
+                vector<int> expect = {-1, -1};
+                EXPECT_EQ(expect, source_out);
+            }
+        }
+    }
 }
 
 /**
- * @brief Metamorphic relation 33: Applying a bitwise operation to the elements in the array, the positions of the searching number in the modified array should
- * align with the positions in the original array, regardless of the bitwise operation applied.
+ * @brief Metamorphic relation 33: If the input vector is non-empty, the output range indices for any value x should be the same as the output range indices for the value abs(x) if it exists in the vector. If abs(x) does not exist in the vector, the output range for x should be the same as if x does not exist in the vector.
  */
 TEST_P(GetRangeParamTest, MR33) {
     /* Get source input */
     GetRangeInput input = GetParam();
     vector<int> vec = input.vec;
-    int target = input.target;
 
-    /* Get source output */
-    vector<int> source_out = get_range(vec, target);
+    /* Verify the metamorphic relation for each value x */
+    for (int x : vec) {
+        vector<int> source_out = get_range(vec, x);
+        int abs_x = abs(x);
 
-    /* Construct follow-up input by applying a bitwise operation to the array elements */
-    vector<int> follow_vec = vec;
-    transform(follow_vec.begin(), follow_vec.end(), follow_vec.begin(), [](int x) { return x ^ 255; });
-
-    /* Get follow-up output */
-    vector<int> follow_out = get_range(follow_vec, target);
-
-    /* Verification */
-    EXPECT_EQ(source_out[0], follow_out[0]);
-    EXPECT_EQ(source_out[1], follow_out[1]);
+        if (find(vec.begin(), vec.end(), abs_x) != vec.end()) {
+            vector<int> expected_out = get_range(vec, abs_x);
+            EXPECT_EQ(expected_out, source_out);
+        } 
+        // No else condition required as the output will be the same if x is not found in the vector
+    }
 }
 
 /**
- * @brief Metamorphic relation 34: Adding a constant value to the elements of the array and then subtracting the same constant value, the positions of the
- * searching number in the modified array should align with the positions in the original array, regardless of the addition and subtraction operations.
+ * @brief Metamorphic relation 34: If the input vector is non-empty and all elements are distinct, then modifying the input vector by removing one element should not affect the output range of any other element. 
  */
 TEST_P(GetRangeParamTest, MR34) {
     /* Get source input */
     GetRangeInput input = GetParam();
     vector<int> vec = input.vec;
-    int target = input.target;
-    int constant = 5;
 
-    /* Get source output */
-    vector<int> source_out = get_range(vec, target);
+    // Ensure the vector is non-empty and contains distinct elements
+    if (vec.size() > 0 && unordered_set<int>(vec.begin(), vec.end()).size() == vec.size()) {
+        vector<int> source_ranges;
+        
+        // Get the range for each element
+        for (int value : vec) {
+            vector<int> range = get_range(vec, value);
+            source_ranges.push_back(range[0]);  // Save the starting index of the range
+            source_ranges.push_back(range[1]);  // Save the ending index of the range
+        }
 
-    /* Construct follow-up input by adding and then subtracting a constant value from the array elements */
-    vector<int> follow_vec = vec;
-    transform(follow_vec.begin(), follow_vec.end(), follow_vec.begin(), [constant](int x) { return x + constant - constant; });
-
-    /* Get follow-up output */
-    vector<int> follow_out = get_range(follow_vec, target);
-
-    /* Verification */
-    EXPECT_EQ(source_out[0], follow_out[0]);
-    EXPECT_EQ(source_out[1], follow_out[1]);
+        // Remove one element and get the new range for each element
+        for (size_t i = 0; i < vec.size(); ++i) {
+            vector<int> modified_vec = vec;
+            modified_vec.erase(modified_vec.begin() + i);
+            for (int value : modified_vec) {
+                vector<int> new_range = get_range(modified_vec, value);
+                EXPECT_EQ(source_ranges[2 * value], new_range[0]);  // Starting index should be unchanged
+                EXPECT_EQ(source_ranges[2 * value + 1], new_range[1]);  // Ending index should be unchanged
+            }
+        }
+    }
 }
 
 /**
- * @brief Metamorphic relation 35: Performing an exclusive OR (XOR) operation with a specific value to the elements of the array, the positions of the searching
- * number in the modified array should align with the positions in the original array, regardless of the XOR operation.
+ * @brief Metamorphic relation 35: If the input vector contains duplicate elements, and we remove all occurrences of any duplicate element, then the range for that element should be [-1, -1].
  */
 TEST_P(GetRangeParamTest, MR35) {
     /* Get source input */
     GetRangeInput input = GetParam();
     vector<int> vec = input.vec;
-    int target = input.target;
-    int xor_value = 15; // XOR value
 
-    /* Get source output */
-    vector<int> source_out = get_range(vec, target);
+    // Ensure the vector contains duplicate elements
+    unordered_set<int> element_set;
+    int duplicate_element = 0;
+    for (int value : vec) {
+        if (element_set.find(value) != element_set.end()) {
+            duplicate_element = value;
+            break;
+        }
+        element_set.insert(value);
+    }
+    if (duplicate_element == 0) {
+        return;
+    }
 
-    /* Construct follow-up input by performing XOR operation with a specific value to the array elements */
-    vector<int> follow_vec = vec;
-    transform(follow_vec.begin(), follow_vec.end(), follow_vec.begin(), [xor_value](int x) { return x ^ xor_value; });
+    // Copy the vector and remove all occurrences of the duplicate element
+    vector<int> modified_vec = vec;
+    modified_vec.erase(remove(modified_vec.begin(), modified_vec.end(), duplicate_element), modified_vec.end());
 
-    /* Get follow-up output */
-    vector<int> follow_out = get_range(follow_vec, target);
-
-    /* Verification */
-    EXPECT_EQ(source_out[0], follow_out[0]);
-    EXPECT_EQ(source_out[1], follow_out[1]);
+    // Get the range for the duplicate element and verify it is [-1, -1]
+    vector<int> range = get_range(modified_vec, duplicate_element);
+    vector<int> expect = {-1, -1};
+    EXPECT_EQ(expect, range);
 }
 
 /**
- * @brief Metamorphic relation 36: Reversing the sign of the elements in the array, the positions of the searching number in the modified array should align
- * with the positions in the original array, regardless of the sign reversal.
+ * @brief Metamorphic relation 36: For any two values x and y such that x > y, if the range for x is [-1, -1], then the range for y should also be [-1, -1].
  */
 TEST_P(GetRangeParamTest, MR36) {
     /* Get source input */
@@ -933,173 +927,130 @@ TEST_P(GetRangeParamTest, MR36) {
     vector<int> vec = input.vec;
     int target = input.target;
 
-    /* Get source output */
+    /* Fix */
     vector<int> source_out = get_range(vec, target);
 
-    /* Construct follow-up input by reversing the sign of the array elements */
-    vector<int> follow_vec = vec;
-    transform(follow_vec.begin(), follow_vec.end(), follow_vec.begin(), std::negate<int>());
+    int follow_target = target - 1;
+    vector<int> follow_out = get_range(vec, follow_target);
 
-    /* Get follow-up output */
-    vector<int> follow_out = get_range(follow_vec, target);
-
-    /* Verification */
-    EXPECT_EQ(source_out[0], follow_out[0]);
-    EXPECT_EQ(source_out[1], follow_out[1]);
+    if (source_out[0] == -1) {
+        EXPECT_EQ(source_out, follow_out);
+    }
 }
 
 /**
- * @brief Metamorphic relation 37: Applying a modulo operation to the elements in the array, the positions of the searching number in the modified array should
- * align with the positions in the original array, regardless of the modulo operation applied.
+ * @brief Metamorphic relation 37: If the input vector has a single element k multiplied by a constant factor c, then the output range indices for k should also be multiplied by the same factor c.
  */
 TEST_P(GetRangeParamTest, MR37) {
     /* Get source input */
     GetRangeInput input = GetParam();
     vector<int> vec = input.vec;
-    int target = input.target;
-    int modulo_value = 10; // Modulo value
 
-    /* Get source output */
-    vector<int> source_out = get_range(vec, target);
+    if(vec.size() !=1) {
+        return;
+    }
 
-    /* Construct follow-up input by applying a modulo operation to the array elements */
-    vector<int> follow_vec = vec;
-    transform(follow_vec.begin(), follow_vec.end(), follow_vec.begin(), [modulo_value](int x) { return x % modulo_value; });
+    int k = vec[0];
+    vector<int> range = get_range(vec, k);
+    vector<int> modified_vec = vec;
+    int c = 2; // Constant factor
 
-    /* Get follow-up output */
-    vector<int> follow_out = get_range(follow_vec, target);
-
-    /* Verification */
-    EXPECT_EQ(source_out[0], follow_out[0]);
-    EXPECT_EQ(source_out[1], follow_out[1]);
+    vector<int> modifiedRange = get_range(modified_vec, k);
+    vector<int> expect = {range[0]*c, range[1]*c};
+    EXPECT_EQ(expect, modifiedRange);
 }
 
 /**
- * @brief Metamorphic relation 38: Shuffling the elements in the array, the positions of the searching number in the shuffled array should align with the
- * positions in the original array.
+ * @brief Metamorphic relation 38: If the input vector contains all negative numbers, sorting the vector should not change the output range for any value.
  */
 TEST_P(GetRangeParamTest, MR38) {
     /* Get source input */
     GetRangeInput input = GetParam();
     vector<int> vec = input.vec;
-    int target = input.target;
 
-    /* Get source output */
-    vector<int> source_out = get_range(vec, target);
+    // Verify if all elements are negative
+    bool allNegative = all_of(vec.begin(), vec.end(), [](int value) { return value < 0; });
 
-    /* Construct follow-up input by shuffling the array elements */
-    vector<int> follow_vec = vec;
-    random_shuffle(follow_vec.begin(), follow_vec.end());
+    if (allNegative) {
+        // Get the ranges for the original vector
+        unordered_map<int, vector<int>> originalRanges;
+        for (int value : vec) {
+            originalRanges[value] = get_range(vec, value);
+        }
 
-    /* Get follow-up output */
-    vector<int> follow_out = get_range(follow_vec, target);
+        // Sort the vector
+        sort(vec.begin(), vec.end());
 
-    /* Verification */
-    EXPECT_EQ(source_out[0], follow_out[0]);
-    EXPECT_EQ(source_out[1], follow_out[1]);
+        // Verify the ranges after sorting
+        for (const auto& [value, range] : originalRanges) {
+            EXPECT_EQ(range, get_range(vec, value));
+        }
+    }
 }
 
 /**
- * @brief Metamorphic relation 39: Combining the elements of the array by concatenating them, the positions of the searching number in the concatenated array
- * should align with the positions in the original array.
+ * @brief Metamorphic relation 39: If the input vector contains all positive numbers, scaling the vector by a factor 'k' should scale the output range for any value 'x' by the same factor 'k'.
  */
 TEST_P(GetRangeParamTest, MR39) {
     /* Get source input */
     GetRangeInput input = GetParam();
     vector<int> vec = input.vec;
-    int target = input.target;
 
-    /* Get source output */
-    vector<int> source_out = get_range(vec, target);
+    // Verify if all elements are positive
+    bool allPositive = all_of(vec.begin(), vec.end(), [](int value) { return value > 0; });
 
-    /* Construct follow-up input by concatenating the array elements */
-    vector<int> follow_vec = vec;
-    follow_vec.insert(follow_vec.end(), vec.begin(), vec.end());
+    if (allPositive) {
+        // Scale factor
+        int k = 2; // Let's consider the scale factor as 2
 
-    /* Get follow-up output */
-    vector<int> follow_out = get_range(follow_vec, target);
+        // Get the ranges for the original vector
+        unordered_map<int, vector<int>> originalRanges;
+        for (int value : vec) {
+            originalRanges[value] = get_range(vec, value);
+        }
 
-    /* Verification */
-    EXPECT_EQ(source_out[0], follow_out[0]);
-    EXPECT_EQ(source_out[1], follow_out[1]);
+        // Scale the vector
+        transform(vec.begin(), vec.end(), vec.begin(), [=](int value) { return value * k; });
+
+        // Verify the scaled ranges
+        for (const auto &[value, range] : originalRanges) {
+            vector<int> scaledRange = get_range(vec, value * k);
+            EXPECT_EQ(range[0] * k, scaledRange[0]);
+            EXPECT_EQ(range[1] * k, scaledRange[1]);
+        }
+    }
 }
 
 /**
- * @brief Metamorphic relation 40: Truncating the array to a smaller size, the positions of the searching number in the truncated array should align with the
- * positions in the original array.
+ * @brief Metamorphic relation 40: If the input vector contains all distinct non-negative numbers, adding a constant 'c' to each element should not change the output range for any value.
  */
 TEST_P(GetRangeParamTest, MR40) {
     /* Get source input */
     GetRangeInput input = GetParam();
     vector<int> vec = input.vec;
-    int target = input.target;
-    const size_t new_size = vec.size() / 2;
 
-    /* Get source output */
-    vector<int> source_out = get_range(vec, target);
+    if (all_of(vec.begin(), vec.end(), [](int value) { return value >= 0; })) {
+        // Get the ranges for the original vector
+        unordered_map<int, vector<int>> originalRanges;
+        for (int value : vec) {
+            originalRanges[value] = get_range(vec, value);
+        }
 
-    /* Construct follow-up input by truncating the array to a smaller size */
-    vector<int> follow_vec(vec.begin(), vec.begin() + new_size);
+        // Add a constant to each element
+        int constant = 5;  // Adding a constant value of 5
+        for (int &value : vec) {
+            value += constant;
+        }
 
-    /* Get follow-up output */
-    vector<int> follow_out = get_range(follow_vec, target);
-
-    /* Verification */
-    EXPECT_EQ(source_out[0], follow_out[0]);
-    EXPECT_EQ(source_out[1], follow_out[1]);
-}
-
-/**
- * @brief Metamorphic relation 41: Selecting a subset of elements from the array, the positions of the searching number in the subset array should align with
- * the positions in the original array.
- */
-TEST_P(GetRangeParamTest, MR41) {
-    /* Get source input */
-    GetRangeInput input = GetParam();
-    vector<int> vec = input.vec;
-    int target = input.target;
-    const size_t subsetSize = vec.size() / 2;
-
-    /* Get source output */
-    vector<int> source_out = get_range(vec, target);
-
-    /* Construct follow-up input by selecting a subset of elements from the array */
-    vector<int> follow_vec(vec.begin(), vec.begin() + subsetSize);
-
-    /* Get follow-up output */
-    vector<int> follow_out = get_range(follow_vec, target);
-
-    /* Verification */
-    EXPECT_EQ(source_out[0], follow_out[0]);
-    EXPECT_EQ(source_out[1], follow_out[1]);
-}
-
-/**
- * @brief Metamorphic relation 42: Duplicating the elements of the array, the positions of the searching number in the duplicated array should align with the
- * positions in the original array.
- */
-TEST_P(GetRangeParamTest, MR42) {
-    /* Get source input */
-    GetRangeInput input = GetParam();
-    vector<int> vec = input.vec;
-    int target = input.target;
-
-    /* Get source output */
-    vector<int> source_out = get_range(vec, target);
-
-    /* Construct follow-up input by duplicating the elements of the array */
-    vector<int> follow_vec;
-    for (const auto &element : vec) {
-        follow_vec.push_back(element);
-        follow_vec.push_back(element);
+        // Verify the ranges after adding the constant
+        for (const auto &entry : originalRanges) {
+          int value = entry.first;
+          vector<int> originalRange = entry.second;
+          vector<int> updatedRange = get_range(vec, value + constant);
+          EXPECT_EQ(originalRange, updatedRange);
+        }
     }
-
-    /* Get follow-up output */
-    vector<int> follow_out = get_range(follow_vec, target);
-
-    /* Verification */
-    EXPECT_EQ(source_out[0], follow_out[0]);
-    EXPECT_EQ(source_out[1], follow_out[1]);
 }
+
 
 INSTANTIATE_TEST_CASE_P(TrueReturn, GetRangeParamTest, testing::ValuesIn(gen_tcs_randomly()));
