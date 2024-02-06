@@ -10,14 +10,33 @@ using namespace std;
 
 class ClosestPairParamTest : public ::testing::TestWithParam<ClosestPairInput> {};
 
-/*  修改说吗:
-    1. point_set 替换为 vec
-    2. set<pair<int,int> 替换为 vector<pair<int, int>>
-    3. vec.insert 替换为 vec.push_back
+/**
+ * @brief Metamorphic relation 1: If the input points are translated by a constant vector, the output should remain the same.
+ *
  */
+TEST_P(ClosestPairParamTest, MR1) {
+    /* Get source input */
+    ClosestPairInput input = GetParam();
+    vector<pair<int, int>> vec = input.vec;
+
+    /* Get source output */
+    float source_out = closest_distance(vec);
+
+    /* Construct follow-up input */
+    vector<pair<int, int>> follow_vec;
+    for (auto &point : vec) {
+        follow_vec.push_back({point.first + 5, point.second + 5});  // Translate each point by a constant vector
+    }
+
+    /* Get follow-up output */
+    float follow_out = closest_distance(follow_vec);
+
+    /* Verification */
+    EXPECT_FLOAT_EQ(source_out, follow_out);
+}
 
 /**
- * @brief Metamorphic relation 2: Reversing the order of the points should not change the distance of the closest pair of points.
+ * @brief Metamorphic relation 2: If the order of the input points is changed, the output should remain the same.
  *
  */
 TEST_P(ClosestPairParamTest, MR2) {
@@ -29,17 +48,18 @@ TEST_P(ClosestPairParamTest, MR2) {
     float source_out = closest_distance(vec);
 
     /* Construct follow-up input */
-    vector<pair<int, int>> follow_vec(vec.rbegin(), vec.rend());
+    vector<pair<int, int>> follow_vec = vec;
+    random_shuffle(follow_vec.begin(), follow_vec.end());  // Change the order of points
 
     /* Get follow-up output */
     float follow_out = closest_distance(follow_vec);
 
     /* Verification */
-    EXPECT_EQ(source_out, follow_out);
+    EXPECT_FLOAT_EQ(source_out, follow_out);
 }
 
 /**
- * @brief Metamorphic relation 3: Scaling all the points by a certain factor should scale the closest distance by the same factor.
+ * @brief Metamorphic relation 3: If all points are scaled by a constant factor, the output should be scaled by the same factor.
  *
  */
 TEST_P(ClosestPairParamTest, MR3) {
@@ -52,19 +72,22 @@ TEST_P(ClosestPairParamTest, MR3) {
 
     /* Construct follow-up input */
     vector<pair<int, int>> follow_vec;
-    for (const auto& point : vec) {
-        follow_vec.push_back({point.first * 2, point.second * 2});
+    for (auto &point : vec) {
+        follow_vec.push_back({2 * point.first, 2 * point.second});  // Scale each point by a constant factor
     }
+
+    /* Calculate expected output */
+    float expected_follow_out = 2 * source_out;  // Expected follow-up output, scaled by the same factor
 
     /* Get follow-up output */
     float follow_out = closest_distance(follow_vec);
 
     /* Verification */
-    EXPECT_DOUBLE_EQ(source_out * 2, follow_out);
+    EXPECT_FLOAT_EQ(expected_follow_out, follow_out);
 }
 
 /**
- * @brief Metamorphic relation 4: Translating all the points by a certain vector should not change the distance of the closest pair of points.
+ * @brief Metamorphic relation 4: If the input points are reversed along the x-axis, the output should remain the same.
  *
  */
 TEST_P(ClosestPairParamTest, MR4) {
@@ -77,20 +100,19 @@ TEST_P(ClosestPairParamTest, MR4) {
 
     /* Construct follow-up input */
     vector<pair<int, int>> follow_vec;
-    pair<int, int> translation_vector = {10, -5};
-    for (const auto& point : vec) {
-        follow_vec.push_back({point.first + translation_vector.first, point.second + translation_vector.second});
+    for (auto &point : vec) {
+        follow_vec.push_back({-point.first, point.second});  // Reverse each point along the x-axis
     }
 
     /* Get follow-up output */
     float follow_out = closest_distance(follow_vec);
 
     /* Verification */
-    EXPECT_DOUBLE_EQ(source_out, follow_out);
+    EXPECT_FLOAT_EQ(source_out, follow_out);
 }
 
 /**
- * @brief Metamorphic relation 5: Adding duplicate points to the set should not change the distance of the closest pair of points.
+ * @brief Metamorphic relation 5: If the input points are shifted along the y-axis, the output should remain the same.
  *
  */
 TEST_P(ClosestPairParamTest, MR5) {
@@ -102,29 +124,20 @@ TEST_P(ClosestPairParamTest, MR5) {
     float source_out = closest_distance(vec);
 
     /* Construct follow-up input */
-    vector<pair<int, int>> follow_vec = vec;
-    follow_vec.push_back(*vec.begin());  // Inserting a duplicate point
+    vector<pair<int, int>> follow_vec;
+    for (auto &point : vec) {
+        follow_vec.push_back({point.first, point.second + 100});  // Shift each point along the y-axis
+    }
 
     /* Get follow-up output */
     float follow_out = closest_distance(follow_vec);
 
     /* Verification */
-    EXPECT_DOUBLE_EQ(source_out, follow_out);
-}
-
-/* Implemented by Radon */
-vector<pair<int, int>> addRandomNoise(vector<pair<int,int>> vec, int val) {
-    mt19937 rng(random_device{}());
-    uniform_int_distribution<int> dist(-val, val);
-    for (auto& point : vec) {
-        point.first += dist(rng);
-        point.second += dist(rng);
-    }
-    return vec;
+    EXPECT_FLOAT_EQ(source_out, follow_out);
 }
 
 /**
- * @brief Metamorphic relation 6: Adding random noise to the points should not change the distance of the closest pair of points significantly.
+ * @brief Metamorphic relation 6: Adding a point inside the boundary defined by the original points should not increase the minimum distance.
  *
  */
 TEST_P(ClosestPairParamTest, MR6) {
@@ -136,17 +149,24 @@ TEST_P(ClosestPairParamTest, MR6) {
     float source_out = closest_distance(vec);
 
     /* Construct follow-up input */
-    vector<pair<int, int>> follow_vec = addRandomNoise(vec, 5);  // Adding random noise within a range of 5
+    vector<pair<int, int>> follow_vec = vec;
+    // Insert a point at the centroid of the given points
+    int sumX = 0, sumY = 0;
+    for (auto &point : vec) {
+        sumX += point.first;
+        sumY += point.second;
+    }
+    follow_vec.push_back({sumX / vec.size(), sumY / vec.size()});
 
     /* Get follow-up output */
     float follow_out = closest_distance(follow_vec);
 
     /* Verification */
-    EXPECT_NEAR(source_out, follow_out, 1e-5);
+    EXPECT_GE(source_out, follow_out);  /* Fix */
 }
 
 /**
- * @brief Metamorphic relation 7: Removing a point from the set should not increase the distance of the closest pair of points.
+ * @brief Metamorphic relation 7: If the input points are duplicated, the output should remain the same.
  *
  */
 TEST_P(ClosestPairParamTest, MR7) {
@@ -157,25 +177,20 @@ TEST_P(ClosestPairParamTest, MR7) {
     /* Get source output */
     float source_out = closest_distance(vec);
 
-#if INVALID
     /* Construct follow-up input */
     vector<pair<int, int>> follow_vec = vec;
-    follow_vec.erase(*vec.begin());  // Removing a point
-#else
-    /* Construct follow-up input */
-    vector<pair<int, int>> follow_vec = vec;
-    follow_vec.erase(follow_vec.begin());  // Removing a point
-#endif
+    // Duplicate the input points
+    follow_vec.insert(follow_vec.end(), vec.begin(), vec.end());
 
     /* Get follow-up output */
     float follow_out = closest_distance(follow_vec);
 
     /* Verification */
-    EXPECT_LE(source_out, follow_out);
+    EXPECT_FLOAT_EQ(source_out, follow_out);
 }
 
 /**
- * @brief Metamorphic relation 8: Swapping two points in the set should not change the distance of the closest pair of points.
+ * @brief Metamorphic relation 8: If all points are shifted in the same direction by a constant distance, the output should remain the same.
  *
  */
 TEST_P(ClosestPairParamTest, MR8) {
@@ -187,20 +202,22 @@ TEST_P(ClosestPairParamTest, MR8) {
     float source_out = closest_distance(vec);
 
     /* Construct follow-up input */
-    vector<pair<int, int>> follow_vec = vec;
-    auto it = follow_vec.begin();
-    auto next_it = std::next(it);
-    std::iter_swap(it, next_it);  // Swapping two points
+    vector<pair<int, int>> follow_vec;
+    int shiftDistance = 10;  // Constant shift distance
+    for (auto &point : vec) {
+        follow_vec.push_back({point.first + shiftDistance, point.second + shiftDistance});  // Shift each point in the same direction
+    }
 
     /* Get follow-up output */
     float follow_out = closest_distance(follow_vec);
 
     /* Verification */
-    EXPECT_DOUBLE_EQ(source_out, follow_out);
+    EXPECT_FLOAT_EQ(source_out, follow_out);
 }
 
 /**
- * @brief Metamorphic relation 9: Applying a scaling transformation to all points in the set should not change the relative distances between the points, and consequently should not change the distance of the closest pair of points.
+ * @brief Metamorphic relation 9: If the input points form a convex hull, adding any new point inside or on the boundary of the convex hull should not increase the minimum distance.
+ *
  */
 TEST_P(ClosestPairParamTest, MR9) {
     /* Get source input */
@@ -210,32 +227,27 @@ TEST_P(ClosestPairParamTest, MR9) {
     /* Get source output */
     float source_out = closest_distance(vec);
 
-    /* Find centroid of the points */
-    pair<int, int> centroid = {0, 0};
-    for (const auto& point : vec) {
-        centroid.first += point.first;
-        centroid.second += point.second;
+    /* Construct follow-up input */
+    vector<pair<int, int>> follow_vec = vec;
+    // Add a new point inside the convex hull of the original points
+    // For simplicity, the centroid of the points can be considered to be inside the convex hull in many cases
+    int sumX = 0, sumY = 0;
+    for (auto &point : vec) {
+        sumX += point.first;
+        sumY += point.second;
     }
-    centroid.first /= vec.size();
-    centroid.second /= vec.size();
-
-    /* Apply scaling transformation to all points relative to the centroid */
-    vector<pair<int, int>> follow_vec;
-    for (const auto& point : vec) {
-        int scaled_x = centroid.first + 2 * (point.first - centroid.first);
-        int scaled_y = centroid.second + 2 * (point.second - centroid.second);
-        follow_vec.push_back({scaled_x, scaled_y});
-    }
+    follow_vec.push_back({sumX / vec.size(), sumY / vec.size()});
 
     /* Get follow-up output */
     float follow_out = closest_distance(follow_vec);
 
     /* Verification */
-    EXPECT_DOUBLE_EQ(source_out, follow_out);
+    EXPECT_GE(source_out, follow_out);
 }
 
 /**
- * @brief Metamorphic relation 10: Adding a constant value to all points in the set should not change the relative distances between the points, and consequently should not change the distance of the closest pair of points.
+ * @brief Metamorphic relation 10: If the input points are restricted to lie on a straight line, the output should remain the same.
+ *
  */
 TEST_P(ClosestPairParamTest, MR10) {
     /* Get source input */
@@ -245,23 +257,24 @@ TEST_P(ClosestPairParamTest, MR10) {
     /* Get source output */
     float source_out = closest_distance(vec);
 
-    /* Apply translation transformation to all points by a constant value */
+    /* Construct follow-up input */
     vector<pair<int, int>> follow_vec;
-    for (const auto& point : vec) {
-        int translated_x = point.first + 5;
-        int translated_y = point.second + 5;
-        follow_vec.push_back({translated_x, translated_y});
+    // Make all points lie on a straight line
+    int yValue = vec[0].second;  // Change all y-coordinates to be the same
+    for (auto &point : vec) {
+        follow_vec.push_back({point.first, yValue});
     }
 
     /* Get follow-up output */
     float follow_out = closest_distance(follow_vec);
 
     /* Verification */
-    EXPECT_DOUBLE_EQ(source_out, follow_out);
+    EXPECT_FLOAT_EQ(source_out, follow_out);
 }
 
 /**
- * @brief Metamorphic relation 11: If we duplicate all the points and add them to the set, the distance of the closest pair of points should not change.
+ * @brief Metamorphic relation 11: If the input points are all on the same horizontal line, the output should remain the same.
+ *
  */
 TEST_P(ClosestPairParamTest, MR11) {
     /* Get source input */
@@ -271,21 +284,24 @@ TEST_P(ClosestPairParamTest, MR11) {
     /* Get source output */
     float source_out = closest_distance(vec);
 
-    /* Construct follow-up input by duplicating all points */
-    vector<pair<int, int>> follow_vec = vec;
-    for(const auto& point : vec) {
-        follow_vec.push_back(point);
+    /* Construct follow-up input */
+    vector<pair<int, int>> follow_vec;
+    // Make all points lie on the same horizontal line
+    int x = vec[0].first;  // Take the x-coordinate of the first point
+    for (auto &point : vec) {
+        follow_vec.push_back({x, point.second});  // Change x-coordinate to be the same
     }
 
     /* Get follow-up output */
     float follow_out = closest_distance(follow_vec);
 
     /* Verification */
-    EXPECT_DOUBLE_EQ(source_out, follow_out);
+    EXPECT_FLOAT_EQ(source_out, follow_out);
 }
 
 /**
- * @brief Metamorphic relation 12: If we apply a horizontal reflection to all the points, the distance of the closest pair of points should not change.
+ * @brief Metamorphic relation 12: If the input points are all on the same vertical line, the output should remain the same.
+ *
  */
 TEST_P(ClosestPairParamTest, MR12) {
     /* Get source input */
@@ -295,118 +311,137 @@ TEST_P(ClosestPairParamTest, MR12) {
     /* Get source output */
     float source_out = closest_distance(vec);
 
-    /* Construct follow-up input by applying a horizontal reflection to all points */
+    /* Construct follow-up input */
     vector<pair<int, int>> follow_vec;
-    for(const auto& point : vec) {
-        follow_vec.push_back({-point.first, point.second});
+    // Make all points lie on the same vertical line
+    int y = vec[0].second;  // Take the y-coordinate of the first point
+    for (auto &point : vec) {
+        follow_vec.push_back({point.first, y});  // Change y-coordinate to be the same
     }
 
     /* Get follow-up output */
     float follow_out = closest_distance(follow_vec);
 
     /* Verification */
-    EXPECT_DOUBLE_EQ(source_out, follow_out);
+    EXPECT_FLOAT_EQ(source_out, follow_out);
 }
 
 /**
- * @brief Metamorphic relation 13: If we sort the points in non-decreasing order of x-coordinate and then calculate the closest pair of points, the distance should not change.
+ * @brief Metamorphic relation 13: If the points are randomly shuffled, the output should remain the same.
+ *
  */
 TEST_P(ClosestPairParamTest, MR13) {
     /* Get source input */
     ClosestPairInput input = GetParam();
-    vector<pair<int, int>> point_vec(input.vec.begin(), input.vec.end());
-
-    /* Sort the points in non-decreasing order of x-coordinate */
-    sort(point_vec.begin(), point_vec.end());
+    vector<pair<int, int>> vec = input.vec;
 
     /* Get source output */
-    float source_out = closest_distance(point_vec);
+    float source_out = closest_distance(vec);
+
+    /* Shuffle the input points */
+    random_shuffle(vec.begin(), vec.end());
+
+    /* Get follow-up output */
+    float follow_out = closest_distance(vec);
 
     /* Verification */
-    EXPECT_DOUBLE_EQ(source_out, closest_distance(input.vec));
+    EXPECT_FLOAT_EQ(source_out, follow_out);
 }
 
 /**
- * @brief Metamorphic relation 14: If we rotate all the points about the origin by a certain angle, the distance of the closest pair of points should not change.
+ * @brief Metamorphic relation 14: If the input points are rotated about their centroid, the output should remain the same.
+ *
  */
 TEST_P(ClosestPairParamTest, MR14) {
     /* Get source input */
     ClosestPairInput input = GetParam();
     vector<pair<int, int>> vec = input.vec;
 
-    constexpr double pi = 3.14159265358979323846;
-    constexpr double rotation_angle = pi / 6;  // Rotate by 30 degrees
-
-    /* Rotate all the points about the origin */
-    vector<pair<int, int>> follow_vec;
-    for (const auto& point : vec) {
-        int new_x = static_cast<int>(point.first * cos(rotation_angle) - point.second * sin(rotation_angle) + 0.5);
-        int new_y = static_cast<int>(point.first * sin(rotation_angle) + point.second * cos(rotation_angle) + 0.5);
-        follow_vec.push_back({new_x, new_y});
+    /* Calculate centroid of the points */
+    int sumX = 0, sumY = 0;
+    for (auto &point : vec) {
+        sumX += point.first;
+        sumY += point.second;
     }
+    int centroidX = sumX / vec.size();
+    int centroidY = sumY / vec.size();
 
     /* Get source output */
     float source_out = closest_distance(vec);
+
+    /* Rotate the points about their centroid */
+    vector<pair<int, int>> follow_vec;
+    for (auto &point : vec) {
+        int x = point.first;
+        int y = point.second;
+        // Perform a 90-degree clockwise rotation
+        int newX = centroidX + (y - centroidY);
+        int newY = centroidY - (x - centroidX);
+        follow_vec.push_back({newX, newY});
+    }
 
     /* Get follow-up output */
     float follow_out = closest_distance(follow_vec);
 
     /* Verification */
-    EXPECT_DOUBLE_EQ(source_out, follow_out);
+    EXPECT_FLOAT_EQ(source_out, follow_out);
 }
 
 /**
- * @brief Metamorphic relation 15: If we add a constant value to each x-coordinate of the points and recalculate the closest pair of points, the output should not change.
+ * @brief Metamorphic relation 15: If the input contains duplicate points, removing duplicates should not change the output.
+ *
  */
 TEST_P(ClosestPairParamTest, MR15) {
     /* Get source input */
     ClosestPairInput input = GetParam();
     vector<pair<int, int>> vec = input.vec;
-    
-    int deltaX = 5; // Constant to be added to x-coordinates
-    
+
+    // Introduce duplicate points
+    vec.push_back(vec[0]);
+    vec.push_back(vec[1]);
+
     /* Get source output */
     float source_out = closest_distance(vec);
 
-    /* Get follow-up output after applying the transformation */
-    vector<pair<int, int>> follow_vec;
-    for (const auto& point : vec) {
-        follow_vec.push_back({point.first + deltaX, point.second});
-    }
-    
-    float follow_out = closest_distance(follow_vec);
+    /* Remove duplicates */
+    set<pair<int, int>> unique_set(vec.begin(), vec.end());
+    vec.assign(unique_set.begin(), unique_set.end());
+
+    /* Get follow-up output */
+    float follow_out = closest_distance(vec);
 
     /* Verification */
-    EXPECT_DOUBLE_EQ(source_out, follow_out);
+    EXPECT_FLOAT_EQ(source_out, follow_out);
 }
 
 /**
- * @brief Metamorphic relation 16: If we add a constant value to each y-coordinate of the points and recalculate the closest pair of points, the output should not change.
+ * @brief Metamorphic relation 16: If the input points are halved such that only every other point is considered, the output should remain the same.
+ *
  */
 TEST_P(ClosestPairParamTest, MR16) {
     /* Get source input */
     ClosestPairInput input = GetParam();
     vector<pair<int, int>> vec = input.vec;
-    
-    int deltaY = 5; // Constant to be added to y-coordinates
-    
+
     /* Get source output */
     float source_out = closest_distance(vec);
 
-    /* Get follow-up output after applying the transformation */
+    /* Construct follow-up input with every other point */
     vector<pair<int, int>> follow_vec;
-    for (const auto& point : vec) {
-        follow_vec.push_back({point.first, point.second + deltaY});
+    for (int i = 0; i < vec.size(); i += 2) {
+        follow_vec.push_back(vec[i]);  // Use only every other point
     }
-    
+
+    /* Get follow-up output */
     float follow_out = closest_distance(follow_vec);
 
     /* Verification */
-    EXPECT_DOUBLE_EQ(source_out, follow_out);
+    EXPECT_FLOAT_EQ(source_out, follow_out);
 }
 
 /**
- * @brief Metamorphic relation 17: If we double the x-coordinate and y-coordinate of each point and recalculate the closest pair of points, the output should not change.
+ * @brief Metamorphic relation 17: If all points are shifted to the same origin, the output should remain the same.
+ *
  */
 TEST_P(ClosestPairParamTest, MR17) {
     /* Get source input */
@@ -415,21 +450,32 @@ TEST_P(ClosestPairParamTest, MR17) {
 
     /* Get source output */
     float source_out = closest_distance(vec);
+    
+    /* Calculate the centroid of the points */
+    int sumX = 0, sumY = 0;
+    for (auto &point : vec) {
+        sumX += point.first;
+        sumY += point.second;
+    }
+    int centroidX = sumX / vec.size();
+    int centroidY = sumY / vec.size();
 
-    /* Get follow-up output after doubling the coordinates of each point */
+    /* Construct follow-up input with shift points */
     vector<pair<int, int>> follow_vec;
-    for (const auto& point : vec) {
-        follow_vec.push_back({2 * point.first, 2 * point.second});
+    for (auto &point : vec) {
+        follow_vec.push_back({point.first - centroidX, point.second - centroidY});
     }
 
+    /* Get follow-up output */
     float follow_out = closest_distance(follow_vec);
 
     /* Verification */
-    EXPECT_DOUBLE_EQ(source_out, follow_out);
+    EXPECT_FLOAT_EQ(source_out, follow_out);
 }
 
 /**
- * @brief Metamorphic relation 18: If we square the x-coordinate and y-coordinate of each point and recalculate the closest pair of points, the output should not change.
+ * @brief Metamorphic relation 18: If the input points are replaced with their negations, the output should remain the same.
+ *
  */
 TEST_P(ClosestPairParamTest, MR18) {
     /* Get source input */
@@ -439,20 +485,22 @@ TEST_P(ClosestPairParamTest, MR18) {
     /* Get source output */
     float source_out = closest_distance(vec);
 
-    /* Get follow-up output after squaring the coordinates of each point */
+    /* Construct follow-up input with negated points */
     vector<pair<int, int>> follow_vec;
-    for (const auto& point : vec) {
-        follow_vec.push_back({point.first * point.first, point.second * point.second});
+    for (auto &point : vec) {
+        follow_vec.push_back({-point.first, -point.second});
     }
 
+    /* Get follow-up output */
     float follow_out = closest_distance(follow_vec);
 
     /* Verification */
-    EXPECT_DOUBLE_EQ(source_out, follow_out);
+    EXPECT_FLOAT_EQ(source_out, follow_out);
 }
 
 /**
- * @brief Metamorphic relation 19: If all y-coordinates of the points are negated and recalculate the closest pair of points, the distance should remain the same.
+ * @brief Metamorphic relation 19: If the input points are rotated around the origin, the output should remain the same.
+ *
  */
 TEST_P(ClosestPairParamTest, MR19) {
     /* Get source input */
@@ -462,20 +510,27 @@ TEST_P(ClosestPairParamTest, MR19) {
     /* Get source output */
     float source_out = closest_distance(vec);
 
-    /* Get follow-up output after negating the y-coordinates of each point */
+    /* Rotate the points around the origin */
     vector<pair<int, int>> follow_vec;
-    for (const auto& point : vec) {
-        follow_vec.push_back({point.first, -point.second});
+    for (auto &point : vec) {
+        int x = point.first;
+        int y = point.second;
+        // Perform a 90-degree counter-clockwise rotation
+        int newX = -y;
+        int newY = x;
+        follow_vec.push_back({newX, newY});
     }
 
+    /* Get follow-up output */
     float follow_out = closest_distance(follow_vec);
 
     /* Verification */
-    EXPECT_DOUBLE_EQ(source_out, follow_out);
+    EXPECT_FLOAT_EQ(source_out, follow_out);
 }
 
 /**
- * @brief Metamorphic relation 20: If all points are rotated 90 degrees counterclockwise, the distance of the closest pair of points should not change.
+ * @brief Metamorphic relation 20: If a scalar value is added to all x-coordinates of the input points, the output should not change.
+ *
  */
 TEST_P(ClosestPairParamTest, MR20) {
     /* Get source input */
@@ -484,71 +539,75 @@ TEST_P(ClosestPairParamTest, MR20) {
 
     /* Get source output */
     float source_out = closest_distance(vec);
-
-    /* Get follow-up output by rotating all points 90 degrees counterclockwise */
+    
+    /* Construct follow-up input */
+    int scalar = 10;  // Scalar value to be added to x-coordinates
     vector<pair<int, int>> follow_vec;
-    for (const auto& point : vec) {
-        follow_vec.push_back({-point.second, point.first});
+    for (auto &point : vec) {
+        follow_vec.push_back({point.first + scalar, point.second});
     }
 
+    /* Get follow-up output */
     float follow_out = closest_distance(follow_vec);
 
     /* Verification */
-    EXPECT_DOUBLE_EQ(source_out, follow_out);
+    EXPECT_FLOAT_EQ(source_out, follow_out);
 }
 
 /**
- * @brief Metamorphic relation 21: If all the points are shifted along the x-axis by a constant value, the distance of the closest pair of points should not change.
+ * @brief Metamorphic relation 21: If a scalar value is added to all y-coordinates of the input points, the output should not change.
+ *
  */
 TEST_P(ClosestPairParamTest, MR21) {
     /* Get source input */
     ClosestPairInput input = GetParam();
     vector<pair<int, int>> vec = input.vec;
 
-    int shiftValue = 10; // Constant value to shift the points along the x-axis
-
     /* Get source output */
     float source_out = closest_distance(vec);
-
-    /* Get follow-up output by shifting all points along the x-axis */
+    
+    /* Construct follow-up input */
+    int scalar = 10;  // Scalar value to be added to y-coordinates
     vector<pair<int, int>> follow_vec;
-    for (const auto& point : vec) {
-        follow_vec.push_back({point.first + shiftValue, point.second});
+    for (auto &point : vec) {
+        follow_vec.push_back({point.first, point.second + scalar});
     }
 
+    /* Get follow-up output */
     float follow_out = closest_distance(follow_vec);
 
     /* Verification */
-    EXPECT_DOUBLE_EQ(source_out, follow_out);
+    EXPECT_FLOAT_EQ(source_out, follow_out);
 }
 
 /**
- * @brief Metamorphic relation 22: If all the points are shifted along the y-axis by a constant value, the distance of the closest pair of points should not change.
+ * @brief Metamorphic relation 22: If the x-coordinates of the input points are replaced by their absolute values, the output should not change.
+ *
  */
 TEST_P(ClosestPairParamTest, MR22) {
     /* Get source input */
     ClosestPairInput input = GetParam();
     vector<pair<int, int>> vec = input.vec;
 
-    int shiftValue = 10; // Constant value to shift the points along the y-axis
-
     /* Get source output */
     float source_out = closest_distance(vec);
-
-    /* Get follow-up output by shifting all points along the y-axis */
+    
+    /* Construct follow-up input */
     vector<pair<int, int>> follow_vec;
-    for (const auto& point : vec) {
-        follow_vec.push_back({point.first, point.second + shiftValue});
+    for (auto &point : vec) {
+        follow_vec.push_back({abs(point.first), point.second});
     }
 
+    /* Get follow-up output */
     float follow_out = closest_distance(follow_vec);
 
     /* Verification */
-    EXPECT_DOUBLE_EQ(source_out, follow_out);
+    EXPECT_FLOAT_EQ(source_out, follow_out);
 }
 
 /**
- * @brief Metamorphic relation 23: If we replace every point p(x, y) with p(-x, y) and recalculate the closest pair of points, the output should remain the same.
+ * @brief Metamorphic relation 23: If the y-coordinates of the input points are replaced by their absolute values, the output should not change.
+ *
  */
 TEST_P(ClosestPairParamTest, MR23) {
     /* Get source input */
@@ -557,21 +616,23 @@ TEST_P(ClosestPairParamTest, MR23) {
 
     /* Get source output */
     float source_out = closest_distance(vec);
-
-    /* Get follow-up output after replacing every point p(x, y) with p(-x, y) */
+    
+    /* Construct follow-up input */
     vector<pair<int, int>> follow_vec;
-    for (const auto& point : vec) {
-        follow_vec.push_back({-point.first, point.second});
+    for (auto &point : vec) {
+        follow_vec.push_back({point.first, abs(point.second)});
     }
 
+    /* Get follow-up output */
     float follow_out = closest_distance(follow_vec);
 
     /* Verification */
-    EXPECT_DOUBLE_EQ(source_out, follow_out);
+    EXPECT_FLOAT_EQ(source_out, follow_out);
 }
 
 /**
- * @brief Metamorphic relation 24: If we replace every point p(x, y) with p(x, -y) and recalculate the closest pair of points, the output should remain the same.
+ * @brief Metamorphic relation 24: If the x-coordinates of the input points are replaced by their squares, the output should not change.
+ *
  */
 TEST_P(ClosestPairParamTest, MR24) {
     /* Get source input */
@@ -580,47 +641,48 @@ TEST_P(ClosestPairParamTest, MR24) {
 
     /* Get source output */
     float source_out = closest_distance(vec);
-
-    /* Get follow-up output after replacing every point p(x, y) with p(x, -y) */
+    
+    /* Construct follow-up input */
     vector<pair<int, int>> follow_vec;
-    for (const auto& point : vec) {
-        follow_vec.push_back({point.first, -point.second});
+    for (auto &point : vec) {
+        follow_vec.push_back({point.first * point.first, point.second});
     }
 
+    /* Get follow-up output */
     float follow_out = closest_distance(follow_vec);
 
     /* Verification */
-    EXPECT_DOUBLE_EQ(source_out, follow_out);
+    EXPECT_FLOAT_EQ(source_out, follow_out);
 }
 
 /**
- * @brief Metamorphic relation 25: If we add a constant value to each x-coordinate and subtract the same constant value from each y-coordinate of the points, the closest pair of points should not change.
+ * @brief Metamorphic relation 25: If the y-coordinates of the input points are replaced by their squares, the output should not change.
+ *
  */
 TEST_P(ClosestPairParamTest, MR25) {
     /* Get source input */
     ClosestPairInput input = GetParam();
     vector<pair<int, int>> vec = input.vec;
-    
-    int constant = 5; // Constant value to be added to x-coordinate and subtracted from y-coordinate
-    
+
     /* Get source output */
     float source_out = closest_distance(vec);
-
+    
     /* Construct follow-up input */
     vector<pair<int, int>> follow_vec;
-    for (const auto& point : vec) {
-        follow_vec.push_back({point.first + constant, point.second - constant});
+    for (auto &point : vec) {
+        follow_vec.push_back({point.first, point.second * point.second});
     }
-    
+
     /* Get follow-up output */
     float follow_out = closest_distance(follow_vec);
 
     /* Verification */
-    EXPECT_DOUBLE_EQ(source_out, follow_out);
+    EXPECT_FLOAT_EQ(source_out, follow_out);
 }
 
 /**
- * @brief Metamorphic relation 26: If all the points are mirrored along the line y=x and recalculate the closest pair of points, the distance should remain the same.
+ * @brief Metamorphic relation 26: If the x-coordinates and y-coordinates are swapped for all points, the output should not change.
+ *
  */
 TEST_P(ClosestPairParamTest, MR26) {
     /* Get source input */
@@ -630,21 +692,21 @@ TEST_P(ClosestPairParamTest, MR26) {
     /* Get source output */
     float source_out = closest_distance(vec);
 
-    /* Construct follow-up input by mirroring all points along the line y=x */
+    /* Construct follow-up input */
     vector<pair<int, int>> follow_vec;
-    for (const auto& point : vec) {
-        follow_vec.push_back({point.second, point.first});
+    for (auto &point : vec) {
+        follow_vec.push_back({point.second, point.first});  // Swap x and y coordinates
     }
 
     /* Get follow-up output */
     float follow_out = closest_distance(follow_vec);
 
     /* Verification */
-    EXPECT_DOUBLE_EQ(source_out, follow_out);
+    EXPECT_FLOAT_EQ(source_out, follow_out);
 }
 
 /**
- * @brief Metamorphic relation 27: If we replace each point (x, y) with (x+y, x-y), the distance of the closest pair of points should remain unchanged.
+ * @brief Metamorphic relation 27: If all x-coordinates are increased by a constant, the minimum distance should not change.
  */
 TEST_P(ClosestPairParamTest, MR27) {
     /* Get source input */
@@ -654,124 +716,121 @@ TEST_P(ClosestPairParamTest, MR27) {
     /* Get source output */
     float source_out = closest_distance(vec);
 
-    /* Construct follow-up input by replacing each point (x, y) with (x+y, x-y) */
+    /* Construct follow-up input */
     vector<pair<int, int>> follow_vec;
-    for (const auto& point : vec) {
-        follow_vec.push_back({point.first + point.second, point.first - point.second});
+    int shiftValue = 10;  // Constant shift value
+    for (auto &point : vec) {
+        follow_vec.push_back({point.first + shiftValue, point.second}); // Increase all x-coordinates by a constant
     }
 
     /* Get follow-up output */
     float follow_out = closest_distance(follow_vec);
 
     /* Verification */
-    EXPECT_DOUBLE_EQ(source_out, follow_out);
+    EXPECT_FLOAT_EQ(source_out, follow_out);
 }
 
 /**
- * @brief Metamorphic relation 28: If we sort the points by the distance from the origin and recalculate the closest pair of points, the output distance should remain unchanged.
+ * @brief Metamorphic relation 28: If all y-coordinates are increased by a constant, the minimum distance should not change.
  */
 TEST_P(ClosestPairParamTest, MR28) {
     /* Get source input */
     ClosestPairInput input = GetParam();
-    vector<pair<int, int>> point_vec(input.vec.begin(), input.vec.end());
-
-    /* Sort points by distance from the origin */
-    sort(point_vec.begin(), point_vec.end(), [](const pair<int, int>& a, const pair<int, int>& b) {
-        return hypot(a.first, a.second) < hypot(b.first, b.second);
-    });
+    vector<pair<int, int>> vec = input.vec;
 
     /* Get source output */
-    float source_out = closest_distance(point_vec);
+    float source_out = closest_distance(vec);
+
+    /* Construct follow-up input */
+    vector<pair<int, int>> follow_vec;
+    int shiftValue = 10;  // Constant shift value
+    for (auto &point : vec) {
+        follow_vec.push_back({point.first, point.second + shiftValue}); // Increase all y-coordinates by a constant
+    }
+
+    /* Get follow-up output */
+    float follow_out = closest_distance(follow_vec);
 
     /* Verification */
-    EXPECT_DOUBLE_EQ(source_out, closest_distance(input.vec));
+    EXPECT_FLOAT_EQ(source_out, follow_out);
 }
 
 /**
- * @brief Metamorphic relation 29: If we expand the x-coordinate and y-coordinate of each point by a certain scaling factor, the closest pair of points should not change.
+ * @brief Metamorphic relation 29: If all x-coordinates and y-coordinates are non-negatively increased by a constant, the minimum distance should not decrease.
  */
 TEST_P(ClosestPairParamTest, MR29) {
     /* Get source input */
     ClosestPairInput input = GetParam();
     vector<pair<int, int>> vec = input.vec;
-    
-    double scalingFactor = 2.0; // Scaling factor for expansion
-    
+
     /* Get source output */
     float source_out = closest_distance(vec);
 
-    /* Construct follow-up input by expanding the coordinates of each point */
+    /* Construct follow-up input */
     vector<pair<int, int>> follow_vec;
-    for (const auto& point : vec) {
-        follow_vec.push_back({static_cast<int>(point.first * scalingFactor), static_cast<int>(point.second * scalingFactor)});
+    int shiftValue = 10;  // Constant shift value
+    for (auto &point : vec) {
+        follow_vec.push_back({max(0, point.first + shiftValue), max(0, point.second + shiftValue)}); // Increase all coordinates non-negatively by a constant
     }
-    
+
     /* Get follow-up output */
     float follow_out = closest_distance(follow_vec);
 
     /* Verification */
-    EXPECT_DOUBLE_EQ(source_out, follow_out);
+    EXPECT_LE(source_out, follow_out);
 }
 
 /**
- * @brief Metamorphic relation 30: If the x-coordinate and y-coordinate of each point are halved, the closest pair of points should not change.
+ * @brief Metamorphic relation 30: If all x-coordinates and y-coordinates are non-positively decreased by a constant, the minimum distance should not increase.
  */
 TEST_P(ClosestPairParamTest, MR30) {
     /* Get source input */
     ClosestPairInput input = GetParam();
     vector<pair<int, int>> vec = input.vec;
-    
+
     /* Get source output */
     float source_out = closest_distance(vec);
 
-    /* Construct follow-up input by halving the coordinates of each point */
+    /* Construct follow-up input */
     vector<pair<int, int>> follow_vec;
-    for (const auto& point : vec) {
-        follow_vec.push_back({point.first / 2, point.second / 2});
+    int shiftValue = 10;  // Constant shift value
+    for (auto &point : vec) {
+        follow_vec.push_back({min(0, point.first - shiftValue), min(0, point.second - shiftValue)}); // Decrease all coordinates non-positively by a constant
     }
-    
+
     /* Get follow-up output */
     float follow_out = closest_distance(follow_vec);
 
     /* Verification */
-    EXPECT_DOUBLE_EQ(source_out, follow_out);
+    EXPECT_GE(source_out, follow_out);
 }
 
 /**
- * @brief Metamorphic relation 31: If all the points are translated such that the centroid of the set becomes the origin, the closest pair of points should not change.
+ * @brief Metamorphic relation 31: If the original points are mirrored about the x-axis, the minimum distance should not change.
  */
 TEST_P(ClosestPairParamTest, MR31) {
     /* Get source input */
     ClosestPairInput input = GetParam();
     vector<pair<int, int>> vec = input.vec;
 
-    // Calculate centroid of points
-    int centroidX = 0, centroidY = 0;
-    for (const auto& point : vec) {
-        centroidX += point.first;
-        centroidY += point.second;
-    }
-    centroidX /= vec.size();
-    centroidY /= vec.size();
-
     /* Get source output */
     float source_out = closest_distance(vec);
 
-    /* Construct follow-up input by translating all points so that the centroid becomes the origin */
+    /* Construct follow-up input with mirrored points about the x-axis */
     vector<pair<int, int>> follow_vec;
-    for (const auto& point : vec) {
-        follow_vec.push_back({point.first - centroidX, point.second - centroidY});
+    for (auto &point : vec) {
+        follow_vec.push_back({point.first, -point.second});  // Mirror original points about the x-axis
     }
 
     /* Get follow-up output */
     float follow_out = closest_distance(follow_vec);
 
     /* Verification */
-    EXPECT_DOUBLE_EQ(source_out, follow_out);
+    EXPECT_FLOAT_EQ(source_out, follow_out);
 }
 
 /**
- * @brief Metamorphic relation 32: If we replace each point p(x, y) with p(y, x) and recalculate the closest pair of points, the output should remain the same.
+ * @brief Metamorphic relation 32: If the original points are mirrored about the y-axis, the minimum distance should not change.
  */
 TEST_P(ClosestPairParamTest, MR32) {
     /* Get source input */
@@ -781,21 +840,21 @@ TEST_P(ClosestPairParamTest, MR32) {
     /* Get source output */
     float source_out = closest_distance(vec);
 
-    /* Construct follow-up input by replacing each point p(x, y) with p(y, x) */
+    /* Construct follow-up input with mirrored points about the y-axis */
     vector<pair<int, int>> follow_vec;
-    for (const auto& point : vec) {
-        follow_vec.push_back({point.second, point.first});
+    for (auto &point : vec) {
+        follow_vec.push_back({-point.first, point.second});  // Mirror original points about the y-axis
     }
 
     /* Get follow-up output */
     float follow_out = closest_distance(follow_vec);
 
     /* Verification */
-    EXPECT_DOUBLE_EQ(source_out, follow_out);
+    EXPECT_FLOAT_EQ(source_out, follow_out);
 }
 
 /**
- * @brief Metamorphic relation 33: If we replace each point p(x, y) with p(x, -y) and recalculate the closest pair of points, the output should remain the same.
+ * @brief Metamorphic relation 33: If the original points are mirrored about the origin, the minimum distance should not change.
  */
 TEST_P(ClosestPairParamTest, MR33) {
     /* Get source input */
@@ -805,97 +864,106 @@ TEST_P(ClosestPairParamTest, MR33) {
     /* Get source output */
     float source_out = closest_distance(vec);
 
-    /* Construct follow-up input by replacing each point p(x, y) with p(x, -y) */
+    /* Construct follow-up input with mirrored points about the origin */
     vector<pair<int, int>> follow_vec;
-    for (const auto& point : vec) {
-        follow_vec.push_back({point.first, -point.second});
+    for (auto &point : vec) {
+        follow_vec.push_back({-point.first, -point.second});  // Mirror original points about the origin
     }
 
     /* Get follow-up output */
     float follow_out = closest_distance(follow_vec);
 
     /* Verification */
-    EXPECT_DOUBLE_EQ(source_out, follow_out);
+    EXPECT_FLOAT_EQ(source_out, follow_out);
 }
 
 /**
- * @brief Metamorphic relation 34: If we replace each point p(x, y) with p(-x, -y) and recalculate the closest pair of points, the output should remain the same.
+ * @brief Metamorphic relation 34: If the original points are randomly perturbed within a small range, the minimum distance should remain the same.
  */
 TEST_P(ClosestPairParamTest, MR34) {
     /* Get source input */
     ClosestPairInput input = GetParam();
     vector<pair<int, int>> vec = input.vec;
 
+    /* Define the perturbation range */
+    int range = 5;
+
     /* Get source output */
     float source_out = closest_distance(vec);
 
-    /* Construct follow-up input by replacing each point p(x, y) with p(-x, -y) */
+    /* Perturb the original points within a small range */
     vector<pair<int, int>> follow_vec;
-    for (const auto& point : vec) {
-        follow_vec.push_back({-point.first, -point.second});
+    for (auto &point : vec) {
+        int perturbX = point.first + (rand() % (2*range + 1)) - range;
+        int perturbY = point.second + (rand() % (2*range + 1)) - range;
+        follow_vec.push_back({perturbX, perturbY});
     }
 
     /* Get follow-up output */
     float follow_out = closest_distance(follow_vec);
 
     /* Verification */
-    EXPECT_DOUBLE_EQ(source_out, follow_out);
+    EXPECT_FLOAT_EQ(source_out, follow_out);
 }
 
 /**
- * @brief Metamorphic relation 35: If we add a constant value to both x and y coordinates of all points and recalculate the closest pair of points, the output should remain the same.
+ * @brief Metamorphic relation 35: If the original points are slightly rotated, the minimum distance should not change significantly.
  */
 TEST_P(ClosestPairParamTest, MR35) {
     /* Get source input */
     ClosestPairInput input = GetParam();
     vector<pair<int, int>> vec = input.vec;
 
-    int constant = 5; // Constant to be added to all coordinates
-
     /* Get source output */
     float source_out = closest_distance(vec);
 
-    /* Construct follow-up input by adding a constant value to both x and y coordinates */
+    /* Rotate the points slightly */
     vector<pair<int, int>> follow_vec;
-    for (const auto& point : vec) {
-        follow_vec.push_back({point.first + constant, point.second + constant});
+    double angle = 0.1; // small angle in radians
+    for (auto &point : vec) {
+        int x = point.first;
+        int y = point.second;
+        int newX = x * cos(angle) - y * sin(angle);
+        int newY = x * sin(angle) + y * cos(angle);
+        follow_vec.push_back({newX, newY});
     }
 
     /* Get follow-up output */
     float follow_out = closest_distance(follow_vec);
 
     /* Verification */
-    EXPECT_DOUBLE_EQ(source_out, follow_out);
+    EXPECT_NEAR(source_out, follow_out, 0.001);  // Allowing a small error
 }
 
 /**
- * @brief Metamorphic relation 36: If we subtract a constant value from both x and y coordinates of all points and recalculate the closest pair of points, the output should remain the same.
+ * @brief Metamorphic relation 36: If the original points are scaled by a constant factor, the minimum distance should be scaled by the same factor.
  */
 TEST_P(ClosestPairParamTest, MR36) {
     /* Get source input */
     ClosestPairInput input = GetParam();
     vector<pair<int, int>> vec = input.vec;
 
-    int constant = 5; // Constant to be subtracted from all coordinates
-
     /* Get source output */
     float source_out = closest_distance(vec);
 
-    /* Construct follow-up input by subtracting a constant value from both x and y coordinates */
+    /* Scale the original points by a constant factor */
     vector<pair<int, int>> follow_vec;
-    for (const auto& point : vec) {
-        follow_vec.push_back({point.first - constant, point.second - constant});
+    int scaleFactor = 2; // constant scale factor
+    for (auto &point : vec) {
+        int newX = point.first * scaleFactor;
+        int newY = point.second * scaleFactor;
+        follow_vec.push_back({newX, newY});
     }
 
     /* Get follow-up output */
     float follow_out = closest_distance(follow_vec);
 
     /* Verification */
-    EXPECT_DOUBLE_EQ(source_out, follow_out);
+    EXPECT_FLOAT_EQ(source_out * scaleFactor, follow_out);
 }
 
 /**
- * @brief Metamorphic relation 37: If we replace each point p(x, y) with p(y, -x) and recalculate the closest pair of points, the output should remain the same.
+ * @brief Metamorphic relation 37: If the original points are sheared by a factor, the minimum distance should not change.
  */
 TEST_P(ClosestPairParamTest, MR37) {
     /* Get source input */
@@ -905,103 +973,96 @@ TEST_P(ClosestPairParamTest, MR37) {
     /* Get source output */
     float source_out = closest_distance(vec);
 
-    /* Construct follow-up input by replacing each point p(x, y) with p(y, -x) */
+    /* Shear the original points by a factor */
     vector<pair<int, int>> follow_vec;
-    for (const auto& point : vec) {
-        follow_vec.push_back({point.second, -point.first});
+    double shearFactor = 0.5; // constant shear factor
+    for (auto &point : vec) {
+        int newX = point.first + shearFactor * point.second;
+        follow_vec.push_back({newX, point.second});
     }
 
     /* Get follow-up output */
     float follow_out = closest_distance(follow_vec);
 
     /* Verification */
-    EXPECT_DOUBLE_EQ(source_out, follow_out);
+    EXPECT_FLOAT_EQ(source_out, follow_out);
 }
 
 /**
- * @brief Metamorphic relation 38: If we concatenate the original set of points with itself and recalculate the closest pair of points, the output should remain unchanged.
+ * @brief Metamorphic relation 38: If the original points are uniformly randomly scattered, the minimum distance should not significantly change.
  */
 TEST_P(ClosestPairParamTest, MR38) {
     /* Get source input */
     ClosestPairInput input = GetParam();
     vector<pair<int, int>> vec = input.vec;
 
-    // Create follow-up input by concatenating the original set of points with itself
-    vector<pair<int, int>> follow_vec = vec;
-    for (const auto& point : vec) {
-        follow_vec.push_back(point);
-    }
+    /* Define the scatter range */
+    int scatterRange = 20;
 
     /* Get source output */
     float source_out = closest_distance(vec);
+
+    /* Scatter the original points uniformly */
+    vector<pair<int, int>> follow_vec;
+    for (auto &point : vec) {
+        int perturbX = point.first + (rand() % (2*scatterRange + 1)) - scatterRange;
+        int perturbY = point.second + (rand() % (2*scatterRange + 1)) - scatterRange;
+        follow_vec.push_back({perturbX, perturbY});
+    }
 
     /* Get follow-up output */
     float follow_out = closest_distance(follow_vec);
 
     /* Verification */
-    EXPECT_DOUBLE_EQ(source_out, follow_out);
+    EXPECT_NEAR(source_out, follow_out, 10);  // Allowing a small error
 }
 
 /**
- * @brief Metamorphic relation 39: If we apply a random permutation to the order of the points and recalculate the closest pair of points, the output should remain the same.
+ * @brief Metamorphic relation 39: If the original points are shifted or translated by a vector, the minimum distance should not change.
  */
 TEST_P(ClosestPairParamTest, MR39) {
     /* Get source input */
     ClosestPairInput input = GetParam();
-    vector<pair<int, int>> point_vec(input.vec.begin(), input.vec.end());
-
-    // Apply random permutation to the order of the points
-    random_shuffle(point_vec.begin(), point_vec.end());
+    vector<pair<int, int>> vec = input.vec;
 
     /* Get source output */
-    float source_out = closest_distance(point_vec);
+    float source_out = closest_distance(vec);
+
+    /* Translate the original points by a vector */
+    vector<pair<int, int>> follow_vec;
+    pair<int, int> translationVector = make_pair(5, 5);
+    for (auto &point : vec) {
+        int newX = point.first + translationVector.first;
+        int newY = point.second + translationVector.second;
+        follow_vec.push_back({newX, newY});
+    }
+
+    /* Get follow-up output */
+    float follow_out = closest_distance(follow_vec);
 
     /* Verification */
-    EXPECT_DOUBLE_EQ(source_out, closest_distance(input.vec));
+    EXPECT_FLOAT_EQ(source_out, follow_out);
 }
 
 /**
- * @brief Metamorphic relation 40: If we remove some points from the set and recalculate the closest pair of points, the output should not significantly change.
+ * @brief Metamorphic relation 40: If a subset of the original points is considered, the minimum distance should not increase.
  */
 TEST_P(ClosestPairParamTest, MR40) {
     /* Get source input */
     ClosestPairInput input = GetParam();
     vector<pair<int, int>> vec = input.vec;
 
-    // Remove some points from the set
-    vector<pair<int, int>> follow_vec = vec;
-    if (follow_vec.size() > 3) {
-        auto it = follow_vec.begin();
-        advance(it, 3); // Removing the first 3 points
-        follow_vec.erase(follow_vec.begin(), it);
-    }
+    // Considering only the first half of the points
+    vector<pair<int, int>> subset_vec(vec.begin(), vec.begin() + vec.size() / 2);
 
     /* Get source output */
     float source_out = closest_distance(vec);
 
     /* Get follow-up output */
-    float follow_out = closest_distance(follow_vec);
+    float follow_out = closest_distance(subset_vec);
 
     /* Verification */
-    EXPECT_NEAR(source_out, follow_out, 1e-5);
-}
-
-/**
- * @brief Metamorphic relation 41: If we reverse the order of the points and calculate the closest pair of points, the output should remain unchanged.
- */
-TEST_P(ClosestPairParamTest, MR41) {
-    /* Get source input */
-    ClosestPairInput input = GetParam();
-    vector<pair<int, int>> point_vec(input.vec.begin(), input.vec.end());
-
-    // Reverse the order of the points
-    reverse(point_vec.begin(), point_vec.end());
-
-    /* Get source output */
-    float source_out = closest_distance(point_vec);
-
-    /* Verification */
-    EXPECT_DOUBLE_EQ(source_out, closest_distance(input.vec));
+    EXPECT_LE(source_out, follow_out);
 }
 
 INSTANTIATE_TEST_CASE_P(TrueReturn, ClosestPairParamTest, testing::ValuesIn(gen_tcs_randomly()));

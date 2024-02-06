@@ -17,7 +17,7 @@ vector<ClosestPairInput> gen_tcs_randomly() {
 
     /* clang-format off */
     uniform_int_distribution<int> dist_size(1, 100),   /* Range of vector's size */
-                                  dist_value(1, 1000);  /* Range of value */
+                                  dist_value(-1000, 1000);  /* Range of value */
     /* clang-format on */
 
     /* 构建测试用例 */
