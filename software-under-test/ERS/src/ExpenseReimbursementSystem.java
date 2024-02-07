@@ -1,5 +1,6 @@
 package src;
 
+import java.io.IOException;
 import java.util.Scanner;
 
 public class ExpenseReimbursementSystem {
@@ -117,37 +118,43 @@ public class ExpenseReimbursementSystem {
 		
 	}	
 
-	/* Writtern by Radon */
-	public double calculateOveruseFee(String stafflevel, double actualmonthlymileage, double monthlysalesamount) {
-		double feeForOverUseOfCar;
 
-		if(stafflevel.equals("seniormanager")){
-
-			allowableMileage = 4000;
-			costPerKilometer = 5;
-			if (actualmonthlymileage < allowableMileage) {
-				actualmonthlymileage = allowableMileage;
-			}
-
-		} else if (stafflevel.equals("manager")) {
-			allowableMileage = 3000;
-			costPerKilometer = 8;
-			if(actualmonthlymileage < allowableMileage){
-				actualmonthlymileage = allowableMileage;
-			}
-		} else if (stafflevel.equals("supervisor")) {
-
-			allowableMileage = 0;
-			costPerKilometer = 0;
-
+	/* Added by Radon */
+	public double getAllowableMileageForStaffLevel(String staffLevel) throws IOException {
+		if (staffLevel.equals("seniormanager")) {
+			return 4000;
+		} else if (staffLevel.equals("manager")) {
+			return 3000;
+		} else if (staffLevel.equals("supervisor")) {
+			return 0;
 		} else {
-
-			new java.io.IOException( "Invalid stafflevel" );
-
+			throw new java.io.IOException("Invalid stafflevel");
 		}
+	}
 
-		feeForOverUseOfCar = costPerKilometer*(actualmonthlymileage - allowableMileage);
 
-		return feeForOverUseOfCar;
+	public double getCostPerKilometerForStaffLevel(String staffLevel) throws IOException {
+		if (staffLevel.equals("seniormanager")) {
+			return 5;
+		} else if (staffLevel.equals("manager")) {
+			return 8;
+		} else if (staffLevel.equals("supervisor")) {
+			return 0;
+		} else {
+			throw new java.io.IOException("Invalid stafflevel");
+		}
+	}
+
+	
+	public static double getThresholdForAirfareReimbursement(String staffLevel) throws IOException {
+		if (staffLevel.equals("seniormanager")) {
+			return 0;
+		} else if (staffLevel.equals("manager")) {
+			return 50000;
+		} else if (staffLevel.equals("supervisor")) {
+			return 80000;
+		} else {
+			throw new java.io.IOException("Invalid stafflevel");
+		}
 	}
 }
