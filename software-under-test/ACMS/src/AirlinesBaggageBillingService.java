@@ -95,4 +95,76 @@ public class AirlinesBaggageBillingService
         result = area % 2;
         return result;
     }
+
+    public int getAirClass() {
+        return airClass;
+    }
+
+    public void setAirClass(int airClass) {
+        this.airClass = airClass;
+    }
+
+    public int getArea() {
+        return area;
+    }
+
+    public void setArea(int area) {
+        this.area = area;
+    }
+
+    public double getLuggage() {
+        return luggage;
+    }
+
+    public void setLuggage(double luggage) {
+        this.luggage = luggage;
+    }
+
+    public double getBenchmark() {
+        return benchmark;
+    }
+
+    public void setBenchmark(double benchmark) {
+        this.benchmark = benchmark;
+    }
+
+    public double getTakealong() {
+        return takealong;
+    }
+
+    public void setTakealong(double takealong) {
+        this.takealong = takealong;
+    }
+
+    public double getLuggagefee() {
+        return luggagefee;
+    }
+
+    public void setLuggagefee(double luggagefee) {
+        this.luggagefee = luggagefee;
+    }
+
+    public int getTln() {
+        return tln;
+    }
+
+    public void setTln(int tln) {
+        this.tln = tln;
+    }
+
+    public boolean isStudent() {
+        return isStudent;
+    }
+
+    public void setStudent(boolean isStudent) {
+        this.isStudent = isStudent;
+    }
+
+    public double getEconomicfee() {
+        return economicfee;
+    }
+
+    public void setEconomicfee(double economicfee) {
+        this.economicfee = economicfee;
+    }
 }
