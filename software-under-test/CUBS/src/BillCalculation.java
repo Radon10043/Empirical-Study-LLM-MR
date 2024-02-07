@@ -28,6 +28,12 @@ public class BillCalculation
 
     public double phoneBillCalculation( String planType, int planFee, int talkTime, int flow )
     {
+        /* Initialization, added by Radon */
+        this.talkTimePer = 0;
+        this.flowPer = 0.3;
+        this.talkTimeBench = 0;
+        this.flowBench = 0;
+
         if (planType == "A" || planType == "a") {
             switch (planFee) {
             case 46 :
@@ -110,5 +116,116 @@ public class BillCalculation
     public static void main(String[] args) {
         BillCalculation b = new BillCalculation();
         System.out.println(b.phoneBillCalculation("b", 46, 3685, 3261));
+    }
+
+
+    /* Getters and Setters, added by Radon */
+    public String getPlanType() {
+        return planType;
+    }
+
+
+    public void setPlanType(String planType) {
+        this.planType = planType;
+    }
+
+
+    public int getPlanFee() {
+        return planFee;
+    }
+
+
+    public void setPlanFee(int planFee) {
+        this.planFee = planFee;
+    }
+
+
+    public int getTalkTime() {
+        return talkTime;
+    }
+
+
+    public void setTalkTime(int talkTime) {
+        this.talkTime = talkTime;
+    }
+
+
+    public int getFlow() {
+        return flow;
+    }
+
+
+    public void setFlow(int flow) {
+        this.flow = flow;
+    }
+
+
+    public int getCallViewTime() {
+        return callViewTime;
+    }
+
+
+    public void setCallViewTime(int callViewTime) {
+        this.callViewTime = callViewTime;
+    }
+
+
+    public double getTalkTimePer() {
+        return talkTimePer;
+    }
+
+
+    public void setTalkTimePer(double talkTimePer) {
+        this.talkTimePer = talkTimePer;
+    }
+
+
+    public double getFlowPer() {
+        return flowPer;
+    }
+
+
+    public void setFlowPer(double flowPer) {
+        this.flowPer = flowPer;
+    }
+
+
+    public double getViewPer() {
+        return viewPer;
+    }
+
+
+    public void setViewPer(double viewPer) {
+        this.viewPer = viewPer;
+    }
+
+
+    public int getTalkTimeBench() {
+        return talkTimeBench;
+    }
+
+
+    public void setTalkTimeBench(int talkTimeBench) {
+        this.talkTimeBench = talkTimeBench;
+    }
+
+
+    public int getFlowBench() {
+        return flowBench;
+    }
+
+
+    public void setFlowBench(int flowBench) {
+        this.flowBench = flowBench;
+    }
+
+
+    public double getBill() {
+        return bill;
+    }
+
+
+    public void setBill(double bill) {
+        this.bill = bill;
     }
 }
