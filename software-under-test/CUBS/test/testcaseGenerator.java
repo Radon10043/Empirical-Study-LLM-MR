@@ -19,6 +19,8 @@ public class testcaseGenerator {
 
         int tcs_num = num;
         String[] cand_planType = {"A", "a", "B", "b"};
+        int[] cand_planFeeA = {46, 96, 286, 886, 990};
+        int[] cand_planFeeB = {46, 96, 126, 186};
         SecureRandom rand = new SecureRandom();
         Arguments[] tcs = new Arguments[tcs_num];
 
@@ -26,7 +28,12 @@ public class testcaseGenerator {
             String planType;
             int planFee, talkTime, flow;
             planType = cand_planType[rand.nextInt(0, 4)];
-            planFee = rand.nextInt(0, 1000);
+
+            if (planType.equals("A") || planType.equals("a"))
+                planFee = cand_planFeeA[rand.nextInt(0, 5)];
+            else
+                planFee = cand_planFeeB[rand.nextInt(0, 4)];
+
             talkTime = rand.nextInt(0, 10000);
             flow = rand.nextInt(0, 10000);
 
