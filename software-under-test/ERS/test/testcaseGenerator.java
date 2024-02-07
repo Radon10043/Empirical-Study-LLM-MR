@@ -19,7 +19,7 @@ public class testcaseGenerator {
     public static Stream<Arguments> generate(int num) throws IOException {
         int tcs_num = num;
         String[] cand = { "seniormanager", "manager", "supervisor" };
-        int[] range = {1000, 100000};
+        int[] range = {1000, 200000};
         SecureRandom rand = new SecureRandom();
         Arguments[] tcs = new Arguments[tcs_num];
 
