@@ -11,14 +11,14 @@ vector<QuickSortInput> gen_tcs_randomly() {
     vector<QuickSortInput> tcs;
     mt19937 rng(random_device{}());
     uniform_int_distribution<int> dist_size(1, 1000);
-    uniform_int_distribution<int> dist(-1000, 1000);
+    uniform_int_distribution<int> dist_value(-1000, 1000);
 
     /* 构建测试用例 */
     for (int i = 0; i < TESTCASE_NUM; i++) {
-        int size = dist(rng);
+        int size = dist_size(rng);
         vector<int> vec(size);
         for (auto &v : vec)
-            v = dist(rng);
+            v = dist_value(rng);
         tcs.push_back(vec);
     }
 
