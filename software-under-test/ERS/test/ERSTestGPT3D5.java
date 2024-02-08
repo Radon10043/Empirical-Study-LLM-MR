@@ -675,6 +675,347 @@ public class ERSTestGPT3D5 {
     }
 
     /**
+     * Metamorphic Relation 27: If the actual monthly mileage is equal to the allowable mileage for the staff level,
+     * and the monthly sales amount is zero, with other inputs constant, the total reimbursement amount should only include
+     * the reimbursement for car overuse fee.
+     * @throws IOException 
+     */
+    @ParameterizedTest
+    @MethodSource("testcaseProvider")
+    public void test27(String stafflevel, double actualmonthlymileage, double monthlysalesamount,
+                    double airfareamount, double otherexpensesamount) throws IOException {
+        if (monthlysalesamount != 0 || actualmonthlymileage != ExpenseReimbursementSystem.getAllowableMileageForStaffLevel(stafflevel)) {
+            return;
+        }
+        /* Get source output */
+        ExpenseReimbursementSystem ERS = new ExpenseReimbursementSystem();
+        double source_out = ERS.calculateReimbursementAmount(stafflevel, actualmonthlymileage,
+                                                            monthlysalesamount, airfareamount, otherexpensesamount);
+
+        /* Verification */
+        assertEquals(source_out, ExpenseReimbursementSystem.calculateCarOveruseFee(stafflevel, actualmonthlymileage));
+    }
+
+    /**
+     * Metamorphic Relation 28: If monthly sales amount is increased for a staff level "seniormanager" and actual monthly mileage 
+     * remains zero, with other inputs constant, the total reimbursement amount should be zero.
+     */
+    @ParameterizedTest
+    @MethodSource("testcaseProvider")
+    public void test28(String stafflevel, double actualmonthlymileage, double monthlysalesamount,
+                    double airfareamount, double otherexpensesamount) {
+        if (actualmonthlymileage != 0 || !stafflevel.equals("seniormanager")) {
+            return;
+        }
+        /* Get source output */
+        ExpenseReimbursementSystem ERS = new ExpenseReimbursementSystem();
+        double source_out = ERS.calculateReimbursementAmount(stafflevel, actualmonthlymileage,
+                                                            monthlysalesamount, airfareamount, otherexpensesamount);
+
+        /* Verification */
+        assertEquals(0, source_out);
+    }
+
+    /**
+     * Metamorphic Relation 29: If monthly sales amount is increased for a staff level "seniormanager" and airfare amount is zero,
+     * with other inputs constant, the total reimbursement amount should only include the reimbursement for car overuse fee.
+     * @throws IOException 
+     */
+    @ParameterizedTest
+    @MethodSource("testcaseProvider")
+    public void test29(String stafflevel, double actualmonthlymileage, double monthlysalesamount,
+                    double airfareamount, double otherexpensesamount) throws IOException {
+        if (airfareamount != 0 || !stafflevel.equals("seniormanager")) {
+            return;
+        }
+        /* Get source output */
+        ExpenseReimbursementSystem ERS = new ExpenseReimbursementSystem();
+        double source_out = ERS.calculateReimbursementAmount(stafflevel, actualmonthlymileage,
+                                                            monthlysalesamount, airfareamount, otherexpensesamount);
+
+        /* Verification */
+        assertEquals(source_out, ExpenseReimbursementSystem.calculateCarOveruseFee(stafflevel, actualmonthlymileage));
+    }
+
+    /**
+     * Metamorphic Relation 30: If the monthly sales amount is increased and the airfare amount is increased, 
+     * the total reimbursement amount should either stay the same or increase.
+     */
+    @ParameterizedTest
+    @MethodSource("testcaseProvider")
+    public void test30(String stafflevel, double actualmonthlymileage, double monthlysalesamount,
+                    double airfareamount, double otherexpensesamount) {
+        /* Get source output */
+        ExpenseReimbursementSystem ERS = new ExpenseReimbursementSystem();
+        double source_out = ERS.calculateReimbursementAmount(stafflevel, actualmonthlymileage,
+                                                            monthlysalesamount, airfareamount, otherexpensesamount);
+    
+        /* Construct follow-up input */
+        double follow_monthlysalesamount = monthlysalesamount * 2;
+        double follow_airfareamount = airfareamount * 2;
+
+        /* Get follow-up output */
+        double follow_out = ERS.calculateReimbursementAmount(stafflevel, actualmonthlymileage,
+                                                            follow_monthlysalesamount, follow_airfareamount, otherexpensesamount);
+
+        /* Verification */
+        assertTrue(source_out <= follow_out);
+    }
+
+    /**
+     * Metamorphic Relation 31: If the stafflevel is "seniormanager" and other expenses amount is zero, with other inputs constant, 
+     * the total reimbursement amount should equal the sum of the reimbursement for car overuse fee and airfare amount.
+     * @throws IOException 
+     */
+    @ParameterizedTest
+    @MethodSource("testcaseProvider")
+    public void test31(String stafflevel, double actualmonthlymileage, double monthlysalesamount,
+                    double airfareamount, double otherexpensesamount) throws IOException {
+        if (otherexpensesamount != 0 || !stafflevel.equals("seniormanager")) {
+            return;
+        }
+        /* Get source output */
+        ExpenseReimbursementSystem ERS = new ExpenseReimbursementSystem();
+        double source_out = ERS.calculateReimbursementAmount(stafflevel, actualmonthlymileage,
+                                                            monthlysalesamount, airfareamount, otherexpensesamount);
+
+        /* Verification */
+        assertEquals(source_out, ExpenseReimbursementSystem.calculateCarOveruseFee(stafflevel, actualmonthlymileage) + airfareamount);
+    }
+
+    /**
+     * Metamorphic Relation 32: If the stafflevel is "manager" and the actual monthly mileage is less than the allowable mileage, 
+     * while monthly sales amount, airfare amount, and other expenses amount remain constant, the total reimbursement amount should 
+     * include the reimbursement for car overuse fee.
+     * @throws IOException 
+     */
+    @ParameterizedTest
+    @MethodSource("testcaseProvider")
+    public void test32(String stafflevel, double actualmonthlymileage, double monthlysalesamount,
+                    double airfareamount, double otherexpensesamount) throws IOException {
+        if (!stafflevel.equals("manager")) {
+            return;
+        }
+
+        /* Get source output */
+        ExpenseReimbursementSystem ERS = new ExpenseReimbursementSystem();
+        double source_out = ERS.calculateReimbursementAmount(stafflevel, actualmonthlymileage,
+                                                            monthlysalesamount, airfareamount, otherexpensesamount);
+
+        double allowableMileage = ExpenseReimbursementSystem.getAllowableMileageForStaffLevel(stafflevel);
+        if (actualmonthlymileage < allowableMileage) {
+            double overuseFee = (allowableMileage - actualmonthlymileage) * ExpenseReimbursementSystem.getCostPerKilometerForStaffLevel(stafflevel);
+            /* Verification */
+            assertEquals(overuseFee, source_out);
+        }
+    }
+
+    /**
+     * Metamorphic Relation 33: If the stafflevel is "seniormanager" and the actual monthly mileage is greater than the allowable mileage, 
+     * while monthly sales amount, airfare amount, and other expenses amount remain constant, the total reimbursement amount 
+     * should include the reimbursement for car overuse fee, airfare amount, and other expenses amount.
+     * @throws IOException 
+     */
+    @ParameterizedTest
+    @MethodSource("testcaseProvider")
+    public void test33(String stafflevel, double actualmonthlymileage, double monthlysalesamount,
+                    double airfareamount, double otherexpensesamount) throws IOException {
+        if (!stafflevel.equals("seniormanager")) {
+            return;
+        }
+
+        /* Get source output */
+        ExpenseReimbursementSystem ERS = new ExpenseReimbursementSystem();
+        double source_out = ERS.calculateReimbursementAmount(stafflevel, actualmonthlymileage,
+                                                            monthlysalesamount, airfareamount, otherexpensesamount);
+
+        double allowableMileage = ExpenseReimbursementSystem.getAllowableMileageForStaffLevel(stafflevel);
+        if (actualmonthlymileage > allowableMileage) {
+            double overuseFee = (actualmonthlymileage - allowableMileage) * ExpenseReimbursementSystem.getCostPerKilometerForStaffLevel(stafflevel);
+            /* Verification */
+            assertEquals(overuseFee + airfareamount + otherexpensesamount, source_out);
+        }
+    }
+
+    /**
+     * Metamorphic Relation 34: If the stafflevel is "supervisor" and the monthly sales amount exceeds the threshold for other expenses reimbursement, 
+     * while actual monthly mileage and airfare amount remain constant, the total reimbursement amount 
+     * should include the reimbursement for car overuse fee, airfare amount, and other expenses amount.
+     * @throws IOException 
+     */
+    @ParameterizedTest
+    @MethodSource("testcaseProvider")
+    public void test34(String stafflevel, double actualmonthlymileage, double monthlysalesamount,
+                    double airfareamount, double otherexpensesamount) throws IOException {
+        if (!stafflevel.equals("supervisor")) {
+            return;
+        }
+
+        /* Get source output */
+        ExpenseReimbursementSystem ERS = new ExpenseReimbursementSystem();
+        double source_out = ERS.calculateReimbursementAmount(stafflevel, actualmonthlymileage,
+                                                            monthlysalesamount, airfareamount, otherexpensesamount);
+
+        double thresholdForOtherExpenses = ExpenseReimbursementSystem.getThresholdForOtherExpensesReimbursement();
+        if (monthlysalesamount > thresholdForOtherExpenses) {
+            double overuseFee = (actualmonthlymileage - ExpenseReimbursementSystem.getAllowableMileageForStaffLevel(stafflevel)) 
+                * ExpenseReimbursementSystem.getCostPerKilometerForStaffLevel(stafflevel);
+            /* Verification */
+            assertTrue(source_out >= (overuseFee + airfareamount + otherexpensesamount));
+        }
+    }
+
+    /**
+     * Metamorphic Relation 35: If the stafflevel is "manager" and the actual monthly mileage is equal to the allowable mileage,
+     * while monthly sales amount, airfare amount, and other expenses amount remain constant, the total reimbursement amount 
+     * should include the reimbursement for car overuse fee and airfare amount.
+     * @throws IOException 
+     */
+    @ParameterizedTest
+    @MethodSource("testcaseProvider")
+    public void test35(String stafflevel, double actualmonthlymileage, double monthlysalesamount,
+                    double airfareamount, double otherexpensesamount) throws IOException {
+        if (!stafflevel.equals("manager")) {
+            return;
+        }
+
+        /* Get source output */
+        ExpenseReimbursementSystem ERS = new ExpenseReimbursementSystem();
+        double source_out = ERS.calculateReimbursementAmount(stafflevel, actualmonthlymileage,
+                                                            monthlysalesamount, airfareamount, otherexpensesamount);
+
+        double allowableMileage = ExpenseReimbursementSystem.getAllowableMileageForStaffLevel(stafflevel);
+        if (actualmonthlymileage == allowableMileage) {
+            double overuseFee = (actualmonthlymileage - allowableMileage) * ExpenseReimbursementSystem.getCostPerKilometerForStaffLevel(stafflevel);
+            /* Verification */
+            assertEquals(overuseFee + airfareamount, source_out);
+        }
+    }
+
+    /**
+     * Metamorphic Relation 36: If monthly sales amount and other expenses amount are both zero, 
+     * the total reimbursement amount should only include the reimbursement for car overuse fee, 
+     * and the airfare amount for a senior manager.
+     * @throws IOException 
+     */
+    @ParameterizedTest
+    @MethodSource("testcaseProvider")
+    public void test36(String stafflevel, double actualmonthlymileage, double monthlysalesamount,
+                    double airfareamount, double otherexpensesamount) throws IOException {
+        if (monthlysalesamount != 0 || otherexpensesamount != 0 || !stafflevel.equals("seniormanager")) {
+            return;
+        }
+        /* Get source output */
+        ExpenseReimbursementSystem ERS = new ExpenseReimbursementSystem();
+        double source_out = ERS.calculateReimbursementAmount(stafflevel, actualmonthlymileage,
+                                                            monthlysalesamount, airfareamount, otherexpensesamount);
+        double overuseFee = Math.max(actualmonthlymileage - ExpenseReimbursementSystem.getAllowableMileageForStaffLevel(stafflevel), 0) 
+            * ExpenseReimbursementSystem.getCostPerKilometerForStaffLevel(stafflevel);
+        /* Verification */
+        assertEquals(overuseFee + airfareamount, source_out);
+    }
+
+    /**
+     * Metamorphic Relation 37: If the stafflevel is "manager" and the monthly sales amount is equal to the threshold for airfare reimbursement, 
+     * then the total reimbursement amount should be at least the airfare amount.
+     * @throws IOException 
+     */
+    @ParameterizedTest
+    @MethodSource("testcaseProvider")
+    public void test37(String stafflevel, double actualmonthlymileage, double monthlysalesamount,
+                    double airfareamount, double otherexpensesamount) throws IOException {
+        if (!stafflevel.equals("manager") || monthlysalesamount < ExpenseReimbursementSystem.getThresholdForAirfareReimbursement(stafflevel)) {
+            return;
+        }
+        /* Get source output */
+        ExpenseReimbursementSystem ERS = new ExpenseReimbursementSystem();
+        double source_out = ERS.calculateReimbursementAmount(stafflevel, actualmonthlymileage,
+                                                            monthlysalesamount, airfareamount, otherexpensesamount);
+        /* Verification */
+        assertTrue(source_out >= airfareamount);
+    }
+
+    /**
+     * Metamorphic Relation 38: If other expenses amount is increased, while actual monthly mileage, monthly sales amount, 
+     * and airfare amount remain constant, the total reimbursement amount should increase.
+     */
+    @ParameterizedTest
+    @MethodSource("testcaseProvider")
+    public void test38(String stafflevel, double actualmonthlymileage, double monthlysalesamount,
+                    double airfareamount, double otherexpensesamount) {
+        /* Get source output */
+        ExpenseReimbursementSystem ERS = new ExpenseReimbursementSystem();
+        double source_out = ERS.calculateReimbursementAmount(stafflevel, actualmonthlymileage,
+                                                            monthlysalesamount, airfareamount, otherexpensesamount);
+    
+        /* Construct follow-up input */
+        double increasedOtherExpensesAmount = otherexpensesamount * 2;
+
+        /* Get follow-up output */
+        double follow_out = ERS.calculateReimbursementAmount(stafflevel, actualmonthlymileage,
+                                                            monthlysalesamount, airfareamount, increasedOtherExpensesAmount);
+
+        /* Verification */
+        assertTrue(source_out < follow_out);
+    }
+
+    /**
+     * Metamorphic Relation 39: If both airfare amount and other expenses amount are zero, 
+     * the total reimbursement amount should only include the reimbursement for car overuse fee, 
+     * given that the monthly sales amount exceeds the threshold for other expenses reimbursement.
+     * @throws IOException 
+     */
+    @ParameterizedTest
+    @MethodSource("testcaseProvider")
+    public void test39(String stafflevel, double actualmonthlymileage, double monthlysalesamount,
+                    double airfareamount, double otherexpensesamount) throws IOException {
+        if (airfareamount !=0 || otherexpensesamount !=0) {
+            return;
+        }
+
+        /* Get source output */
+        ExpenseReimbursementSystem ERS = new ExpenseReimbursementSystem();
+        double source_out = ERS.calculateReimbursementAmount(stafflevel, actualmonthlymileage,
+                                                            monthlysalesamount, airfareamount, otherexpensesamount);
+    
+        double thresholdForOtherExpenses = ExpenseReimbursementSystem.getThresholdForOtherExpensesReimbursement();
+        if (monthlysalesamount > thresholdForOtherExpenses) {
+            double overuseFee = Math.max(actualmonthlymileage - ExpenseReimbursementSystem.getAllowableMileageForStaffLevel(stafflevel), 0) 
+                * ExpenseReimbursementSystem.getCostPerKilometerForStaffLevel(stafflevel);
+        
+            /* Verification */
+            assertEquals(overuseFee, source_out);
+        }
+    }
+
+    /**
+     * Metamorphic Relation 40: If the stafflevel is "seniormanager" and the actual monthly mileage is equal to the allowable mileage, 
+     * while monthly sales amount, airfare amount, and other expenses amount remain constant, the total reimbursement amount 
+     * should include the reimbursement for car overuse fee and airfare amount.
+     * @throws IOException 
+     */
+    @ParameterizedTest
+    @MethodSource("testcaseProvider")
+    public void test40(String stafflevel, double actualmonthlymileage, double monthlysalesamount,
+                    double airfareamount, double otherexpensesamount) throws IOException {
+        if (!stafflevel.equals("seniormanager")) {
+            return;
+        }
+
+        /* Get source output */
+        ExpenseReimbursementSystem ERS = new ExpenseReimbursementSystem();
+        double source_out = ERS.calculateReimbursementAmount(stafflevel, actualmonthlymileage,
+                                                            monthlysalesamount, airfareamount, otherexpensesamount);
+
+        double allowableMileage = ExpenseReimbursementSystem.getAllowableMileageForStaffLevel(stafflevel);
+        if (actualmonthlymileage == allowableMileage) {
+            double overuseFee = (actualmonthlymileage - allowableMileage) * ExpenseReimbursementSystem.getCostPerKilometerForStaffLevel(stafflevel);
+            /* Verification */
+            assertEquals(overuseFee + airfareamount, source_out);
+        }
+    }
+
+    /**
      * 随机生成测试用例
      *
      * @return
