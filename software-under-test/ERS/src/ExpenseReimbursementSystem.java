@@ -120,7 +120,7 @@ public class ExpenseReimbursementSystem {
 
 
 	/* Added by Radon */
-	public double getAllowableMileageForStaffLevel(String staffLevel) throws IOException {
+	public static double getAllowableMileageForStaffLevel(String staffLevel) throws IOException {
 		if (staffLevel.equals("seniormanager")) {
 			return 4000;
 		} else if (staffLevel.equals("manager")) {
@@ -133,7 +133,7 @@ public class ExpenseReimbursementSystem {
 	}
 
 
-	public double getCostPerKilometerForStaffLevel(String staffLevel) throws IOException {
+	public static double getCostPerKilometerForStaffLevel(String staffLevel) throws IOException {
 		if (staffLevel.equals("seniormanager")) {
 			return 5;
 		} else if (staffLevel.equals("manager")) {
@@ -156,5 +156,18 @@ public class ExpenseReimbursementSystem {
 		} else {
 			throw new java.io.IOException("Invalid stafflevel");
 		}
+	}
+
+	public static double getThresholdForOtherExpensesReimbursement() {
+		return 100000;
+	}
+
+	public static double calculateCarOveruseFee(String staffLevel, double actualMonthlyMileage) throws IOException {
+		double allowableMileage = getAllowableMileageForStaffLevel(staffLevel);
+		double costPerKilometer = getCostPerKilometerForStaffLevel(staffLevel);
+		if (actualMonthlyMileage < allowableMileage) {
+			actualMonthlyMileage = allowableMileage;
+		}
+		return costPerKilometer * (actualMonthlyMileage - allowableMileage);
 	}
 }
