@@ -2,7 +2,7 @@
 Author: Radon
 Date: 2023-12-05 10:21:39
 LastEditors: Radon
-LastEditTime: 2024-01-18 17:49:41
+LastEditTime: 2024-02-09 10:28:06
 Description: Hi, say something
 """
 import unittest
@@ -27,7 +27,7 @@ def load_test_cases() -> list:
     -----
     _description_
     """
-    return gen_tcs_randomly()
+    return gen_tcs_randomly(1000)
 
 
 class TestingClass(unittest.TestCase):
