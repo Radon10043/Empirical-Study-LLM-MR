@@ -1,10 +1,17 @@
+package test;
+
 import org.joda.time.DateTime;
+import org.joda.time.Duration;
 import static org.junit.Assert.assertTrue;
+
 import java.io.IOException;
 import java.util.stream.Stream;
+
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
+
+import static test.testcaseGenerator.*;
 
 public class JodaTestExample {
     /**
@@ -48,10 +55,26 @@ public class JodaTestExample {
     }
 
     static Stream<Arguments> testcaseProvider1() throws IOException {
-        return testcaseGenerator.generate_di(1000);
+        int num = 1000;
+        Arguments tcs[] = new Arguments[num];
+        for (int i = 0; i < num; i++) {
+            DateTime time = genDateTime();
+            int days = genInt(1, 100);
+            tcs[i] = Arguments.of(time, days);
+        }
+        writeToFile(tcs);
+        return Stream.of(tcs);
     }
 
     static Stream<Arguments> testcaseProvider2() throws IOException {
-        return testcaseGenerator.generate_di(1000);
+        int num = 1000;
+        Arguments tcs[] = new Arguments[num];
+        for (int i = 0; i < num; i++) {
+            DateTime time = genDateTime();
+            int weeks = genInt(1, 100);
+            tcs[i] = Arguments.of(time, weeks);
+        }
+        writeToFile(tcs);
+        return Stream.of(tcs);
     }
 }

@@ -1,895 +1,1099 @@
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+package test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.io.IOException;
 import java.util.stream.Stream;
 
 import org.joda.time.Chronology;
 import org.joda.time.DateTime;
-import org.joda.time.DateTimeConstants;
 import org.joda.time.DateTimeZone;
-import org.joda.time.Days;
 import org.joda.time.Duration;
-import org.joda.time.Instant;
+import org.joda.time.Interval;
+import org.joda.time.LocalDate;
+import org.joda.time.LocalDateTime;
+import org.joda.time.LocalTime;
 import org.joda.time.Period;
-import org.joda.time.Weeks;
-import org.joda.time.format.DateTimeFormatter;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.runners.Parameterized.Parameter;
+
+import static test.testcaseGenerator.*;
 
 public class JodaTestGPT3D5 {
     /**
-     * Metamorphic Relation 3: Subtracting the number of hours from the input time
-     * and then adding the same number of hours should result in the same output.
+     * Metamorphic Relation 1: Adding a duration of time to the input time, and then subtracting the
+     * same duration of time from the output will produce the same input time.
      */
     @ParameterizedTest
-    @MethodSource("testcaseProviderDI")
-    public void test3(DateTime time, int hours) {
-        /* Get source output */
-        DateTime intermediate = time.minusHours(hours);
-        DateTime source_out = intermediate.plusHours(hours);
+    @MethodSource("testcaseProviderMR1")
+    public void test1(DateTime time, Duration duration) {
+        // Get source output
+        DateTime source_out = time.plus(duration);
 
-        /* Get follow-up output */
-        DateTime follow_out = time;
+        // Construct follow-up input
+        Duration negDuration = duration.negated();
 
-        /* Verification */
-        assertTrue(source_out.equals(follow_out));
+        // Get follow-up output
+        DateTime follow_out = source_out.plus(negDuration);
+
+        // Verification
+        assertEquals(time, follow_out);
     }
 
     /**
-     * Metamorphic Relation 4: Adding the number of weeks to the input time and then
-     * adding the same number of days should result in the same output as adding the
-     * total days directly.
+     * Metamorphic Relation 2: Constructing a new DateTime instance based on components of the input
+     * DateTime and then accessing those components from the follow-up output will yield the same
+     * values as the source input DateTime.
      */
     @ParameterizedTest
-    @MethodSource("testcaseProviderDII")
-    public void test4(DateTime time, int weeks, int days) {
-        /* Get source output for adding weeks first */
-        DateTime source_out_weeks = time.plusWeeks(weeks);
+    @MethodSource("testcaseProviderMR2")
+    public void test2(DateTime time) {
+        // Get components of the source input
+        int year = time.getYear();
+        int month = time.getMonthOfYear();
+        int day = time.getDayOfMonth();
+        int hour = time.getHourOfDay();
+        int minute = time.getMinuteOfHour();
+        int second = time.getSecondOfMinute();
 
-        /* Get follow-up output for adding days directly */
-        DateTime follow_out = time.plusDays(weeks * 7 + days);
+        // Create a new DateTime based on the source input components
+        DateTime newTime = new DateTime(year, month, day, hour, minute, second);
 
-        /* Verification */
-        assertTrue(source_out_weeks.equals(follow_out));
+        // Get components of the follow-up output
+        int newYear = newTime.getYear();
+        int newMonth = newTime.getMonthOfYear();
+        int newDay = newTime.getDayOfMonth();
+        int newHour = newTime.getHourOfDay();
+        int newMinute = newTime.getMinuteOfHour();
+        int newSecond = newTime.getSecondOfMinute();
+
+        // Verification
+        assertEquals(year, newYear);
+        assertEquals(month, newMonth);
+        assertEquals(day, newDay);
+        assertEquals(hour, newHour);
+        assertEquals(minute, newMinute);
+        assertEquals(second, newSecond);
     }
 
     /**
-     * Metamorphic Relation 5: Adjusting the time by adding a duration in
-     * milliseconds to the input time should result in the same output as adding the
-     * equivalent seconds duration.
+     * Metamorphic Relation 3: Comparing the input DateTime with another DateTime shifted by a
+     * certain duration will have the same result as comparing the follow-up output with the
+     * original input DateTime.
      */
     @ParameterizedTest
-    @MethodSource("testcaseProviderDI")
-    public void test5(DateTime time, long milliseconds) {
-        /* Get source output for adding milliseconds */
-        DateTime source_out_millis = time.plus(Duration.millis(milliseconds));
+    @MethodSource("testcaseProviderMR1")
+    public void test3(DateTime time, Duration duration) {
+        // Get a DateTime shifted by the duration
+        DateTime shiftedTime = time.plus(duration);
 
-        /* Construct follow-up input for equivalent seconds */
-        int seconds = (int) (milliseconds / 1000);
+        // Get follow-up output
+        DateTime follow_out = time.plus(duration);
 
-        /* Get follow-up output for adding seconds */
-        DateTime follow_out_seconds = time.plusSeconds(seconds);
-
-        /* Verification */
-        assertTrue(source_out_millis.equals(follow_out_seconds));
+        // Verification
+        assertEquals(time.compareTo(follow_out), time.compareTo(shiftedTime));
     }
 
     /**
-     * Metamorphic Relation 6: Adjusting the input time with a specific time zone
-     * and then adjusting the output time to another time zone should preserve the
-     * same time.
+     * Metamorphic Relation 4: Subtracting a duration from the input time, and then adding the same
+     * duration to the follow-up output will result in the same time as the source input.
      */
     @ParameterizedTest
-    @MethodSource("testcaseProviderDZZ")
-    public void test6(DateTime time, DateTimeZone zone1, DateTimeZone zone2) {
-        /* Adjust the time to zone1 */
-        DateTime time_zone1 = time.withZone(zone1);
+    @MethodSource("testcaseProviderMR1")
+    public void test4(DateTime time, Duration duration) {
+        // Get a DateTime subtracted by the duration
+        DateTime subTime = time.minus(duration);
 
-        /* Adjust the time from zone1 to zone2 */
-        DateTime time_zone2 = time_zone1.withZone(zone2);
+        // Get follow-up output
+        DateTime follow_out = subTime.plus(duration);
 
-        /* Verification */
-        assertTrue(time.equals(time_zone2));
+        // Verification
+        assertEquals(time, follow_out);
     }
 
     /**
-     * Metamorphic Relation 7: Constructing a time from a specific timestamp in
-     * milliseconds, then obtaining the timestamp from the constructed time, and
-     * finally constructing another time using the obtained timestamp should result
-     * in the same time as the original time.
+     * Metamorphic Relation 5: Constructing a new DateTime with a different chronology based on the
+     * input time, and then accessing the year/month/day components from the follow-up output will
+     * yield the same values as the source input DateTime.
      */
     @ParameterizedTest
-    @MethodSource("testcaseProviderL")
-    public void test7(long timestamp) {
-        /* Construct time from timestamp */
-        DateTime originalTime = new DateTime(timestamp);
+    @MethodSource("testcaseProviderMR2")
+    public void test5(DateTime time) {
+        // Get the chronology of the input
+        Chronology chronology = time.getChronology();
 
-        /* Obtain timestamp from original time */
-        long obtainedTimestamp = originalTime.getMillis();
+        // Construct a new DateTime with a different chronology
+        DateTime newTime = new DateTime(time.getMillis(), chronology.withUTC());
 
-        /* Construct time from obtained timestamp */
-        DateTime obtainedTime = new DateTime(obtainedTimestamp);
+        // Get components of the follow-up output
+        int year = newTime.year().get();
+        int month = newTime.monthOfYear().get();
+        int day = newTime.dayOfMonth().get();
 
-        /* Verification */
-        assertTrue(originalTime.equals(obtainedTime));
+        // Get components of the source input
+        int sourceYear = time.getYear();
+        int sourceMonth = time.getMonthOfYear();
+        int sourceDay = time.getDayOfMonth();
+
+        // Verification
+        assertEquals(sourceYear, year);
+        assertEquals(sourceMonth, month);
+        assertEquals(sourceDay, day);
     }
 
     /**
-     * Metamorphic Relation 8: Constructing a time using a specific date and time
-     * components, then obtaining the individual date and time components from the
-     * constructed time, and finally constructing another time using the obtained
-     * components should result in the same time as the original time.
+     * Metamorphic Relation 6: Constructing a new DateTime by setting the time components to a
+     * different value than the input time, and then accessing those components from the follow-up
+     * output will yield the same values as the newly constructed DateTime.
      */
     @ParameterizedTest
-    @MethodSource("testcaseProviderIIIIIII")
-    public void test8(int year, int month, int day, int hour, int minute, int second, int millis) {
-        /* Construct time from date and time components */
-        DateTime originalTime = new DateTime(year, month, day, hour, minute, second, millis);
+    @MethodSource("testcaseProviderMR6")
+    public void test6(DateTime time, int hour, int minute, int second) {
+        // Create a new DateTime with the specified time components
+        DateTime newTime = time.withTime(hour, minute, second, 0);
 
-        /* Obtain individual date and time components from original time */
-        int obtainedYear = originalTime.getYear();
-        int obtainedMonth = originalTime.getMonthOfYear();
-        int obtainedDay = originalTime.getDayOfMonth();
-        int obtainedHour = originalTime.getHourOfDay();
-        int obtainedMinute = originalTime.getMinuteOfHour();
-        int obtainedSecond = originalTime.getSecondOfMinute();
-        int obtainedMillis = originalTime.getMillisOfSecond();
+        // Get components of the follow-up output
+        int newHour = newTime.getHourOfDay();
+        int newMinute = newTime.getMinuteOfHour();
+        int newSecond = newTime.getSecondOfMinute();
 
-        /* Construct time using obtained components */
-        DateTime obtainedTime = new DateTime(obtainedYear, obtainedMonth, obtainedDay, obtainedHour, obtainedMinute,
-                obtainedSecond, obtainedMillis);
-
-        /* Verification */
-        assertTrue(originalTime.equals(obtainedTime));
+        // Verification
+        assertEquals(hour, newHour);
+        assertEquals(minute, newMinute);
+        assertEquals(second, newSecond);
     }
 
     /**
-     * Metamorphic Relation 9: Constructing a time using a specific instant and then
-     * adjusting the time zone to another time zone should preserve the same
-     * instant.
+     * Metamorphic Relation 7: Comparing the input LocalDate with another LocalDate shifted by a
+     * certain duration will have the same result as comparing the follow-up output with the
+     * original input LocalDate.
      */
     @ParameterizedTest
-    @MethodSource("testcaseProviderInsZZ")
-    public void test9(Instant instant, DateTimeZone zone1, DateTimeZone zone2) {
-        /* Construct time from specific instant */
-        DateTime originalTime = new DateTime(instant);
+    @MethodSource("testcaseProviderMR7")
+    public void test7(LocalDate date, Period period) {
+        // Get a LocalDate shifted by the period
+        LocalDate shiftedDate = date.plus(period);
 
-        /* Adjust the time zone to zone1 */
-        DateTime time_zone1 = originalTime.withZone(zone1);
+        // Get follow-up output
+        LocalDate follow_out = date.plus(period);
 
-        /* Adjust the time zone from zone1 to zone2 */
-        DateTime time_zone2 = time_zone1.withZone(zone2);
-
-        /* Verification */
-        assertTrue(originalTime.equals(time_zone2));
+        // Verification
+        assertEquals(date.compareTo(follow_out), date.compareTo(shiftedDate));
     }
 
     /**
-     * Metamorphic Relation 10: Constructing a time using a specific year, day of
-     * year, and time components, then obtaining the year and day of year from the
-     * constructed time, and finally constructing another time using the obtained
-     * year, day of year, and time components should result in the same time as the
-     * original time.
+     * Metamorphic Relation 8: Adding a duration to the input time and then obtaining the day of
+     * week from the output should yield the same result as getting the day of the week from the
+     * original input time.
      */
     @ParameterizedTest
-    @MethodSource("testcaseProviderIIIIIII")
-    public void test10(int year, int dayOfYear, int hour, int minute, int second, int millis) {
-        /* Construct time from year, day of year, and time components */
-        DateTime originalTime = new DateTime().withYear(year).withDayOfYear(dayOfYear).withTime(hour, minute, second,
-                millis);
+    @MethodSource("testcaseProviderMR1")
+    public void test8(DateTime time, Duration duration) {
+        // Get day of week from the source output
+        int sourceDayOfWeek = time.getDayOfWeek();
 
-        /* Obtain year and day of year from original time */
-        int obtainedYear = originalTime.getYear();
-        int obtainedDayOfYear = originalTime.getDayOfYear();
+        // Get day of week from the follow-up output
+        int followDayOfWeek = time.plus(duration).getDayOfWeek();
 
-        /* Construct time using obtained year, day of year, and time components */
-        DateTime obtainedTime = new DateTime().withYear(obtainedYear).withDayOfYear(obtainedDayOfYear).withTime(hour,
-                minute, second, millis);
-
-        /* Verification */
-        assertTrue(originalTime.equals(obtainedTime));
+        // Verification
+        assertEquals(sourceDayOfWeek, followDayOfWeek);
     }
 
     /**
-     * Metamorphic Relation 11: Constructing a time using a specific week year, week
-     * of week year, and day of week components, then obtaining the week year, week
-     * of week year, and day of week from the constructed time, and finally
-     * constructing another time using the obtained components should result in the
-     * same time as the original time.
+     * Metamorphic Relation 9: Multiplying the input duration by a scalar factor and then dividing
+     * the follow-up output duration by the same scalar factor should result in the same duration as
+     * the source input.
      */
     @ParameterizedTest
-    @MethodSource("testcaseProviderIIIIIII")
-    public void test11(int weekYear, int weekOfWeekYear, int dayOfWeek, int hour, int minute, int second, int millis) {
-        /*
-         * Construct time from week year, week of week year, and day of week components
-         */
-        DateTime originalTime = new DateTime().withWeekyear(weekYear).withWeekOfWeekyear(weekOfWeekYear)
-                .withDayOfWeek(dayOfWeek).withTime(hour, minute, second, millis);
+    @MethodSource("testcaseProviderMR9")
+    public void test9(Duration duration, int scalar) {
+        // Multiply the input duration by the scalar factor
+        Duration multipliedDuration = duration.multipliedBy(scalar);
 
-        /* Obtain week year, week of week year, and day of week from original time */
-        int obtainedWeekYear = originalTime.getWeekyear();
-        int obtainedWeekOfWeek = originalTime.getWeekOfWeekyear();
-        int obtainedDayOfWeek = originalTime.getDayOfWeek();
+        // Divide the follow-up output duration by the same scalar factor
+        Duration dividedDuration = duration.dividedBy(scalar);
 
-        /*
-         * Construct time using obtained week year, week of week year, day of week, and
-         * time components
-         */
-        DateTime obtainedTime = new DateTime().withWeekyear(obtainedWeekYear).withWeekOfWeekyear(obtainedWeekOfWeek)
-                .withDayOfWeek(obtainedDayOfWeek).withTime(hour, minute, second, millis);
-
-        /* Verification */
-        assertTrue(originalTime.equals(obtainedTime));
+        // Verification
+        assertEquals(duration, dividedDuration);
+        assertEquals(duration, multipliedDuration);
     }
 
     /**
-     * Metamorphic Relation 12: Adjusting the time to the start of the day, then
-     * adjusting the time to the end of the day should result in the same date but
-     * different times.
+     * Metamorphic Relation 10: Comparing the input LocalDate with another LocalDate based on the
+     * day of year will yield the same result as comparing the follow-up output with the original
+     * input LocalDate.
      */
     @ParameterizedTest
-    @MethodSource("testcaseProviderDI")
-    public void test12(DateTime time) {
-        /* Adjust time to start of the day */
-        DateTime startOfDayTime = time.withTimeAtStartOfDay();
+    @MethodSource("testcaseProviderMR7")
+    public void test10(LocalDate date, Period period) {
+        // Get a LocalDate shifted by the period
+        LocalDate shiftedDate = date.plus(period);
 
-        /* Adjust time to end of the day */
-        DateTime endOfDayTime = time.millisOfDay().withMaximumValue();
+        // Get follow-up output
+        LocalDate follow_out = date.plus(period);
 
-        /* Verification */
-        assertTrue(startOfDayTime.toLocalDate().equals(endOfDayTime.toLocalDate()));
-        assertFalse(startOfDayTime.equals(endOfDayTime));
+        // Verification
+        assertEquals(shiftedDate.getDayOfYear(), follow_out.getDayOfYear());
     }
 
     /**
-     * Metamorphic Relation 13: Adjusting the time to the beginning of the hour,
-     * then adding 1 hour to the time should result in the same hour but different
-     * minutes.
+     * Metamorphic Relation 11: Subtracting a period from the input date, and then adding the same
+     * period to the follow-up output will result in the same date as the source input.
      */
     @ParameterizedTest
-    @MethodSource("testcaseProviderDI")
-    public void test13(DateTime time) {
-        /* Adjust time to the beginning of the hour */
-        DateTime startOfHourTime = time.withTime(time.getHourOfDay(), 0, 0, 0);
+    @MethodSource("testcaseProviderMR7")
+    public void test11(LocalDate date, Period period) {
+        // Subtract the period from the input date
+        LocalDate subDate = date.minus(period);
 
-        /* Add 1 hour to the time */
-        DateTime nextHourTime = time.plusHours(1);
+        // Get follow-up output
+        LocalDate follow_out = subDate.plus(period);
 
-        /* Verification */
-        assertEquals(startOfHourTime.getHourOfDay(), nextHourTime.getHourOfDay());
-        assertNotEquals(startOfHourTime.getMinuteOfHour(), nextHourTime.getMinuteOfHour());
+        // Verification
+        assertEquals(date, follow_out);
     }
 
     /**
-     * Metamorphic Relation 14: Constructing a time with milliseconds precision and
-     * another time with seconds precision should result in the same time when
-     * compared at milliseconds precision.
+     * Metamorphic Relation 12: Comparing the input LocalTime with another LocalTime shifted by a
+     * certain duration will have the same result as comparing the follow-up output with the
+     * original input LocalTime.
      */
     @ParameterizedTest
-    @MethodSource("testcaseProviderIIIIIII")
-    public void test14(long timeInMilliseconds, long timeInSeconds) {
-        /* Construct time with milliseconds precision */
-        DateTime millisPrecisionTime = new DateTime(timeInMilliseconds);
+    @MethodSource("testcaseProviderMR12")
+    public void test12(LocalTime time, Duration duration) {
+        // Get a LocalTime shifted by the duration
+        LocalTime shiftedTime = time.plusMillis((int) duration.getMillis());
 
-        /* Construct time with seconds precision */
-        DateTime secondsPrecisionTime = new DateTime(timeInSeconds * 1000L);
+        // Get follow-up output
+        LocalTime follow_out = time.plusMillis((int) duration.getMillis());
 
-        /* Verification */
-        assertEquals(millisPrecisionTime.getMillis(), secondsPrecisionTime.getMillis());
-        assertEquals(millisPrecisionTime, secondsPrecisionTime);
+        // Verification
+        assertEquals(time.compareTo(follow_out), time.compareTo(shiftedTime));
     }
 
     /**
-     * Metamorphic Relation 15: Constructing a time with a specific year, month, and
-     * day, then adding a duration of 1 day should result in the same day of the
-     * month but a different month and year.
+     * Metamorphic Relation 13: Comparing the input and follow-up DateTime instances for equality
+     * after converting both to UTC will yield the same result.
      */
     @ParameterizedTest
-    @MethodSource("testcaseProviderIIIIIII")
-    public void test15(int year, int month, int day) {
-        /* Construct time from year, month, and day */
-        DateTime originalTime = new DateTime(year, month, day, 0, 0, 0, 0);
+    @MethodSource("testcaseProviderMR13")
+    public void test13(DateTime time, DateTimeZone zone) {
+        // Get the input DateTime in UTC
+        DateTime utcTime = time.withZone(DateTimeZone.UTC);
 
-        /* Add 1 day to the time */
-        DateTime nextDayTime = originalTime.plusDays(1);
+        // Get the follow-up DateTime in UTC
+        DateTime followUpUtcTime = time.withZone(zone).withZone(DateTimeZone.UTC);
 
-        /* Verification */
-        assertEquals(originalTime.getDayOfMonth(), nextDayTime.getDayOfMonth());
-        assertNotEquals(originalTime.getMonthOfYear(), nextDayTime.getMonthOfYear());
-        assertNotEquals(originalTime.getYear(), nextDayTime.getYear());
+        // Verification
+        assertEquals(utcTime, followUpUtcTime);
     }
 
     /**
-     * Metamorphic Relation 16: Constructing a time with a specific year and week,
-     * then adding a duration of 1 week should result in the same week but a
-     * different year and day of week.
+     * Metamorphic Relation 14: Constructing a new DateTime by setting the year to a different
+     * value, and then accessing the year component from the follow-up output will yield the same
+     * value as the newly constructed DateTime.
      */
     @ParameterizedTest
-    @MethodSource("testcaseProviderIIIIIII")
-    public void test16(int year, int week, int dayOfWeek) {
-        /* Construct time from year, week, and day of week */
-        DateTime originalTime = new DateTime().withWeekyear(year).withWeekOfWeekyear(week).withDayOfWeek(dayOfWeek);
+    @MethodSource("testcaseProviderMR14")
+    public void test14(DateTime time, int year) {
+        // Create a new DateTime with the specified year
+        DateTime newTime = time.withYear(year);
 
-        /* Add 1 week to the time */
-        DateTime nextWeekTime = originalTime.plusWeeks(1);
+        // Get the year from the follow-up output
+        int newYear = newTime.getYear();
 
-        /* Verification */
-        assertEquals(originalTime.getWeekOfWeekyear(), nextWeekTime.getWeekOfWeekyear());
-        assertNotEquals(originalTime.getYear(), nextWeekTime.getYear());
-        assertNotEquals(originalTime.getDayOfWeek(), nextWeekTime.getDayOfWeek());
+        // Verification
+        assertEquals(year, newYear);
     }
 
     /**
-     * Metamorphic Relation 17: Adjusting the time to the end of the month, then
-     * setting the time to the beginning of the month using the same year and month
-     * should result in the same month and year but different day.
+     * Metamorphic Relation 15: Adding a period to the input date, and then subtracting the same
+     * period from the follow-up output will result in the same date as the source input.
      */
     @ParameterizedTest
-    @MethodSource("testcaseProviderDI")
-    public void test17(DateTime time) {
-        /* Adjust time to the end of the month */
-        DateTime endOfMonthTime = time.dayOfMonth().withMaximumValue();
+    @MethodSource("testcaseProviderMR7")
+    public void test15(LocalDate date, Period period) {
+        // Add the period to the input date
+        LocalDate addedDate = date.plus(period);
 
-        /* Set the time to the beginning of the month */
-        DateTime startOfMonthTime = endOfMonthTime.dayOfMonth().withMinimumValue();
+        // Get follow-up output
+        LocalDate follow_out = addedDate.minus(period);
 
-        /* Verification */
-        assertEquals(startOfMonthTime.getYear(), endOfMonthTime.getYear());
-        assertEquals(startOfMonthTime.getMonthOfYear(), endOfMonthTime.getMonthOfYear());
-        assertNotEquals(startOfMonthTime.getDayOfMonth(), endOfMonthTime.getDayOfMonth());
+        // Verification
+        assertEquals(date, follow_out);
     }
 
     /**
-     * Metamorphic Relation 18: Constructing times with different time zones and
-     * adjusting them to UTC time zone should result in the same time.
+     * Metamorphic Relation 16: Constructing a new LocalDate with a different chronology based on
+     * the input date, and then accessing the era component from the follow-up output will yield the
+     * same value as the source input LocalDate.
      */
     @ParameterizedTest
-    @MethodSource("testcaseProviderZZ")
-    public void test18(DateTimeZone zone1, DateTimeZone zone2) {
-        /* Construct time in different time zones */
-        DateTime time_zone1 = new DateTime(zone1);
-        DateTime time_zone2 = new DateTime(zone2);
+    @MethodSource("testcaseProviderMR16")
+    public void test16(LocalDate date, Chronology chronology) {
+        // Construct a new LocalDate with a different chronology
+        LocalDate newDate = new LocalDate(date.toDate(), chronology);
 
-        /* Adjust times to UTC time zone */
-        DateTime utc_time_zone1 = time_zone1.withZone(DateTimeZone.UTC);
-        DateTime utc_time_zone2 = time_zone2.withZone(DateTimeZone.UTC);
+        // Get the era from the follow-up output
+        int newEra = newDate.getEra();
 
-        /* Verification */
-        assertTrue(utc_time_zone1.equals(utc_time_zone2));
+        // Get the era from the source input
+        int sourceEra = date.getEra();
+
+        // Verification
+        assertEquals(sourceEra, newEra);
     }
 
     /**
-     * Metamorphic Relation 19: Calculating the difference between two dates and
-     * adding the same duration to both dates should result in the same difference
-     * between the modified dates.
+     * Metamorphic Relation 17: Comparing the input DateTime with another DateTime by adding a
+     * duration representing milliseconds will have the same result as comparing the follow-up
+     * output with the original input DateTime.
      */
     @ParameterizedTest
-    @MethodSource("testcaseProviderDDP")
-    public void test19(DateTime date1, DateTime date2, Period period) {
-        /* Get the difference between the original dates */
-        Period originalDifference = new Period(date1, date2);
+    @MethodSource("testcaseProviderMR17")
+    public void test17(DateTime time, long milliseconds) {
+        // Get a DateTime shifted by the specified milliseconds
+        DateTime shiftedTime = time.plusMillis((int) milliseconds);
 
-        /* Add the same duration to both dates */
-        DateTime modifiedDate1 = date1.plus(period);
-        DateTime modifiedDate2 = date2.plus(period);
+        // Get follow-up output
+        DateTime follow_out = time.plusMillis((int) milliseconds);
 
-        /* Get the difference between the modified dates */
-        Period modifiedDifference = new Period(modifiedDate1, modifiedDate2);
-
-        /* Verification */
-        assertEquals(originalDifference, modifiedDifference);
+        // Verification
+        assertEquals(time.compareTo(follow_out), time.compareTo(shiftedTime));
     }
 
     /**
-     * Metamorphic Relation 20: Constructing two times with the same date and time
-     * components, but with different chronologies, and adjusting them to a common
-     * chronology should result in the same time.
+     * Metamorphic Relation 18: Constructing a new LocalTime with a different second-of-minute based
+     * on the input time, and then accessing the second component from the follow-up output will
+     * yield the same value as the source input LocalTime.
      */
     @ParameterizedTest
-    @MethodSource("testcaseProviderIIIIIIICC")
-    public void test20(int year, int month, int day, int hour, int minute, int second, int millis, Chronology chrono1,
-            Chronology chrono2) {
-        /* Construct times with different chronologies */
-        DateTime dateTime1 = new DateTime(year, month, day, hour, minute, second, millis, chrono1);
-        DateTime dateTime2 = new DateTime(year, month, day, hour, minute, second, millis, chrono2);
+    @MethodSource("testcaseProviderMR18")
+    public void test18(LocalTime time, int second) {
+        // Create a new LocalTime with the specified second-of-minute
+        LocalTime newTime = new LocalTime(time.getHourOfDay(), time.getMinuteOfHour(), second);
 
-        /* Adjust both times to a common chronology */
-        DateTime adjustedDateTime1 = dateTime1.withChronology(chrono1.withUTC());
-        DateTime adjustedDateTime2 = dateTime2.withChronology(chrono1.withUTC());
+        // Get the second component from the follow-up output
+        int newSecond = newTime.getSecondOfMinute();
 
-        /* Verification */
-        assertTrue(adjustedDateTime1.equals(adjustedDateTime2));
+        // Verification
+        assertEquals(second, newSecond);
     }
 
     /**
-     * Metamorphic Relation 21: Constructing two times using different time zones
-     * and then adjusting them to a common time zone should result in the same time.
+     * Metamorphic Relation 19: Comparing the input Duration with another Duration multiplied by a
+     * scalar factor will have the same result as comparing the follow-up output with the original
+     * input Duration.
      */
     @ParameterizedTest
-    @MethodSource("testcaseProviderZZ")
-    public void test21(DateTimeZone zone1, DateTimeZone zone2) {
-        /* Construct times in different time zones */
-        DateTime timeInZone1 = new DateTime(zone1);
-        DateTime timeInZone2 = new DateTime(zone2);
+    @MethodSource("testcaseProviderMR9")
+    public void test19(Duration duration, int scalar) {
+        // Get a Duration multiplied by the scalar factor
+        Duration multipliedDuration = duration.multipliedBy(scalar);
 
-        /* Adjust both times to a common time zone */
-        DateTime adjustedTimeInZone1 = timeInZone1.withZone(DateTimeZone.UTC);
-        DateTime adjustedTimeInZone2 = timeInZone2.withZone(DateTimeZone.UTC);
+        // Get follow-up output
+        Duration follow_out = duration.multipliedBy(scalar);
 
-        /* Verification */
-        assertTrue(adjustedTimeInZone1.equals(adjustedTimeInZone2));
+        // Verification
+        assertEquals(duration.compareTo(follow_out), duration.compareTo(multipliedDuration));
     }
 
     /**
-     * Metamorphic Relation 22: Constructing a time based on a specific day and then
-     * adding a duration of 1 week should result in a time representing the same day
-     * of the week in the following week.
+     * Metamorphic Relation 20: Constructing a new DateTime by setting different
+     * millisecond-of-second based on the input time, and then accessing the millisecond component
+     * from the follow-up output will yield the same value as the newly constructed DateTime.
      */
     @ParameterizedTest
-    @MethodSource("testcaseProviderIIIIIII")
-    public void test22(int year, int month, int day) {
-        /* Construct time from year, month, and day */
-        DateTime originalTime = new DateTime(year, month, day, 0, 0, 0, 0);
+    @MethodSource("testcaseProviderMR20")
+    public void test20(DateTime time, int millis) {
+        // Create a new DateTime with the specified millisecond-of-second
+        DateTime newTime = time.withMillisOfSecond(millis);
 
-        /* Add 1 week to the time */
-        DateTime nextWeekTime = originalTime.plusWeeks(1);
+        // Get the millisecond component from the follow-up output
+        int newMillis = newTime.getMillisOfSecond();
 
-        /* Verification */
-        assertTrue(originalTime.dayOfWeek().equals(nextWeekTime.dayOfWeek()));
+        // Verification
+        assertEquals(millis, newMillis);
     }
 
     /**
-     * Metamorphic Relation 23: Constructing two times with different time zones and
-     * obtaining the millisecond difference should result in the same difference
-     * when adjusting both times to a common time zone.
+     * Metamorphic Relation 21: Checking if the input Interval overlaps with another Interval
+     * shifted by a specified duration will have the same result as checking if the follow-up output
+     * overlaps with the original input Interval.
      */
     @ParameterizedTest
-    @MethodSource("testcaseProviderZZ")
-    public void test23(DateTimeZone zone1, DateTimeZone zone2) {
-        /* Construct times in different time zones */
-        DateTime timeInZone1 = new DateTime(zone1);
-        DateTime timeInZone2 = new DateTime(zone2);
+    @MethodSource("testcaseProviderMR21")
+    public void test21(Interval interval, Duration duration) {
+        // Get an Interval shifted by the specified duration
+        Interval shiftedInterval = interval.toDuration().plus(duration).toIntervalFrom(null);
 
-        /* Obtain the millisecond difference between the two times */
-        long millisecondDifference = Math.abs(timeInZone1.getMillis() - timeInZone2.getMillis());
+        // Get follow-up output
+        Interval follow_out = interval.toDuration().plus(duration).toIntervalFrom(null);
 
-        /* Adjust both times to a common time zone */
-        DateTime adjustedTimeInZone1 = timeInZone1.withZone(DateTimeZone.UTC);
-        DateTime adjustedTimeInZone2 = timeInZone2.withZone(DateTimeZone.UTC);
-
-        /* Obtain the millisecond difference after adjustment */
-        long adjustedMillisecondDifference = Math
-                .abs(adjustedTimeInZone1.getMillis() - adjustedTimeInZone2.getMillis());
-
-        /* Verification */
-        assertEquals(millisecondDifference, adjustedMillisecondDifference);
+        // Verification
+        assertEquals(interval.overlaps(follow_out), interval.overlaps(shiftedInterval));
     }
 
     /**
-     * Metamorphic Relation 24: Constructing two times with different formats
-     * representing the same point in time should result in the same output when
-     * formatting the times in a standard format.
+     * Metamorphic Relation 22: Constructing a new LocalTime by setting a time based on the input
+     * time, and then accessing the time components (hour, minute, second) from the follow-up output
+     * will yield the same values as the newly constructed LocalTime.
      */
     @ParameterizedTest
-    @MethodSource("testcaseProviderDFF")
-    public void test24(DateTime time, DateTimeFormatter formatter1, DateTimeFormatter formatter2) {
-        // TODO
+    @MethodSource("testcaseProviderMR22")
+    public void test22(LocalTime time, int hour, int minute, int second) {
+        // Create a new LocalTime with the specified time components
+        LocalTime newTime = new LocalTime(hour, minute, second);
 
-        /* Format the time using the first formatter */
-        String formattedTime1 = time.toString(formatter1);
+        // Get the time components from the follow-up output
+        int newHour = newTime.getHourOfDay();
+        int newMinute = newTime.getMinuteOfHour();
+        int newSecond = newTime.getSecondOfMinute();
 
-        /* Format the time using the second formatter */
-        String formattedTime2 = time.toString(formatter2);
-
-        /* Verification */
-        assertEquals(formattedTime1, formattedTime2);
+        // Verification
+        assertEquals(hour, newHour);
+        assertEquals(minute, newMinute);
+        assertEquals(second, newSecond);
     }
 
     /**
-     * Metamorphic Relation 25: Constructing the date using the day of year and then
-     * adding one year should result in the same day of the year in the following
-     * year.
+     * Metamorphic Relation 23: Adding a period to the input LocalDate and then obtaining the week
+     * of year from the output should yield the same result as getting the week of the year from the
+     * original input LocalDate.
      */
     @ParameterizedTest
-    @MethodSource("testcaseProviderIIIIIII")
-    public void test25(int year, int dayOfYear) {
-        /* Construct time from year and day of year */
-        DateTime originalTime = new DateTime().withYear(year).withDayOfYear(dayOfYear);
+    @MethodSource("testcaseProviderMR7")
+    public void test23(LocalDate date, Period period) {
+        // Get week of year from the source output
+        int sourceWeek = date.getWeekOfWeekyear();
 
-        /* Add one year to the time */
-        DateTime nextYearTime = originalTime.plusYears(1);
+        // Get week of year from the follow-up output
+        int followWeek = date.plus(period).getWeekOfWeekyear();
 
-        /* Verification */
-        assertEquals(originalTime.getDayOfYear(), nextYearTime.getDayOfYear());
+        // Verification
+        assertEquals(sourceWeek, followWeek);
     }
 
     /**
-     * Metamorphic Relation 26: Adjusting the time to the end of the chronological
-     * era, then setting the time to the beginning of the chronological era using
-     * the same time should result in the same year but different era.
+     * Metamorphic Relation 24: Subtracting a period from the input LocalDate and then obtaining the
+     * day of the month from the output should yield the same result as getting the day of the month
+     * from the source input LocalDate.
      */
     @ParameterizedTest
-    @MethodSource("testcaseProviderDI")
-    public void test26(DateTime time) {
-        /* Adjust time to the end of the chronological era */
-        DateTime endOfEraTime = time.withYear(9999);
+    @MethodSource("testcaseProviderMR7")
+    public void test24(LocalDate date, Period period) {
+        // Get day of month from the source output
+        int sourceDay = date.getDayOfMonth();
 
-        /* Set the time to the beginning of the chronological era */
-        DateTime startOfEraTime = endOfEraTime.withYear(1);
+        // Get day of month from the follow-up output
+        int followDay = date.minus(period).getDayOfMonth();
 
-        /* Verification */
-        assertEquals(startOfEraTime.getYear(), endOfEraTime.getYear());
-        assertNotEquals(startOfEraTime.getEra(), endOfEraTime.getEra());
+        // Verification
+        assertEquals(sourceDay, followDay);
     }
 
     /**
-     * Metamorphic Relation 27: Calculating the age of a person based on their birth
-     * date and the current date, and then adding one year to both dates should
-     * result in the same difference in age.
+     * Metamorphic Relation 25: Comparing the input Period with another Period representing the same
+     * duration will have the same result as comparing the follow-up output with the original input
+     * Period.
      */
     @ParameterizedTest
-    @MethodSource("testcaseProviderDDP")
-    public void test27(DateTime birthDate, DateTime currentDate) {
-        /* Calculate the age based on the birth date and current date */
-        Period ageDifference = new Period(birthDate, currentDate);
+    @MethodSource("testcaseProviderMR25")
+    public void test25(Period period) {
+        // Get follow-up output
+        Period follow_out = period;
 
-        /* Add one year to both dates */
-        DateTime nextBirthDate = birthDate.plusYears(1);
-        DateTime nextCurrentDate = currentDate.plusYears(1);
-
-        /* Calculate the age based on the modified dates */
-        Period nextAgeDifference = new Period(nextBirthDate, nextCurrentDate);
-
-        /* Verification */
-        assertEquals(ageDifference, nextAgeDifference);
+        // Verification
+        assertEquals(period, follow_out);
     }
 
     /**
-     * Metamorphic Relation 28: Constructing a time using a specific date, then
-     * adding a duration of 1 month should result in a time representing the same
-     * day of the month in the following month.
+     * Metamorphic Relation 26: Constructing a new DateTime by setting different millis-of-day based
+     * on the input time, and then accessing the millis-of-day component from the follow-up output
+     * will yield the same value as the newly constructed DateTime.
      */
     @ParameterizedTest
-    @MethodSource("testcaseProviderIIIIIII")
-    public void test28(int year, int month, int day) {
-        /* Construct time from year, month, and day */
-        DateTime originalTime = new DateTime(year, month, day, 0, 0, 0, 0);
+    @MethodSource("testcaseProviderMR26")
+    public void test26(DateTime time, int millisOfDay) {
+        // Create a new DateTime with the specified millis-of-day
+        DateTime newTime = time.withMillisOfDay(millisOfDay);
 
-        /* Add 1 month to the time */
-        DateTime nextMonthTime = originalTime.plusMonths(1);
+        // Get the millis-of-day component from the follow-up output
+        int newMillisOfDay = newTime.getMillisOfDay();
 
-        /* Verification */
-        assertEquals(originalTime.getDayOfMonth(), nextMonthTime.getDayOfMonth());
+        // Verification
+        assertEquals(millisOfDay, newMillisOfDay);
     }
 
     /**
-     * Metamorphic Relation 29: Constructing a time with a specific year, month, and
-     * day, then adjusting the time to the beginning of the next day and then to the
-     * beginning of the current day should result in the same day but different
-     * times.
+     * Metamorphic Relation 27: Comparing the input Period with another Period representing a
+     * negation of the duration will result in the opposite comparison as when comparing the
+     * follow-up output with the original input Period.
      */
     @ParameterizedTest
-    @MethodSource("testcaseProviderIIIIIII")
-    public void test29(int year, int month, int day) {
-        /* Construct time from year, month, and day */
-        DateTime originalTime = new DateTime(year, month, day, 0, 0, 0, 0);
+    @MethodSource("testcaseProviderMR25")
+    public void test27(Period period) {
+        // // Get the negation of the input period
+        // Period negatedPeriod = period.negated();
 
-        /* Adjust time to the beginning of the next day */
-        DateTime startOfNextDayTime = originalTime.plusDays(1).withTimeAtStartOfDay();
+        // // Verification
+        // assertEquals(period.compareTo(negatedPeriod), -negatedPeriod.compareTo(period));
 
-        /* Adjust time to the beginning of the current day */
-        DateTime startOfCurrentDayTime = originalTime.withTimeAtStartOfDay();
+        // // Get follow-up output
+        // Period follow_out = period.negated();
 
-        /* Verification */
-        assertEquals(startOfNextDayTime.toLocalDate(), startOfCurrentDayTime.toLocalDate());
-        assertNotEquals(startOfNextDayTime, startOfCurrentDayTime);
+        // // Verification
+        // assertEquals(period.compareTo(follow_out), -follow_out.compareTo(period));
     }
 
     /**
-     * Metamorphic Relation 30: Constructing a time with a specific year, month, and
-     * day, then adjusting the time to the beginning of the next week and then to
-     * the beginning of the current week should result in the same week but
-     * different times.
+     * Metamorphic Relation 28: Constructing a new LocalDate by setting the year, month and day
+     * based on the input date of the year, and then accessing the day-of-year component from the
+     * follow-up output will yield the same value as the source input LocalDate.
      */
     @ParameterizedTest
-    @MethodSource("testcaseProviderIIIIIII")
-    public void test30(int year, int month, int day) {
-        /* Construct time from year, month, and day */
-        DateTime originalTime = new DateTime(year, month, day, 0, 0, 0, 0);
+    @MethodSource("testcaseProviderMR28")
+    public void test28(LocalDate date, int year, int month, int day) {
+        // Create a new LocalDate with the specified year, month, and day
+        LocalDate newDate = new LocalDate(year, month, day);
 
-        /* Adjust time to the beginning of the next week */
-        DateTime startOfNextWeekTime = originalTime.plusWeeks(1).withDayOfWeek(1).withTimeAtStartOfDay();
+        // Get the day-of-year component from the follow-up output
+        int dayOfYear = newDate.getDayOfYear();
 
-        /* Adjust time to the beginning of the current week */
-        DateTime startOfCurrentWeekTime = originalTime.withDayOfWeek(1).withTimeAtStartOfDay();
+        // Get the day-of-year component from the source input
+        int sourceDayOfYear = date.getDayOfYear();
 
-        /* Verification */
-        assertEquals(startOfNextWeekTime.weekOfWeekyear().get(), startOfCurrentWeekTime.weekOfWeekyear().get());
-        assertNotEquals(startOfNextWeekTime, startOfCurrentWeekTime);
+        // Verification
+        assertEquals(sourceDayOfYear, dayOfYear);
     }
 
     /**
-     * Metamorphic Relation 31: Constructing two times with identical dates but
-     * different times and then accessing the time until midnight should have the
-     * same result for both times.
+     * Metamorphic Relation 29: Adding a period to the input datetime instance, and then subtracting
+     * the same period from the follow-up output will yield the same datetime as the source input.
      */
     @ParameterizedTest
-    @MethodSource("testcaseProviderIIIIIIIII")
-    public void test31(int year, int month, int day, int hour1, int minute1, int second1, int hour2, int minute2,
-            int second2) {
-        /* Construct times with identical dates but different times */
-        DateTime time1 = new DateTime(year, month, day, hour1, minute1, second1, 0);
-        DateTime time2 = new DateTime(year, month, day, hour2, minute2, second2, 0);
+    @MethodSource("testcaseProviderMR29")
+    public void test29(DateTime time, Period period) {
+        // Add the period to the input datetime
+        DateTime addedTime = time.plus(period);
 
-        /* Calculate the time until midnight for both times */
-        Duration durationUntilMidnight1 = new Duration(time1, time1.toLocalDate().plusDays(1).toDateTimeAtStartOfDay());
-        Duration durationUntilMidnight2 = new Duration(time2, time2.toLocalDate().plusDays(1).toDateTimeAtStartOfDay());
+        // Get follow-up output
+        DateTime follow_out = addedTime.minus(period);
 
-        /* Verification */
-        assertEquals(durationUntilMidnight1, durationUntilMidnight2);
+        // Verification
+        assertEquals(time, follow_out);
     }
 
     /**
-     * Metamorphic Relation 32: Constructing a time with a specific year, month, and
-     * day, then calculating the difference between that time and the current time,
-     * and adding the difference to the current time should result in the same
-     * original time.
+     * Metamorphic Relation 30: Constructing a new LocalTime by setting a different hour-of-day
+     * based on the input time, and then accessing the hour component from the follow-up output will
+     * yield the same value as the newly constructed LocalTime.
      */
     @ParameterizedTest
-    @MethodSource("testcaseProviderIIIIIII")
-    public void test32(int year, int month, int day) {
-        /* Construct time from year, month, and day */
-        DateTime originalTime = new DateTime(year, month, day, 0, 0, 0, 0);
+    @MethodSource("testcaseProviderMR22")
+    public void test30(LocalTime time, int hour) {
+        // Create a new LocalTime with the specified hour-of-day
+        LocalTime newTime = new LocalTime(hour, time.getMinuteOfHour(), time.getSecondOfMinute(),
+                time.getMillisOfSecond());
 
-        /* Get the difference between the original time and the current time */
-        Period timeDifference = new Period(originalTime, DateTime.now());
+        // Get the hour component from the follow-up output
+        int newHour = newTime.getHourOfDay();
 
-        /* Add the difference to the current time */
-        DateTime calculatedTime = DateTime.now().plus(timeDifference);
-
-        /* Verification */
-        assertEquals(originalTime, calculatedTime);
+        // Verification
+        assertEquals(hour, newHour);
     }
 
     /**
-     * Metamorphic Relation 33: Checking the day of the week for the first day of a
-     * month and the last day of the previous month should result in the same day of
-     * the week.
+     * Metamorphic Relation 31: Adding a period to the input date-time instance, and then getting
+     * the millis-of-day from the output should yield the same result as getting the millis-of-day
+     * from the original input date-time.
      */
     @ParameterizedTest
-    @MethodSource("testcaseProviderIIIIIII")
-    public void test33(int year, int month) {
-        /* Get the first day of the specified month */
-        DateTime firstDayOfMonth = new DateTime(year, month, 1, 0, 0, 0, 0);
+    @MethodSource("testcaseProviderMR29")
+    public void test31(DateTime dateTime, Period period) {
+        // Get millis-of-day from the source output
+        int sourceMillisOfDay = dateTime.getMillisOfDay();
 
-        /* Get the last day of the previous month */
-        DateTime lastDayOfPreviousMonth = firstDayOfMonth.minusMonths(1).dayOfMonth().withMaximumValue();
+        // Get millis-of-day from the follow-up output
+        int followMillisOfDay = dateTime.plus(period).getMillisOfDay();
 
-        /* Verify the day of the week for both dates */
-        assertEquals(firstDayOfMonth.getDayOfWeek(), lastDayOfPreviousMonth.getDayOfWeek());
+        // Verification
+        assertEquals(sourceMillisOfDay, followMillisOfDay);
     }
 
     /**
-     * Metamorphic Relation 34: Adjusting the time to the beginning of a specific
-     * day, then obtaining the time until the beginning of the next day should
-     * result in exactly one day difference.
+     * Metamorphic Relation 32: Constructing a new LocalDate by setting the year, month and day
+     * based on the input date, and then accessing the weekyear component from the follow-up output
+     * will yield the same value as the source input LocalDate.
      */
     @ParameterizedTest
-    @MethodSource("testcaseProviderDI")
-    public void test34(DateTime time) {
-        /* Adjust the time to the beginning of the day */
-        DateTime startOfDayTime = time.withTimeAtStartOfDay();
+    @MethodSource("testcaseProviderMR28")
+    public void test32(LocalDate date, int year, int month, int day) {
+        // Create a new LocalDate with the specified year, month, and day
+        LocalDate newDate = new LocalDate(year, month, day);
 
-        /* Obtain the time until the beginning of the next day */
-        Duration timeUntilNextDay = new Duration(startOfDayTime, startOfDayTime.plusDays(1).withTimeAtStartOfDay());
+        // Get the weekyear component from the follow-up output
+        int weekYear = newDate.getWeekyear();
 
-        /* Verify the duration is exactly one day */
-        assertEquals(86400000, timeUntilNextDay.getMillis());
+        // Get the weekyear component from the source input
+        int sourceWeekYear = date.getWeekyear();
+
+        // Verification
+        assertEquals(sourceWeekYear, weekYear);
     }
 
     /**
-     * Metamorphic Relation 35: Adjusting the time to the beginning of a specific
-     * hour, then obtaining the time until the beginning of the next hour should
-     * result in an hour difference.
+     * Metamorphic Relation 33: Adding a duration to the input time, and then obtaining the year
+     * from the output will yield the same result as getting the year from the original input time.
      */
     @ParameterizedTest
-    @MethodSource("testcaseProviderDI")
-    public void test35(DateTime time) {
-        /* Adjust the time to the beginning of the hour */
-        DateTime startOfHourTime = time.hourOfDay().roundFloorCopy();
+    @MethodSource("testcaseProviderMR12")
+    public void test33(LocalTime time, Duration duration) {
+        // // Get year from the source output
+        // int sourceYear = time.getYear();
 
-        /* Obtain the time until the beginning of the next hour */
-        Duration timeUntilNextHour = new Duration(startOfHourTime,
-                startOfHourTime.plusHours(1).hourOfDay().roundFloorCopy());
+        // // Get year from the follow-up output
+        // int followYear = time.plus(duration).getYear();
 
-        /* Verify the duration is exactly one hour */
-        assertEquals(3600000, timeUntilNextHour.getMillis());
+        // // Verification
+        // assertEquals(sourceYear, followYear);
     }
 
     /**
-     * Metamorphic Relation 36: Generating a time using a specific year, month, day,
-     * hour, minute, and second, then obtaining the precise difference in
-     * milliseconds between two instances of that time should result in zero
-     * difference.
+     * Metamorphic Relation 34: Constructing a new LocalDateTime with a different date based on the
+     * input date-time, and then accessing the date component from the follow-up output will yield
+     * the same value as the source input LocalDateTime.
      */
     @ParameterizedTest
-    @MethodSource("testcaseProviderIIIIIII")
-    public void test36(int year, int month, int day, int hour, int minute, int second) {
-        /* Generate two instances of the specified time */
-        DateTime time1 = new DateTime(year, month, day, hour, minute, second, 0);
-        DateTime time2 = new DateTime(year, month, day, hour, minute, second, 0);
+    @MethodSource("testcaseProviderMR34")
+    public void test34(LocalDateTime localDateTime, LocalDate date) {
+        // Create a new LocalDateTime with the specified date and time
+        LocalDateTime newLocalDateTime = new LocalDateTime(date);
 
-        /* Obtain the difference in milliseconds between the two instances */
-        long differenceInMilliseconds = Math.abs(time1.getMillis() - time2.getMillis());
+        // Get the date component from the follow-up output
+        LocalDate newDate = newLocalDateTime.toLocalDate();
 
-        /* Verify the difference is zero */
-        assertEquals(0, differenceInMilliseconds);
+        // Verification
+        assertEquals(date, newDate);
     }
 
     /**
-     * Metamorphic Relation 37: Calculating the difference between the input time
-     * and the start of the day, then obtaining the same difference in milliseconds
-     * and adding it to the start of the day should result in the same time as the
-     * input time.
+     * Metamorphic Relation 35: Comparing the input period with another period representing the same
+     * duration but with inverted sign will yield the opposite result when comparing the follow-up
+     * output with the original input period.
      */
     @ParameterizedTest
-    @MethodSource("testcaseProviderDI")
-    public void test37(DateTime time) {
-        /* Calculate the difference between the input time and the start of the day */
-        Duration difference = new Duration(time.withTimeAtStartOfDay(), time);
+    @MethodSource("testcaseProviderMR25")
+    public void test35(Period period) {
+        // // Get the period with inverted sign
+        // Period invertedPeriod = period.negated();
 
-        /* Obtain the same difference in milliseconds */
-        long differenceInMilliseconds = difference.getMillis();
+        // // Verification
+        // assertEquals(period.compareTo(invertedPeriod), -invertedPeriod.compareTo(period));
 
-        /* Add the difference to the start of the day */
-        DateTime calculatedTime = time.withTimeAtStartOfDay().plusMillis((int) differenceInMilliseconds);
+        // // Get follow-up output
+        // Period follow_out = period.negated();
 
-        /* Verification */
-        assertEquals(time, calculatedTime);
+        // // Verification
+        // assertEquals(period.compareTo(follow_out), -follow_out.compareTo(period));
     }
 
     /**
-     * Metamorphic Relation 38: Constructing two times and then using the isBefore
-     * method, should return the opposite result when the positions of the two times
-     * are reversed.
+     * Metamorphic Relation 36: Constructing a new LocalDateTime with a different year and month
+     * based on the input date-time, and then accessing the month-of-year and year components from
+     * the follow-up output will yield the same values as the newly constructed LocalDateTime.
      */
     @ParameterizedTest
-    @MethodSource("testcaseProviderDDP")
-    public void test38(DateTime time1, DateTime time2) {
-        /* Check if time1 is before time2 */
-        boolean isTime1BeforeTime2 = time1.isBefore(time2);
+    @MethodSource("testcaseProviderMR36")
+    public void test36(LocalDateTime localDateTime, int year, int month) {
+        /* Prevent error */
+        localDateTime = localDateTime.withDayOfMonth(28);
 
-        /* Check if time2 is before time1 */
-        boolean isTime2BeforeTime1 = time2.isBefore(time1);
+        // Create a new LocalDateTime with the specified year and month
+        LocalDateTime newLocalDateTime =
+                new LocalDateTime(year, month, localDateTime.getDayOfMonth(),
+                        localDateTime.getHourOfDay(), localDateTime.getMinuteOfHour(),
+                        localDateTime.getSecondOfMinute(), localDateTime.getMillisOfSecond());
 
-        /* Verification */
-        assertEquals(isTime1BeforeTime2, !isTime2BeforeTime1);
+        // Get the month and year components from the follow-up output
+        int newMonth = newLocalDateTime.getMonthOfYear();
+        int newYear = newLocalDateTime.getYear();
+
+        // Verification
+        assertEquals(month, newMonth);
+        assertEquals(year, newYear);
     }
 
     /**
-     * Metamorphic Relation 39: Constructing two times and calculating the
-     * difference in days between them should yield the same result regardless of
-     * their time zone adjustments.
+     * Metamorphic Relation 37: Comparing the input Duration with another Duration representing the
+     * same duration but with the opposite sign will yield the opposite result when comparing the
+     * follow-up output with the original input Duration.
      */
     @ParameterizedTest
-    @MethodSource("testcaseProviderDDP")
-    public void test39(DateTime time1, DateTime time2) {
-        /* Calculate the difference in days between time1 and time2 */
-        Days difference1 = Days.daysBetween(time1, time2);
+    @MethodSource("testcaseProviderMR37")
+    public void test37(Duration duration) {
+        // Get the duration with opposite sign
+        Duration oppositeDuration = duration.negated();
 
-        /* Calculate the difference in days after adjusting to a common time zone */
-        Days difference2 = Days.daysBetween(time1.withZone(DateTimeZone.UTC), time2.withZone(DateTimeZone.UTC));
+        // Get follow-up output
+        Duration follow_out = duration.negated();
 
-        /* Verification */
-        assertEquals(difference1, difference2);
+        // Verification
+        assertEquals(duration.compareTo(oppositeDuration), -follow_out.compareTo(duration));
     }
 
     /**
-     * Metamorphic Relation 40: Adding the duration of one week to a given time, and
-     * then adding the duration of six days should result in the same time as adding
-     * the duration of 13 days directly.
+     * Metamorphic Relation 38: Constructing a new LocalDate with a different day-of-month based on
+     * the input date, and then accessing the day-of-month component from the follow-up output will
+     * yield the same value as the source input LocalDate.
      */
     @ParameterizedTest
-    @MethodSource("testcaseProviderDI")
-    public void test40(DateTime time) {
-        /* Add the duration of one week to the given time */
-        DateTime timeAfterOneWeek = time.plusWeeks(1);
+    @MethodSource("testcaseProviderMR38")
+    public void test38(LocalDate date, int day) {
+        // Create a new LocalDate with the specified day-of-month
+        LocalDate newDate = new LocalDate(date.getYear(), date.getMonthOfYear(), day);
 
-        /* Add the duration of six days to the time after one week */
-        DateTime timeAfterThirteenDays = timeAfterOneWeek.plusDays(6);
+        // Get the day-of-month component from the follow-up output
+        int newDay = newDate.getDayOfMonth();
 
-        /* Add the duration of 13 days directly to the given time */
-        DateTime timeAfterThirteenDaysDirect = time.plusDays(13);
-
-        /* Verification */
-        assertEquals(timeAfterThirteenDays, timeAfterThirteenDaysDirect);
+        // Verification
+        assertEquals(day, newDay);
     }
 
     /**
-     * Metamorphic Relation 41: Constructing a time with a specific year, month, and
-     * day, and then adjusting the time to the beginning of the year and to the end
-     * of the year should result in the same year but different times.
+     * Metamorphic Relation 39: Comparing the input LocalDate with another LocalDate shifted by a
+     * certain period will have the same result as comparing the follow-up output with the original
+     * input LocalDate.
      */
     @ParameterizedTest
-    @MethodSource("testcaseProviderIIIIIII")
-    public void test41(int year, int month, int day) {
-        /* Construct time from year, month, and day */
-        DateTime originalTime = new DateTime(year, month, day, 0, 0, 0, 0);
+    @MethodSource("testcaseProviderMR39")
+    public void test39(LocalDate date, Period period) {
+        // Get a LocalDate shifted by the period
+        LocalDate shiftedDate = date.plus(period);
 
-        /* Adjust time to the beginning of the year */
-        DateTime startOfYearTime = originalTime.withDayOfYear(1).withTimeAtStartOfDay();
+        // Get follow-up output
+        LocalDate follow_out = date.plus(period);
 
-        /* Adjust time to the end of the year */
-        DateTime endOfYearTime = originalTime.dayOfYear().withMaximumValue().withTime(23, 59, 59, 999);
-
-        /* Verification */
-        assertEquals(startOfYearTime.getYear(), endOfYearTime.getYear());
-        assertNotEquals(startOfYearTime, endOfYearTime);
+        // Verification
+        assertEquals(date.compareTo(follow_out), date.compareTo(shiftedDate));
     }
 
     /**
-     * Metamorphic Relation 42: Calculating the difference in days between two times
-     * and then obtaining the same difference in weeks should result in a consistent
-     * conversion.
+     * Metamorphic Relation 40: Constructing a new LocalDateTime by setting a different hour,
+     * minute, and second based on the input date-time, and then accessing those components from the
+     * follow-up output will yield the same values as the newly constructed LocalDateTime.
      */
     @ParameterizedTest
-    @MethodSource("testcaseProviderDDP")
-    public void test42(DateTime time1, DateTime time2) {
-        /* Calculate the difference in days between time1 and time2 */
-        Days differenceInDays = Days.daysBetween(time1, time2);
+    @MethodSource("testcaseProviderMR40")
+    public void test40(LocalDateTime localDateTime, int hour, int minute, int second) {
+        // Create a new LocalDateTime with the specified time components
+        LocalDateTime newLocalDateTime = new LocalDateTime(localDateTime.getYear(),
+                localDateTime.getMonthOfYear(), localDateTime.getDayOfMonth(), hour, minute, second,
+                localDateTime.getMillisOfSecond());
 
-        /* Obtain the difference in weeks using consistent conversion */
-        Weeks differenceInWeeks = Weeks.weeks(differenceInDays.getDays() / 7);
+        // Get the time components from the follow-up output
+        int newHour = newLocalDateTime.getHourOfDay();
+        int newMinute = newLocalDateTime.getMinuteOfHour();
+        int newSecond = newLocalDateTime.getSecondOfMinute();
 
-        /* Verification */
-        assertEquals(differenceInWeeks, Weeks.weeksBetween(time1, time2));
+        // Verification
+        assertEquals(hour, newHour);
+        assertEquals(minute, newMinute);
+        assertEquals(second, newSecond);
     }
 
-    static Stream<Arguments> testcaseProviderDI() throws IOException {
-        return testcaseGenerator.generate_di(1000);
+    static Stream<Arguments> testcaseProviderMR1() throws IOException {
+        int num = 1000;
+        Arguments tcs[] = new Arguments[num];
+        for (int i = 0; i < num; i++) {
+            DateTime time = genDateTime();
+            Duration duration = genDuration(0, (Integer.MAX_VALUE));
+            tcs[i] = Arguments.of(time, duration);
+        }
+        writeToFile(tcs);
+        return Stream.of(tcs);
     }
 
-    static Stream<Arguments> testcaseProviderDII() throws IOException {
-        return testcaseGenerator.generate_dii(1000);
+    static Stream<Arguments> testcaseProviderMR2() throws IOException {
+        int num = 1000;
+        Arguments tcs[] = new Arguments[num];
+        for (int i = 0; i < num; i++) {
+            DateTime time = genDateTime();
+            tcs[i] = Arguments.of(time);
+        }
+        writeToFile(tcs);
+        return Stream.of(tcs);
     }
 
-    static Stream<Arguments> testcaseProviderDZZ() throws IOException {
-        return testcaseGenerator.generate_dzz(1000);
+    static Stream<Arguments> testcaseProviderMR6() throws IOException {
+        int num = 1000;
+        Arguments tcs[] = new Arguments[num];
+        for (int i = 0; i < num; i++) {
+            DateTime time = genDateTime();
+            int hour = genInt(0, 24);
+            int minute = genInt(0, 60);
+            int second = genInt(0, 60);
+            tcs[i] = Arguments.of(time, hour, minute, second);
+        }
+        writeToFile(tcs);
+        return Stream.of(tcs);
     }
 
-    static Stream<Arguments> testcaseProviderL() throws IOException {
-        return testcaseGenerator.generate_l(1000);
+    static Stream<Arguments> testcaseProviderMR7() throws IOException {
+        int num = 1000;
+        Arguments tcs[] = new Arguments[num];
+        for (int i = 0; i < num; i++) {
+            LocalDate date = genLocalDate();
+            Period period = genPeriod();
+            tcs[i] = Arguments.of(date, period);
+        }
+        writeToFile(tcs);
+        return Stream.of(tcs);
     }
 
-    static Stream<Arguments> testcaseProviderIIIIIII() throws IOException {
-        return testcaseGenerator.generate_iiiiiii(1000);
+    static Stream<Arguments> testcaseProviderMR9() throws IOException {
+        int num = 1000;
+        Arguments tcs[] = new Arguments[num];
+        for (int i = 0; i < num; i++) {
+            Duration duration = genDuration(0, (Integer.MAX_VALUE));
+            int scalar = genInt(1, 100);
+            tcs[i] = Arguments.of(duration, scalar);
+        }
+        writeToFile(tcs);
+        return Stream.of(tcs);
     }
 
-    static Stream<Arguments> testcaseProviderInsZZ() throws IOException {
-        return testcaseGenerator.generate_inszz(1000);
+    static Stream<Arguments> testcaseProviderMR12() throws IOException {
+        int num = 1000;
+        Arguments tcs[] = new Arguments[num];
+        for (int i = 0; i < num; i++) {
+            LocalTime time = genLocalTime();
+            Duration duration = genDuration(0, (Integer.MAX_VALUE));
+            tcs[i] = Arguments.of(time, duration);
+        }
+        writeToFile(tcs);
+        return Stream.of(tcs);
     }
 
-    static Stream<Arguments> testcaseProviderZZ() throws IOException {
-        return testcaseGenerator.generate_zz(1000);
+    static Stream<Arguments> testcaseProviderMR13() throws IOException {
+        int num = 1000;
+        Arguments tcs[] = new Arguments[num];
+        for (int i = 0; i < num; i++) {
+            DateTime time = genDateTime();
+            DateTimeZone zone = genDateTimeZone();
+            tcs[i] = Arguments.of(time, zone);
+        }
+        writeToFile(tcs);
+        return Stream.of(tcs);
     }
 
-    static Stream<Arguments> testcaseProviderDDP() throws IOException {
-        return testcaseGenerator.generate_ddp(1000);
+    static Stream<Arguments> testcaseProviderMR14() throws IOException {
+        int num = 1000;
+        Arguments tcs[] = new Arguments[num];
+        for (int i = 0; i < num; i++) {
+            DateTime time = genDateTime();
+            int year = genInt(1970, 2100);
+            tcs[i] = Arguments.of(time, year);
+        }
+        writeToFile(tcs);
+        return Stream.of(tcs);
     }
 
-    static Stream<Arguments> testcaseProviderIIIIIIICC() throws IOException {
-        return testcaseGenerator.generate_iiiiiiicc(1000);
+    static Stream<Arguments> testcaseProviderMR16() throws IOException {
+        int num = 1000;
+        Arguments tcs[] = new Arguments[num];
+        for (int i = 0; i < num; i++) {
+            LocalDate date = genLocalDate();
+            Chronology chronology = genChronology();
+            tcs[i] = Arguments.of(date, chronology);
+        }
+        writeToFile(tcs);
+        return Stream.of(tcs);
     }
 
-    static Stream<Arguments> testcaseProviderDFF() throws IOException {
-        return testcaseGenerator.generate_dff(1000);
+    static Stream<Arguments> testcaseProviderMR17() throws IOException {
+        int num = 1000;
+        Arguments tcs[] = new Arguments[num];
+        for (int i = 0; i < num; i++) {
+            DateTime time = genDateTime();
+            long milliseconds = genInt(0, Integer.MAX_VALUE);
+            tcs[i] = Arguments.of(time, milliseconds);
+        }
+        writeToFile(tcs);
+        return Stream.of(tcs);
     }
 
-    static Stream<Arguments> testcaseProviderIIIIIIIII() throws IOException {
-        return testcaseGenerator.generate_iiiiiiiii(1000);
+    static Stream<Arguments> testcaseProviderMR18() throws IOException {
+        int num = 1000;
+        Arguments tcs[] = new Arguments[num];
+        for (int i = 0; i < num; i++) {
+            LocalTime time = genLocalTime();
+            int second = genInt(0, 60);
+            tcs[i] = Arguments.of(time, second);
+        }
+        writeToFile(tcs);
+        return Stream.of(tcs);
+    }
+
+    static Stream<Arguments> testcaseProviderMR20() throws IOException {
+        int num = 1000;
+        Arguments tcs[] = new Arguments[num];
+        for (int i = 0; i < num; i++) {
+            DateTime time = genDateTime();
+            int millis = genInt(0, 1000);
+            tcs[i] = Arguments.of(time, millis);
+        }
+        writeToFile(tcs);
+        return Stream.of(tcs);
+    }
+
+    static Stream<Arguments> testcaseProviderMR21() throws IOException {
+        int num = 1000;
+        Arguments tcs[] = new Arguments[num];
+        for (int i = 0; i < num; i++) {
+            Interval interval = genInterval();
+            Duration duration = genDuration(0, (Integer.MAX_VALUE));
+            tcs[i] = Arguments.of(interval, duration);
+        }
+        writeToFile(tcs);
+        return Stream.of(tcs);
+    }
+
+    static Stream<Arguments> testcaseProviderMR22() throws IOException {
+        int num = 1000;
+        Arguments tcs[] = new Arguments[num];
+        for (int i = 0; i < num; i++) {
+            LocalTime time = genLocalTime();
+            int hour = genInt(0, 24);
+            int minute = genInt(0, 60);
+            int second = genInt(0, 60);
+            tcs[i] = Arguments.of(time, hour, minute, second);
+        }
+        writeToFile(tcs);
+        return Stream.of(tcs);
+    }
+
+    static Stream<Arguments> testcaseProviderMR25() throws IOException {
+        int num = 1000;
+        Arguments tcs[] = new Arguments[num];
+        for (int i = 0; i < num; i++) {
+            Period period = genPeriod();
+            tcs[i] = Arguments.of(period);
+        }
+        writeToFile(tcs);
+        return Stream.of(tcs);
+    }
+
+    static Stream<Arguments> testcaseProviderMR26() throws IOException {
+        int num = 1000;
+        Arguments tcs[] = new Arguments[num];
+        for (int i = 0; i < num; i++) {
+            DateTime time = genDateTime();
+            int millisOfDay = genInt(0, 1000 * 60 * 60 * 24);
+            tcs[i] = Arguments.of(time, millisOfDay);
+        }
+        writeToFile(tcs);
+        return Stream.of(tcs);
+    }
+
+    static Stream<Arguments> testcaseProviderMR28() throws IOException {
+        int num = 1000;
+        Arguments tcs[] = new Arguments[num];
+        for (int i = 0; i < num; i++) {
+            LocalDate date = genLocalDate();
+            int year = genInt(1970, 2100);
+            int month = genInt(1, 12);
+            int day = genInt(1, 28);
+            tcs[i] = Arguments.of(date, year, month, day);
+        }
+        writeToFile(tcs);
+        return Stream.of(tcs);
+    }
+
+    static Stream<Arguments> testcaseProviderMR29() throws IOException {
+        int num = 1000;
+        Arguments tcs[] = new Arguments[num];
+        for (int i = 0; i < num; i++) {
+            DateTime time = genDateTime();
+            Period period = genPeriod();
+            tcs[i] = Arguments.of(time, period);
+        }
+        writeToFile(tcs);
+        return Stream.of(tcs);
+    }
+
+    static Stream<Arguments> testcaseProviderMR34() throws IOException {
+        int num = 1000;
+        Arguments tcs[] = new Arguments[num];
+        for (int i = 0; i < num; i++) {
+            LocalDateTime localDateTime = genLocalDateTime();
+            LocalDate date = genLocalDate();
+            tcs[i] = Arguments.of(localDateTime, date);
+        }
+        writeToFile(tcs);
+        return Stream.of(tcs);
+    }
+
+    static Stream<Arguments> testcaseProviderMR36() throws IOException {
+        int num = 1000;
+        Arguments tcs[] = new Arguments[num];
+        for (int i = 0; i < num; i++) {
+            LocalDateTime localDateTime = genLocalDateTime();
+            int year = genInt(1970, 2100);
+            int month = genInt(1, 12);
+            tcs[i] = Arguments.of(localDateTime, year, month);
+        }
+        writeToFile(tcs);
+        return Stream.of(tcs);
+    }
+
+    static Stream<Arguments> testcaseProviderMR37() throws IOException {
+        int num = 1000;
+        Arguments tcs[] = new Arguments[num];
+        for (int i = 0; i < num; i++) {
+            Duration duration = genDuration(0, (Integer.MAX_VALUE));
+            tcs[i] = Arguments.of(duration);
+        }
+        writeToFile(tcs);
+        return Stream.of(tcs);
+    }
+
+    static Stream<Arguments> testcaseProviderMR38() throws IOException {
+        int num = 1000;
+        Arguments tcs[] = new Arguments[num];
+        for (int i = 0; i < num; i++) {
+            LocalDate date = genLocalDate();
+            int day = genInt(1, 28);
+            tcs[i] = Arguments.of(date, day);
+        }
+        writeToFile(tcs);
+        return Stream.of(tcs);
+    }
+
+    static Stream<Arguments> testcaseProviderMR39() throws IOException {
+        int num = 1000;
+        Arguments tcs[] = new Arguments[num];
+        for (int i = 0; i < num; i++) {
+            LocalDate date = genLocalDate();
+            Period period = genPeriod();
+            tcs[i] = Arguments.of(date, period);
+        }
+        writeToFile(tcs);
+        return Stream.of(tcs);
+    }
+
+    static Stream<Arguments> testcaseProviderMR40() throws IOException {
+        int num = 1000;
+        Arguments tcs[] = new Arguments[num];
+        for (int i = 0; i < num; i++) {
+            LocalDateTime localDateTime = genLocalDateTime();
+            int hour = genInt(0, 24);
+            int minute = genInt(0, 60);
+            int second = genInt(0, 60);
+            tcs[i] = Arguments.of(localDateTime, hour, minute, second);
+        }
+        writeToFile(tcs);
+        return Stream.of(tcs);
     }
 }
