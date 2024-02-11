@@ -19,7 +19,7 @@ public class testcaseGenerator {
     public static Stream<Arguments> generate(int num) throws IOException {
         int tcs_num = num;
         int[] range_size = { 1, 5 }; // 矩阵大小的范围, [1, 5)
-        int[] range_value = { 1, 5 }; // 矩阵元素的范围, [1, 5)
+        int[] range_value = { -4, 5 }; // 矩阵元素的范围, [-4, 5)
         SecureRandom rand = new SecureRandom();
         Arguments[] tcs = new Arguments[tcs_num];
 
@@ -58,8 +58,8 @@ public class testcaseGenerator {
 
     public static Stream<Arguments> generate_mm(int num) throws IOException {
         int tcs_num = num;
-        int[] range_size = { 1, 5 }; // 矩阵大小的范围, [1, 11)
-        int[] range_value = { 1, 5 }; // 矩阵元素的范围, [0, 5)
+        int[] range_size = { 1, 5 }; // 矩阵大小的范围, [1, 5)
+        int[] range_value = { -4, 5 }; // 矩阵元素的范围, [-4, 5)
         SecureRandom rand = new SecureRandom();
         Arguments[] tcs = new Arguments[tcs_num];
 
@@ -91,11 +91,9 @@ public class testcaseGenerator {
                 }
                 writer.write("\n");
             }
-            writer.write("\n\n");
+            writer.write("\n");
 
             size = m2.getRowDimension();
-            writer.write("Testcase " + String.valueOf(i) + ":\n");
-            writer.write("----------------------------------------------------------------\n");
             for (int r = 0; r < size; r++) {
                 for (int c = 0; c < size; c++) {
                     writer.write(String.valueOf((int) m2.get(r, c)) + ",");
