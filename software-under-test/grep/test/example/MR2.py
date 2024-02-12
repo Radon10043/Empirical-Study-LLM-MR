@@ -8,15 +8,18 @@ class TestingClass(unittest.TestCase):
         the output should be the same.
         """
         # Get source output
-        process = os.popen(f"{GREP_PATH} --ignore-case {pattern} {file}")
+        process = os.popen(f"{GREP_PATH} --ignore-case -f {pattern} {file}")
         source_out = process.readlines()
         process.close()
 
         # Construct follow-up input
-        follow_pattern = pattern.swapcase()
+        follow_pattern = os.path.join(os.path.dirname(pattern), "follow_pattern.txt")
+        with open(follow_pattern, mode="w") as ff:
+            with open(pattern) as sf:
+                ff.write(sf.read().swapcase())
 
         # Get follow-up output
-        process = os.popen(f"{GREP_PATH} --ignore-case {follow_pattern} {file}")
+        process = os.popen(f"{GREP_PATH} --ignore-case -f {follow_pattern} {file}")
         follow_out = process.readlines()
         process.close()
 
