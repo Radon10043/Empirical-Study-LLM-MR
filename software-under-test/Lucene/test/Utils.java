@@ -5,13 +5,10 @@ import org.apache.lucene.document.Field;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.index.IndexWriter;
-import org.apache.lucene.index.Term;
-import org.apache.lucene.search.BooleanQuery;
+import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.Hits;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
-import org.apache.lucene.search.TermQuery;
-import org.apache.lucene.search.BooleanClause.Occur;
 import org.apache.lucene.store.FSDirectory;
 
 import java.io.File;
@@ -19,7 +16,6 @@ import java.io.FileReader;
 import java.io.Reader;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 
 public class Utils {
     /**
@@ -61,79 +57,17 @@ public class Utils {
     public static ArrayList<String> fullTextSearch(String index_dir, ArrayList<String> search_terms) throws Exception {
 
         /* @formatter:off */
-        FSDirectory         directory = FSDirectory.getDirectory(new File(index_dir), false);
-        IndexSearcher       searcher = new IndexSearcher(directory);
-        BooleanQuery        query       = new BooleanQuery();
-        HashSet<String>     keywords    = new HashSet<String>();
+        FSDirectory     directory   = FSDirectory.getDirectory(new File(index_dir), false);
+        IndexSearcher   searcher    = new IndexSearcher(directory);
+        QueryParser     parser      = new QueryParser("contents", new StandardAnalyzer());
         /* @formatter:on */
 
-        /* 向HashSet中添加关键词 */
-        keywords.add("AND");
-        keywords.add("OR");
-        keywords.add("NOT");
-
-        /* 根据搜索项内容的不同生成不通过的query */
-        switch (search_terms.size()) {
-
-            case 1: {
-                /* 搜索项只有1个时, 寻找出现该搜索项的文件 */
-                if (!keywords.contains(search_terms.get(0))) {
-                    Query q = new TermQuery(new Term("contents", search_terms.get(0)));
-                    query.add(q, Occur.MUST);
-                }
-                break;
-            }
-
-            case 2: {
-                /*
-                 * 搜索项有2个时, 如果第2个搜索项是关键字, 那么就只搜索出现第1个搜索项的文件,
-                 * 如果第2个搜索项不是关键字, 那么搜索2个搜索项都出现的文件.
-                 */
-                if (keywords.contains(search_terms.get(1))) {
-                    Query q = new TermQuery(new Term("contents", search_terms.get(0)));
-                    query.add(q, Occur.MUST);
-                } else {
-                    Query q = new TermQuery(new Term("contents", search_terms.get(0) + search_terms.get(1)));
-                    query.add(q, Occur.MUST);
-                }
-                break;
-            }
-
-            case 3: {
-                /*
-                 * 搜索项有3个时, 分为4种情况:
-                 * 1. 中间是AND: 搜索左右两侧的搜索项都出现的文件
-                 * 2. 中间是OR: 搜索左侧或右侧搜索项出现的文件
-                 * 3. 中间是NOT: 搜索左侧搜索项出现但右侧搜索项没出现的文件
-                 * 4. 中间不是关键字: 搜索3个搜索项都出现的文件
-                 */
-                if (search_terms.get(1).equals("AND")) {
-                    Query q1 = new TermQuery(new Term("contents", search_terms.get(0)));
-                    Query q2 = new TermQuery(new Term("contents", search_terms.get(2)));
-                    query.add(q1, Occur.MUST);
-                    query.add(q2, Occur.MUST);
-                } else if (search_terms.get(1).equals("OR")) {
-                    Query q1 = new TermQuery(new Term("contents", search_terms.get(0)));
-                    Query q2 = new TermQuery(new Term("contents", search_terms.get(2)));
-                    query.add(q1, Occur.SHOULD);
-                    query.add(q2, Occur.SHOULD);
-                } else if (search_terms.get(1).equals("NOT")) {
-                    Query q1 = new TermQuery(new Term("contents", search_terms.get(0)));
-                    Query q2 = new TermQuery(new Term("contents", search_terms.get(2)));
-                    query.add(q1, Occur.MUST);
-                    query.add(q2, Occur.MUST_NOT);
-                } else {
-                    Query q1 = new TermQuery(new Term("contents", search_terms.get(0)));
-                    Query q2 = new TermQuery(new Term("contents", search_terms.get(1)));
-                    Query q3 = new TermQuery(new Term("contents", search_terms.get(2)));
-                    query.add(q1, Occur.MUST);
-                    query.add(q2, Occur.MUST);
-                    query.add(q3, Occur.MUST);
-                }
-                break;
-            }
-
+        /* 将搜索项转换为Query对象 */
+        String s = "";
+        for (String term : search_terms) {
+            s += term + " ";
         }
+        Query query = parser.parse(s);
 
         /* 寻找与搜索项匹配的文件, 并将路径存入result */
         Hits hits = searcher.search(query);

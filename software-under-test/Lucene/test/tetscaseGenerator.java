@@ -17,7 +17,7 @@ public class tetscaseGenerator {
      */
     public static String generate_term() {
         SecureRandom rand = new SecureRandom();
-        int len_term = rand.nextInt(1, 10);
+        int len_term = rand.nextInt(4, 10);     // 防止随机生成的字符是keyword
         return RandomStringUtils.randomAlphabetic(len_term);
     }
 
@@ -59,9 +59,9 @@ public class tetscaseGenerator {
 
             for (int j = 0; j < size; j++) {
 
-                if (j == 1) {
+                if (j == 1 && size == 3) {
 
-                    /* 在构建第二个搜索项时, 有一定概率生成关键词 */
+                    /* 在构建第二个搜索项时, 如果搜索项的数量为3, 则有一定概率生成关键词 */
                     /* 生成关键词和普通字符串的概率是一半一半 */
                     if (rand.nextInt(0, 100) < 50) {
                         search_terms.add(generate_keyword());
