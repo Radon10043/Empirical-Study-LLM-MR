@@ -13,7 +13,6 @@ from string import ascii_letters, digits
 
 # fmt:off
 # ========== GLOBAL VARIABLES ==========
-TESTCASE_NUM      = 1000        # 测试用例数量
 RANGE_TEXT_LINE   = (1, 1000)   # 文本文件行数范围
 RANGE_TEXT_LEN    = (1, 100)    # 文本文件行长度范围
 RANGE_PATTERN_LEN = (1, 10)     # 搜索项长度范围
@@ -77,13 +76,13 @@ def gen_pattern_randomly(fp: str):
         f.write(pattern)
 
 
-def gen_tcs_randomly():
+def gen_tcs_randomly(num: int):
     """随机生成测试用例
 
-    Returns
-    -------
-    list
-        _description_
+    Parameters
+    ----------
+    num : int
+        测试用例数量
     """
     tcs_dir = os.path.join(os.path.dirname(__file__), "..", "testcases")
 
@@ -91,7 +90,7 @@ def gen_tcs_randomly():
     shutil.rmtree(tcs_dir, ignore_errors=True)
     os.mkdir(tcs_dir)
 
-    for i in range(TESTCASE_NUM):
+    for i in range(num):
         print("Creating testcase " + str(i).zfill(3) + "...", end="\r")
 
         tc_dir = os.path.join(tcs_dir, "tc" + str(i).zfill(3))
@@ -105,16 +104,16 @@ def gen_tcs_randomly():
         pattern_path = os.path.join(tc_dir, "pattern.txt")
         gen_pattern_randomly(pattern_path)
 
-    print(f"{TESTCASE_NUM} testcases are created!")
+    print(f"{num} testcases are created!")
 
 
-def gen_tcs_randomly_combination():
+def gen_tcs_randomly_combination(num: int):
     """随机生成测试用例 (combination)
 
-    Returns
-    -------
-    list
-        _description_
+    Parameters
+    ----------
+    num : int
+        测试用例数量
     """
     tcs_dir = os.path.join(os.path.dirname(__file__), "..", "testcases")
 
@@ -122,7 +121,7 @@ def gen_tcs_randomly_combination():
     shutil.rmtree(tcs_dir, ignore_errors=True)
     os.mkdir(tcs_dir)
 
-    for i in range(TESTCASE_NUM):
+    for i in range(num):
         print("Creating testcase " + str(i).zfill(3) + "...", end="\r")
 
         tc_dir = os.path.join(tcs_dir, "tc" + str(i).zfill(3))
@@ -138,7 +137,7 @@ def gen_tcs_randomly_combination():
         pattern_path = os.path.join(tc_dir, "pattern.txt")
         gen_pattern_randomly(pattern_path)
 
-    print(f"{TESTCASE_NUM} testcases are created!")
+    print(f"{num} testcases are created!")
 
 
 if __name__ == "__main__":
