@@ -19,6 +19,22 @@
 > - `-E`, `--extended-regexp`: Interpret the pattern as an extended regular expression (ERE).
 > - `-F`, `--fixed-strings`: Interpret the pattern as a list of fixed strings (instead of regular expressions), separated by newlines, any of which is to be matched.
 >
+> ### Examples
+> Search for the word "example" in a file called "sample.txt":
+> ```bash
+> grep "example" sample.txt
+> ```
+>
+> Search recursively in the current directory for lines containing "def" and ignore case:
+> ```bash
+> grep -ri "def" .
+> ```
+>
+> Count the number of lines that contain the word "todo" in all `.py` files in the current directory and its subdirectories:
+> ```bash
+> grep -r --include="*.py" -c "todo" .
+> ```
+>
 > ### Notes
 > - `grep` is a fundamental tool in text processing and is widely used for filtering and manipulating text, log analysis, and script programming.
 > - The utility's efficiency and flexibility come from its use of regular expressions, allowing sophisticated patterns and matching criteria.
