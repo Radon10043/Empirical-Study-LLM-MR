@@ -2,7 +2,7 @@
 Author: Radon
 Date: 2024-01-09 17:27:20
 LastEditors: Radon
-LastEditTime: 2024-01-09 22:08:25
+LastEditTime: 2024-02-13 17:15:47
 Description: Hi, say something
 """
 import os
@@ -13,7 +13,6 @@ from random import randint
 
 # fmt:off
 # ==================== GLOBAL BARIABLES ====================
-TESTCASE_NUM = 1000
 RANGE_LINE   = (1, 100)
 RANGE_SMALL  = (1, 5)
 RANGE_LARGE  = (1, 100)
@@ -119,8 +118,14 @@ def gen_comment() -> str:
     return s
 
 
-def gen_tcs_randomly():
-    """随机生成一定数量的测试用例, 并保存到testcases文件夹下"""
+def gen_tcs_randomly(num: int):
+    """随机生成测试用例, 保存至testcases文件夹下
+
+    Parameters
+    ----------
+    num : int
+        测试用例数量
+    """
     tcs_dir = os.path.join(os.path.dirname(__file__), "..", "testcases")
     if not os.path.exists(tcs_dir):
         os.mkdir(tcs_dir)
@@ -128,7 +133,7 @@ def gen_tcs_randomly():
     # 可选操作
     operations = [gen_keyword, gen_special, gen_identifier, gen_numeric, gen_string, gen_comment]
 
-    for i in range(TESTCASE_NUM):
+    for i in range(num):
         print("\rGenerating testcase " + str(i).zfill(3) + " ...", end="")
         tc_file = os.path.join(tcs_dir, "tc" + str(i).zfill(3) + ".txt")
         line_num = randint(*RANGE_LINE)

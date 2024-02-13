@@ -1,18 +1,21 @@
 ```python
-@parameterized.expand(load_test_cases)
+@parameterized.expand(load_test_cases(1000))
 def test1(self, tc: str):
-    """Metamorphic Relation 1: Adding a new line that only includes a comma, the number of follow-up output's rows equals the number of source output's rows plus one."""
+    """Metamorphic Relation 1: Changing all the characters from lower case to upper case, the keyword will disappear."""
     # Get source output
     source_out = subprocess.check_output(PRINT_TOKENS_PATH, input=tc, text=True).split("\n")
 
     # Construct follow-up input
-    follow_tc = tc + "\n,"
+    follow_tc = tc.upper()
 
     # Get follow-up output
     follow_out = subprocess.check_output(PRINT_TOKENS_PATH, input=follow_tc, text=True).split("\n")
 
     # Verification
-    self.assertEqual(len(source_out) + 1, len(follow_out))
+    type_list = list()
+    for line in follow_out:
+        type_list.append(line.split(",")[0])
+    self.assertNotIn("keyword", type_list)
 
 @parameterized.expand(load_test_cases)
 def test2(self, tc: str):
