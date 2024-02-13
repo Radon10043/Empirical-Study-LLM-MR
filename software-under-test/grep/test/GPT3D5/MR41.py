@@ -2,23 +2,19 @@ from utils import *
 
 
 class TestingClass(unittest.TestCase):
-    @parameterized.expand(load_test_cases)
+    @parameterized.expand(load_test_cases(1000))
     def test41(self, pattern: str, file: str):
-        """Metamorphic Relation 41: If the file path is changed to an absolute path, the output should remain the same."""
-        absolute_path = os.path.abspath(file)
+        """Metamorphic Relation 41: If the --file option is used, the output should be consistent with the original output."""
+        process_with_file_option = os.popen(f"{GREP_PATH} --file={pattern} {file}")
+        output_with_file_option = process_with_file_option.readlines()
+        process_with_file_option.close()
 
-        # Get source output with original file path
-        process_orig = os.popen(f"{GREP_PATH} '{pattern}' {file}")
-        source_out = process_orig.readlines()
-        process_orig.close()
-
-        # Get follow-up output with absolute file path
-        process_follow = os.popen(f"{GREP_PATH} '{pattern}' {absolute_path}")
-        follow_out = process_follow.readlines()
-        process_follow.close()
+        process_without_file_option = os.popen(f"{GREP_PATH} -f {pattern} {file}")
+        output_without_file_option = process_without_file_option.readlines()
+        process_without_file_option.close()
 
         # Verification
-        self.assertEqual(source_out, follow_out)
+        self.assertEqual(output_with_file_option, output_without_file_option, "Output differs when using the --file option")
 
 
 if __name__ == "__main__":

@@ -2,27 +2,27 @@ from utils import *
 
 
 class TestingClass(unittest.TestCase):
-    @parameterized.expand(load_test_cases)
+    @parameterized.expand(load_test_cases(1000))
     def test5(self, pattern: str, file: str):
-        """Metamorphic Relation 5: If the pattern is replaced with its negation,
-        the output should be complementary.
-        """
+        """Metamorphic Relation 5: If the pattern is extended in length, the output should be a subset of the original output."""
         # Get source output
-        process_orig = os.popen(f"{GREP_PATH} {pattern} {file}")
-        source_out = process_orig.readlines()
-        process_orig.close()
+        process = os.popen(f"{GREP_PATH} -f {pattern} {file}")
+        source_out = process.readlines()
+        process.close()
 
-        # Construct follow-up input with negation of the pattern
-        follow_pattern = f"!{pattern}"
+        # Construct follow-up input
+        follow_pattern = os.path.join(os.path.dirname(pattern), "follow_pattern.txt")
+        with open(follow_pattern, mode="w") as ff:
+            with open(pattern) as sf:
+                ff.write(sf.read() + "extended")
 
         # Get follow-up output
-        process_follow = os.popen(f"{GREP_PATH} '{follow_pattern}' {file}")
-        follow_out = process_follow.readlines()
-        process_follow.close()
+        process = os.popen(f"{GREP_PATH} -f {follow_pattern} {file}")
+        follow_out = process.readlines()
+        process.close()
 
-        # Verification - Ensure the combined output length is equal to the sum of individual output lengths
-        combined_out = source_out + follow_out
-        self.assertEqual(len(combined_out), len(set(source_out) | set(follow_out)))
+        # Verification
+        self.assertTrue(set(follow_out).issubset(set(source_out)))
 
 
 if __name__ == "__main__":

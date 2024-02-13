@@ -2,7 +2,7 @@
 Author: Radon
 Date: 2024-01-09 15:59:19
 LastEditors: Radon
-LastEditTime: 2024-01-19 16:26:23
+LastEditTime: 2024-02-13 16:29:29
 Description: Hi, say something
 """
 import os, shutil
@@ -15,7 +15,7 @@ from string import ascii_letters, digits
 # ========== GLOBAL VARIABLES ==========
 RANGE_TEXT_LINE   = (1, 1000)   # 文本文件行数范围
 RANGE_TEXT_LEN    = (1, 100)    # 文本文件行长度范围
-RANGE_PATTERN_LEN = (1, 10)     # 搜索项长度范围
+RANGE_PATTERN_LEN = (1, 5)     # 搜索项长度范围
 # ======================================
 # fmt:on
 
@@ -68,7 +68,7 @@ def gen_pattern_randomly(fp: str):
     """
     # 随机生成pattern, 避免出现空格
     pattern = gen_str_randomly(randint(*RANGE_PATTERN_LEN))
-    while " " in pattern:
+    while " " in pattern or "\t" in pattern:
         pattern = gen_str_randomly(randint(*RANGE_PATTERN_LEN))
 
     # 写入文件

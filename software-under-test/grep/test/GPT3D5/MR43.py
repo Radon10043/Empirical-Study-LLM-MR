@@ -2,26 +2,15 @@ from utils import *
 
 
 class TestingClass(unittest.TestCase):
-    @parameterized.expand(load_test_cases)
+    @parameterized.expand(load_test_cases(1000))
     def test43(self, pattern: str, file: str):
-        """Metamorphic Relation 43: If the pattern is changed to its lookbehind assertion form and the '-v' option is used,
-        the output should remain the same.
-        """
-        # Get source output with original pattern and '-v' option
-        process_orig = os.popen(f"{GREP_PATH} -v '{pattern}' {file}")
-        source_out = process_orig.readlines()
-        process_orig.close()
-
-        # Construct follow-up input with the pattern in lookbehind assertion form
-        follow_pattern = f"(?<={pattern})"
-
-        # Get follow-up output with '-v' option
-        process_follow = os.popen(f"{GREP_PATH} -v '{follow_pattern}' {file}")
-        follow_out = process_follow.readlines()
-        process_follow.close()
+        """Metamorphic Relation 43: If the --quiet option is used, the program should produce no output."""
+        process_with_quiet = os.popen(f"{GREP_PATH} --quiet {pattern} {file}")
+        output_with_quiet = process_with_quiet.readlines()
+        process_with_quiet.close()
 
         # Verification
-        self.assertEqual(source_out, follow_out)
+        self.assertFalse(output_with_quiet, "Unexpected output when using the --quiet option")
 
 
 if __name__ == "__main__":

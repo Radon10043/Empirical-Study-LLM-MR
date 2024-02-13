@@ -2,21 +2,23 @@ from utils import *
 
 
 class TestingClass(unittest.TestCase):
-    @parameterized.expand(load_test_cases_combinations)
-    def test13(self, pattern: str, file1: str, file2: str):
-        """Metamorphic Relation 13: If the order of the input files is reversed, the output should remain unchanged."""
-        # Get source output with original input file order
-        process_orig = os.popen(f"{GREP_PATH} {pattern} {file1} {file2}")
-        source_out = process_orig.readlines()
-        process_orig.close()
+    @parameterized.expand(load_test_cases(1000))
+    def test13(self, pattern: str, file: str):
+        """Metamorphic Relation 13: If no file is specified, the output should be the same as when searching the standard input."""
+        unittest.TestCase.skipTest(self, "This test is not applicable for the current version of grep")
 
-        # Get follow-up output with reversed input file order
-        process_follow = os.popen(f"{GREP_PATH} {pattern} {file2} {file1}")
-        follow_out = process_follow.readlines()
-        process_follow.close()
+        # Get source output with a file specified
+        process = os.popen(f"{GREP_PATH} {pattern} {file}")
+        file_out = process.readlines()
+        process.close()
+
+        # Get source output without specifying a file
+        process = os.popen(f"{GREP_PATH} {pattern}")
+        stdin_out = process.readlines()
+        process.close()
 
         # Verification
-        self.assertEqual(source_out, follow_out)
+        self.assertEqual(file_out, stdin_out)
 
 
 if __name__ == "__main__":

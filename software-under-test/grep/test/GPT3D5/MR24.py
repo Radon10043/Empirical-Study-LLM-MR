@@ -2,24 +2,22 @@ from utils import *
 
 
 class TestingClass(unittest.TestCase):
-    @parameterized.expand(load_test_cases)
+    @parameterized.expand(load_test_cases(1000))
     def test24(self, pattern: str, file: str):
-        """Metamorphic Relation 24: If the pattern is changed to its zero-width negative lookbehind form, the output should remain the same."""
-        # Get source output
-        process_orig = os.popen(f"{GREP_PATH} '{pattern}' {file}")
-        source_out = process_orig.readlines()
-        process_orig.close()
+        """Metamorphic Relation 24: If the recursive search option is used with a specific file type, the output should be the same as when filtering the file type in a single recursive search."""
+        file_type = "*.txt"  # Example file type
+        # Get source output with recursive search filtered by file type
+        process = os.popen(f"{GREP_PATH} --include={file_type} -f {pattern} {os.path.dirname(file)}")
+        filtered_out = process.readlines()
+        process.close()
 
-        # Construct follow-up input with the pattern in zero-width negative lookbehind form
-        follow_pattern = f"(?<!{pattern})"
-
-        # Get follow-up output
-        process_follow = os.popen(f"{GREP_PATH} '{follow_pattern}' {file}")
-        follow_out = process_follow.readlines()
-        process_follow.close()
+        # Get source output with single recursive search and filtering by file type
+        process = os.popen(f"{GREP_PATH} -r -f {pattern} --include={file_type} {os.path.dirname(file)}")
+        recursive_filtered_out = process.readlines()
+        process.close()
 
         # Verification
-        self.assertEqual(source_out, follow_out)
+        self.assertEqual(filtered_out, recursive_filtered_out)
 
 
 if __name__ == "__main__":

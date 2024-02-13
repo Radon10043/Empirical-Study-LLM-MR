@@ -2,24 +2,17 @@ from utils import *
 
 
 class TestingClass(unittest.TestCase):
-    @parameterized.expand(load_test_cases)
+    @parameterized.expand(load_test_cases(1000))
     def test23(self, pattern: str, file: str):
-        """Metamorphic Relation 23: If the pattern is changed to its zero-width positive lookbehind form, the output should remain the same."""
-        # Get source output
-        process_orig = os.popen(f"{GREP_PATH} '{pattern}' {file}")
-        source_out = process_orig.readlines()
-        process_orig.close()
-
-        # Construct follow-up input with the pattern in zero-width positive lookbehind form
-        follow_pattern = f"(?<={pattern})"
-
-        # Get follow-up output
-        process_follow = os.popen(f"{GREP_PATH} '{follow_pattern}' {file}")
-        follow_out = process_follow.readlines()
-        process_follow.close()
+        """Metamorphic Relation 23: If the '-m' option is used to limit the number of matching lines, the output should contain at most the specified number of lines."""
+        num_lines = 5  # Example number of lines
+        # Get source output with limited number of matching lines
+        process = os.popen(f"{GREP_PATH} -m {num_lines} {pattern} {file}")
+        limited_out = process.readlines()
+        process.close()
 
         # Verification
-        self.assertEqual(source_out, follow_out)
+        self.assertLessEqual(len(limited_out), num_lines)
 
 
 if __name__ == "__main__":

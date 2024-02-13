@@ -2,32 +2,25 @@ from utils import *
 
 
 class TestingClass(unittest.TestCase):
-    # Fix by Radon
-    @parameterized.expand(load_test_cases)
-    def test8(self, pattern: str, file: str):
-        """Metamorphic Relation 8: If a different line number range is used, the output should be based on the new line number range."""
-        start_line, end_line = 0, 0
-        f = open(file, mode="r", encoding="UTF-8")
-        sum_line = len(f.readlines())
-        f.close()
-        start_line = randint(0, int(sum_line / 2))
-        end_line = randint(int(sum_line / 2), sum_line)
+    @parameterized.expand(load_test_cases_combinations(1000))
+    def test8(self, pattern: str, file1: str, file2: str):
+        """Metamorphic Relation 8: If multiple files are provided, the output should be the combined output of each individual file search."""
+        # Get source output
+        process = os.popen(f"{GREP_PATH} -h -f {pattern} {file1} {file2}")
+        source_out = process.readlines()
+        process.close()
 
-        # Get source output with original line number range
-        process_orig = os.popen(f"{GREP_PATH} -n '{pattern}' {file} | sed -n '{start_line},{end_line}p'")
-        source_out = process_orig.readlines()
-        process_orig.close()
-
-        # Adjust follow-up input with new line number range
-        new_start_line = start_line + 1
-        new_end_line = end_line + 1
-        # Get follow-up output with adjusted line number range
-        process_follow = os.popen(f"{GREP_PATH} -n '{pattern}' {file} | sed -n '{new_start_line},{new_end_line}p'")
-        follow_out = process_follow.readlines()
-        process_follow.close()
+        # Get separate file outputs
+        process = os.popen(f"{GREP_PATH} -f {pattern} {file1}")
+        file_out1 = process.readlines()
+        process.close()
+        process = os.popen(f"{GREP_PATH} -f {pattern} {file2}")
+        file_out2 = process.readlines()
+        process.close()
 
         # Verification
-        self.assertEqual(source_out, follow_out)
+        combined_output = file_out1 + file_out2
+        self.assertEqual(source_out, combined_output)
 
 
 if __name__ == "__main__":

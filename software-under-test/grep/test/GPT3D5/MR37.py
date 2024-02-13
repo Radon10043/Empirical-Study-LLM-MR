@@ -2,24 +2,19 @@ from utils import *
 
 
 class TestingClass(unittest.TestCase):
-    @parameterized.expand(load_test_cases)
+    @parameterized.expand(load_test_cases(1000))
     def test37(self, pattern: str, file: str):
-        """Metamorphic Relation 37: If the pattern is changed to its atomic grouping form and combined with the --line-buffered option, the output should remain the same."""
-        # Get source output with original pattern and --line-buffered option
-        process_orig = os.popen(f"{GREP_PATH} --line-buffered '{pattern}' {file}")
-        source_out = process_orig.readlines()
-        process_orig.close()
+        """Metamorphic Relation 37: If the extended-regexp option is used, the output should be consistent with the original output."""
+        process_with_ere = os.popen(f"{GREP_PATH} -E -f {pattern} {file}")
+        output_with_ere = process_with_ere.readlines()
+        process_with_ere.close()
 
-        # Construct follow-up input with the pattern in atomic grouping form
-        follow_pattern = f"(?<={pattern})"
-
-        # Get follow-up output with --line-buffered option
-        process_follow = os.popen(f"{GREP_PATH} --line-buffered '{follow_pattern}' {file}")
-        follow_out = process_follow.readlines()
-        process_follow.close()
+        process_without_ere = os.popen(f"{GREP_PATH} -f {pattern} {file}")
+        output_without_ere = process_without_ere.readlines()
+        process_without_ere.close()
 
         # Verification
-        self.assertEqual(source_out, follow_out)
+        self.assertEqual(output_with_ere, output_without_ere, "Output differs when using the extended-regexp option")
 
 
 if __name__ == "__main__":

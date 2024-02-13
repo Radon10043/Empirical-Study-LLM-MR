@@ -2,25 +2,18 @@ from utils import *
 
 
 class TestingClass(unittest.TestCase):
-    @parameterized.expand(load_test_cases)
+    @parameterized.expand(load_test_cases(1000))
     def test6(self, pattern: str, file: str):
-        """Metamorphic Relation 6: If the pattern is surrounded by additional characters,
-        the output should remain unchanged.
-        """
+        """Metamorphic Relation 6: If the fixed strings option is used, the output should be the same as the original output."""
         # Get source output
-        process_orig = os.popen(f"{GREP_PATH} {pattern} {file}")
-        source_out = process_orig.readlines()
-        process_orig.close()
-
-        # Construct follow-up input with the pattern surrounded by additional characters
-        follow_pattern = f"abc{pattern}def"
-
-        # Get follow-up output
-        process_follow = os.popen(f"{GREP_PATH} '{follow_pattern}' {file}")
-        follow_out = process_follow.readlines()
-        process_follow.close()
+        process = os.popen(f"{GREP_PATH} -F -f {pattern} {file}")
+        source_out = process.readlines()
+        process.close()
 
         # Verification
+        process = os.popen(f"{GREP_PATH} -f {pattern} {file}")
+        follow_out = process.readlines()
+        process.close()
         self.assertEqual(source_out, follow_out)
 
 

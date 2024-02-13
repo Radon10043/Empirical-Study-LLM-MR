@@ -2,25 +2,25 @@ from utils import *
 
 
 class TestingClass(unittest.TestCase):
-    @parameterized.expand(load_test_cases)
+    @parameterized.expand(load_test_cases(1000))
     def test10(self, pattern: str, file: str):
-        """Metamorphic Relation 10: If the pattern is changed to its logical NOT form, the output should be complementary to the original output."""
+        """Metamorphic Relation 10: If recursive search is performed, the output should be the combined output of all files in the directory tree."""
         # Get source output
-        process_orig = os.popen(f"{GREP_PATH} {pattern} {file}")
-        source_out = process_orig.readlines()
-        process_orig.close()
+        process = os.popen(f"{GREP_PATH} -h -r -f {pattern} {os.path.dirname(file)}")
+        source_out = process.readlines()
+        process.close()
 
-        # Construct follow-up input with logical NOT of the pattern
-        follow_pattern = f"!( {pattern} )"
-
-        # Get follow-up output
-        process_follow = os.popen(f"{GREP_PATH} -v '{follow_pattern}' {file}")
-        follow_out = process_follow.readlines()
-        process_follow.close()
+        # Get separate file outputs
+        combined_out = []
+        for root, dirs, files in os.walk(os.path.dirname(file)):
+            for f in files:
+                process = os.popen(f"{GREP_PATH} -f {pattern} {os.path.join(root, f)}")
+                file_out = process.readlines()
+                process.close()
+                combined_out.extend(file_out)
 
         # Verification
-        combined_out = source_out + follow_out
-        self.assertEqual(len(combined_out), len(set(source_out) | set(follow_out)))
+        self.assertEqual(source_out, combined_out)
 
 
 if __name__ == "__main__":

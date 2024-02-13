@@ -2,26 +2,23 @@ from utils import *
 
 
 class TestingClass(unittest.TestCase):
-    @parameterized.expand(load_test_cases)
+    @parameterized.expand(load_test_cases(1000))
     def test36(self, pattern: str, file: str):
-        """Metamorphic Relation 36: If the pattern is changed by adding a word boundary assertion, the output should reflect the matches with the added word boundary."""
-        # Get source output for the original pattern
-        process_orig = os.popen(f"{GREP_PATH} '{pattern}' {file}")
-        source_out = process_orig.readlines()
-        process_orig.close()
+        """Metamorphic Relation 36: If a different regular expression engine is used, the output should be consistent with the original regular expression engine."""
+        other_grep_path = "/usr/bin/grep"  # Example path to a different grep utility
 
-        # Construct follow-up input with word boundary assertion added to the pattern
-        follow_pattern = r"\b" + pattern + r"\b"
+        # Get source output with original regular expression engine
+        process = os.popen(f"{GREP_PATH} {pattern} {file}")
+        source_out = process.readlines()
+        process.close()
 
-        # Get follow-up output for the modified pattern with word boundary assertion
-        process_follow = os.popen(f"{GREP_PATH} '{follow_pattern}' {file}")
-        follow_out = process_follow.readlines()
-        process_follow.close()
+        # Get source output with different regular expression engine
+        process = os.popen(f"{other_grep_path} {pattern} {file}")
+        other_out = process.readlines()
+        process.close()
 
         # Verification
-        combined_out = source_out + follow_out
-        # Ensure that the combined output length is equal to the sum of individual output lengths
-        self.assertEqual(len(combined_out), len(set(source_out) | set(follow_out)))
+        self.assertEqual(source_out, other_out, "Output differs when using a different regular expression engine")
 
 
 if __name__ == "__main__":

@@ -12,16 +12,21 @@ from generate import *
 GREP_PATH = os.path.join(os.path.dirname(__file__), "..", "..", "src", "grep-3.11", "obj-temp", "src", "grep")
 
 
-def load_test_cases() -> list:
+def load_test_cases(num: int) -> list:
     """加载测试用例
+
+    Parameters
+    ----------
+    num : int
+        测试用例数量
 
     Returns
     -------
     list
-        text文件和pattern文件的地址
+        _description_
     """
     # 每次测试开始前先创建测试用例
-    gen_tcs_randomly()
+    gen_tcs_randomly(num)
 
     tc_dir = os.path.join(os.path.dirname(__file__), "..", "..", "testcases")  # 文件系统中存储所有测试用例的根目录
     dirs = [os.path.join(tc_dir, dir) for dir in os.listdir(tc_dir)]  # 存储了测试用例文件路径的列表
@@ -36,16 +41,21 @@ def load_test_cases() -> list:
     return testcases
 
 
-def load_test_cases_combinations() -> list:
+def load_test_cases_combinations(num: int) -> list:
     """加载测试用例
+
+    Parameters
+    ----------
+    num : int
+        测试用例数量
 
     Returns
     -------
     list
-        text文件和pattern文件的地址
+        text1, text2和pattern文件的地址
     """
     # 每次测试开始前先创建测试用例
-    gen_tcs_randomly_combination()
+    gen_tcs_randomly_combination(num)
 
     tc_dir = os.path.join(os.path.dirname(__file__), "..", "..", "testcases")  # 文件系统中存储所有测试用例的根目录
     dirs = [os.path.join(tc_dir, dir) for dir in os.listdir(tc_dir)]  # 存储了测试用例文件路径的列表

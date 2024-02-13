@@ -2,24 +2,32 @@ from utils import *
 
 
 class TestingClass(unittest.TestCase):
-    @parameterized.expand(load_test_cases)
+    @parameterized.expand(load_test_cases(1000))
     def test21(self, pattern: str, file: str):
-        """Metamorphic Relation 21: If the pattern is changed by applying zero-width positive lookahead, the output should remain the same."""
-        # Get source output
-        process_orig = os.popen(f"{GREP_PATH} '{pattern}' {file}")
-        source_out = process_orig.readlines()
-        process_orig.close()
+        """Metamorphic Relation 21: If the context option is used, the output should contain the matched lines along with specified context around them."""
+        context_lines = 2  # Number of lines of context
+        # Get source output with context option
+        process = os.popen(f"{GREP_PATH} -C {context_lines} -f {pattern} {file}")
+        context_out = process.readlines()
+        process.close()
 
-        # Construct follow-up input with the pattern modified by zero-width positive lookahead
-        follow_pattern = f"{pattern}(?={pattern})"
+        # Get separate file outputs to construct expected output with context
+        process = os.popen(f"grep -n -f {pattern} {file}")
+        matched_lines = process.readlines()
+        process.close()
 
-        # Get follow-up output
-        process_follow = os.popen(f"{GREP_PATH} '{follow_pattern}' {file}")
-        follow_out = process_follow.readlines()
-        process_follow.close()
+        expected_output = []
+        for line in matched_lines:
+            line_number = int(line.split(':')[0])
+            start_line = max(1, line_number - context_lines)
+            end_line = line_number + context_lines + 1
+            process = os.popen(f"sed -n '{start_line},{end_line}p' {file}")
+            context = process.readlines()
+            process.close()
+            expected_output.extend(context)
 
         # Verification
-        self.assertEqual(source_out, follow_out)
+        self.assertEqual(context_out, expected_output)
 
 
 if __name__ == "__main__":

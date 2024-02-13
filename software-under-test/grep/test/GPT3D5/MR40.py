@@ -2,24 +2,21 @@ from utils import *
 
 
 class TestingClass(unittest.TestCase):
-    @parameterized.expand(load_test_cases)
+    @parameterized.expand(load_test_cases(1000))
     def test40(self, pattern: str, file: str):
-        """Metamorphic Relation 40: If the pattern is changed to its negation form and combined with the --null-data option, the output should remain the same."""
-        # Get source output with original pattern and --null-data option
-        process_orig = os.popen(f"{GREP_PATH} --null-data '{pattern}' {file}")
-        source_out = process_orig.readlines()
-        process_orig.close()
+        """Metamorphic Relation 40: If the --regexp option is used, the output should be consistent with the original output."""
+        with open(pattern, "r") as f:
+            content = f.read()
+        process_with_regexp = os.popen(f"{GREP_PATH} --regexp={content} {file}")
+        output_with_regexp = process_with_regexp.readlines()
+        process_with_regexp.close()
 
-        # Construct follow-up input with the negation form of the pattern
-        follow_pattern = f"!({pattern})"
-
-        # Get follow-up output with --null-data option
-        process_follow = os.popen(f"{GREP_PATH} --null-data '{follow_pattern}' {file}")
-        follow_out = process_follow.readlines()
-        process_follow.close()
+        process_without_regexp = os.popen(f"{GREP_PATH} -f {pattern} {file}")
+        output_without_regexp = process_without_regexp.readlines()
+        process_without_regexp.close()
 
         # Verification
-        self.assertEqual(source_out, follow_out)
+        self.assertEqual(output_with_regexp, output_without_regexp, "Output differs when using the --regexp option")
 
 
 if __name__ == "__main__":

@@ -2,29 +2,19 @@ from utils import *
 
 
 class TestingClass(unittest.TestCase):
-    # Fix by Radon
-    @parameterized.expand(load_test_cases)
+    @parameterized.expand(load_test_cases(1000))
     def test35(self, pattern: str, file: str):
-        """Metamorphic Relation 35: If the pattern is changed by appending a back-reference and a numeric subgroup, the output may change based on the specific input files and patterns."""
-        group_num = randint(1, 5)
+        """Metamorphic Relation 35: If inverted match is performed on an empty pattern, the entire file should be output."""
+        process_inverted_match = os.popen(f"{GREP_PATH} -v '' {file}")
+        output_inverted_match = process_inverted_match.readlines()
+        process_inverted_match.close()
 
-        # Get source output for the original pattern and numeric subgroup
-        process_orig = os.popen(f"{GREP_PATH} -E '{pattern}' {file}")
-        source_out = process_orig.readlines()
-        process_orig.close()
-
-        # Construct follow-up input with the back-reference and numeric subgroup
-        follow_pattern = f"{pattern}\\{group_num}"
-
-        # Get follow-up output
-        process_follow = os.popen(f"{GREP_PATH} -E '{follow_pattern}' {file}")
-        follow_out = process_follow.readlines()
-        process_follow.close()
+        process_entire_file = os.popen(f"cat {file}")
+        output_entire_file = process_entire_file.readlines()
+        process_entire_file.close()
 
         # Verification
-        combined_out = source_out + follow_out
-        # Ensure that the combined output length is equal to the sum of individual output lengths
-        self.assertEqual(len(combined_out), len(set(source_out) | set(follow_out)))
+        self.assertEqual(output_inverted_match, output_entire_file, "Inverted match with empty pattern does not output the entire file")
 
 
 if __name__ == "__main__":

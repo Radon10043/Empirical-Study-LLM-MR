@@ -2,24 +2,17 @@ from utils import *
 
 
 class TestingClass(unittest.TestCase):
-    @parameterized.expand(load_test_cases)
+    @parameterized.expand(load_test_cases(1000))
     def test7(self, pattern: str, file: str):
-        """Metamorphic Relation 7: If the pattern is duplicated, the output should remain unchanged."""
+        """Metamorphic Relation 7: If the search is performed on a specific line number, the output should contain only that line."""
+        line_number = 5  # Example line number
         # Get source output
-        process_orig = os.popen(f"{GREP_PATH} {pattern} {file}")
-        source_out = process_orig.readlines()
-        process_orig.close()
-
-        # Construct follow-up input with the pattern duplicated
-        follow_pattern = pattern + pattern
-
-        # Get follow-up output
-        process_follow = os.popen(f"{GREP_PATH} '{follow_pattern}' {file}")
-        follow_out = process_follow.readlines()
-        process_follow.close()
+        process = os.popen(f"{GREP_PATH} -n {pattern} {file} | grep :{line_number}:")
+        source_out = process.readlines()
+        process.close()
 
         # Verification
-        self.assertEqual(source_out, follow_out)
+        self.assertEqual(len(source_out), 1)  # Ensure only the specified line is in the output
 
 
 if __name__ == "__main__":

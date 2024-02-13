@@ -2,26 +2,21 @@ from utils import *
 
 
 class TestingClass(unittest.TestCase):
-    @parameterized.expand(load_test_cases)
+    @parameterized.expand(load_test_cases(1000))
     def test32(self, pattern: str, file: str):
-        """Metamorphic Relation 32: If the pattern is changed by appending a pipe character and another pattern, the output should reflect the union of matches."""
-        # Get source output for the original pattern
-        process_orig = os.popen(f"{GREP_PATH} '{pattern}' {file}")
-        source_out = process_orig.readlines()
-        process_orig.close()
+        """Metamorphic Relation 32: If the '-v' option is used to select non-matching lines, the output should not contain any line that matches the pattern."""
+        process_with_v_option = os.popen(f"{GREP_PATH} -v -f {pattern} {file}")
+        output_with_v_option = process_with_v_option.readlines()
+        process_with_v_option.close()
 
-        # Construct follow-up input with union pattern
-        union_pattern = "another_pattern"
-        follow_pattern = f"({pattern})|({union_pattern})"
-
-        # Get follow-up output for the union pattern
-        process_follow = os.popen(f"{GREP_PATH} '{follow_pattern}' {file}")
-        follow_out = process_follow.readlines()
-        process_follow.close()
+        process_without_v_option = os.popen(f"{GREP_PATH} -f {pattern} {file}")
+        output_without_v_option = process_without_v_option.readlines()
+        process_without_v_option.close()
 
         # Verification
-        combined_out = source_out + follow_out
-        self.assertEqual(len(combined_out), len(set(source_out) | set(follow_out)))
+        for line in output_with_v_option:
+            self.assertNotIn(pattern, line, "Output with -v option contains matching lines")
+        self.assertNotEqual(output_with_v_option, output_without_v_option, "Output differs when using the -v option")
 
 
 if __name__ == "__main__":

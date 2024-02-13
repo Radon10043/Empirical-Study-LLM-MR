@@ -2,31 +2,19 @@ from utils import *
 
 
 class TestingClass(unittest.TestCase):
-    # Fix by Radon
-    @parameterized.expand(load_test_cases)
+    @parameterized.expand(load_test_cases(1000))
     def test30(self, pattern: str, file: str):
-        """Metamorphic Relation 30: If the pattern is enclosed in quotes and the context option is used,
-        the output should remain the same.
-        """
-        before_lines, after_lines = 0, 0
-        f = open(file, mode="r", encoding="UTF-8")
-        sum_line = len(f.readlines())
-        f.close()
-        before_lines = randint(0, int(sum_line / 2))
-        after_lines = randint(int(sum_line / 2), sum_line)
+        """Metamorphic Relation 30: If the '-y' option (or --any-dot) is used, the output should match any character including the newline."""
+        process_with_y_option = os.popen(f"{GREP_PATH} -y . {file}")
+        output_with_y_option = process_with_y_option.readlines()
+        process_with_y_option.close()
 
-        # Get source output with original pattern and context lines configuration
-        process_orig = os.popen(f"{GREP_PATH} -B {before_lines} -A {after_lines} '{pattern}' {file}")
-        source_out = process_orig.readlines()
-        process_orig.close()
-
-        # Get follow-up output with quoted pattern and context lines
-        process_follow = os.popen(f"{GREP_PATH} -B {before_lines} -A {after_lines} '{pattern}' {file}")
-        follow_out = process_follow.readlines()
-        process_follow.close()
+        process_without_y_option = os.popen(f"{GREP_PATH} . {file}")
+        output_without_y_option = process_without_y_option.readlines()
+        process_without_y_option.close()
 
         # Verification
-        self.assertEqual(source_out, follow_out)
+        self.assertEqual(output_with_y_option, output_without_y_option, "Output differs when using the -y option and not using the -y option")
 
 
 if __name__ == "__main__":

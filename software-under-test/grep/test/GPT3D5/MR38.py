@@ -2,24 +2,22 @@ from utils import *
 
 
 class TestingClass(unittest.TestCase):
-    @parameterized.expand(load_test_cases)
+    @parameterized.expand(load_test_cases(1000))
     def test38(self, pattern: str, file: str):
-        """Metamorphic Relation 38: If the pattern is changed by using a backslash sequence, the output should not change."""
-        # Get source output
-        process_orig = os.popen(f"{GREP_PATH} '{pattern}' {file}")
-        source_out = process_orig.readlines()
-        process_orig.close()
+        """Metamorphic Relation 38: If the fixed-strings option is used, the output should be consistent with the original output."""
+        with open(pattern, "a") as f:
+            f.write("\na")
 
-        # Construct follow-up input by using a common backslash sequence
-        follow_pattern = "abc\\d+"
+        process_with_fixed_strings = os.popen(f"{GREP_PATH} -F -f {pattern} {file}")
+        output_with_fixed_strings = process_with_fixed_strings.readlines()
+        process_with_fixed_strings.close()
 
-        # Get follow-up output
-        process_follow = os.popen(f"{GREP_PATH} '{follow_pattern}' {file}")
-        follow_out = process_follow.readlines()
-        process_follow.close()
+        process_without_fixed_strings = os.popen(f"{GREP_PATH} -f {pattern} {file}")
+        output_without_fixed_strings = process_without_fixed_strings.readlines()
+        process_without_fixed_strings.close()
 
         # Verification
-        self.assertEqual(source_out, follow_out)
+        self.assertEqual(output_with_fixed_strings, output_without_fixed_strings, "Output differs when using the fixed-strings option")
 
 
 if __name__ == "__main__":

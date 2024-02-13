@@ -2,24 +2,18 @@ from utils import *
 
 
 class TestingClass(unittest.TestCase):
-    @parameterized.expand(load_test_cases)
+    @parameterized.expand(load_test_cases(1000))
     def test12(self, pattern: str, file: str):
-        """Metamorphic Relation 12: If the pattern is changed to its lazy matching form, the output should remain the same."""
+        """Metamorphic Relation 12: If a different file is used instead of a regular file, the output should be an error message indicating the file does not exist."""
+        invalid_file = "invalid_file.txt"  # Example non-existent file
+
         # Get source output
-        process_orig = os.popen(f"{GREP_PATH} '{pattern}' {file}")
-        source_out = process_orig.readlines()
-        process_orig.close()
-
-        # Construct follow-up input with lazy matching form of the pattern
-        follow_pattern = f"{pattern}?"
-
-        # Get follow-up output
-        process_follow = os.popen(f"{GREP_PATH} '{follow_pattern}' {file}")
-        follow_out = process_follow.readlines()
-        process_follow.close()
+        process = os.popen(f"{GREP_PATH} {pattern} {invalid_file}")
+        source_out = process.readlines()
+        process.close()
 
         # Verification
-        self.assertEqual(source_out, follow_out)
+        self.assertTrue(any("No such file or directory" in line for line in source_out))  # Ensure the error message is present in the output
 
 
 if __name__ == "__main__":
