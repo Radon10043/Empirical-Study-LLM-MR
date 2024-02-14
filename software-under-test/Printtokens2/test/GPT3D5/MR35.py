@@ -10,20 +10,20 @@ class TestingClass(unittest.TestCase):
         proc.readlines()
         proc.close()
 
-    @parameterized.expand(load_test_cases)
+    @parameterized.expand(load_test_cases(1000))
     def test35(self, tc: str):
-        """Metamorphic Relation 35: Applying letter case transformation to the input tokens, the output token counts should remain the same."""
+        """Metamorphic Relation 35: Replacing all occurrences of a specific token in the input with another token, the output should remain unchanged"""
         # Get source output
-        source_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=tc, text=True).split("\n")
+        source_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=tc, text=True)
 
-        # Applying letter case transformation to the input tokens
-        follow_tc = '\n'.join([token.upper() if random.choice([True, False]) else token.lower() for token in tc.strip().split('\n')])
+        # Construct follow-up input by replacing a specific token with another
+        follow_tc = tc.replace('specific_token', 'another_token')
 
         # Get follow-up output
-        follow_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=follow_tc, text=True).split("\n")
+        follow_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=follow_tc, text=True)
 
         # Verification
-        self.assertEqual(len(source_out), len(follow_out))
+        self.assertEqual(source_out, follow_out)
 
 
 if __name__ == "__main__":

@@ -10,17 +10,17 @@ class TestingClass(unittest.TestCase):
         proc.readlines()
         proc.close()
 
-    @parameterized.expand(load_test_cases)
+    @parameterized.expand(load_test_cases(1000))
     def test1(self, tc: str):
-        """Metamorphic Relation 1: Reversing the input sequence, the output should remain unchanged."""
+        """Metamorphic Relation 1: Reversing the input file content, the output should remain the same"""
         # Get source output
-        source_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=tc, text=True).split("\n")
+        source_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=tc, text=True)
 
-        # Construct follow-up input by reversing the input sequence
-        follow_tc = "\n".join(reversed(tc.split("\n")))
+        # Construct follow-up input
+        follow_tc = ''.join(reversed(tc))
 
         # Get follow-up output
-        follow_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=follow_tc, text=True).split("\n")
+        follow_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=follow_tc, text=True)
 
         # Verification
         self.assertEqual(source_out, follow_out)

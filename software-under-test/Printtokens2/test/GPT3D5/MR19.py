@@ -10,26 +10,21 @@ class TestingClass(unittest.TestCase):
         proc.readlines()
         proc.close()
 
-    @parameterized.expand(load_test_cases)
+    @parameterized.expand(load_test_cases(1000))
     def test19(self, tc: str):
-        """Metamorphic Relation 19: Duplicating a specific token in the input, the count of that token in the output should increase."""
+        """Metamorphic Relation 19: Reversing the lines in the input, the output should not change"""
         # Get source output
-        source_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=tc, text=True).split("\n")
+        source_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=tc, text=True)
 
-        # Duplicate a specific token in the input
-        tokens = tc.strip().split("\n")
-        target_token = random.choice(tokens).split()[0]
-        duplicated_tokens = tokens + [token for token in tokens if token.startswith(target_token)]
-        duplicated_tc = "\n".join(duplicated_tokens)
+        # Construct follow-up input
+        lines = tc.split('\n')
+        follow_tc = '\n'.join(lines[::-1])
 
         # Get follow-up output
-        follow_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=duplicated_tc, text=True).split("\n")
-
-        source_token_count = sum(1 for token in source_out if token.startswith(target_token))
-        follow_token_count = sum(1 for token in follow_out if token.startswith(target_token))
+        follow_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=follow_tc, text=True)
 
         # Verification
-        self.assertGreaterEqual(follow_token_count, source_token_count)
+        self.assertEqual(source_out, follow_out)
 
 
 if __name__ == "__main__":

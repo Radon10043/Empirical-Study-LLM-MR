@@ -10,23 +10,22 @@ class TestingClass(unittest.TestCase):
         proc.readlines()
         proc.close()
 
-    @parameterized.expand(load_test_cases)
+    @parameterized.expand(load_test_cases(1000))
     def test9(self, tc: str):
-        """Metamorphic Relation 9: Applying a rotating transformation to the input, the token categories should maintain the same relative order."""
+        """Metamorphic Relation 9: Rearranging the lines in the input file, the output should not change"""
         # Get source output
-        source_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=tc, text=True).split("\n")
+        source_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=tc, text=True)
 
-        # Apply rotating transformation to the input
-        tokens = tc.strip().split('\n')
-        rotated_tokens = tokens[-1:] + tokens[:-1]
-        follow_tc = '\n'.join(rotated_tokens)
+        # Construct follow-up input
+        lines = tc.split('\n')
+        random.shuffle(lines)
+        follow_tc = '\n'.join(lines)
 
         # Get follow-up output
-        follow_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=follow_tc, text=True).split("\n")
+        follow_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=follow_tc, text=True)
 
         # Verification
-        for i, line in enumerate(source_out):
-            self.assertEqual(line.split()[1], follow_out[i].split()[1])
+        self.assertEqual(source_out, follow_out)
 
 
 if __name__ == "__main__":

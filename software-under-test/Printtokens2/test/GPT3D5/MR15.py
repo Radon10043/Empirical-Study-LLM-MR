@@ -10,22 +10,18 @@ class TestingClass(unittest.TestCase):
         proc.readlines()
         proc.close()
 
-    @parameterized.expand(load_test_cases)
+    @parameterized.expand(load_test_cases(1000))
     def test15(self, tc: str):
-        """Metamorphic Relation 15: Shuffling the tokens within each line of the input, the output should remain unchanged."""
+        """Metamorphic Relation 15: Scrambling the characters within each token in the input, the output should remain the same"""
         # Get source output
-        source_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=tc, text=True).split("\n")
+        source_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=tc, text=True)
 
-        # Shuffle the tokens within each line of the input
-        shuffled_tokens = []
-        for line in tc.strip().split("\n"):
-            tokens = line.split()
-            random.shuffle(tokens)
-            shuffled_tokens.append(" ".join(tokens))
-        shuffled_tc = "\n".join(shuffled_tokens)
+        # Construct follow-up input by scrambling characters in each token
+        tokens = tc.split(" ")
+        follow_tc = " ".join("".join(random.sample(token, len(token))) for token in tokens)
 
         # Get follow-up output
-        follow_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=shuffled_tc, text=True).split("\n")
+        follow_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=follow_tc, text=True)
 
         # Verification
         self.assertEqual(source_out, follow_out)

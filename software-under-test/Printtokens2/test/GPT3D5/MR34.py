@@ -10,23 +10,22 @@ class TestingClass(unittest.TestCase):
         proc.readlines()
         proc.close()
 
-    @parameterized.expand(load_test_cases)
+    @parameterized.expand(load_test_cases(1000))
     def test34(self, tc: str):
-        """Metamorphic Relation 34: Removing certain tokens from the input, the output token counts should be less than or equal to the source output token counts."""
+        """Metamorphic Relation 34: Shuffling the tokens in the input, the output should not change"""
         # Get source output
-        source_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=tc, text=True).split("\n")
+        source_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=tc, text=True)
 
-        tokens = tc.strip().split("\n")
-        tokens_to_remove = tokens[:len(tokens)//2]
-
-        # Remove certain tokens from the input
-        follow_tc = '\n'.join([token for token in tokens if token not in tokens_to_remove])
+        # Construct follow-up input by shuffling the tokens
+        tokens = tc.split()
+        random.shuffle(tokens)
+        follow_tc = ' '.join(tokens)
 
         # Get follow-up output
-        follow_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=follow_tc, text=True).split("\n")
+        follow_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=follow_tc, text=True)
 
         # Verification
-        self.assertLessEqual(len(follow_out), len(source_out))
+        self.assertEqual(source_out, follow_out)
 
 
 if __name__ == "__main__":

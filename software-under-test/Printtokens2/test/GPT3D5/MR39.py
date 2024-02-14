@@ -10,21 +10,21 @@ class TestingClass(unittest.TestCase):
         proc.readlines()
         proc.close()
 
-    @parameterized.expand(load_test_cases)
+    @parameterized.expand(load_test_cases(1000))
     def test39(self, tc: str):
-        """Metamorphic Relation 39: Applying a random transformation to the input tokens, the output should still contain the same tokens."""
+        """Metamorphic Relation 39: Reversing the order of characters in each token in the input, the output should remain the same"""
         # Get source output
-        source_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=tc, text=True).split("\n")
+        source_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=tc, text=True)
 
-        # Applying a random transformation to the input tokens
-        transformed_tokens = [token.translate(str.maketrans('aeiou', '12345')) for token in tc.strip().split("\n")]
-        follow_tc = "\n".join(transformed_tokens)
+        # Construct follow-up input by reversing characters in each token
+        tokens = tc.split(" ")
+        follow_tc = " ".join(token[::-1] for token in tokens)
 
         # Get follow-up output
-        follow_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=follow_tc, text=True).split("\n")
+        follow_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=follow_tc, text=True)
 
         # Verification
-        self.assertEqual(set(source_out), set(follow_out))
+        self.assertEqual(source_out, follow_out)
 
 
 if __name__ == "__main__":

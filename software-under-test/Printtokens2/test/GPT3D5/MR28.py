@@ -10,25 +10,21 @@ class TestingClass(unittest.TestCase):
         proc.readlines()
         proc.close()
 
-    @parameterized.expand(load_test_cases)
+    @parameterized.expand(load_test_cases(1000))
     def test28(self, tc: str):
-        """Metamorphic Relation 28: Replacing integers with their string representations, the token counts in the output should remain the same."""
+        """Metamorphic Relation 28: Shifting the lines in the input file, the output will have shifted lines, but the same tokens"""
         # Get source output
-        source_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=tc, text=True).split("\n")
+        source_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=tc, text=True)
 
-        # Replace integers with their string representations in the input
-        replaced_tc = ""
-        for line in tc.split("\n"):
-            tokens = line.split()
-            replaced_tokens = [str(int(token)) if token.isdigit() else token for token in tokens]
-            replaced_line = " ".join(replaced_tokens)
-            replaced_tc += replaced_line + "\n"
+        # Construct follow-up input
+        lines = tc.split('\n')
+        follow_tc = '\n'.join(lines[1:] + [lines[0]])
 
         # Get follow-up output
-        follow_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=replaced_tc, text=True).split("\n")
+        follow_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=follow_tc, text=True)
 
         # Verification
-        self.assertEqual(len(source_out), len(follow_out))
+        self.assertEqual(source_out, follow_out)
 
 
 if __name__ == "__main__":

@@ -10,26 +10,20 @@ class TestingClass(unittest.TestCase):
         proc.readlines()
         proc.close()
 
-    @parameterized.expand(load_test_cases)
+    @parameterized.expand(load_test_cases(1000))
     def test30(self, tc: str):
-        """Metamorphic Relation 30: Replacing specific tokens with their synonyms, the token counts in the output should remain the same."""
+        """Metamorphic Relation 30: Replacing all lowercase letters with their uppercase versions in the input, the output should not change"""
         # Get source output
-        source_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=tc, text=True).split("\n")
+        source_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=tc, text=True)
 
-        # Replace specific tokens with their synonyms in the input
-        synonym_mapping = {"int": "integer", "float": "decimal", "string": "text"}
-        replaced_tc = ""
-        for line in tc.split("\n"):
-            tokens = line.split()
-            replaced_tokens = [synonym_mapping.get(token, token) for token in tokens]
-            replaced_line = " ".join(replaced_tokens)
-            replaced_tc += replaced_line + "\n"
+        # Construct follow-up input
+        follow_tc = tc.upper()
 
         # Get follow-up output
-        follow_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=replaced_tc, text=True).split("\n")
+        follow_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=follow_tc, text=True)
 
         # Verification
-        self.assertEqual(len(source_out), len(follow_out))
+        self.assertEqual(source_out, follow_out)
 
 
 if __name__ == "__main__":

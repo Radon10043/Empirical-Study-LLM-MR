@@ -10,21 +10,20 @@ class TestingClass(unittest.TestCase):
         proc.readlines()
         proc.close()
 
-    @parameterized.expand(load_test_cases)
+    @parameterized.expand(load_test_cases(1000))
     def test4(self, tc: str):
-        """Metamorphic Relation 4: Removing duplicate tokens from the input, the output's token counts should be less or equal to the source output's token counts."""
+        """Metamorphic Relation 4: Adding extra spaces between tokens in the input, the output should remain the same"""
         # Get source output
-        source_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=tc, text=True).split("\n")
+        source_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=tc, text=True)
 
-        # Construct follow-up input with removed duplicate tokens
-        unique_tokens = set(tc.split("\n"))  # Convert to set to remove duplicates
-        follow_tc = "\n".join(unique_tokens)
+        # Construct follow-up input
+        follow_tc = "  ".join(tc.split(" "))
 
         # Get follow-up output
-        follow_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=follow_tc, text=True).split("\n")
+        follow_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=follow_tc, text=True)
 
         # Verification
-        self.assertLessEqual(len(follow_out), len(source_out))
+        self.assertEqual(source_out, follow_out)
 
 
 if __name__ == "__main__":

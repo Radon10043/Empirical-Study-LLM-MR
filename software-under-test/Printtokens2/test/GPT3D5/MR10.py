@@ -10,26 +10,20 @@ class TestingClass(unittest.TestCase):
         proc.readlines()
         proc.close()
 
-    @parameterized.expand(load_test_cases)
+    @parameterized.expand(load_test_cases(1000))
     def test10(self, tc: str):
-        """Metamorphic Relation 10: Replacing tokens with synonyms, the output should remain unchanged."""
+        """Metamorphic Relation 10: Inserting an empty line into the input, the output will have an additional empty token in the token stream"""
         # Get source output
-        source_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=tc, text=True).split("\n")
+        source_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=tc, text=True)
 
-        # Replace tokens with synonyms in the input
-        synonym_mapping = {"int": "integer", "float": "decimal", "string": "text"}
-        replaced_tc = ""
-        for line in tc.split("\n"):
-            tokens = line.split()
-            replaced_tokens = [synonym_mapping.get(token, token) for token in tokens]
-            replaced_line = " ".join(replaced_tokens)
-            replaced_tc += replaced_line + "\n"
+        # Construct follow-up input
+        follow_tc = tc[:len(tc)//2] + "\n" + tc[len(tc)//2:]
 
         # Get follow-up output
-        follow_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=replaced_tc, text=True).split("\n")
+        follow_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=follow_tc, text=True)
 
         # Verification
-        self.assertEqual(source_out, follow_out)
+        self.assertTrue(len(source_out.split('\n')) < len(follow_out.split('\n')))
 
 
 if __name__ == "__main__":

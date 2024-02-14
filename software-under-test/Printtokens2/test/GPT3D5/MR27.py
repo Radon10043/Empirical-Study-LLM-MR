@@ -1,3 +1,4 @@
+import re
 from utils import *
 
 
@@ -10,18 +11,17 @@ class TestingClass(unittest.TestCase):
         proc.readlines()
         proc.close()
 
-    @parameterized.expand(load_test_cases)
+    @parameterized.expand(load_test_cases(1000))
     def test27(self, tc: str):
-        """Metamorphic Relation 27: Applying a random transformation to the entire input, the output should still contain the same tokens."""
+        """Metamorphic Relation 27: Replacing special characters with spaces in the input, the output should not change"""
         # Get source output
-        source_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=tc, text=True).split("\n")
+        source_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=tc, text=True)
 
-        # Apply a random transformation to the entire input
-        transformation = ''.join(random.sample(tc, len(tc)))
-        follow_tc = transformation
+        # Construct follow-up input
+        follow_tc = re.sub(r'[^A-Za-z0-9]+', ' ', tc)
 
         # Get follow-up output
-        follow_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=follow_tc, text=True).split("\n")
+        follow_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=follow_tc, text=True)
 
         # Verification
         self.assertEqual(source_out, follow_out)

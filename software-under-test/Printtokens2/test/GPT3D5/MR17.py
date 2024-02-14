@@ -10,20 +10,20 @@ class TestingClass(unittest.TestCase):
         proc.readlines()
         proc.close()
 
-    @parameterized.expand(load_test_cases)
+    @parameterized.expand(load_test_cases(1000))
     def test17(self, tc: str):
-        """Metamorphic Relation 17: Adding newlines between every character of the input, the token counts should be greater than the original input."""
+        """Metamorphic Relation 17: Removing all spaces from the input, the output should not change"""
         # Get source output
-        source_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=tc, text=True).split("\n")
+        source_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=tc, text=True)
 
-        # Construct follow-up input by adding newlines between every character
-        follow_tc = "\n".join(" ".join(list(line)) for line in tc.split("\n"))
+        # Construct follow-up input
+        follow_tc = tc.replace(' ', '')
 
         # Get follow-up output
-        follow_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=follow_tc, text=True).split("\n")
+        follow_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=follow_tc, text=True)
 
         # Verification
-        self.assertGreater(len(follow_out), len(source_out))
+        self.assertEqual(source_out, follow_out)
 
 
 if __name__ == "__main__":

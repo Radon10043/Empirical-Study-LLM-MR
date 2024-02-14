@@ -10,19 +10,21 @@ class TestingClass(unittest.TestCase):
         proc.readlines()
         proc.close()
 
-    @parameterized.expand(load_test_cases)
+    @parameterized.expand(load_test_cases(1000))
     def test36(self, tc: str):
-        """Metamorphic Relation 36: Generating the input with numerical sequence, the output token counts should be the same."""
+        """Metamorphic Relation 36: Adding line numbers at the beginning of each line in the input, the list of tokens in the output should be the same"""
         # Get source output
         source_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=tc, text=True).split("\n")
 
-        numerical_sequence = "\n".join(map(str, range(1, len(tc.strip().split("\n")) + 1)))
+        # Construct follow-up input
+        lines = tc.split('\n')
+        follow_tc = '\n'.join([f"{i+1}: {line}" for i, line in enumerate(lines)])
 
         # Get follow-up output
-        follow_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=numerical_sequence, text=True).split("\n")
+        follow_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=follow_tc, text=True).split("\n")
 
         # Verification
-        self.assertEqual(len(source_out), len(follow_out))
+        self.assertEqual(source_out, follow_out)
 
 
 if __name__ == "__main__":

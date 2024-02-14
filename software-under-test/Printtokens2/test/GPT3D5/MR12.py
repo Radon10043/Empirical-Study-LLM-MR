@@ -10,18 +10,17 @@ class TestingClass(unittest.TestCase):
         proc.readlines()
         proc.close()
 
-    @parameterized.expand(load_test_cases)
+    @parameterized.expand(load_test_cases(1000))
     def test12(self, tc: str):
-        """Metamorphic Relation 12: Reversing the ordering of tokens within each line of the input, the output should remain unchanged."""
+        """Metamorphic Relation 12: Reversing the order of lines in the input, the output should remain the same"""
         # Get source output
-        source_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=tc, text=True).split("\n")
+        source_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=tc, text=True)
 
-        # Reverse the ordering of tokens within each line of the input
-        reversed_tokens = [line[::-1] for line in tc.strip().split("\n")]
-        reversed_tc = "\n".join(reversed_tokens)
+        # Construct follow-up input
+        follow_tc = '\n'.join(tc.split('\n')[::-1])
 
         # Get follow-up output
-        follow_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=reversed_tc, text=True).split("\n")
+        follow_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=follow_tc, text=True)
 
         # Verification
         self.assertEqual(source_out, follow_out)

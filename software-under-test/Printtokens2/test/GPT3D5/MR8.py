@@ -10,26 +10,20 @@ class TestingClass(unittest.TestCase):
         proc.readlines()
         proc.close()
 
-    # TODO
-    @parameterized.expand(load_test_cases)
+    @parameterized.expand(load_test_cases(1000))
     def test8(self, tc: str):
-        """Metamorphic Relation 8: Concatenating two input sequences, the output should be the concatenation of source and follow-up outputs."""
+        """Metamorphic Relation 8: Concatenating two input files together, the follow-up output contains the token stream of both input files"""
         # Get source output
-        source_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=tc, text=True).split("\n")
+        source_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=tc, text=True)
 
-        # Initialize a new set of test cases and get the source and follow-up outputs separately
-        follow_tc = random.choice(load_test_cases())
-        follow_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=follow_tc, text=True).split("\n")
+        # Create a new file with the content of the original file repeated
+        follow_tc = tc + "\n" + tc
 
-        # Construct combined input and combined output
-        combined_tc = tc + follow_tc
-        combined_out = source_out + follow_out
-
-        # Get combined output using subprocess
-        combined_sub_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=combined_tc, text=True).split("\n")
+        # Get follow-up output
+        follow_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=follow_tc, text=True)
 
         # Verification
-        self.assertEqual(combined_out, combined_sub_out)
+        self.assertIn(source_out, follow_out)
 
 
 if __name__ == "__main__":

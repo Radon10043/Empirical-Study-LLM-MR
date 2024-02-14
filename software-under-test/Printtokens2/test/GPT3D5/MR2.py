@@ -11,21 +11,20 @@ class TestingClass(unittest.TestCase):
         proc.close()
 
     # Fix by Radon
-    @parameterized.expand(load_test_cases)
+    @parameterized.expand(load_test_cases(1000))
     def test2(self, tc: str):
-        """Metamorphic Relation 2: Adding whitespace characters to the input, the output should remain unchanged."""
+        """Metamorphic Relation 2: Appending the same content to the input, the follow-up output should be identical to the source output"""
         # Get source output
-        source_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=tc, text=True).split("\n")
+        source_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=tc, text=True)
 
-        # Construct follow-up input with added whitespace characters
-        follow_tc = " " + tc
+        # Construct follow-up input
+        follow_tc = tc + tc
 
         # Get follow-up output
-        follow_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=follow_tc, text=True).split("\n")
+        follow_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=follow_tc, text=True)
 
         # Verification
         self.assertEqual(source_out, follow_out)
-
 
 if __name__ == "__main__":
     unittest.main()

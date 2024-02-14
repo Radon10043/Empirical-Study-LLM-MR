@@ -10,19 +10,17 @@ class TestingClass(unittest.TestCase):
         proc.readlines()
         proc.close()
 
-    @parameterized.expand(load_test_cases)
+    @parameterized.expand(load_test_cases(1000))
     def test13(self, tc: str):
-        """Metamorphic Relation 13: Splitting and merging input lines, the output should be the same."""
+        """Metamorphic Relation 13: Replacing all tabs with spaces in the input, the output should not change"""
         # Get source output
-        source_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=tc, text=True).split("\n")
+        source_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=tc, text=True)
 
-        # Split the input lines into smaller segments and merge them back
-        segments = [line.split() for line in tc.strip().split("\n")]
-        merged_lines = [" ".join(segment) for segment in segments]
-        merged_tc = "\n".join(merged_lines)
+        # Construct follow-up input
+        follow_tc = tc.replace('\t', ' ')
 
         # Get follow-up output
-        follow_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=merged_tc, text=True).split("\n")
+        follow_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=follow_tc, text=True)
 
         # Verification
         self.assertEqual(source_out, follow_out)

@@ -10,25 +10,24 @@ class TestingClass(unittest.TestCase):
         proc.readlines()
         proc.close()
 
-    @parameterized.expand(load_test_cases)
+    @parameterized.expand(load_test_cases(1000))
     def test29(self, tc: str):
-        """Metamorphic Relation 29: Applying a transformation to the entire input while maintaining token lengths, the token counts in the output should remain the same."""
+        """Metamorphic Relation 29: Doubling the lines in the input, the output should display the token stream of each line doubled"""
         # Get source output
         source_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=tc, text=True).split("\n")
 
-        # Applying a transformation to the entire input while maintaining token lengths
-        transformed_tc = ""
-        for line in tc.split("\n"):
-            tokens = line.split()
-            transformed_tokens = [token[::-1] if len(token) % 2 == 0 else token for token in tokens]
-            transformed_line = " ".join(transformed_tokens)
-            transformed_tc += transformed_line + "\n"
+        # Construct follow-up input
+        follow_tc = tc + "\n" + tc
 
         # Get follow-up output
-        follow_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=transformed_tc, text=True).split("\n")
+        follow_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=follow_tc, text=True).split("\n")
 
         # Verification
-        self.assertEqual(len(source_out), len(follow_out))
+        for _ in range(2):
+            source_out.pop()
+            follow_out.pop()
+        expected_follow_out = source_out + source_out
+        self.assertEqual(expected_follow_out, follow_out)
 
 
 if __name__ == "__main__":

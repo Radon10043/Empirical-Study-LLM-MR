@@ -10,16 +10,14 @@ class TestingClass(unittest.TestCase):
         proc.readlines()
         proc.close()
 
-    @parameterized.expand(load_test_cases)
+    @parameterized.expand(load_test_cases(1000))
     def test23(self, tc: str):
-        """Metamorphic Relation 23: Adding or removing empty lines in the input, the output should remain unchanged."""
+        """Metamorphic Relation 23: Adding the comment, the output should not change"""
         # Get source output
         source_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=tc, text=True).split("\n")
 
-        # Construct follow-up input by adding or removing empty lines
-        follow_tc = tc + "\n"  # Adding an empty line
-        # or
-        follow_tc = tc.replace('\n', '\n\n')  # Adding an extra empty line
+        # Construct follow-up input
+        follow_tc = tc + "; Comment!\n"
 
         # Get follow-up output
         follow_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=follow_tc, text=True).split("\n")

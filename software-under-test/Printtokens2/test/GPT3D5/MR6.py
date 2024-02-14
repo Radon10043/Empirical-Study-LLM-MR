@@ -1,3 +1,4 @@
+import re
 from utils import *
 
 
@@ -10,23 +11,20 @@ class TestingClass(unittest.TestCase):
         proc.readlines()
         proc.close()
 
-    @parameterized.expand(load_test_cases)
+    @parameterized.expand(load_test_cases(1000))
     def test6(self, tc: str):
-        """Metamorphic Relation 6: Removing a token from the input, the output's token counts should be less than the source output's token counts."""
+        """Metamorphic Relation 6: Replacing all numeric characters in the input with a constant, the output should not change"""
         # Get source output
-        source_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=tc, text=True).split("\n")
+        source_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=tc, text=True)
 
-        # Remove a token from the input
-        tokens = tc.strip().split("\n")
-        tokens_to_remove = random.choice(tokens)
-        tokens.remove(tokens_to_remove)
-        follow_tc = "\n".join(tokens)
+        # Construct follow-up input
+        follow_tc = re.sub(r'\d', '9', tc)
 
         # Get follow-up output
-        follow_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=follow_tc, text=True).split("\n")
+        follow_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=follow_tc, text=True)
 
         # Verification
-        self.assertLess(len(follow_out), len(source_out))
+        self.assertEqual(source_out, follow_out)
 
 
 if __name__ == "__main__":

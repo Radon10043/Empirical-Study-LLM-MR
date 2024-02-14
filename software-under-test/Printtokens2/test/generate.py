@@ -2,10 +2,11 @@
 Author: Radon
 Date: 2024-01-10 20:21:28
 LastEditors: Radon
-LastEditTime: 2024-02-14 11:46:31
+LastEditTime: 2024-02-14 12:46:03
 Description: Hi, say something
 """
 import os
+import shutil
 import string
 
 from random import randint
@@ -13,7 +14,6 @@ from random import randint
 
 # fmt:off
 # ==================== GLOBAL BARIABLES ====================
-TESTCASE_NUM = 1000
 RANGE_LINE   = (1, 100)
 RANGE_SMALL  = (1, 5)
 RANGE_LARGE  = (1, 100)
@@ -90,7 +90,7 @@ def gen_string() -> str:
     str
         字符串
     """
-    candidate = string.ascii_letters + string.digits + " "
+    candidate = string.ascii_letters + string.digits
     s = '"'
     length = randint(*RANGE_SMALL)
 
@@ -120,7 +120,7 @@ def gen_comment() -> str:
 
 
 def gen_tcs_randomly(num: int):
-    """随机生成一定数量的测试用例, 保存到testcases文件夹下
+    """生成一定数量的测试用例
 
     Parameters
     ----------
@@ -128,13 +128,14 @@ def gen_tcs_randomly(num: int):
         测试用例数量
     """
     tcs_dir = os.path.join(os.path.dirname(__file__), "..", "testcases")
-    if not os.path.exists(tcs_dir):
-        os.mkdir(tcs_dir)
+    if os.path.exists(tcs_dir):
+        shutil.rmtree(tcs_dir)
+    os.mkdir(tcs_dir)
 
     # 可选操作
     operations = [gen_keyword, gen_special, gen_identifier, gen_numeric, gen_string, gen_comment]
 
-    for i in range(TESTCASE_NUM):
+    for i in range(num):
         print("\rGenerating testcase " + str(i).zfill(3) + " ...", end="")
         tc_file = os.path.join(tcs_dir, "tc" + str(i).zfill(3) + ".txt")
         line_num = randint(*RANGE_LINE)

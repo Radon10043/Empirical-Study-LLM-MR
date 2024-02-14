@@ -10,22 +10,21 @@ class TestingClass(unittest.TestCase):
         proc.readlines()
         proc.close()
 
-    @parameterized.expand(load_test_cases)
+    @parameterized.expand(load_test_cases(1000))
     def test26(self, tc: str):
-        """Metamorphic Relation 26: Adding or removing whitespace between tokens, the token counts in the output should remain the same."""
+        """Metamorphic Relation 26: Reversing the order of tokens in the input file, the output should remain the same"""
         # Get source output
-        source_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=tc, text=True).split("\n")
+        source_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=tc, text=True)
 
-        # Adding or removing whitespace between tokens in the input
-        follow_tc = tc.replace(' ', '')  # Removing whitespaces
-        # or
-        follow_tc = tc.replace(' ', '  ')  # Adding extra whitespaces
+        # Construct follow-up input
+        tokens = tc.split()
+        follow_tc = ' '.join(tokens[::-1])
 
         # Get follow-up output
-        follow_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=follow_tc, text=True).split("\n")
+        follow_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=follow_tc, text=True)
 
         # Verification
-        self.assertEqual(len(source_out), len(follow_out))
+        self.assertEqual(source_out, follow_out)
 
 
 if __name__ == "__main__":

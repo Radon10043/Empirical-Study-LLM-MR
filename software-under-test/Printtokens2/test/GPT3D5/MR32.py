@@ -10,24 +10,20 @@ class TestingClass(unittest.TestCase):
         proc.readlines()
         proc.close()
 
-    @parameterized.expand(load_test_cases)
+    @parameterized.expand(load_test_cases(1000))
     def test32(self, tc: str):
-        """Metamorphic Relation 32: Mixing the input lines, the output token counts should be greater than or equal to the source output token counts."""
+        """Metamorphic Relation 32: Reversing the order of words in the input, the output should not change"""
         # Get source output
-        source_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=tc, text=True).split("\n")
+        source_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=tc, text=True)
 
-        # Mix the input lines
-        lines = tc.strip().split("\n")
-        mixed_lines = random.sample(lines, len(lines))
-        mixed_tc = "\n".join(mixed_lines)
+        # Construct follow-up input
+        follow_tc = " ".join(tc.split(" ")[::-1])
 
         # Get follow-up output
-        follow_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=mixed_tc, text=True).split("\n")
+        follow_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=follow_tc, text=True)
 
         # Verification
-        source_tokens = [token.split()[0] for token in source_out if token]  # Extract tokens from source output
-        follow_tokens = [token.split()[0] for token in follow_out if token]  # Extract tokens from follow-up output
-        self.assertGreaterEqual(len(follow_tokens), len(source_tokens))
+        self.assertEqual(source_out, follow_out)
 
 
 if __name__ == "__main__":

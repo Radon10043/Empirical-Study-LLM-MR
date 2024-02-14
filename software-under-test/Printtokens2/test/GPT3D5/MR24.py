@@ -10,14 +10,15 @@ class TestingClass(unittest.TestCase):
         proc.readlines()
         proc.close()
 
-    @parameterized.expand(load_test_cases)
+    @parameterized.expand(load_test_cases(1000))
     def test24(self, tc: str):
-        """Metamorphic Relation 24: Reversing the input sequence, the output should remain unchanged."""
+        """Metamorphic Relation 24: Adding a line numbers at the beginning of each line in the input, the token stream in the output should remain unchanged"""
         # Get source output
         source_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=tc, text=True).split("\n")
 
-        # Construct follow-up input by reversing the input sequence
-        follow_tc = "\n".join(tc.split("\n")[::-1])
+        # Construct follow-up input
+        tc_lines = tc.split("\n")
+        follow_tc = "\n".join([f"{i+1}: {line}" for i, line in enumerate(tc_lines)])
 
         # Get follow-up output
         follow_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=follow_tc, text=True).split("\n")

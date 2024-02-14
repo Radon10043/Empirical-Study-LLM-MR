@@ -10,23 +10,20 @@ class TestingClass(unittest.TestCase):
         proc.readlines()
         proc.close()
 
-    @parameterized.expand(load_test_cases)
+    @parameterized.expand(load_test_cases(1000))
     def test11(self, tc: str):
-        """Metamorphic Relation 11: Applying a random permutation to the input lines, the output should still contain the same tokens."""
+        """Metamorphic Relation 11: Adding a space at the end of each line in the input, the output should not change"""
         # Get source output
-        source_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=tc, text=True).split("\n")
+        source_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=tc, text=True)
 
-        # Apply a random permutation to the input lines
-        permuted_lines = random.sample(tc.strip().split("\n"), len(tc.strip().split("\n")))
-        permuted_tc = "\n".join(permuted_lines)
+        # Construct follow-up input
+        follow_tc = tc.replace('\n', ' \n')
 
         # Get follow-up output
-        follow_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=permuted_tc, text=True).split("\n")
+        follow_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=follow_tc, text=True)
 
         # Verification
-        source_tokens = [token.split()[0] for token in source_out if token]  # Extract tokens from source output
-        follow_tokens = [token.split()[0] for token in follow_out if token]  # Extract tokens from follow-up output
-        self.assertCountEqual(source_tokens, follow_tokens)
+        self.assertEqual(source_out, follow_out)
 
 
 if __name__ == "__main__":

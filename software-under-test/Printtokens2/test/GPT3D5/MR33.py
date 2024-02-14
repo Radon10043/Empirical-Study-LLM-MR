@@ -1,3 +1,4 @@
+import re
 from utils import *
 
 
@@ -10,22 +11,20 @@ class TestingClass(unittest.TestCase):
         proc.readlines()
         proc.close()
 
-    @parameterized.expand(load_test_cases)
+    @parameterized.expand(load_test_cases(1000))
     def test33(self, tc: str):
-        """Metamorphic Relation 33: Adding or removing punctuation marks in the input, the token counts should remain the same."""
+        """Metamorphic Relation 33: Replacing all even numbers with a constant, the output should not change"""
         # Get source output
-        source_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=tc, text=True).split("\n")
+        source_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=tc, text=True)
 
-        # Adding or removing punctuation marks in the input
-        follow_tc = tc.replace('.', '')  # Removing periods
-        # or
-        follow_tc = tc + "!!!"  # Adding exclamation marks
+        # Construct follow-up input by replacing even numbers with a constant
+        follow_tc = re.sub(r'\b(\d*[02468])\b', '999', tc)
 
         # Get follow-up output
-        follow_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=follow_tc, text=True).split("\n")
+        follow_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=follow_tc, text=True)
 
         # Verification
-        self.assertEqual(len(source_out), len(follow_out))
+        self.assertEqual(source_out, follow_out)
 
 
 if __name__ == "__main__":

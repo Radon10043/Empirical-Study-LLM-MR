@@ -10,22 +10,24 @@ class TestingClass(unittest.TestCase):
         proc.readlines()
         proc.close()
 
-    @parameterized.expand(load_test_cases)
+    @parameterized.expand(load_test_cases(1000))
     def test31(self, tc: str):
-        """Metamorphic Relation 31: Repeating the input multiple times, the output should be the concatenation of source outputs."""
+        """Metamorphic Relation 31: Prepending a special identifier to each token in the input, the follow-up output should contain tokens with the identifier"""
         # Get source output
-        source_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=tc, text=True).split("\n")
+        source_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=tc, text=True)
+        source_tokens = source_out.split()
 
-        # Construct follow-up input by repeating the source input
-        repeat_factor = 3
-        follow_tc = "\n".join([tc]*repeat_factor)
+        # Construct follow-up input
+        special_identifier = "TOKEN:"
+        follow_tc = " ".join([special_identifier + token for token in tc.split()])
 
         # Get follow-up output
-        follow_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=follow_tc, text=True).split("\n")
+        follow_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=follow_tc, text=True)
+        follow_tokens = follow_out.split()
 
         # Verification
-        combined_source_out = source_out * repeat_factor
-        self.assertEqual(combined_source_out, follow_out)
+        for token in source_tokens:
+            self.assertIn(special_identifier + token, follow_tokens)
 
 
 if __name__ == "__main__":

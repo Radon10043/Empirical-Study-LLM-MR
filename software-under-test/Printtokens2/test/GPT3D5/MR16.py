@@ -10,24 +10,20 @@ class TestingClass(unittest.TestCase):
         proc.readlines()
         proc.close()
 
-    @parameterized.expand(load_test_cases)
+    @parameterized.expand(load_test_cases(1000))
     def test16(self, tc: str):
-        """Metamorphic Relation 16: Replacing specific tokens with null, the output should still contain the same tokens."""
+        """Metamorphic Relation 16: Repeating the input file content multiple times, the follow-up output should contain the token stream of the original file repeated"""
         # Get source output
-        source_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=tc, text=True).split("\n")
+        source_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=tc, text=True)
 
-        # Replace specific tokens with null in the input
-        tokens = tc.strip().split("\n")
-        tokens[random.randint(0, len(tokens) - 1)] = ""
-        replaced_tc = "\n".join(tokens)
+        # Create a new file with the content of the original file repeated
+        follow_tc = (tc + "\n") * 3
 
         # Get follow-up output
-        follow_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=replaced_tc, text=True).split("\n")
+        follow_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=follow_tc, text=True)
 
         # Verification
-        source_tokens = set([token.split()[0] for token in source_out if token])  # Extract tokens from source output
-        follow_tokens = set([token.split()[0] for token in follow_out if token])  # Extract tokens from follow-up output
-        self.assertEqual(source_tokens, follow_tokens)
+        self.assertIn(source_out, follow_out)
 
 
 if __name__ == "__main__":
