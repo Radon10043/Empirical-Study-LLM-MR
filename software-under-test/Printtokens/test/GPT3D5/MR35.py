@@ -1,7 +1,3 @@
-import unittest
-import os, subprocess, time
-
-from parameterized import parameterized
 from utils import *
 
 
@@ -14,20 +10,24 @@ class TestingClass(unittest.TestCase):
         proc.readlines()
         proc.close()
 
-    @parameterized.expand(load_test_cases)
+    @parameterized.expand(load_test_cases(1000))
     def test35(self, tc: str):
-        """Metamorphic Relation 35: Repeating the input multiple times, the output should remain the same"""
+        """Metamorphic Relation 35: Interchanging the positions of two consecutive tokens, the output should change accordingly."""
         # Get source output
-        source_out = subprocess.check_output(PRINT_TOKENS_PATH, input=tc * 3, text=True)
+        source_out = subprocess.check_output(PRINT_TOKENS_PATH, input=tc, text=True).split("\n")
 
-        # Construct follow-up input by repeating the original input multiple times
-        follow_tc = tc * 3
+        tokens = tc.split(" ")
+        # Swap the positions of two consecutive tokens
+        if len(tokens) > 1:
+            idx = random.randint(0, len(tokens) - 2)
+            tokens[idx], tokens[idx + 1] = tokens[idx + 1], tokens[idx]
+            follow_tc = " ".join(tokens)
 
-        # Get follow-up output
-        follow_out = subprocess.check_output(PRINT_TOKENS_PATH, input=follow_tc, text=True)
+            # Get follow-up output
+            follow_out = subprocess.check_output(PRINT_TOKENS_PATH, input=follow_tc, text=True).split("\n")
 
-        # Verification
-        self.assertEqual(source_out, follow_out)
+            # Verification
+            self.assertNotEqual(source_out, follow_out)
 
 
 if __name__ == "__main__":

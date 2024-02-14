@@ -1,7 +1,3 @@
-import unittest
-import os, subprocess, time
-
-from parameterized import parameterized
 from utils import *
 
 
@@ -14,14 +10,24 @@ class TestingClass(unittest.TestCase):
         proc.readlines()
         proc.close()
 
-    @parameterized.expand(load_test_cases)
+    @parameterized.expand(load_test_cases(1000))
     def test21(self, tc: str):
-        """Metamorphic Relation 21: Adding or removing leading/trailing whitespaces in the input, the output should remain the same"""
+        """Metamorphic Relation 21: Replacing synonyms with their antonyms, the output should not change."""
         # Get source output
         source_out = subprocess.check_output(PRINT_TOKENS_PATH, input=tc, text=True).split("\n")
 
-        # Construct follow-up input with added/removed leading/trailing whitespaces
-        follow_tc = "\n".join([line.strip() for line in tc.split("\n")])
+        tokens = tc.split()
+        # Replace some tokens with their antonyms
+        antonyms = {
+            'hot': 'cold',
+            'happy': 'sad',
+            'light': 'dark',
+            'fast': 'slow'
+        }
+        for i, token in enumerate(tokens):
+            if token.lower() in antonyms:
+                tokens[i] = antonyms[token.lower()]
+        follow_tc = " ".join(tokens)
 
         # Get follow-up output
         follow_out = subprocess.check_output(PRINT_TOKENS_PATH, input=follow_tc, text=True).split("\n")

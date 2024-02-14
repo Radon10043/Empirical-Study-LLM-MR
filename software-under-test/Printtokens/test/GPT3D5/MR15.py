@@ -1,7 +1,3 @@
-import unittest
-import os, subprocess, time
-
-from parameterized import parameterized
 from utils import *
 
 
@@ -14,20 +10,20 @@ class TestingClass(unittest.TestCase):
         proc.readlines()
         proc.close()
 
-    @parameterized.expand(load_test_cases)
+    @parameterized.expand(load_test_cases(1000))
     def test15(self, tc: str):
-        """Metamorphic Relation 15: Reordering the input tokens alphabetically, the output should remain the same"""
+        """Metamorphic Relation 15: Encoding the input in a different character encoding, the output should remain the same."""
         # Get source output
         source_out = subprocess.check_output(PRINT_TOKENS_PATH, input=tc, text=True).split("\n")
 
-        # Construct follow-up input with reordered tokens
-        follow_tc = " ".join(sorted(tc.split()))
+        # Construct follow-up input encoded in a different character encoding
+        follow_tc = tc.encode('utf-16').decode('latin1')
 
         # Get follow-up output
         follow_out = subprocess.check_output(PRINT_TOKENS_PATH, input=follow_tc, text=True).split("\n")
 
         # Verification
-        self.assertEqual(len(source_out), len(follow_out))
+        self.assertEqual(source_out, follow_out)
 
 
 if __name__ == "__main__":

@@ -1,7 +1,4 @@
-import unittest
-import os, subprocess, time
-
-from parameterized import parameterized
+import re
 from utils import *
 
 
@@ -14,23 +11,20 @@ class TestingClass(unittest.TestCase):
         proc.readlines()
         proc.close()
 
-    @parameterized.expand(load_test_cases)
+    @parameterized.expand(load_test_cases(1000))
     def test12(self, tc: str):
-        """Metamorphic Relation 12: Duplicating all lines of input, the number of tokens in each category should double"""
+        """Metamorphic Relation 12: Removing all the numeric values, the output should remain the same."""
         # Get source output
         source_out = subprocess.check_output(PRINT_TOKENS_PATH, input=tc, text=True).split("\n")
 
         # Construct follow-up input
-        follow_tc = "\n".join([line + "\n" + line for line in tc.split("\n")])
+        follow_tc = re.sub(r'\d+', '', tc)
 
         # Get follow-up output
         follow_out = subprocess.check_output(PRINT_TOKENS_PATH, input=follow_tc, text=True).split("\n")
 
-        # Verify the doubling of tokens in each category
-        for category in set(source_out):
-            source_count = source_out.count(category)
-            follow_count = follow_out.count(category)
-            self.assertEqual(source_count * 2, follow_count)
+        # Verification
+        self.assertEqual(source_out, follow_out)
 
 
 if __name__ == "__main__":

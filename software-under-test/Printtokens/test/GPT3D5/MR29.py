@@ -1,7 +1,3 @@
-import unittest
-import os, subprocess, time
-
-from parameterized import parameterized
 from utils import *
 
 
@@ -14,14 +10,15 @@ class TestingClass(unittest.TestCase):
         proc.readlines()
         proc.close()
 
-    @parameterized.expand(load_test_cases)
+    @parameterized.expand(load_test_cases(1000))
     def test29(self, tc: str):
-        """Metamorphic Relation 29: Adding or removing insignificant characters, such as spaces or tabs, within tokens, the output should remain the same"""
+        """Metamorphic Relation 29: Capitalizing the first letter of each token, the output should remain the same."""
         # Get source output
         source_out = subprocess.check_output(PRINT_TOKENS_PATH, input=tc, text=True).split("\n")
 
-        # Construct follow-up input with added/removed insignificant characters within tokens
-        follow_tc = " ".join([token.replace(" ", "\t") for token in tc.split()])
+        # Capitalize the first letter of each token
+        tokens = tc.split()
+        follow_tc = " ".join([token.capitalize() for token in tokens])
 
         # Get follow-up output
         follow_out = subprocess.check_output(PRINT_TOKENS_PATH, input=follow_tc, text=True).split("\n")

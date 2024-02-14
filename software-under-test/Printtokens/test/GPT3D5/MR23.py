@@ -1,7 +1,3 @@
-import unittest
-import os, subprocess, time
-
-from parameterized import parameterized
 from utils import *
 
 
@@ -14,16 +10,23 @@ class TestingClass(unittest.TestCase):
         proc.readlines()
         proc.close()
 
-    @parameterized.expand(load_test_cases)
+    @parameterized.expand(load_test_cases(1000))
     def test23(self, tc: str):
-        """Metamorphic Relation 23: Shuffling the input lines, the output should remain the same"""
+        """Metamorphic Relation 23: Replacing each instance of a token with its base form (lemma), the output should remain the same."""
+        import spacy
+
+        # load pre-trained English NLP model
+        nlp = spacy.load("en_core_web_sm")
+
         # Get source output
         source_out = subprocess.check_output(PRINT_TOKENS_PATH, input=tc, text=True).split("\n")
 
-        # Construct follow-up input with shuffled lines
-        lines = tc.split("\n")
-        random.shuffle(lines)
-        follow_tc = "\n".join(lines)
+        # Tokenize the input using spaCy
+        source_tokens = [token.text for token in nlp(tc)]
+
+        # Replace each token with its base form (lemma) using spaCy
+        follow_tokens = [token.lemma_ if token.lemma_ != "-PRON-" else token.text for token in nlp(tc)]
+        follow_tc = " ".join(follow_tokens)
 
         # Get follow-up output
         follow_out = subprocess.check_output(PRINT_TOKENS_PATH, input=follow_tc, text=True).split("\n")

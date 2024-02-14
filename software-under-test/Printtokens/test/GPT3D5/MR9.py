@@ -1,7 +1,4 @@
-import unittest
-import os, subprocess, time
-
-from parameterized import parameterized
+import re
 from utils import *
 
 
@@ -14,25 +11,14 @@ class TestingClass(unittest.TestCase):
         proc.readlines()
         proc.close()
 
-    @parameterized.expand(load_test_cases)
+    @parameterized.expand(load_test_cases(1000))
     def test9(self, tc: str):
-        """Metamorphic Relation 9: Replacing a token by a synonym, the output should remain the same"""
+        """Metamorphic Relation 9: Removing all the special characters, the output should remain the same."""
         # Get source output
         source_out = subprocess.check_output(PRINT_TOKENS_PATH, input=tc, text=True).split("\n")
 
-        # Replace a token by a synonym
-        token_synonyms = {
-            "int": "integer",
-            "float": "real",
-            "str": "string"
-        }
-        tokens = tc.split()
-        for i in range(len(tokens)):
-            if tokens[i] in token_synonyms:
-                tokens[i] = token_synonyms[tokens[i]]
-
         # Construct follow-up input
-        follow_tc = " ".join(tokens)
+        follow_tc = re.sub(r'\W+', ' ', tc)
 
         # Get follow-up output
         follow_out = subprocess.check_output(PRINT_TOKENS_PATH, input=follow_tc, text=True).split("\n")

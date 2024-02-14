@@ -1,7 +1,3 @@
-import unittest
-import os, subprocess, time
-
-from parameterized import parameterized
 from utils import *
 
 
@@ -14,20 +10,22 @@ class TestingClass(unittest.TestCase):
         proc.readlines()
         proc.close()
 
-    @parameterized.expand(load_test_cases)
+    @parameterized.expand(load_test_cases(1000))
     def test5(self, tc: str):
-        """Metamorphic Relation 5: Adding whitespace in between tokens, the output should remain the same"""
+        """Metamorphic Relation 5: Swapping the positions of two words, the output should change according to the swapped tokens."""
         # Get source output
         source_out = subprocess.check_output(PRINT_TOKENS_PATH, input=tc, text=True).split("\n")
 
-        # Construct follow-up input
-        follow_tc = " ".join(tc.split())
+        tokens = tc.split()
+        # Swap the first two words
+        tokens[0], tokens[1] = tokens[1], tokens[0]
+        follow_tc = " ".join(tokens)
 
         # Get follow-up output
         follow_out = subprocess.check_output(PRINT_TOKENS_PATH, input=follow_tc, text=True).split("\n")
 
         # Verification
-        self.assertEqual(source_out, follow_out)
+        self.assertNotEqual(source_out, follow_out)
 
 
 if __name__ == "__main__":

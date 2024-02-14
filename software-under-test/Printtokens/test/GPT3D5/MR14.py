@@ -1,7 +1,3 @@
-import unittest
-import os, subprocess, time
-
-from parameterized import parameterized
 from utils import *
 
 
@@ -14,14 +10,15 @@ class TestingClass(unittest.TestCase):
         proc.readlines()
         proc.close()
 
-    @parameterized.expand(load_test_cases)
+    @parameterized.expand(load_test_cases(1000))
     def test14(self, tc: str):
-        """Metamorphic Relation 14: Adding or removing a space between characters in each token, the output should remain the same"""
+        """Metamorphic Relation 14: Appending special characters at the end of each token, the output should remain the same."""
         # Get source output
         source_out = subprocess.check_output(PRINT_TOKENS_PATH, input=tc, text=True).split("\n")
 
-        # Construct follow-up input with added/removed space between characters in tokens
-        follow_tc = "\n".join([token.replace(" ", "") for token in tc.split("\n")])
+        # Construct follow-up input
+        tokens = tc.split()
+        follow_tc = " ".join([token + '@#$' for token in tokens])
 
         # Get follow-up output
         follow_out = subprocess.check_output(PRINT_TOKENS_PATH, input=follow_tc, text=True).split("\n")

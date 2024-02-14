@@ -11,23 +11,19 @@ class TestingClass(unittest.TestCase):
         proc.close()
 
     @parameterized.expand(load_test_cases(1000))
-    def test13(self, tc: str):
-        """Metamorphic Relation 13: Reordering the appearance of the tokens, the output should remain the same but ordered differently."""
+    def test2(self, tc: str):
+        """Metamorphic Relation 2: Appending an empty line at the end, the number of follow-up output's rows equals the number of source output's rows plus one."""
         # Get source output
         source_out = subprocess.check_output(PRINT_TOKENS_PATH, input=tc, text=True).split("\n")
 
         # Construct follow-up input
-        tokens = tc.split()
-        random.shuffle(tokens)
-        follow_tc = " ".join(tokens)
+        follow_tc = tc + "\n"
 
         # Get follow-up output
         follow_out = subprocess.check_output(PRINT_TOKENS_PATH, input=follow_tc, text=True).split("\n")
 
-        # Verify the content is the same regardless of the order
-        self.assertCountEqual(source_out, follow_out)
-        # Verify the order is different
-        self.assertNotEqual(source_out, follow_out)
+        # Verification
+        self.assertEqual(len(source_out) + 1, len(follow_out))
 
 
 if __name__ == "__main__":

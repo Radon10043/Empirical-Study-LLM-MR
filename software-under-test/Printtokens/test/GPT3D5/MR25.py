@@ -1,7 +1,3 @@
-import unittest
-import os, subprocess, time
-
-from parameterized import parameterized
 from utils import *
 
 
@@ -14,19 +10,24 @@ class TestingClass(unittest.TestCase):
         proc.readlines()
         proc.close()
 
-    @parameterized.expand(load_test_cases)
+    @parameterized.expand(load_test_cases(1000))
     def test25(self, tc: str):
-        """Metamorphic Relation 25: Duplicate the entire input, the output should remain the same"""
+        """Metamorphic Relation 25: Using a synonym of the program input as the follow-up input should yield the same output as the original input."""
         # Get source output
         source_out = subprocess.check_output(PRINT_TOKENS_PATH, input=tc, text=True).split("\n")
 
-        # Duplicate the input
-        follow_tc = tc + tc
+        # Replace certain tokens with synonyms
+        tokens = tc.split()
+        synonyms = {'function': 'operation', 'process': 'procedure', 'input': 'data'}
+        for i, token in enumerate(tokens):
+            if token.lower() in synonyms:
+                tokens[i] = synonyms[token.lower()]
+        follow_tc = " ".join(tokens)
 
         # Get follow-up output
         follow_out = subprocess.check_output(PRINT_TOKENS_PATH, input=follow_tc, text=True).split("\n")
 
-        # Verification
+        # Verify that the output remains the same
         self.assertEqual(source_out, follow_out)
 
 

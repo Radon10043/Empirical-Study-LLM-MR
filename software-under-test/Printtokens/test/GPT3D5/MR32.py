@@ -1,7 +1,3 @@
-import unittest
-import os, subprocess, time
-
-from parameterized import parameterized
 from utils import *
 
 
@@ -14,23 +10,23 @@ class TestingClass(unittest.TestCase):
         proc.readlines()
         proc.close()
 
-    @parameterized.expand(load_test_cases)
+    @parameterized.expand(load_test_cases(1000))
     def test32(self, tc: str):
-        """Metamorphic Relation 32: Removing a token from the input, the removed token should not appear in the output"""
+        """Metamorphic Relation 32: Replacing tokens with a placeholder representing their token type, the output token should also be the placeholder."""
         # Get source output
-        source_out = subprocess.check_output(PRINT_TOKENS_PATH, input=tc, text=True)
+        source_out = subprocess.check_output(PRINT_TOKENS_PATH, input=tc, text=True).split("\n")
 
-        # Construct follow-up input by removing a token
         tokens = tc.split()
-        if tokens:
-            tokens.pop()
-        follow_tc = " ".join(tokens)
+        token_type_map = {'name': '<NAME>', 'number': '<NUMBER>', 'symbol': '<SYMBOL>'}
+
+        # Replace tokens with placeholder representing their token type
+        follow_tc = " ".join([token_type_map.get(token.lower(), token) for token in tokens])
 
         # Get follow-up output
-        follow_out = subprocess.check_output(PRINT_TOKENS_PATH, input=follow_tc, text=True)
+        follow_out = subprocess.check_output(PRINT_TOKENS_PATH, input=follow_tc, text=True).split("\n")
 
-        # Verify the removed token in the follow-up output
-        self.assertNotIn(tokens[-1], follow_out)
+        # Verification
+        self.assertEqual(source_out, follow_out)
 
 
 if __name__ == "__main__":

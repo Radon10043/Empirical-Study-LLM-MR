@@ -1,7 +1,4 @@
-import unittest
-import os, subprocess, time
-
-from parameterized import parameterized
+import re
 from utils import *
 
 
@@ -14,22 +11,20 @@ class TestingClass(unittest.TestCase):
         proc.readlines()
         proc.close()
 
-    # Fix by Radon
-    @parameterized.expand(load_test_cases)
+    @parameterized.expand(load_test_cases(1000))
     def test34(self, tc: str):
-        """Metamorphic Relation 34: Adding a token with a different category, the new token should appear in the output with the appropriate category"""
+        """Metamorphic Relation 34: Replacing numeric values with their binary representation, the output should not change."""
         # Get source output
-        source_out = subprocess.check_output(PRINT_TOKENS_PATH, input=tc, text=True)
+        source_out = subprocess.check_output(PRINT_TOKENS_PATH, input=tc, text=True).split("\n")
 
-        # Construct follow-up input by adding a new token with a different category
-        follow_tc = tc + " lambda"
+        # Replace numeric values with their binary representation
+        follow_tc = re.sub(r'\d+', lambda x: bin(int(x.group())), tc)
 
         # Get follow-up output
-        follow_out = subprocess.check_output(PRINT_TOKENS_PATH, input=follow_tc, text=True)
+        follow_out = subprocess.check_output(PRINT_TOKENS_PATH, input=follow_tc, text=True).split("\n")
 
-        # Verify the new token and its category in the follow-up output
-        self.assertIn("lambda", follow_out)
-        self.assertIn("keyword,\t\"lambda\"", follow_out)
+        # Verification
+        self.assertEqual(source_out, follow_out)
 
 
 if __name__ == "__main__":

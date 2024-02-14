@@ -1,7 +1,3 @@
-import unittest
-import os, subprocess, time
-
-from parameterized import parameterized
 from utils import *
 
 
@@ -14,17 +10,17 @@ class TestingClass(unittest.TestCase):
         proc.readlines()
         proc.close()
 
-    @parameterized.expand(load_test_cases)
-    def test42(self, tc: str):
-        """Metamorphic Relation 42: Appending an empty line at the end, the output should remain the same"""
+    @parameterized.expand(load_test_cases(1000))
+    def test3(self, tc: str):
+        """Metamorphic Relation 3: Removing all the white spaces, the output should remain the same."""
         # Get source output
-        source_out = subprocess.check_output(PRINT_TOKENS_PATH, input=tc, text=True)
+        source_out = subprocess.check_output(PRINT_TOKENS_PATH, input=tc, text=True).split("\n")
 
-        # Append an empty line at the end
-        follow_tc = tc + "\n"
+        # Construct follow-up input
+        follow_tc = "".join(tc.split())
 
         # Get follow-up output
-        follow_out = subprocess.check_output(PRINT_TOKENS_PATH, input=follow_tc, text=True)
+        follow_out = subprocess.check_output(PRINT_TOKENS_PATH, input=follow_tc, text=True).split("\n")
 
         # Verification
         self.assertEqual(source_out, follow_out)

@@ -1,7 +1,3 @@
-import unittest
-import os, subprocess, time
-
-from parameterized import parameterized
 from utils import *
 
 
@@ -14,15 +10,16 @@ class TestingClass(unittest.TestCase):
         proc.readlines()
         proc.close()
 
-    @parameterized.expand(load_test_cases)
+    @parameterized.expand(load_test_cases(1000))
     def test28(self, tc: str):
-        """Metamorphic Relation 28: Mix the token order within each line, the output should remain the same"""
+        """Metamorphic Relation 28: Replacing every instance of a token with a wildcard, the output should remain the same."""
+        import re
+
         # Get source output
         source_out = subprocess.check_output(PRINT_TOKENS_PATH, input=tc, text=True).split("\n")
 
-        # Mix the token order within each line
-        follow_tc_lines = [' '.join(random.sample(line.split(), len(line.split()))) for line in tc.split('\n')]
-        follow_tc = '\n'.join(follow_tc_lines)
+        # Replace every instance of a token with a wildcard
+        follow_tc = re.sub(r'\b\w+\b', '*', tc)
 
         # Get follow-up output
         follow_out = subprocess.check_output(PRINT_TOKENS_PATH, input=follow_tc, text=True).split("\n")

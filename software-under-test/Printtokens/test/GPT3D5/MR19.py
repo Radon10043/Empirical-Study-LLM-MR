@@ -1,7 +1,3 @@
-import unittest
-import os, subprocess, time
-
-from parameterized import parameterized
 from utils import *
 
 
@@ -14,20 +10,26 @@ class TestingClass(unittest.TestCase):
         proc.readlines()
         proc.close()
 
-    @parameterized.expand(load_test_cases)
+    @parameterized.expand(load_test_cases(1000))
     def test19(self, tc: str):
-        """Metamorphic Relation 19: Adding a line with the same content at the end, the output should remain the same"""
+        """Metamorphic Relation 19: Replacing certain tokens with synonyms, the general structure of the output should not change."""
         # Get source output
         source_out = subprocess.check_output(PRINT_TOKENS_PATH, input=tc, text=True).split("\n")
 
-        # Construct follow-up input with an additional line at the end
-        follow_tc = tc + "\n" + tc.split("\n")[-1]
+        tokens = tc.split(" ")
+        # Replace some tokens with synonyms
+        for i, token in enumerate(tokens):
+            if token.lower() == 'large':
+                tokens[i] = 'big'
+            elif token.lower() == 'define':
+                tokens[i] = 'specify'
+        follow_tc = " ".join(tokens)
 
         # Get follow-up output
         follow_out = subprocess.check_output(PRINT_TOKENS_PATH, input=follow_tc, text=True).split("\n")
 
-        # Verification
-        self.assertEqual(source_out, follow_out)
+        # Verify that the general structure of the output is similar
+        self.assertGreaterEqual(len(follow_out), len(source_out) * 0.9)
 
 
 if __name__ == "__main__":

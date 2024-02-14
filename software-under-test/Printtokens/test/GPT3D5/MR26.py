@@ -1,7 +1,3 @@
-import unittest
-import os, subprocess, time
-
-from parameterized import parameterized
 from utils import *
 
 
@@ -14,21 +10,26 @@ class TestingClass(unittest.TestCase):
         proc.readlines()
         proc.close()
 
-    @parameterized.expand(load_test_cases)
+    @parameterized.expand(load_test_cases(1000))
     def test26(self, tc: str):
-        """Metamorphic Relation 26: Reverse the order of tokens at each line, the output should remain the same"""
+        """Metamorphic Relation 26: Replacing certain tokens with truncated versions, the general structure of the output should not change."""
+        import re
+
         # Get source output
         source_out = subprocess.check_output(PRINT_TOKENS_PATH, input=tc, text=True).split("\n")
 
-        # Reverse the order of tokens at each line
-        follow_tc_lines = [' '.join(line.split()[::-1]) for line in tc.split('\n')]
-        follow_tc = '\n'.join(follow_tc_lines)
+        # Replace certain tokens with truncated versions
+        tokens = tc.split()
+        for i, token in enumerate(tokens):
+            if re.match(r'^[A-Za-z0-9_]+$', token):
+                tokens[i] = token[:3]
+        follow_tc = " ".join(tokens)
 
         # Get follow-up output
         follow_out = subprocess.check_output(PRINT_TOKENS_PATH, input=follow_tc, text=True).split("\n")
 
-        # Verification
-        self.assertEqual(source_out, follow_out)
+        # Verify that the general structure of the output is similar
+        self.assertGreaterEqual(len(follow_out), len(source_out) * 0.9)
 
 
 if __name__ == "__main__":

@@ -1,7 +1,3 @@
-import unittest
-import os, subprocess, time
-
-from parameterized import parameterized
 from utils import *
 
 
@@ -14,19 +10,17 @@ class TestingClass(unittest.TestCase):
         proc.readlines()
         proc.close()
 
-    @parameterized.expand(load_test_cases)
+    @parameterized.expand(load_test_cases(1000))
     def test36(self, tc: str):
-        """Metamorphic Relation 36: Swapping lines within the input, the output should remain the same"""
+        """Metamorphic Relation 36: Replacing special characters with their corresponding escape sequences, the output should not change."""
         # Get source output
-        source_out = subprocess.check_output(PRINT_TOKENS_PATH, input=tc, text=True)
+        source_out = subprocess.check_output(PRINT_TOKENS_PATH, input=tc, text=True).split("\n")
 
-        # Swapping lines within the input
-        lines = tc.split("\n")
-        random.shuffle(lines)
-        follow_tc = "\n".join(lines)
+        # Replace special characters with their escape sequences
+        follow_tc = tc.replace("'", "\\'").replace('"', '\\"').replace('\t', '\\t').replace('\n', '\\n')
 
         # Get follow-up output
-        follow_out = subprocess.check_output(PRINT_TOKENS_PATH, input=follow_tc, text=True)
+        follow_out = subprocess.check_output(PRINT_TOKENS_PATH, input=follow_tc, text=True).split("\n")
 
         # Verification
         self.assertEqual(source_out, follow_out)

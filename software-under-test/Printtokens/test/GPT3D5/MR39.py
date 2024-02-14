@@ -1,7 +1,3 @@
-import unittest
-import os, subprocess, time
-
-from parameterized import parameterized
 from utils import *
 
 
@@ -14,28 +10,20 @@ class TestingClass(unittest.TestCase):
         proc.readlines()
         proc.close()
 
-    @parameterized.expand(load_test_cases)
+    @parameterized.expand(load_test_cases(1000))
     def test39(self, tc: str):
-        """Metamorphic Relation 39: Randomly replacing tokens with synonyms, the output should remain the same"""
+        """Metamorphic Relation 39: Appending control characters, such as newline and tab, the number of follow-up output's rows should increase."""
         # Get source output
-        source_out = subprocess.check_output(PRINT_TOKENS_PATH, input=tc, text=True)
+        source_out = subprocess.check_output(PRINT_TOKENS_PATH, input=tc, text=True).split("\n")
 
-        # Define token synonyms
-        token_synonyms = {
-            "int": "integer",
-            "float": "real",
-            "str": "string"
-        }
-
-        # Randomly replace tokens with synonyms
-        new_tokens = [token_synonyms.get(token, token) for token in tc.split()]
-        follow_tc = " ".join(new_tokens)
+        # Append control characters to the input
+        follow_tc = tc + "\n" + "\t"
 
         # Get follow-up output
-        follow_out = subprocess.check_output(PRINT_TOKENS_PATH, input=follow_tc, text=True)
+        follow_out = subprocess.check_output(PRINT_TOKENS_PATH, input=follow_tc, text=True).split("\n")
 
         # Verification
-        self.assertEqual(source_out, follow_out)
+        self.assertGreater(len(follow_out), len(source_out))
 
 
 if __name__ == "__main__":

@@ -2,10 +2,12 @@
 Author: Radon
 Date: 2024-01-09 17:27:20
 LastEditors: Radon
-LastEditTime: 2024-02-13 17:15:47
+LastEditTime: 2024-02-13 18:09:40
 Description: Hi, say something
 """
+
 import os
+import shutil
 import string
 
 from random import randint
@@ -127,8 +129,9 @@ def gen_tcs_randomly(num: int):
         测试用例数量
     """
     tcs_dir = os.path.join(os.path.dirname(__file__), "..", "testcases")
-    if not os.path.exists(tcs_dir):
-        os.mkdir(tcs_dir)
+    if os.path.exists(tcs_dir):
+        shutil.rmtree(tcs_dir)
+    os.mkdir(tcs_dir)
 
     # 可选操作
     operations = [gen_keyword, gen_special, gen_identifier, gen_numeric, gen_string, gen_comment]
@@ -139,10 +142,12 @@ def gen_tcs_randomly(num: int):
         line_num = randint(*RANGE_LINE)
 
         f = open(tc_file, mode="w", encoding="utf-8")
-        for _ in range(line_num):
+        for j in range(line_num):
             for _ in range(*RANGE_COUNT):
                 op = operations[randint(0, len(operations) - 1)]
                 f.write(op() + " ")
+            if j == line_num - 1:
+                break
             f.write("\n")
         f.close()
 
@@ -150,4 +155,4 @@ def gen_tcs_randomly(num: int):
 
 
 if __name__ == "__main__":
-    gen_tcs_randomly()
+    gen_tcs_randomly(1000)

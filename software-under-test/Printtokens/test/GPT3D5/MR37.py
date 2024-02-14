@@ -1,7 +1,3 @@
-import unittest
-import os, subprocess, time
-
-from parameterized import parameterized
 from utils import *
 
 
@@ -14,17 +10,19 @@ class TestingClass(unittest.TestCase):
         proc.readlines()
         proc.close()
 
-    @parameterized.expand(load_test_cases)
+    @parameterized.expand(load_test_cases(1000))
     def test37(self, tc: str):
-        """Metamorphic Relation 37: Replacing numeric constants with their arithmetic expressions, the output should remain the same"""
-        # Get source output
-        source_out = subprocess.check_output(PRINT_TOKENS_PATH, input=tc, text=True)
+        """Metamorphic Relation 37: Replacing URLs with a placeholder, the output should remain the same."""
+        import re
 
-        # Replace numeric constants with arithmetic expressions
-        follow_tc = tc.replace("100", "50 + 50").replace("200", "150 + 50")
+        # Get source output
+        source_out = subprocess.check_output(PRINT_TOKENS_PATH, input=tc, text=True).split("\n")
+
+        # Replace URLs with a placeholder
+        follow_tc = re.sub(r'http\S+', '<URL>', tc)
 
         # Get follow-up output
-        follow_out = subprocess.check_output(PRINT_TOKENS_PATH, input=follow_tc, text=True)
+        follow_out = subprocess.check_output(PRINT_TOKENS_PATH, input=follow_tc, text=True).split("\n")
 
         # Verification
         self.assertEqual(source_out, follow_out)

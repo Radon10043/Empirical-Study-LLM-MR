@@ -1,7 +1,3 @@
-import unittest
-import os, subprocess, time
-
-from parameterized import parameterized
 from utils import *
 
 
@@ -14,21 +10,23 @@ class TestingClass(unittest.TestCase):
         proc.readlines()
         proc.close()
 
-    # Fix by Radon
-    @parameterized.expand(load_test_cases)
+    @parameterized.expand(load_test_cases(1000))
     def test31(self, tc: str):
-        """Metamorphic Relation 31: Adding a new token into the input, the new token should appear in the output with the appropriate category"""
+        """Metamorphic Relation 31: Removing all occurrences of a specific token, the count of that token should be zero in the output."""
         # Get source output
-        source_out = subprocess.check_output(PRINT_TOKENS_PATH, input=tc, text=True)
+        source_out = subprocess.check_output(PRINT_TOKENS_PATH, input=tc, text=True).split("\n")
 
-        # Construct follow-up input by adding a new token
-        follow_tc = tc + "lambda"
+        tokens = tc.split()
+        token_to_remove = "example_token"
+
+        # Remove all occurrences of a specific token
+        follow_tc = " ".join([token for token in tokens if token != token_to_remove])
 
         # Get follow-up output
-        follow_out = subprocess.check_output(PRINT_TOKENS_PATH, input=follow_tc, text=True)
+        follow_out = subprocess.check_output(PRINT_TOKENS_PATH, input=follow_tc, text=True).split("\n")
 
-        # Verify the new token in the follow-up output
-        self.assertTrue(follow_out.endswith("keyword,\t\"lambda\".\neof.\n"))
+        # Verify the count of occurrences for the specific token is zero
+        self.assertEqual(source_out.count(token_to_remove), 0)
 
 
 if __name__ == "__main__":

@@ -1,7 +1,3 @@
-import unittest
-import os, subprocess, time
-
-from parameterized import parameterized
 from utils import *
 
 
@@ -14,20 +10,22 @@ class TestingClass(unittest.TestCase):
         proc.readlines()
         proc.close()
 
-    @parameterized.expand(load_test_cases)
+    @parameterized.expand(load_test_cases(1000))
     def test38(self, tc: str):
-        """Metamorphic Relation 38: Replacing boolean constants with their inverses, the output should remain the same"""
+        """Metamorphic Relation 38: Shuffling the order of words within a sentence, the general structure of the output should remain the same."""
         # Get source output
-        source_out = subprocess.check_output(PRINT_TOKENS_PATH, input=tc, text=True)
+        source_out = subprocess.check_output(PRINT_TOKENS_PATH, input=tc, text=True).split("\n")
 
-        # Replace boolean constants with their inverses
-        follow_tc = tc.replace("True", "False").replace("False", "True")
+        tokens = tc.split()
+        # Randomly shuffle the order of words within a sentence
+        random.shuffle(tokens)
+        follow_tc = " ".join(tokens)
 
         # Get follow-up output
-        follow_out = subprocess.check_output(PRINT_TOKENS_PATH, input=follow_tc, text=True)
+        follow_out = subprocess.check_output(PRINT_TOKENS_PATH, input=follow_tc, text=True).split("\n")
 
-        # Verification
-        self.assertEqual(source_out, follow_out)
+        # Verify that the general structure of the output is similar
+        self.assertGreaterEqual(len(follow_out), len(source_out) * 0.9)
 
 
 if __name__ == "__main__":

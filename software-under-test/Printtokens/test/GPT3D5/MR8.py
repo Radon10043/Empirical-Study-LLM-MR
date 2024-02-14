@@ -1,7 +1,3 @@
-import unittest
-import os, subprocess, time
-
-from parameterized import parameterized
 from utils import *
 
 
@@ -14,19 +10,14 @@ class TestingClass(unittest.TestCase):
         proc.readlines()
         proc.close()
 
-    @parameterized.expand(load_test_cases)
+    @parameterized.expand(load_test_cases(1000))
     def test8(self, tc: str):
-        """Metamorphic Relation 8: Reordering the tokens while preserving categories, the output should remain the same"""
+        """Metamorphic Relation 8: Appending gibberish characters at the end of the input, the output should remain the same."""
         # Get source output
         source_out = subprocess.check_output(PRINT_TOKENS_PATH, input=tc, text=True).split("\n")
 
-        # Process tokens and categories
-        tokens_categories = [token.split(":") for token in tc.split()]
-        tokens_categories.sort(key=lambda x: x[1])  # Sort by category while preserving token order
-        reordered_tokens = [":".join(pair) for pair in tokens_categories]
-
         # Construct follow-up input
-        follow_tc = " ".join(reordered_tokens)
+        follow_tc = tc + "jdfkjdf"
 
         # Get follow-up output
         follow_out = subprocess.check_output(PRINT_TOKENS_PATH, input=follow_tc, text=True).split("\n")

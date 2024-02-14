@@ -1,7 +1,3 @@
-import unittest
-import os, subprocess, time
-
-from parameterized import parameterized
 from utils import *
 
 
@@ -14,23 +10,29 @@ class TestingClass(unittest.TestCase):
         proc.readlines()
         proc.close()
 
-    @parameterized.expand(load_test_cases)
+    @parameterized.expand(load_test_cases(1000))
     def test27(self, tc: str):
-        """Metamorphic Relation 27: Adding a blank line in the middle of existing input lines, the output should remain the same"""
+        """Metamorphic Relation 27: Reverse the order of occurrence of tokens, the output should remain the same but ordered differently."""
+        from itertools import permutations
+
         # Get source output
         source_out = subprocess.check_output(PRINT_TOKENS_PATH, input=tc, text=True).split("\n")
 
-        # Adding a blank line in the middle of existing input lines
-        lines = tc.split('\n')
-        mid_index = len(lines) // 2
-        follow_tc_lines = lines[:mid_index] + [''] + lines[mid_index:]
-        follow_tc = '\n'.join(follow_tc_lines)
+        tokens = tc.split(" ")
+
+        # Reverse
+        tokens.reverse()
+
+        # Randomly select a permutation
+        follow_tc = ' '.join(tokens)
 
         # Get follow-up output
         follow_out = subprocess.check_output(PRINT_TOKENS_PATH, input=follow_tc, text=True).split("\n")
 
-        # Verification
-        self.assertEqual(source_out, follow_out)
+        # Verify the content is the same regardless of the order
+        self.assertCountEqual(source_out, follow_out)
+        # Verify the order is different
+        self.assertNotEqual(source_out, follow_out)
 
 
 if __name__ == "__main__":
