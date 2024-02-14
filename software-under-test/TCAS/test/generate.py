@@ -2,12 +2,13 @@
 Author: Radon
 Date: 2024-01-10 21:23:15
 LastEditors: Radon
-LastEditTime: 2024-01-24 19:50:01
+LastEditTime: 2024-02-14 13:52:20
 Description: Hi, say something
 """
 import os
 
 from random import randint
+import shutil
 
 
 # fmt:off
@@ -22,11 +23,18 @@ RANGE_CLIMB_INHIBIT    = (0, 1)
 # fmt:on
 
 
-def gen_tcs_randomly():
-    """随机生成一定数量的测试用例, 并保存到文件"""
+def gen_tcs_randomly(num: int):
+    """随机生成一定数量的测试用例, 并存储到testcases目录下
+
+    Parameters
+    ----------
+    num : int
+        测试用例数量
+    """
     tcs_dir = os.path.join(os.path.dirname(__file__), "..", "testcases")
-    if not os.path.exists(tcs_dir):
-        os.mkdir(tcs_dir)
+    if os.path.exists(tcs_dir):
+        shutil.rmtree(tcs_dir)
+    os.mkdir(tcs_dir)
 
     for i in range(TETSCASE_NUM):
         print(f"\rGenerating testcase {i}", end="")
