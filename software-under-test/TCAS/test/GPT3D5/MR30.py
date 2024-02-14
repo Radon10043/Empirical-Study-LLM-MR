@@ -10,25 +10,21 @@ class TestingClass(unittest.TestCase):
         proc.readlines()
         proc.close()
 
-    @parameterized.expand(load_test_cases)
+    @parameterized.expand(load_test_cases(1000))
     def test30(self, vals: list):
-        """Metamorphic Relation 30: If the Alt_Layer_Value is 0 and the Up_Separation is less than the Down_Separation, then changing the value of Climb_Inhibit should lead to the same output as changing the value of Other_Capability by the same amount."""
+        """Metamorphic Relation 30: If all inputs remain unchanged, but the state indicating the presence of valid altitude reports changes, the advisories output should not change."""
         # Get source output
-        source_out = run_tcas(vals)
+        source_out = run_TCAS(vals)
 
-        if vals[INDEX["Alt_Layer_Value"]] == 0 and vals[INDEX["Up_Separation"]] < vals[INDEX["Down_Separation"]]:
-            # Construct follow-up input: Change Climb_Inhibit
-            follow_climb_inhibit_vals = vals.copy()
-            follow_climb_inhibit_vals[INDEX["Climb_Inhibit"]] = 1 - follow_climb_inhibit_vals[INDEX["Climb_Inhibit"]]
-            follow_climb_inhibit_out = run_tcas(follow_climb_inhibit_vals)
+        # Construct follow-up input
+        follow_vals = vals.copy()
+        follow_vals[INDEX["Two_of_Three_Reports_Valid"]] = not follow_vals[INDEX["Two_of_Three_Reports_Valid"]]  # Changing the state indicating the presence of valid altitude reports
 
-            # Construct follow-up input: Change Other_Capability
-            follow_other_capability_vals = vals.copy()
-            follow_other_capability_vals[INDEX["Other_Capability"]] = 1 - follow_other_capability_vals[INDEX["Other_Capability"]]
-            follow_other_capability_out = run_tcas(follow_other_capability_vals)
+        # Get follow-up output
+        follow_out = run_TCAS(follow_vals)
 
-            # Verification
-            self.assertEqual(follow_climb_inhibit_out, follow_other_capability_out)
+        # Verification
+        self.assertEqual(source_out, follow_out)
 
 
 if __name__ == "__main__":

@@ -10,20 +10,17 @@ class TestingClass(unittest.TestCase):
         proc.readlines()
         proc.close()
 
-    @parameterized.expand(load_test_cases)
+    @parameterized.expand(load_test_cases(1000))
     def test16(self, vals: list):
-        """Metamorphic Relation 16: If the Up_Separation is greater than the Down_Separation, and the high confidence is set to 1, then changing the value of Other_RAC should not change the output."""
+        """Metamorphic Relation 16: If all the input parameters remain unchanged, the resolution advisory should remain unchanged."""
         # Get source output
-        source_out = run_tcas(vals)
+        source_out = run_TCAS(vals)
 
         # Construct follow-up input
-        follow_vals = vals.copy()
-        follow_vals[INDEX["High_Confidence"]] = 1
-        if vals[INDEX["Up_Separation"]] > vals[INDEX["Down_Separation"]]:
-            follow_vals[INDEX["Other_RAC"]] = (follow_vals[INDEX["Other_RAC"]] + 1) % len(OTHER_RAC_VALUES)  # Change Other_RAC
+        follow_vals = vals
 
         # Get follow-up output
-        follow_out = run_tcas(follow_vals)
+        follow_out = run_TCAS(follow_vals)
 
         # Verification
         self.assertEqual(source_out, follow_out)

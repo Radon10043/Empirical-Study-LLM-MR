@@ -10,22 +10,22 @@ class TestingClass(unittest.TestCase):
         proc.readlines()
         proc.close()
 
-    @parameterized.expand(load_test_cases)
+    @parameterized.expand(load_test_cases(1000))
     def test22(self, vals: list):
-        """Metamorphic Relation 22: If the Other_RAC is set to DO_NOT_DESCEND, and the TCAS system of the other aircraft is not active, changing the value of Other_Capability should not change the output."""
+        """Metamorphic Relation 22: If the intruder aircraft has an intention to descend, and the altitude thresholds for positive resolution advisories are incremented, the TCAS output should recommend a downward resolution advisory."""
         # Get source output
-        source_out = run_tcas(vals)
+        source_out = run_TCAS(vals)
 
         # Construct follow-up input
         follow_vals = vals.copy()
-        if vals[INDEX["Other_RAC"]] == OTHER_RAC_VALUES["DO_NOT_DESCEND"] and vals[INDEX["Other_Capability"]] == OTHER_CAPABILITY_VALUES["NO_INTENT"]:
-            follow_vals[INDEX["Other_Capability"]] = (follow_vals[INDEX["Other_Capability"]] + 1) % 2  # Change Other_Capability
+        if vals[INDEX["Other_RAC"]] == 2:  # Assuming a downward intention
+            follow_vals[INDEX["ALIM()"]] = vals[INDEX["ALIM()"]] + 100  # Incrementing the altitude thresholds for positive resolution advisories
 
         # Get follow-up output
-        follow_out = run_tcas(follow_vals)
+        follow_out = run_TCAS(follow_vals)
 
         # Verification
-        self.assertEqual(source_out, follow_out)
+        self.assertEqual(follow_out, 2)  # Expecting a recommendation for a downward resolution advisory
 
 
 if __name__ == "__main__":

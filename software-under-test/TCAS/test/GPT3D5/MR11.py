@@ -10,18 +10,18 @@ class TestingClass(unittest.TestCase):
         proc.readlines()
         proc.close()
 
-    @parameterized.expand(load_test_cases)
+    @parameterized.expand(load_test_cases(1000))
     def test11(self, vals: list):
-        """Metamorphic Relation 11: If the altitudes are reversed (Own_Tracked_Alt becomes Other_Tracked_Alt and vice versa), the output should remain the same."""
+        """Metamorphic Relation 11: If the combination of separation thresholds and the Upper Layer Value remains the same, the output should remain the same."""
         # Get source output
-        source_out = run_tcas(vals)
+        source_out = run_TCAS(vals)
 
         # Construct follow-up input
         follow_vals = vals.copy()
-        follow_vals[INDEX["Own_Tracked_Alt"]], follow_vals[INDEX["Other_Tracked_Alt"]] = follow_vals[INDEX["Other_Tracked_Alt"]], follow_vals[INDEX["Own_Tracked_Alt"]]  # Reverse altitudes
+        follow_vals[INDEX["alt_sep_test()"]] = (follow_vals[INDEX["alt_sep_test()"]] + follow_vals[INDEX["Alt_Layer_Value"]]) / 2
 
         # Get follow-up output
-        follow_out = run_tcas(follow_vals)
+        follow_out = run_TCAS(follow_vals)
 
         # Verification
         self.assertEqual(source_out, follow_out)

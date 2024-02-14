@@ -10,25 +10,22 @@ class TestingClass(unittest.TestCase):
         proc.readlines()
         proc.close()
 
-    @parameterized.expand(load_test_cases)
+    @parameterized.expand(load_test_cases(1000))
     def test25(self, vals: list):
-        """Metamorphic Relation 25: If the value of Alt_Layer_Value is 1 or 2 and Own_Tracked_Alt is greater than Other_Tracked_Alt, changing the value of Own_Tracked_Alt should lead to the same output as changing the value of Other_Tracked_Alt by the same amount."""
+        """Metamorphic Relation 25: If the altitude of the own aircraft and the other aircraft changes, but the vertical separation remains the same, the output should not change."""
         # Get source output
-        source_out = run_tcas(vals)
+        source_out = run_TCAS(vals)
 
-        if vals[INDEX["Alt_Layer_Value"]] in [1, 2] and vals[INDEX["Own_Tracked_Alt"]] > vals[INDEX["Other_Tracked_Alt"]]:
-            # Construct follow-up input: Change Own_Tracked_Alt
-            follow_own_vals = vals.copy()
-            follow_own_vals[INDEX["Own_Tracked_Alt"]] += 100
-            follow_own_out = run_tcas(follow_own_vals)
+        # Construct follow-up input
+        follow_vals = vals.copy()
+        follow_vals[INDEX["Own_Tracked_Alt"]] += 100  # Increasing the altitude of the own aircraft
+        follow_vals[INDEX["Other_Tracked_Alt"]] += 100  # Increasing the altitude of the other aircraft
 
-            # Construct follow-up input: Change Other_Tracked_Alt
-            follow_other_vals = vals.copy()
-            follow_other_vals[INDEX["Other_Tracked_Alt"]] += 100
-            follow_other_out = run_tcas(follow_other_vals)
+        # Get follow-up output
+        follow_out = run_TCAS(follow_vals)
 
-            # Verification
-            self.assertEqual(follow_own_out, follow_other_out)
+        # Verification
+        self.assertEqual(source_out, follow_out)
 
 
 if __name__ == "__main__":

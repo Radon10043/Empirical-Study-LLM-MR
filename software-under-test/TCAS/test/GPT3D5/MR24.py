@@ -10,19 +10,19 @@ class TestingClass(unittest.TestCase):
         proc.readlines()
         proc.close()
 
-    @parameterized.expand(load_test_cases)
+    @parameterized.expand(load_test_cases(1000))
     def test24(self, vals: list):
-        """Metamorphic Relation 24: If the Other_Capability is set to TCAS_TA, the report validity is 1, and the Intruder aircraft has the intent to climb, then the output should not change when the value of Climb_Inhibit is changed."""
+        """Metamorphic Relation 24: If the separation thresholds are adjusted, the advisory should remain the same if the Cur_Vertical_Separation is halved."""
         # Get source output
-        source_out = run_tcas(vals)
+        source_out = run_TCAS(vals)
 
         # Construct follow-up input
         follow_vals = vals.copy()
-        if vals[INDEX["Other_Capability"]] == OTHER_CAPABILITY_VALUES["TCAS_TA"] and vals[INDEX["Two_of_Three_Reports_Valid"]] == 1 and vals[INDEX["Other_RAC"]] == OTHER_RAC_VALUES["DO_NOT_DESCEND"]:
-            follow_vals[INDEX["Climb_Inhibit"]] = (follow_vals[INDEX["Climb_Inhibit"]] + 1) % 2  # Change Climb_Inhibit
+        follow_vals[INDEX["Separation_Thresholds"]] += 100  # Adjusting the separation thresholds
+        follow_vals[INDEX["Cur_Vertical_Sep"]] = vals[INDEX["Cur_Vertical_Sep"]] / 2  # Halving the Cur_Vertical_Sep
 
         # Get follow-up output
-        follow_out = run_tcas(follow_vals)
+        follow_out = run_TCAS(follow_vals)
 
         # Verification
         self.assertEqual(source_out, follow_out)

@@ -10,19 +10,18 @@ class TestingClass(unittest.TestCase):
         proc.readlines()
         proc.close()
 
-    @parameterized.expand(load_test_cases)
+    @parameterized.expand(load_test_cases(1000))
     def test12(self, vals: list):
-        """Metamorphic Relation 12: If the own altitude rate is negative, and the other altitude rate is positive, the output should not change."""
+        """Metamorphic Relation 12: If the main state variables remain unchanged, the output should remain unchanged too."""
         # Get source output
-        source_out = run_tcas(vals)
+        source_out = run_TCAS(vals)
 
         # Construct follow-up input
         follow_vals = vals.copy()
-        follow_vals[INDEX["Own_Tracked_Alt_Rate"]] = -abs(follow_vals[INDEX["Own_Tracked_Alt_Rate"]])  # Set own rate negative
-        follow_vals[INDEX["Other_Tracked_Alt_Rate"]] = abs(follow_vals[INDEX["Other_Tracked_Alt_Rate"]])  # Set other rate positive
+        follow_vals[INDEX["State_Variables"]] = follow_vals[INDEX["State_Variables"]]
 
         # Get follow-up output
-        follow_out = run_tcas(follow_vals)
+        follow_out = run_TCAS(follow_vals)
 
         # Verification
         self.assertEqual(source_out, follow_out)

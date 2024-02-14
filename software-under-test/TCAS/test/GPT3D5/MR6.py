@@ -10,18 +10,18 @@ class TestingClass(unittest.TestCase):
         proc.readlines()
         proc.close()
 
-    @parameterized.expand(load_test_cases)
+    @parameterized.expand(load_test_cases(1000))
     def test6(self, vals: list):
-        """Metamorphic Relation 6: If the Own_Tracked_Alt_Rate is multiplied by -1, the output should not change."""
+        """Metamorphic Relation 6: If the combination of Own_Tracked_Alt and Other_Tracked_Alt_Rate remains the same, the output should remain the same."""
         # Get source output
-        source_out = run_tcas(vals)
+        source_out = run_TCAS(vals)
 
         # Construct follow-up input
         follow_vals = vals.copy()
-        follow_vals[INDEX["Own_Tracked_Alt_Rate"]] *= -1  # Multiply Own_Tracked_Alt_Rate by -1
+        follow_vals[INDEX["Own_Tracked_Alt"]] += follow_vals[INDEX["Other_Tracked_Alt_Rate"]]
 
         # Get follow-up output
-        follow_out = run_tcas(follow_vals)
+        follow_out = run_TCAS(follow_vals)
 
         # Verification
         self.assertEqual(source_out, follow_out)

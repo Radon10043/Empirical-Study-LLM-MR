@@ -10,22 +10,21 @@ class TestingClass(unittest.TestCase):
         proc.readlines()
         proc.close()
 
-    @parameterized.expand(load_test_cases)
+    @parameterized.expand(load_test_cases(1000))
     def test7(self, vals: list):
-        """Metamorphic Relation 7: If the Up_Separation and Down_Separation are swapped, the output should not change."""
+        """Metamorphic Relation 7: If the Intruder's intention (Other_RAC) changes, but the altitude-related parameters remain the same, the output should change as per the new intention."""
         # Get source output
-        source_out = run_tcas(vals)
+        source_out = run_TCAS(vals)
 
         # Construct follow-up input
         follow_vals = vals.copy()
-        follow_vals[INDEX["Up_Separation"]] = vals[INDEX["Down_Separation"]]
-        follow_vals[INDEX["Down_Separation"]] = vals[INDEX["Up_Separation"]]
+        follow_vals[INDEX["Other_RAC"]] = (follow_vals[INDEX["Other_RAC"]] + 1) % 3  # Assuming 3 intention states
 
         # Get follow-up output
-        follow_out = run_tcas(follow_vals)
+        follow_out = run_TCAS(follow_vals)
 
         # Verification
-        self.assertEqual(source_out, follow_out)
+        self.assertNotEqual(source_out, follow_out)
 
 
 if __name__ == "__main__":

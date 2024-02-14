@@ -10,20 +10,21 @@ class TestingClass(unittest.TestCase):
         proc.readlines()
         proc.close()
 
-    @parameterized.expand(load_test_cases)
+    @parameterized.expand(load_test_cases(1000))
     def test32(self, vals: list):
-        """Metamorphic Relation 32: If the value of Up_Separation is less than the value of Down_Separation, and the TCAS system of the other aircraft is active, then switching the values of Alt_Layer_Value and Two_of_Three_Reports_Valid should lead to the same output."""
+        """Metamorphic Relation 32: If the Own_Tracked_Alt and Other_Tracked_Alt_Rate are unchanged, and the state indicating the presence of valid altitude reports changes, the outcome should remain the same."""
         # Get source output
-        source_out = run_tcas(vals)
+        source_out = run_TCAS(vals)
 
-        if vals[INDEX["Up_Separation"]] < vals[INDEX["Down_Separation"]] and vals[INDEX["Other_Capability"]] == 1:
-            # Construct follow-up input: Switch Alt_Layer_Value and Two_of_Three_Reports_Valid
-            follow_vals = vals.copy()
-            follow_vals[INDEX["Alt_Layer_Value"]], follow_vals[INDEX["Two_of_Three_Reports_Valid"]] = follow_vals[INDEX["Two_of_Three_Reports_Valid"]], follow_vals[INDEX["Alt_Layer_Value"]]
-            follow_out = run_tcas(follow_vals)
+        # Construct follow-up input
+        follow_vals = vals.copy()
+        follow_vals[INDEX["Two_of_Three_Reports_Valid"]] = not follow_vals[INDEX["Two_of_Three_Reports_Valid"]]  # Changing the state indicating the presence of valid altitude reports
 
-            # Verification
-            self.assertEqual(source_out, follow_out)
+        # Get follow-up output
+        follow_out = run_TCAS(follow_vals)
+
+        # Verification
+        self.assertEqual(source_out, follow_out)
 
 
 if __name__ == "__main__":

@@ -10,25 +10,22 @@ class TestingClass(unittest.TestCase):
         proc.readlines()
         proc.close()
 
-    @parameterized.expand(load_test_cases)
+    @parameterized.expand(load_test_cases(1000))
     def test40(self, vals: list):
-        """Metamorphic Relation 40: If the Up_Separation is less than Down_Separation and high confidence is set to 1, then changing the value of Climb_Inhibit should lead to the same output as changing the value of Other_Capability."""
+        """Metamorphic Relation 40: If the Intruder's altitude changes to be the same as the own aircraft's altitude and the Own_Above_Threat state changes, the TCAS output should change accordingly."""
         # Get source output
-        source_out = run_tcas(vals)
+        source_out = run_TCAS(vals)
 
-        if vals[INDEX["Up_Separation"]] < vals[INDEX["Down_Separation"]] and vals[INDEX["High_Confidence"]] == 1:
-            # Construct follow-up input 1: Changing Climb_Inhibit
-            follow_climb_inhibit_vals = vals.copy()
-            follow_climb_inhibit_vals[INDEX["Climb_Inhibit"]] = 1 - follow_climb_inhibit_vals[INDEX["Climb_Inhibit"]]
-            follow_climb_inhibit_out = run_tcas(follow_climb_inhibit_vals)
+        # Construct follow-up input
+        follow_vals = vals.copy()
+        follow_vals[INDEX["Other_Tracked_Alt"]] = vals[INDEX["Own_Tracked_Alt"]]  # Making the intruder's altitude the same as own aircraft's altitude
+        follow_vals[INDEX["Own_Above_Threat"]] = not follow_vals[INDEX["Own_Above_Threat"]]  # Changing the Own_Above_Threat state
 
-            # Construct follow-up input 2: Changing Other_Capability
-            follow_capability_vals = vals.copy()
-            follow_capability_vals[INDEX["Other_Capability"]] = 1 - follow_capability_vals[INDEX["Other_Capability"]]
-            follow_capability_out = run_tcas(follow_capability_vals)
+        # Get follow-up output
+        follow_out = run_TCAS(follow_vals)
 
-            # Verification
-            self.assertEqual(follow_climb_inhibit_out, follow_capability_out)
+        # Verification
+        self.assertNotEqual(source_out, follow_out)
 
 
 if __name__ == "__main__":

@@ -10,25 +10,21 @@ class TestingClass(unittest.TestCase):
         proc.readlines()
         proc.close()
 
-    @parameterized.expand(load_test_cases)
+    @parameterized.expand(load_test_cases(1000))
     def test38(self, vals: list):
-        """Metamorphic Relation 38: If the Other_Tracked_Alt is greater than Own_Tracked_Alt, then changing the value of High_Confidence should lead to the same output as changing the value of Two_of_Three_Reports_Valid."""
+        """Metamorphic Relation 38: If the Cur_Vertical_Sep and Own_Tracked_Alt values are unchanged and the Other_Tracked_Alt values are doubled, the output should change accordingly."""
         # Get source output
-        source_out = run_tcas(vals)
+        source_out = run_TCAS(vals)
 
-        if vals[INDEX["Other_Tracked_Alt"]] > vals[INDEX["Own_Tracked_Alt"]]:
-            # Construct follow-up input 1: Changing High_Confidence
-            follow_confidence_vals = vals.copy()
-            follow_confidence_vals[INDEX["High_Confidence"]] = 1 - follow_confidence_vals[INDEX["High_Confidence"]]
-            follow_confidence_out = run_tcas(follow_confidence_vals)
+        # Construct follow-up input
+        follow_vals = vals.copy()
+        follow_vals[INDEX["Other_Tracked_Alt"]] *= 2  # Doubling the Other_Tracked_Alt values
 
-            # Construct follow-up input 2: Changing Two_of_Three_Reports_Valid
-            follow_report_vals = vals.copy()
-            follow_report_vals[INDEX["Two_of_Three_Reports_Valid"]] = 1 - follow_report_vals[INDEX["Two_of_Three_Reports_Valid"]]
-            follow_report_out = run_tcas(follow_report_vals)
+        # Get follow-up output
+        follow_out = run_TCAS(follow_vals)
 
-            # Verification
-            self.assertEqual(follow_confidence_out, follow_report_out)
+        # Verification
+        self.assertNotEqual(source_out, follow_out)
 
 
 if __name__ == "__main__":

@@ -10,25 +10,21 @@ class TestingClass(unittest.TestCase):
         proc.readlines()
         proc.close()
 
-    @parameterized.expand(load_test_cases)
+    @parameterized.expand(load_test_cases(1000))
     def test29(self, vals: list):
-        """Metamorphic Relation 29: If the Up_Separation is less than 100, and the High_Confidence is set to 1, then changing the value of Climb_Inhibit should lead to the same output as changing the value of Two_of_Three_Reports_Valid by the same amount."""
+        """Metamorphic Relation 29: If the state indicating the presence of a valid altitude report (Two_of_Three_Reports_Valid) is unchanged, and the Climb_Inhibit parameter changes, the advisories output should remain unchanged."""
         # Get source output
-        source_out = run_tcas(vals)
+        source_out = run_TCAS(vals)
 
-        if vals[INDEX["Up_Separation"]] < 100 and vals[INDEX["High_Confidence"]] == 1:
-            # Construct follow-up input: Change Climb_Inhibit
-            follow_climb_inhibit_vals = vals.copy()
-            follow_climb_inhibit_vals[INDEX["Climb_Inhibit"]] = 1 - follow_climb_inhibit_vals[INDEX["Climb_Inhibit"]]
-            follow_climb_inhibit_out = run_tcas(follow_climb_inhibit_vals)
+        # Construct follow-up input
+        follow_vals = vals.copy()
+        follow_vals[INDEX["Climb_Inhibit"]] = not follow_vals[INDEX["Climb_Inhibit"]]  # Changing the Climb_Inhibit parameter
 
-            # Construct follow-up input: Change Two_of_Three_Reports_Valid
-            follow_two_of_three_vals = vals.copy()
-            follow_two_of_three_vals[INDEX["Two_of_Three_Reports_Valid"]] = 1 - follow_two_of_three_vals[INDEX["Two_of_Three_Reports_Valid"]]
-            follow_two_of_three_out = run_tcas(follow_two_of_three_vals)
+        # Get follow-up output
+        follow_out = run_TCAS(follow_vals)
 
-            # Verification
-            self.assertEqual(follow_climb_inhibit_out, follow_two_of_three_out)
+        # Verification
+        self.assertEqual(source_out, follow_out)
 
 
 if __name__ == "__main__":

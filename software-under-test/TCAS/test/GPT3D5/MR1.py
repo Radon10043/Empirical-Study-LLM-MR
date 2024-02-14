@@ -11,14 +11,15 @@ class TestingClass(unittest.TestCase):
         proc.close()
 
     @parameterized.expand(load_test_cases(1000))
-    def test35(self, vals: list):
-        """Metamorphic Relation 35: If the state variables remain unchanged, the output should remain unchanged."""
+    def test1(self, vals: list):
+        """Metamorphic Relation 1: If the relationship between the Cur_Vertical_Sep and Own_Tracked_Alt is preserved, the output of the TCAS should remain the same."""
         # Get source output
         source_out = run_TCAS(vals)
 
         # Construct follow-up input
         follow_vals = vals.copy()
-        follow_vals[INDEX["State_Variables"]] = follow_vals[INDEX["State_Variables"]]
+        follow_vals[INDEX["Cur_Vertical_Sep"]] *= 2
+        follow_vals[INDEX["Own_Tracked_Alt"]] *= 2
 
         # Get follow-up output
         follow_out = run_TCAS(follow_vals)

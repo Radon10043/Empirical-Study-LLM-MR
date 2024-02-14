@@ -10,19 +10,21 @@ class TestingClass(unittest.TestCase):
         proc.readlines()
         proc.close()
 
-    @parameterized.expand(load_test_cases)
+    @parameterized.expand(load_test_cases(1000))
     def test23(self, vals: list):
-        """Metamorphic Relation 23: If the Up_Separation is less than the Down_Separation, and high confidence is set to 1, and both reports are valid, then the output should not change when Other_RAC is changed."""
+        """Metamorphic Relation 23: If the intruder aircraft's capability changes from being TCAS equipped to not being TCAS equipped, but the own aircraft's altitude and other parameters remain the same, the output should remain the same."""
         # Get source output
-        source_out = run_tcas(vals)
+        source_out = run_TCAS(vals)
 
         # Construct follow-up input
         follow_vals = vals.copy()
-        if vals[INDEX["Up_Separation"]] < vals[INDEX["Down_Separation"]] and vals[INDEX["High_Confidence"]] == 1 and vals[INDEX["Two_of_Three_Reports_Valid"]] == 1:
-            follow_vals[INDEX["Other_RAC"]] = (follow_vals[INDEX["Other_RAC"]] + 1) % len(OTHER_RAC_VALUES)  # Change Other_RAC
+        if follow_vals[INDEX["Other_Capability"]] == OTHER_CAPABILITY_VALUES["TCAS_TA"]:
+            follow_vals[INDEX["Other_Capability"]] = OTHER_CAPABILITY_VALUES["OTHER"]
+        elif follow_vals[INDEX["Other_Capability"]] == OTHER_CAPABILITY_VALUES["OTHER"]:
+            follow_vals[INDEX["Other_Capability"]] = OTHER_CAPABILITY_VALUES["TCAS_TA"]
 
         # Get follow-up output
-        follow_out = run_tcas(follow_vals)
+        follow_out = run_TCAS(follow_vals)
 
         # Verification
         self.assertEqual(source_out, follow_out)

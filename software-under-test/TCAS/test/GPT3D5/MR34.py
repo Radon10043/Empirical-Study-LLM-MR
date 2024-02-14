@@ -10,25 +10,24 @@ class TestingClass(unittest.TestCase):
         proc.readlines()
         proc.close()
 
-    @parameterized.expand(load_test_cases)
+    @parameterized.expand(load_test_cases(1000))
     def test34(self, vals: list):
-        """Metamorphic Relation 34: If the high confidence is set to 1, and the Up_Separation is less than 300, changing the value of Other_RAC should lead to the same output as changing the value of Two_of_Three_Reports_Valid."""
+        """Metamorphic Relation 34: If the other aircraft's intention changes, and the Own_Above_Threat and Own_Below_Threat parameters are preserved, the output should change according to the new intention."""
         # Get source output
-        source_out = run_tcas(vals)
+        source_out = run_TCAS(vals)
 
-        if vals[INDEX["High_Confidence"]] == 1 and vals[INDEX["Up_Separation"]] < 300:
-            # Construct follow-up input 1: Changing Other_RAC
-            follow_rac_vals = vals.copy()
-            follow_rac_vals[INDEX["Other_RAC"]] = (follow_rac_vals[INDEX["Other_RAC"]] + 1) % len(OTHER_RAC_VALUES)
-            follow_rac_out = run_tcas(follow_rac_vals)
+        # Construct follow-up input
+        follow_vals = vals.copy()
+        if vals[INDEX["Other_RAC"]] == 2:  # Assuming a downward intention
+            follow_vals[INDEX["Other_RAC"]] = 1  # Changing the intention to an upward advisory
+        elif vals[INDEX["Other_RAC"]] == 1:  # Assuming an upward intention
+            follow_vals[INDEX["Other_RAC"]] = 2  # Changing the intention to a downward advisory
 
-            # Construct follow-up input 2: Changing Two_of_Three_Reports_Valid
-            follow_two_of_three_vals = vals.copy()
-            follow_two_of_three_vals[INDEX["Two_of_Three_Reports_Valid"]] = 1 - follow_two_of_three_vals[INDEX["Two_of_Three_Reports_Valid"]]
-            follow_two_of_three_out = run_tcas(follow_two_of_three_vals)
+        # Get follow-up output
+        follow_out = run_TCAS(follow_vals)
 
-            # Verification
-            self.assertEqual(follow_rac_out, follow_two_of_three_out)
+        # Verification
+        self.assertNotEqual(source_out, follow_out)
 
 
 if __name__ == "__main__":

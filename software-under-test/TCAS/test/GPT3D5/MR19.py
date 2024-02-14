@@ -10,19 +10,18 @@ class TestingClass(unittest.TestCase):
         proc.readlines()
         proc.close()
 
-    @parameterized.expand(load_test_cases)
+    @parameterized.expand(load_test_cases(1000))
     def test19(self, vals: list):
-        """Metamorphic Relation 19: Given that the Vertical separation is greater than 300, if the Thresh_Vertical_Sep is changed from 0 to 1, the output should not change."""
+        """Metamorphic Relation 19: If the Climb_Inhibit parameter is unchanged, the advisories provided should remain unchanged."""
         # Get source output
-        source_out = run_tcas(vals)
+        source_out = run_TCAS(vals)
 
         # Construct follow-up input
         follow_vals = vals.copy()
-        if vals[INDEX["Cur_Vertical_Sep"]] > 300:
-            follow_vals[INDEX["Thresh_Vertical_Sep"]] = 1
+        follow_vals[INDEX["Climb_Inhibit"]] = follow_vals[INDEX["Climb_Inhibit"]]
 
         # Get follow-up output
-        follow_out = run_tcas(follow_vals)
+        follow_out = run_TCAS(follow_vals)
 
         # Verification
         self.assertEqual(source_out, follow_out)

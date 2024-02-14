@@ -10,25 +10,21 @@ class TestingClass(unittest.TestCase):
         proc.readlines()
         proc.close()
 
-    @parameterized.expand(load_test_cases)
+    @parameterized.expand(load_test_cases(1000))
     def test28(self, vals: list):
-        """Metamorphic Relation 28: If Own_Tracked_Alt is less than Other_Tracked_Alt and the TCAS system of the other aircraft is active, then changing the value of Other_RAC should lead to the same output as changing the value of Two_of_Three_Reports_Valid by the same amount."""
+        """Metamorphic Relation 28: If all inputs remain the same, but the state indicating the presence of valid altitude reports changes, the advisories output should not change."""
         # Get source output
-        source_out = run_tcas(vals)
+        source_out = run_TCAS(vals)
 
-        if vals[INDEX["Own_Tracked_Alt"]] < vals[INDEX["Other_Tracked_Alt"]] and vals[INDEX["Other_Capability"]] == 1:
-            # Construct follow-up input: Change Other_RAC
-            follow_other_rac_vals = vals.copy()
-            follow_other_rac_vals[INDEX["Other_RAC"]] = 1 - follow_other_rac_vals[INDEX["Other_RAC"]]
-            follow_other_rac_out = run_tcas(follow_other_rac_vals)
+        # Construct follow-up input
+        follow_vals = vals.copy()
+        follow_vals[INDEX["Two_of_Three_Reports_Valid"]] = not follow_vals[INDEX["Two_of_Three_Reports_Valid"]]  # Changing the state indicating the presence of valid altitude reports
 
-            # Construct follow-up input: Change Two_of_Three_Reports_Valid
-            follow_two_of_three_vals = vals.copy()
-            follow_two_of_three_vals[INDEX["Two_of_Three_Reports_Valid"]] = 1 - follow_two_of_three_vals[INDEX["Two_of_Three_Reports_Valid"]]
-            follow_two_of_three_out = run_tcas(follow_two_of_three_vals)
+        # Get follow-up output
+        follow_out = run_TCAS(follow_vals)
 
-            # Verification
-            self.assertEqual(follow_other_rac_out, follow_two_of_three_out)
+        # Verification
+        self.assertEqual(source_out, follow_out)
 
 
 if __name__ == "__main__":

@@ -1,24 +1,6 @@
 from utils import *
 
 
-def swap_climb_decision(decision):
-    if decision == 0:
-        return 2
-    elif decision == 2:
-        return 0
-    else:
-        return 1
-
-
-def invert_decision(decision):
-    if decision == 0:
-        return 2
-    elif decision == 2:
-        return 0
-    else:
-        return 1
-
-
 class TestingClass(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -28,21 +10,21 @@ class TestingClass(unittest.TestCase):
         proc.readlines()
         proc.close()
 
-    @parameterized.expand(load_test_cases)
+    @parameterized.expand(load_test_cases(1000))
     def test8(self, vals: list):
-        """Metamorphic Relation 8: If the climb decision is changed to a descend decision, the output should be the inverse (0 becomes 2, 2 becomes 0, 1 remains the same)."""
+        """Metamorphic Relation 8: If the Other_Capability changes, but the Own_Above_Threat and Own_Below_Threat states remain the same, the output should not change."""
         # Get source output
-        source_out = run_tcas(vals)
+        source_out = run_TCAS(vals)
 
         # Construct follow-up input
         follow_vals = vals.copy()
-        follow_vals[INDEX["Climb_Inhibit"]] = swap_climb_decision(follow_vals[INDEX["Climb_Inhibit"]])
+        follow_vals[INDEX["Other_Capability"]] = not follow_vals[INDEX["Other_Capability"]]
 
         # Get follow-up output
-        follow_out = run_tcas(follow_vals)
+        follow_out = run_TCAS(follow_vals)
 
         # Verification
-        self.assertEqual(invert_decision(source_out), follow_out)
+        self.assertEqual(source_out, follow_out)
 
 
 if __name__ == "__main__":

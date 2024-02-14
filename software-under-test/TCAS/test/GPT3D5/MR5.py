@@ -10,18 +10,18 @@ class TestingClass(unittest.TestCase):
         proc.readlines()
         proc.close()
 
-    @parameterized.expand(load_test_cases)
+    @parameterized.expand(load_test_cases(1000))
     def test5(self, vals: list):
-        """Metamorphic Relation 5: If the Cur_Vertical_Sep is decreased by a certain amount, the output should not change."""
+        """Metamorphic Relation 5: If the relationship between Up_Separation and Down_Separation is preserved, the output of the TCAS should remain the same."""
         # Get source output
-        source_out = run_tcas(vals)
+        source_out = run_TCAS(vals)
 
         # Construct follow-up input
         follow_vals = vals.copy()
-        follow_vals[INDEX["Cur_Vertical_Sep"]] -= 100  # Decrease Cur_Vertical_Sep by 100 (or any other suitable amount)
+        follow_vals[INDEX["Up_Separation"]] = follow_vals[INDEX["Down_Separation"]] + 100
 
         # Get follow-up output
-        follow_out = run_tcas(follow_vals)
+        follow_out = run_TCAS(follow_vals)
 
         # Verification
         self.assertEqual(source_out, follow_out)

@@ -10,20 +10,19 @@ class TestingClass(unittest.TestCase):
         proc.readlines()
         proc.close()
 
-    @parameterized.expand(load_test_cases)
+    @parameterized.expand(load_test_cases(1000))
     def test21(self, vals: list):
-        """Metamorphic Relation 21: If Two_of_Three_Reports_Valid is set to 0, and the Up_Separation is less than 300, then changing the value of Climb_Inhibit should not change the output."""
+        """Metamorphic Relation 21: If the inputs from the intruder aircraft (Other_Tracked_Alt, Other_Tracked_Alt_Rate) are halved, the advisories output from the TCAS should remain the same."""
         # Get source output
-        source_out = run_tcas(vals)
+        source_out = run_TCAS(vals)
 
         # Construct follow-up input
         follow_vals = vals.copy()
-        follow_vals[INDEX["Two_of_Three_Reports_Valid"]] = 0
-        if vals[INDEX["Up_Separation"]] < 300:
-            follow_vals[INDEX["Climb_Inhibit"]] = (follow_vals[INDEX["Climb_Inhibit"]] + 1) % 2  # Change Climb_Inhibit
+        follow_vals[INDEX["Other_Tracked_Alt"]] = follow_vals[INDEX["Other_Tracked_Alt"]] / 2
+        follow_vals[INDEX["Other_Tracked_Alt_Rate"]] = follow_vals[INDEX["Other_Tracked_Alt"]] / 2
 
         # Get follow-up output
-        follow_out = run_tcas(follow_vals)
+        follow_out = run_TCAS(follow_vals)
 
         # Verification
         self.assertEqual(source_out, follow_out)

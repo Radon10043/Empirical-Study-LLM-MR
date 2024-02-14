@@ -10,18 +10,18 @@ class TestingClass(unittest.TestCase):
         proc.readlines()
         proc.close()
 
-    @parameterized.expand(load_test_cases)
+    @parameterized.expand(load_test_cases(1000))
     def test14(self, vals: list):
-        """Metamorphic Relation 14: If Own_Tracked_Alt is greater than Other_Tracked_Alt, and the vertical separation is constant, the output should not change."""
+        """Metamorphic Relation 14: If the Cur_Vertical_Sep parameter remains unchanged, the advisory provided should remain the same."""
         # Get source output
-        source_out = run_tcas(vals)
+        source_out = run_TCAS(vals)
 
         # Construct follow-up input
         follow_vals = vals.copy()
-        follow_vals[INDEX["Own_Tracked_Alt"]] = vals[INDEX["Other_Tracked_Alt"]] + 1000  # Set Own_Tracked_Alt greater than Other_Tracked_Alt
+        follow_vals[INDEX["Cur_Vertical_Sep"]] = follow_vals[INDEX["Cur_Vertical_Sep"]]
 
         # Get follow-up output
-        follow_out = run_tcas(follow_vals)
+        follow_out = run_TCAS(follow_vals)
 
         # Verification
         self.assertEqual(source_out, follow_out)

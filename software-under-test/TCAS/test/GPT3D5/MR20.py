@@ -10,22 +10,21 @@ class TestingClass(unittest.TestCase):
         proc.readlines()
         proc.close()
 
-    @parameterized.expand(load_test_cases)
+    @parameterized.expand(load_test_cases(1000))
     def test20(self, vals: list):
-        """Metamorphic Relation 20: If the own aircraft has a climb intention and the other aircraft has a do not climb intention, changing the state of Other_Capability should not change the output."""
+        """Metamorphic Relation 20: If the Other_Tracked_Alt parameter is adjusted based on the relationship with Own_Tracked_Alt, the output should change accordingly."""
         # Get source output
-        source_out = run_tcas(vals)
+        source_out = run_TCAS(vals)
 
         # Construct follow-up input
         follow_vals = vals.copy()
-        if vals[INDEX["Climb_Inhibit"]] == 0 and vals[INDEX["Other_RAC"]] == OTHER_RAC_VALUES["DO_NOT_CLIMB"]:
-            follow_vals[INDEX["Other_Capability"]] = (follow_vals[INDEX["Other_Capability"]] + 1) % 2  # Change Other_Capability
+        follow_vals[INDEX["Other_Tracked_Alt"]] = 2 * follow_vals[INDEX["Own_Tracked_Alt"]]  # Adjusting the Other_Tracked_Alt based on the relationship with Own_Tracked_Alt
 
         # Get follow-up output
-        follow_out = run_tcas(follow_vals)
+        follow_out = run_TCAS(follow_vals)
 
         # Verification
-        self.assertEqual(source_out, follow_out)
+        self.assertNotEqual(source_out, follow_out)
 
 
 if __name__ == "__main__":

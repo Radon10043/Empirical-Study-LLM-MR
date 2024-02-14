@@ -10,20 +10,21 @@ class TestingClass(unittest.TestCase):
         proc.readlines()
         proc.close()
 
-    @parameterized.expand(load_test_cases)
+    @parameterized.expand(load_test_cases(1000))
     def test33(self, vals: list):
-        """Metamorphic Relation 33: If the Other_Tracked_Alt is greater than Own_Tracked_Alt, then changing the reported intruder's RAC value should not change the output."""
+        """Metamorphic Relation 33: If the altitude thresholds for providing a resolution advisory are adjusted while keeping Own_Tracked_Alt and Other_Tracked_Alt unchanged, the output advisory should remain the same."""
         # Get source output
-        source_out = run_tcas(vals)
+        source_out = run_TCAS(vals)
 
-        if vals[INDEX["Other_Tracked_Alt"]] > vals[INDEX["Own_Tracked_Alt"]]:
-            # Construct follow-up input: Change Other_RAC
-            follow_vals = vals.copy()
-            follow_vals[INDEX["Other_RAC"]] = 1 if follow_vals[INDEX["Other_RAC"]] == 0 else 0
-            follow_out = run_tcas(follow_vals)
+        # Construct follow-up input
+        follow_vals = vals.copy()
+        follow_vals[INDEX["ALIM()"]] += 100  # Adjusting the altitude thresholds for resolution advisory
 
-            # Verification
-            self.assertEqual(source_out, follow_out)
+        # Get follow-up output
+        follow_out = run_TCAS(follow_vals)
+
+        # Verification
+        self.assertEqual(source_out, follow_out)
 
 
 if __name__ == "__main__":

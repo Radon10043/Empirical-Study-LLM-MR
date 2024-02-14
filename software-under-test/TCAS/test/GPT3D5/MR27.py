@@ -10,25 +10,21 @@ class TestingClass(unittest.TestCase):
         proc.readlines()
         proc.close()
 
-    @parameterized.expand(load_test_cases)
+    @parameterized.expand(load_test_cases(1000))
     def test27(self, vals: list):
-        """Metamorphic Relation 27: If the TCAS system of the other aircraft is active and the RAC is DO_NOT_DESCEND with high confidence, then changing the value of Two_of_Three_Reports_Valid should lead to the same output as changing the value of Climb_Inhibit by the same amount."""
+        """Metamorphic Relation 27: If the Own_Tracked_Alt_Rate and Other_Tracked_Alt parameters are unchanged, and the state indicating the presence of valid altitude reports changes, the output should not change."""
         # Get source output
-        source_out = run_tcas(vals)
+        source_out = run_TCAS(vals)
 
-        if vals[INDEX["Other_Capability"]] == 1 and vals[INDEX["Other_RAC"]] == 2 and vals[INDEX["High_Confidence"]] == 1:
-            # Construct follow-up input: Change Two_of_Three_Reports_Valid
-            follow_two_of_three_vals = vals.copy()
-            follow_two_of_three_vals[INDEX["Two_of_Three_Reports_Valid"]] = 1 - follow_two_of_three_vals[INDEX["Two_of_Three_Reports_Valid"]]
-            follow_two_of_three_out = run_tcas(follow_two_of_three_vals)
+        # Construct follow-up input
+        follow_vals = vals.copy()
+        follow_vals[INDEX["Two_of_Three_Reports_Valid"]] = not follow_vals[INDEX["Two_of_Three_Reports_Valid"]]  # Changing the state indicating the presence of valid altitude reports
 
-            # Construct follow-up input: Change Climb_Inhibit
-            follow_climb_inhibit_vals = vals.copy()
-            follow_climb_inhibit_vals[INDEX["Climb_Inhibit"]] = 1 - follow_climb_inhibit_vals[INDEX["Climb_Inhibit"]]
-            follow_climb_inhibit_out = run_tcas(follow_climb_inhibit_vals)
+        # Get follow-up output
+        follow_out = run_TCAS(follow_vals)
 
-            # Verification
-            self.assertEqual(follow_two_of_three_out, follow_climb_inhibit_out)
+        # Verification
+        self.assertEqual(source_out, follow_out)
 
 
 if __name__ == "__main__":
