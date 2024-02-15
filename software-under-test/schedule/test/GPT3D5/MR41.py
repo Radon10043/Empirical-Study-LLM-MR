@@ -10,23 +10,23 @@ class TestingClass(unittest.TestCase):
         proc.readlines()
         proc.close()
 
-    # Fix by Radon
-    @parameterized.expand(load_test_cases)
+    @parameterized.expand(load_test_cases(1000))
     def test41(self, job_list: list):
-        """Metamorphic Relation 41: If all jobs are blocked and then a new job is added, the resulting output should be different from the original output."""
+        """Metamorphic Relation 41: The output of blocking and then flushing all processes is the same as flushing all processes and then blocking a process."""
         # Get source output
-        source_op = [SCHEDULE_OPERATIONS["BLOCK"], SCHEDULE_OPERATIONS["BLOCK"], SCHEDULE_OPERATIONS["BLOCK"],
-                    SCHEDULE_OPERATIONS["NEW_JOB"], PRIORITY_LEVEL["HIGH"], SCHEDULE_OPERATIONS["FLUSH"]]
+        source_op = [SCHEDULE_OPERATIONS["NEW_JOB"], PRIORITY_LEVEL["HIGH"], SCHEDULE_OPERATIONS["BLOCK"], SCHEDULE_OPERATIONS["FLUSH"]]
         cmd_list = [SCHEDULE_PATH]
         cmd_list.extend(job_list)
         source_out = subprocess.check_output(cmd_list, input=" ".join(source_op), text=True).split("\n")
 
-        # Construct follow-up input to add a job after blocking all jobs
-        follow_op = [SCHEDULE_OPERATIONS["NEW_JOB"], PRIORITY_LEVEL["HIGH"], SCHEDULE_OPERATIONS["FLUSH"]]
+        # Construct follow-up input
+        follow_op = [SCHEDULE_OPERATIONS["FLUSH"], SCHEDULE_OPERATIONS["NEW_JOB"], PRIORITY_LEVEL["HIGH"], SCHEDULE_OPERATIONS["BLOCK"]]
+
+        # Get follow-up output
         follow_out = subprocess.check_output(cmd_list, input=" ".join(follow_op), text=True).split("\n")
 
         # Verification
-        assert source_out != follow_out
+        self.assertEqual(source_out, follow_out)
 
 
 if __name__ == "__main__":

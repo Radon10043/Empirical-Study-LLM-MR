@@ -10,22 +10,23 @@ class TestingClass(unittest.TestCase):
         proc.readlines()
         proc.close()
 
-    # Fix by Radon
-    @parameterized.expand(load_test_cases)
+    @parameterized.expand(load_test_cases(1000))
     def test36(self, job_list: list):
-        """Metamorphic Relation 36: If a job with the highest priority is upgraded and then a new job is added, the resulting output should be different from the original output."""
+        """Metamorphic Relation 36: The output of upgrading the priority of a process and then flushing all processes is the same as just flushing all processes without upgrading the priority."""
         # Get source output
-        source_op = [SCHEDULE_OPERATIONS["UPGRADE_PRIO"], PRIORITY_LEVEL["HIGH"], SCHEDULE_OPERATIONS["NEW_JOB"], PRIORITY_LEVEL["MEDIUM"], SCHEDULE_OPERATIONS["FLUSH"]]
+        source_op = [SCHEDULE_OPERATIONS["NEW_JOB"], PRIORITY_LEVEL["HIGH"], SCHEDULE_OPERATIONS["UPGRADE_PRIO"], PRIORITY_LEVEL["HIGH"], "0.99999", SCHEDULE_OPERATIONS["FLUSH"]]
         cmd_list = [SCHEDULE_PATH]
         cmd_list.extend(job_list)
         source_out = subprocess.check_output(cmd_list, input=" ".join(source_op), text=True).split("\n")
 
-        # Construct follow-up input to add a new job after upgrading the priority of a job
-        follow_op = [SCHEDULE_OPERATIONS["NEW_JOB"], PRIORITY_LEVEL["MEDIUM"], SCHEDULE_OPERATIONS["UPGRADE_PRIO"], PRIORITY_LEVEL["HIGH"], SCHEDULE_OPERATIONS["FLUSH"]]
+        # Construct follow-up input
+        follow_op = [SCHEDULE_OPERATIONS["FLUSH"], SCHEDULE_OPERATIONS["NEW_JOB"], PRIORITY_LEVEL["HIGH"]]
+
+        # Get follow-up output
         follow_out = subprocess.check_output(cmd_list, input=" ".join(follow_op), text=True).split("\n")
 
         # Verification
-        assert source_out != follow_out
+        self.assertEqual(source_out, follow_out)
 
 
 if __name__ == "__main__":

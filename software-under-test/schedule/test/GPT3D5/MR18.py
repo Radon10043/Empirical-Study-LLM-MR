@@ -10,19 +10,23 @@ class TestingClass(unittest.TestCase):
         proc.readlines()
         proc.close()
 
-    # Fix by Radon
-    @parameterized.expand(load_test_cases)
+    @parameterized.expand(load_test_cases(1000))
     def test18(self, job_list: list):
-        """Metamorphic Relation 18: If two jobs with different priorities are added in sequence and then prioritized such that the order is reversed, the resulting output should remain unchanged."""
+        """Metamorphic Relation 18: The output of flushing all processes is the same as not performing any flushing."""
         # Get source output
-        source_op = [SCHEDULE_OPERATIONS["NEW_JOB"], PRIORITY_LEVEL["HIGH"], SCHEDULE_OPERATIONS["NEW_JOB"], PRIORITY_LEVEL["LOW"],
-                    SCHEDULE_OPERATIONS["UPGRADE_PRIO"], PRIORITY_LEVEL["LOW"], SCHEDULE_OPERATIONS["UPGRADE_PRIO"], PRIORITY_LEVEL["HIGH"], SCHEDULE_OPERATIONS["FLUSH"]]
+        source_op = [SCHEDULE_OPERATIONS["FLUSH"]]
         cmd_list = [SCHEDULE_PATH]
         cmd_list.extend(job_list)
         source_out = subprocess.check_output(cmd_list, input=" ".join(source_op), text=True).split("\n")
 
+        # Construct follow-up input
+        follow_op = []
+
+        # Get follow-up output
+        follow_out = subprocess.check_output(cmd_list, input=" ".join(follow_op), text=True).split("\n")
+
         # Verification
-        assert source_out == subprocess.check_output(cmd_list, input=" ".join(source_op), text=True).split("\n")
+        self.assertEqual(source_out, follow_out)
 
 
 if __name__ == "__main__":

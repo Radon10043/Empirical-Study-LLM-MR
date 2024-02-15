@@ -30,7 +30,7 @@ PRIORITY_LEVEL = {
 
 
 def load_test_cases(num: int) -> list:
-    """读取测试用例
+    """读取所有测试用例
 
     Parameters
     ----------
