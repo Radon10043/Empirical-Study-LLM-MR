@@ -10,20 +10,21 @@ class TestingClass(unittest.TestCase):
         proc.readlines()
         proc.close()
 
-    @parameterized.expand(load_test_cases)
-    def test24(self, job_list: list):
-        """Metamorphic Relation 24: If all jobs are unblocked, the execution order will be adjusted accordingly based on priorities."""
+    # Fixed
+    @parameterized.expand(load_test_cases(1000))
+    def test_metamorphic_relation_24(self, job_list: list):
+        """Metamorphic Relation 24: If the current process is finished and then the scheduler state is flushed, it will have the same result as directly flushing the scheduler state without finishing the process."""
         # Get source output
-        source_op = [SCHEDULE_OPERATIONS["UNBLOCK"]] * len(job_list) + [SCHEDULE_OPERATIONS["FLUSH"]]
+        source_op = SCHEDULE_OPERATIONS["FINISH"] + "\n" + SCHEDULE_OPERATIONS["FLUSH"]
         cmd_list = [SCHEDULE_PATH]
         cmd_list.extend(job_list)
-        source_out = subprocess.check_output(cmd_list, input="\n".join(source_op), text=True).split("\n")
+        source_out = subprocess.check_output(cmd_list, input=source_op, text=True).replace("\n", "")
 
         # Construct follow-up input
-        follow_op = [SCHEDULE_OPERATIONS["FLUSH"]]
+        follow_op = SCHEDULE_OPERATIONS["FLUSH"]
 
         # Get follow-up output
-        follow_out = subprocess.check_output(cmd_list, input="\n".join(follow_op), text=True).split("\n")
+        follow_out = subprocess.check_output(cmd_list, input=follow_op, text=True).replace("\n", "")
 
         # Verification
         self.assertEqual(source_out, follow_out)

@@ -10,23 +10,23 @@ class TestingClass(unittest.TestCase):
         proc.readlines()
         proc.close()
 
-    @parameterized.expand(load_test_cases)
-    def test37(self, job_list: list):
-        """Metamorphic Relation 37: If a job with the lowest priority is finished and another job with the highest priority is finished, the execution order reflects the priority change."""
+    @parameterized.expand(load_test_cases(1000))
+    def test_metamorphic_relation_37(self, job_list: list):
+        """Metamorphic Relation 37: If a process with a specific priority is finished and then moved to the blocked queue, it will have the same result as moving the process to the blocked queue first and then finishing the process."""
         # Get source output
-        source_op = [SCHEDULE_OPERATIONS["FINISH"], SCHEDULE_OPERATIONS["FINISH"], PRIORITY_LEVEL["HIGH"], SCHEDULE_OPERATIONS["FLUSH"]]
+        source_op = SCHEDULE_OPERATIONS["FINISH"] + "\n" + SCHEDULE_OPERATIONS["BLOCK"] + "\n" + SCHEDULE_OPERATIONS["FLUSH"]
         cmd_list = [SCHEDULE_PATH]
         cmd_list.extend(job_list)
-        source_out = subprocess.check_output(cmd_list, input="\n".join(source_op), text=True).split("\n")
+        source_out = subprocess.check_output(cmd_list, input=source_op, text=True).split("\n")
 
         # Construct follow-up input
-        follow_up_op = [SCHEDULE_OPERATIONS["FLUSH"]]
+        follow_op = SCHEDULE_OPERATIONS["BLOCK"] + "\n" + SCHEDULE_OPERATIONS["FINISH"] + "\n" + SCHEDULE_OPERATIONS["FLUSH"]
 
         # Get follow-up output
-        follow_up_out = subprocess.check_output(cmd_list, input="\n".join(follow_up_op), text=True).split("\n")
+        follow_out = subprocess.check_output(cmd_list, input=follow_op, text=True).split("\n")
 
         # Verification
-        self.assertEqual(source_out, follow_up_out)
+        self.assertEqual(source_out, follow_out)
 
 
 if __name__ == "__main__":

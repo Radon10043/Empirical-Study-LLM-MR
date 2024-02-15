@@ -10,34 +10,23 @@ class TestingClass(unittest.TestCase):
         proc.readlines()
         proc.close()
 
-    @parameterized.expand(load_test_cases)
-    def test7(self, job_list: list):
-        """Metamorphic Relation 7: If the job list is modified by adding or removing a job, the execution order remains consistent."""
+    @parameterized.expand(load_test_cases(1000))
+    def test_metamorphic_relation_7(self, job_list: list):
+        """Metamorphic Relation 7: If a process is moved from one priority queue to another and then the scheduler state is flushed, it will have the same result as if the process is directly flushed without moving it."""
         # Get source output
-        source_op = [SCHEDULE_OPERATIONS["NEW_JOB"], PRIORITY_LEVEL["HIGH"], SCHEDULE_OPERATIONS["FLUSH"]]
+        source_op = SCHEDULE_OPERATIONS["NEW_JOB"] + " " + PRIORITY_LEVEL["HIGH"] + "\n" + SCHEDULE_OPERATIONS["UPGRADE_PRIO"] + " " + PRIORITY_LEVEL["HIGH"] + " " + "0.5\n" + SCHEDULE_OPERATIONS["FLUSH"]
         cmd_list = [SCHEDULE_PATH]
         cmd_list.extend(job_list)
-        source_out = subprocess.check_output(cmd_list, input="\n".join(source_op), text=True).split("\n")
+        source_out = subprocess.check_output(cmd_list, input=source_op, text=True).split("\n")
 
-        # Construct follow-up input with one job removed
-        follow_op_remove = [SCHEDULE_OPERATIONS["FLUSH"]]
-        modified_job_list_remove = job_list[:-1]
+        # Construct follow-up input
+        follow_op = SCHEDULE_OPERATIONS["FLUSH"]
 
-        # Get follow-up output with one job removed
-        follow_out_remove = subprocess.check_output(cmd_list, input="\n".join(follow_op_remove), text=True).split("\n")
+        # Get follow-up output
+        follow_out = subprocess.check_output(cmd_list, input=follow_op, text=True).split("\n")
 
-        # Verification for job removal
-        self.assertEqual(source_out, follow_out_remove)
-
-        # Construct follow-up input with one job added
-        follow_op_add = [SCHEDULE_OPERATIONS["NEW_JOB"], PRIORITY_LEVEL["MEDIUM"], SCHEDULE_OPERATIONS["FLUSH"]]
-        modified_job_list_add = job_list + [PRIORITY_LEVEL["MEDIUM"]]
-
-        # Get follow-up output with one job added
-        follow_out_add = subprocess.check_output(cmd_list, input="\n".join(follow_op_add), text=True).split("\n")
-
-        # Verification for job addition
-        self.assertEqual(source_out, follow_out_add)
+        # Verification
+        self.assertEqual(source_out, follow_out)
 
 
 if __name__ == "__main__":

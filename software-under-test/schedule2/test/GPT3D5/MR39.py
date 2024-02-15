@@ -10,23 +10,23 @@ class TestingClass(unittest.TestCase):
         proc.readlines()
         proc.close()
 
-    @parameterized.expand(load_test_cases)
-    def test39(self, job_list: list):
-        """Metamorphic Relation 39: If all jobs are upgraded to the same priority level, the execution order remains unchanged."""
+    @parameterized.expand(load_test_cases(1000))
+    def test_metamorphic_relation_39(self, job_list: list):
+        """Metamorphic Relation 39: If a process is unblocked and then finished, it will have the same result as finishing the process first and then unblocking it."""
         # Get source output
-        source_op = [SCHEDULE_OPERATIONS["UPGRADE_PRIO"], PRIORITY_LEVEL["MEDIUM"]] * len(job_list) + [SCHEDULE_OPERATIONS["FLUSH"]]
+        source_op = SCHEDULE_OPERATIONS["UNBLOCK"] + "\n" + SCHEDULE_OPERATIONS["FINISH"] + "\n" + SCHEDULE_OPERATIONS["FLUSH"]
         cmd_list = [SCHEDULE_PATH]
         cmd_list.extend(job_list)
-        source_out = subprocess.check_output(cmd_list, input="\n".join(source_op), text=True).split("\n")
+        source_out = subprocess.check_output(cmd_list, input=source_op, text=True).split("\n")
 
         # Construct follow-up input
-        follow_up_op = [SCHEDULE_OPERATIONS["FLUSH"]]
+        follow_op = SCHEDULE_OPERATIONS["FINISH"] + "\n" + SCHEDULE_OPERATIONS["UNBLOCK"] + "\n" + SCHEDULE_OPERATIONS["FLUSH"]
 
         # Get follow-up output
-        follow_up_out = subprocess.check_output(cmd_list, input="\n".join(follow_up_op), text=True).split("\n")
+        follow_out = subprocess.check_output(cmd_list, input=follow_op, text=True).split("\n")
 
         # Verification
-        self.assertEqual(source_out, follow_up_out)
+        self.assertEqual(source_out, follow_out)
 
 
 if __name__ == "__main__":
