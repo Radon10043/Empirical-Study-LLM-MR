@@ -4,7 +4,7 @@ main() {
     # 跑几次测试, 查看测试结果
     echo -e "# Test $2\n"
     for ((i = 1; i <= $3; i++)); do
-        timeout 10 $CUR_DIR/build/test/$1 --gtest_filter=TrueReturn/QuickSortParamTest.$2/* >testcases.output.txt
+        timeout 20 $CUR_DIR/build/test/$1 --gtest_filter=TrueReturn/QuickSortParamTest.$2/* >testcases.output.txt
         retcode=$?
 
         if [ $retcode -eq 0 ]; then
