@@ -10,20 +10,20 @@ class TestingClass(unittest.TestCase):
         proc.readlines()
         proc.close()
 
-    @parameterized.expand(load_test_cases)
-    def test9(self, job_list: list):
-        """Metamorphic Relation 9: If all jobs in the list are blocked, the execution order remains unchanged."""
+    @parameterized.expand(load_test_cases(1000))
+    def test_metamorphic_relation_9(self, job_list: list):
+        """Metamorphic Relation 9: If a process is added to the scheduler and then the scheduler state is flushed, it will have the same result as adding the process after flushing the scheduler state."""
         # Get source output
-        source_op = [SCHEDULE_OPERATIONS["BLOCK"]] * len(job_list) + [SCHEDULE_OPERATIONS["FLUSH"]]
+        source_op = SCHEDULE_OPERATIONS["FLUSH"]
         cmd_list = [SCHEDULE_PATH]
         cmd_list.extend(job_list)
-        source_out = subprocess.check_output(cmd_list, input="\n".join(source_op), text=True).split("\n")
+        source_out = subprocess.check_output(cmd_list, input=source_op, text=True).split("\n")
 
         # Construct follow-up input
-        follow_op = [SCHEDULE_OPERATIONS["FLUSH"]]
+        follow_op = SCHEDULE_OPERATIONS["NEW_JOB"] + " " + PRIORITY_LEVEL["HIGH"] + "\n" + SCHEDULE_OPERATIONS["FLUSH"]
 
         # Get follow-up output
-        follow_out = subprocess.check_output(cmd_list, input="\n".join(follow_op), text=True).split("\n")
+        follow_out = subprocess.check_output(cmd_list, input=follow_op, text=True).split("\n")
 
         # Verification
         self.assertEqual(source_out, follow_out)

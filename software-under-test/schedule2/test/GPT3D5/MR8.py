@@ -10,21 +10,20 @@ class TestingClass(unittest.TestCase):
         proc.readlines()
         proc.close()
 
-    @parameterized.expand(load_test_cases)
-    def test8(self, job_list: list):
-        """Metamorphic Relation 8: If all jobs are upgraded to a higher priority level, the execution order reflects the priority change."""
+    @parameterized.expand(load_test_cases(1000))
+    def test_metamorphic_relation_8(self, job_list: list):
+        """Metamorphic Relation 8: The order of adding new jobs with different priorities into the scheduler followed by the 'FLUSH' operation should not affect the final output."""
         # Get source output
-        source_op = [SCHEDULE_OPERATIONS["UPGRADE_PRIO"], PRIORITY_LEVEL["HIGH"]] * len(job_list)
-        source_op.append(SCHEDULE_OPERATIONS["FLUSH"])
+        source_op = SCHEDULE_OPERATIONS["NEW_JOB"] + " " + PRIORITY_LEVEL["HIGH"] + "\n" + SCHEDULE_OPERATIONS["NEW_JOB"] + " " + PRIORITY_LEVEL["MEDIUM"] + "\n" + SCHEDULE_OPERATIONS["NEW_JOB"] + " " + PRIORITY_LEVEL["LOW"] + "\n" + SCHEDULE_OPERATIONS["FLUSH"]
         cmd_list = [SCHEDULE_PATH]
         cmd_list.extend(job_list)
-        source_out = subprocess.check_output(cmd_list, input="\n".join(source_op), text=True).split("\n")
+        source_out = subprocess.check_output(cmd_list, input=source_op, text=True).split("\n")
 
         # Construct follow-up input
-        follow_op = [SCHEDULE_OPERATIONS["FLUSH"]]
+        follow_op = SCHEDULE_OPERATIONS["NEW_JOB"] + " " + PRIORITY_LEVEL["LOW"] + "\n" + SCHEDULE_OPERATIONS["NEW_JOB"] + " " + PRIORITY_LEVEL["HIGH"] + "\n" + SCHEDULE_OPERATIONS["NEW_JOB"] + " " + PRIORITY_LEVEL["MEDIUM"] + "\n" + SCHEDULE_OPERATIONS["FLUSH"]
 
         # Get follow-up output
-        follow_out = subprocess.check_output(cmd_list, input="\n".join(follow_op), text=True).split("\n")
+        follow_out = subprocess.check_output(cmd_list, input=follow_op, text=True).split("\n")
 
         # Verification
         self.assertEqual(source_out, follow_out)

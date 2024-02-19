@@ -11,16 +11,18 @@ class TestingClass(unittest.TestCase):
         proc.close()
 
     @parameterized.expand(load_test_cases(1000))
-    def test_metamorphic_relation_25(self, job_list: list):
-        """Metamorphic Relation 25: The result of flushing the scheduler state followed by expiring the quantum for the current process will be the same as expiring the quantum first and then flushing the scheduler state."""
+    def test2(self, job_list: list):
+        """Metamorphic Relation 2: Two different sets of operations: The first is adding one job at the end of the
+        queue with high priority, while the second is adding one job at the end of the queue with medium priority,
+        and then moving it to the queue with high priority. They will output the same."""
         # Get source output
-        source_op = SCHEDULE_OPERATIONS["FLUSH"] + "\n" + SCHEDULE_OPERATIONS["QUANTUM_EXPIRE"] + "\n" + SCHEDULE_OPERATIONS["FLUSH"]
+        source_op = SCHEDULE_OPERATIONS["NEW_JOB"] + " " + PRIORITY_LEVEL["HIGH"] + "\n" + SCHEDULE_OPERATIONS["FLUSH"]
         cmd_list = [SCHEDULE_PATH]
         cmd_list.extend(job_list)
         source_out = subprocess.check_output(cmd_list, input=source_op, text=True).split("\n")
 
         # Construct follow-up input
-        follow_op = SCHEDULE_OPERATIONS["QUANTUM_EXPIRE"] + "\n" + SCHEDULE_OPERATIONS["FLUSH"]
+        follow_op = SCHEDULE_OPERATIONS["NEW_JOB"] + " " + PRIORITY_LEVEL["MEDIUM"] + "\n" + SCHEDULE_OPERATIONS["UPGRADE_PRIO"] + " " + PRIORITY_LEVEL["MEDIUM"] + " " + "0.99999\n" + SCHEDULE_OPERATIONS["FLUSH"]
 
         # Get follow-up output
         follow_out = subprocess.check_output(cmd_list, input=follow_op, text=True).split("\n")

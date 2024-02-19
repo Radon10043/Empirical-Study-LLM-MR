@@ -10,20 +10,20 @@ class TestingClass(unittest.TestCase):
         proc.readlines()
         proc.close()
 
-    @parameterized.expand(load_test_cases)
-    def test16(self, job_list: list):
-        """Metamorphic Relation 16: If all jobs are terminated and then new jobs are added, the execution order is based on the new jobs."""
+    @parameterized.expand(load_test_cases(1000))
+    def test_metamorphic_relation_16(self, job_list: list):
+        """Metamorphic Relation 16: The flushing of the scheduler state followed by adding a new job with a specific priority will have the same result as adding the new job and then flushing the scheduler state."""
         # Get source output
-        source_op = [SCHEDULE_OPERATIONS["FINISH"]] * len(job_list) + [SCHEDULE_OPERATIONS["NEW_JOB"], PRIORITY_LEVEL["HIGH"], SCHEDULE_OPERATIONS["FLUSH"]]
+        source_op = SCHEDULE_OPERATIONS["FLUSH"] + "\n" + SCHEDULE_OPERATIONS["NEW_JOB"] + " " + PRIORITY_LEVEL["HIGH"]
         cmd_list = [SCHEDULE_PATH]
         cmd_list.extend(job_list)
-        source_out = subprocess.check_output(cmd_list, input="\n".join(source_op), text=True).split("\n")
+        source_out = subprocess.check_output(cmd_list, input=source_op, text=True).split("\n")
 
         # Construct follow-up input
-        follow_op = [SCHEDULE_OPERATIONS["FLUSH"]]
+        follow_op = SCHEDULE_OPERATIONS["NEW_JOB"] + " " + PRIORITY_LEVEL["HIGH"] + "\n" + SCHEDULE_OPERATIONS["FLUSH"]
 
         # Get follow-up output
-        follow_out = subprocess.check_output(cmd_list, input="\n".join(follow_op), text=True).split("\n")
+        follow_out = subprocess.check_output(cmd_list, input=follow_op, text=True).split("\n")
 
         # Verification
         self.assertEqual(source_out, follow_out)

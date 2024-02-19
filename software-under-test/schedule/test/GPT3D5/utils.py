@@ -29,15 +29,20 @@ PRIORITY_LEVEL = {
 # ==========================================================
 
 
-def load_test_cases() -> list:
-    """读取所有测试用例
+def load_test_cases(num: int) -> list:
+    """读取测试用例
+
+    Parameters
+    ----------
+    num : int
+        测试用例数量
 
     Returns
     -------
     list
         存储测试用例的列表
     """
-    gen_tcs_randomly()
+    gen_tcs_randomly(num)
 
     tcs_dir = os.path.join(os.path.dirname(__file__), "..", "..", "testcases")
     tcs = list()

@@ -1,4 +1,20 @@
 ```python
+SCHEDULE_OPERATIONS = {
+    "NEW_JOB"       : "1",
+    "UPGRADE_PRIO"  : "2",
+    "BLOCK"         : "3",
+    "UNBLOCK"       : "4",
+    "QUANTUM_EXPIRE": "5",
+    "FINISH"        : "6",
+    "FLUSH"         : "7"
+}
+
+PRIORITY_LEVEL = {
+    "HIGH"  : "3",
+    "MEDIUM": "2",
+    "LOW"   : "1"
+}
+
 @parameterized.expand(load_test_cases)
 def test1(self, job_list: list):
     """Metamorphic Relation 1: If the size of a job-list is 1, then the operation that moving the job at the top of this list to the end will not affect the output."""

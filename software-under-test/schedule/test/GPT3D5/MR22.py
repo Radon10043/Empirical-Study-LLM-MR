@@ -10,26 +10,23 @@ class TestingClass(unittest.TestCase):
         proc.readlines()
         proc.close()
 
-    # Fix by Radon
-    @parameterized.expand(load_test_cases)
+    @parameterized.expand(load_test_cases(1000))
     def test22(self, job_list: list):
-        """Metamorphic Relation 22: If all jobs are finished and then a job is added with the highest priority, the resulting output should be the same as if the job was added first and then all other jobs were finished."""
+        """Metamorphic Relation 22: The output of adding a new process and then upgrading its priority is the same as upgrading the priority of the same process without adding it."""
         # Get source output
-        source_op = [SCHEDULE_OPERATIONS["FINISH"], SCHEDULE_OPERATIONS["FINISH"], SCHEDULE_OPERATIONS["FINISH"],
-                    SCHEDULE_OPERATIONS["NEW_JOB"], PRIORITY_LEVEL["HIGH"], SCHEDULE_OPERATIONS["FLUSH"]]
+        source_op = [SCHEDULE_OPERATIONS["NEW_JOB"], PRIORITY_LEVEL["HIGH"], SCHEDULE_OPERATIONS["UPGRADE_PRIO"], PRIORITY_LEVEL["HIGH"], "0.99999", SCHEDULE_OPERATIONS["FLUSH"]]
         cmd_list = [SCHEDULE_PATH]
         cmd_list.extend(job_list)
         source_out = subprocess.check_output(cmd_list, input=" ".join(source_op), text=True).split("\n")
 
-        # Construct follow-up input to add a job with the highest priority first, and then finish all jobs
-        follow_op = [SCHEDULE_OPERATIONS["NEW_JOB"], PRIORITY_LEVEL["HIGH"],
-                    SCHEDULE_OPERATIONS["FINISH"], SCHEDULE_OPERATIONS["FINISH"], SCHEDULE_OPERATIONS["FINISH"], SCHEDULE_OPERATIONS["FLUSH"]]
+        # Construct follow-up input
+        follow_op = [SCHEDULE_OPERATIONS["NEW_JOB"], PRIORITY_LEVEL["HIGH"], SCHEDULE_OPERATIONS["FLUSH"], SCHEDULE_OPERATIONS["UPGRADE_PRIO"], PRIORITY_LEVEL["HIGH"], "0.99999"]
 
         # Get follow-up output
         follow_out = subprocess.check_output(cmd_list, input=" ".join(follow_op), text=True).split("\n")
 
         # Verification
-        assert source_out == follow_out
+        self.assertEqual(source_out, follow_out)
 
 
 if __name__ == "__main__":

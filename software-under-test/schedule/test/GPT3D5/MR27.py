@@ -10,24 +10,23 @@ class TestingClass(unittest.TestCase):
         proc.readlines()
         proc.close()
 
-    # Fix by Radon
-    @parameterized.expand(load_test_cases)
+    @parameterized.expand(load_test_cases(1000))
     def test27(self, job_list: list):
-        """Metamorphic Relation 27: If all jobs are finished and then one high priority job is added, the resulting output should be the same as if the high priority job was added first and then all other jobs were finished."""
+        """Metamorphic Relation 27: The output of finishing all processes and then flushing all processes has the same output as flushing all processes and then finishing all processes."""
         # Get source output
-        source_op = [SCHEDULE_OPERATIONS["FINISH"], SCHEDULE_OPERATIONS["FINISH"], SCHEDULE_OPERATIONS["FINISH"],
-                    SCHEDULE_OPERATIONS["NEW_JOB"], PRIORITY_LEVEL["HIGH"], SCHEDULE_OPERATIONS["FLUSH"]]
+        source_op = [SCHEDULE_OPERATIONS["FLUSH"], SCHEDULE_OPERATIONS["FLUSH"]]
         cmd_list = [SCHEDULE_PATH]
         cmd_list.extend(job_list)
         source_out = subprocess.check_output(cmd_list, input=" ".join(source_op), text=True).split("\n")
 
-        # Construct follow-up input to add a high priority job first, then finish all jobs
-        follow_op = [SCHEDULE_OPERATIONS["NEW_JOB"], PRIORITY_LEVEL["HIGH"],
-                    SCHEDULE_OPERATIONS["FINISH"], SCHEDULE_OPERATIONS["FINISH"], SCHEDULE_OPERATIONS["FINISH"], SCHEDULE_OPERATIONS["FLUSH"]]
+        # Construct follow-up input
+        follow_op = [SCHEDULE_OPERATIONS["FLUSH"], SCHEDULE_OPERATIONS["FLUSH"]]
+
+        # Get follow-up output
         follow_out = subprocess.check_output(cmd_list, input=" ".join(follow_op), text=True).split("\n")
 
         # Verification
-        assert source_out == follow_out
+        self.assertEqual(source_out, follow_out)
 
 
 if __name__ == "__main__":

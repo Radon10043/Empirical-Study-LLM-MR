@@ -10,20 +10,20 @@ class TestingClass(unittest.TestCase):
         proc.readlines()
         proc.close()
 
-    @parameterized.expand(load_test_cases)
-    def test5(self, job_list: list):
-        """Metamorphic Relation 5: If a job is finished and another job with higher priority becomes ready, the execution order reflects the priority change."""
+    @parameterized.expand(load_test_cases(1000))
+    def test_metamorphic_relation_5(self, job_list: list):
+        """Metamorphic Relation 5: If a quantum expires for the current process and then the process is finished, it will have the same result as if the process is finished without expiring the quantum first."""
         # Get source output
-        source_op = [SCHEDULE_OPERATIONS["FINISH"], SCHEDULE_OPERATIONS["NEW_JOB"], PRIORITY_LEVEL["HIGH"], SCHEDULE_OPERATIONS["FLUSH"]]
+        source_op = SCHEDULE_OPERATIONS["QUANTUM_EXPIRE"] + "\n" + SCHEDULE_OPERATIONS["FINISH"] + "\n" + SCHEDULE_OPERATIONS["FLUSH"]
         cmd_list = [SCHEDULE_PATH]
         cmd_list.extend(job_list)
-        source_out = subprocess.check_output(cmd_list, input="\n".join(source_op), text=True).split("\n")
+        source_out = subprocess.check_output(cmd_list, input=source_op, text=True).split("\n")
 
         # Construct follow-up input
-        follow_op = [SCHEDULE_OPERATIONS["FLUSH"]]
+        follow_op = SCHEDULE_OPERATIONS["FINISH"] + "\n" + SCHEDULE_OPERATIONS["FLUSH"]
 
         # Get follow-up output
-        follow_out = subprocess.check_output(cmd_list, input="\n".join(follow_op), text=True).split("\n")
+        follow_out = subprocess.check_output(cmd_list, input=follow_op, text=True).split("\n")
 
         # Verification
         self.assertEqual(source_out, follow_out)

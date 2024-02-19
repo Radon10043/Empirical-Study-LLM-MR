@@ -7,7 +7,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 from generate import *
 
 # ==================== GLOBAL VRAIABLES ====================
-SCHEDULE_PATH = os.path.join(os.path.dirname(__file__), "..", "..", "src", "schedule2.out")
+SCHEDULE_PATH = os.path.join(os.path.dirname(__file__), "..", "..", "src", "schedule.out")
 
 # fmt:off
 SCHEDULE_OPERATIONS = {
@@ -30,7 +30,7 @@ PRIORITY_LEVEL = {
 
 
 def load_test_cases(num: int) -> list:
-    """读取测试用例
+    """读取所有测试用例
 
     Parameters
     ----------

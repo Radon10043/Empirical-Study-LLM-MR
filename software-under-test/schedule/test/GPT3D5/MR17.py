@@ -10,18 +10,23 @@ class TestingClass(unittest.TestCase):
         proc.readlines()
         proc.close()
 
-    # Fix by Radon
-    @parameterized.expand(load_test_cases)
+    @parameterized.expand(load_test_cases(1000))
     def test17(self, job_list: list):
-        """Metamorphic Relation 17: If a job with the highest priority is blocked and then unblocked, the resulting output should be the same as the original output."""
+        """Metamorphic Relation 17: The output of adding a new process is the same as not adding any process at all."""
         # Get source output
-        source_op = [SCHEDULE_OPERATIONS["BLOCK"], SCHEDULE_OPERATIONS["UNBLOCK"], SCHEDULE_OPERATIONS["FLUSH"]]
+        source_op = [SCHEDULE_OPERATIONS["NEW_JOB"], PRIORITY_LEVEL["HIGH"], SCHEDULE_OPERATIONS["FLUSH"]]
         cmd_list = [SCHEDULE_PATH]
         cmd_list.extend(job_list)
         source_out = subprocess.check_output(cmd_list, input=" ".join(source_op), text=True).split("\n")
 
+        # Construct follow-up input
+        follow_op = [SCHEDULE_OPERATIONS["FLUSH"]]
+
+        # Get follow-up output
+        follow_out = subprocess.check_output(cmd_list, input=" ".join(follow_op), text=True).split("\n")
+
         # Verification
-        assert source_out == subprocess.check_output(cmd_list, input=" ".join(source_op), text=True).split("\n")
+        self.assertEqual(source_out, follow_out)
 
 
 if __name__ == "__main__":
