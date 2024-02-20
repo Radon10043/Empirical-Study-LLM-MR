@@ -13,1080 +13,984 @@ import src.MealOrderingSystem;
 
 public class MOSTestGPT3D5 {
 
+    public boolean MSREquals(MSR msr1, MSR msr2) {
+        return msr1.numberOfFirstClassMeals == msr2.numberOfFirstClassMeals
+                && msr1.numberOfBusinessClassMeals == msr2.numberOfBusinessClassMeals
+                && msr1.numberOfEconomicClassMeals == msr2.numberOfEconomicClassMeals
+                && msr1.numberOfMealsForCrewMembers == msr2.numberOfMealsForCrewMembers
+                && msr1.numberOfMealsForPilots == msr2.numberOfMealsForPilots
+                && msr1.numberOfChildMeals == msr2.numberOfChildMeals
+                && msr1.numberOfBundlesOfFlowers == msr2.numberOfBundlesOfFlowers;
+    }
+
     /**
-     * Metamorphic Relation 2: change in the number of crew members should not
-     * change the total
-     * number of meals for crew members.
+     * Metamorphic Relation 1: The MSR output should be the same regardless of the order of crew member and pilot changes.
+     */
+    @ParameterizedTest
+    @MethodSource("testcaseProvider")
+    public void test1(String aircraftmodel, String changeinthenumberofcrewmembers,
+            int newnumberofcrewmembers, String changeinthenumberofpilots, int newnumberofpilots,
+            int numberofchildpassengers, int numberofrequestedbundlesofflowers) {   // Fixed
+        /* Get source output */
+        MealOrderingSystem MOS = new MealOrderingSystem();
+        MSR source_out = MOS.generateMSR(aircraftmodel, changeinthenumberofcrewmembers,
+                newnumberofcrewmembers, changeinthenumberofpilots, newnumberofpilots,
+                numberofchildpassengers, numberofrequestedbundlesofflowers);
+
+        /* Get follow-up output with reversed changes in crew members and pilots */
+        MSR follow_out = MOS.generateMSR(aircraftmodel, changeinthenumberofpilots, newnumberofpilots,
+                changeinthenumberofcrewmembers, newnumberofcrewmembers, numberofchildpassengers,
+                numberofrequestedbundlesofflowers);
+
+        /* Verification */
+        assertTrue(MSREquals(source_out, follow_out));
+    }
+
+    /**
+     * Metamorphic Relation 2: If the number of child passengers doubles, the total number of child meals in the MSR output should also double.
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
     public void test2(String aircraftmodel, String changeinthenumberofcrewmembers,
             int newnumberofcrewmembers, String changeinthenumberofpilots, int newnumberofpilots,
-            int numberofchildpassengers, int numberofrequestedbundlesofflowers) {
-        // Get source output
+            int numberofchildpassengers, int numberofrequestedbundlesofflowers) {   // Fixed
+        /* Get source output */
         MealOrderingSystem MOS = new MealOrderingSystem();
         MSR source_out = MOS.generateMSR(aircraftmodel, changeinthenumberofcrewmembers,
                 newnumberofcrewmembers, changeinthenumberofpilots, newnumberofpilots,
                 numberofchildpassengers, numberofrequestedbundlesofflowers);
 
-        // Construct follow-up input
-        int follow_newnumberofcrewmembers = newnumberofcrewmembers + 5; // Change in the number of
-                                                                        // crew members
+        /* Construct follow-up input */
+        int follow_numberofchildpassengers = numberofchildpassengers * 2;
 
-        // Get follow-up output
-        MSR follow_out = MOS.generateMSR(aircraftmodel, "y", follow_newnumberofcrewmembers,
-                changeinthenumberofpilots, newnumberofpilots, numberofchildpassengers,
-                numberofrequestedbundlesofflowers);
+        /* Get follow-up output */
+        MSR follow_out = MOS.generateMSR(aircraftmodel, changeinthenumberofcrewmembers,
+                newnumberofcrewmembers, changeinthenumberofpilots, newnumberofpilots,
+                follow_numberofchildpassengers, numberofrequestedbundlesofflowers);
 
-        // Verification
-        assertEquals(source_out.numberOfMealsForCrewMembers,
-                follow_out.numberOfMealsForCrewMembers);
+        /* Verification */
+        assertEquals(source_out.numberOfChildMeals * 2, follow_out.numberOfChildMeals);
+    }
+
+    int getTotalMeals(MSR msr) {
+        return msr.numberOfBusinessClassMeals + msr.numberOfEconomicClassMeals + msr.numberOfFirstClassMeals + msr.numberOfChildMeals
+                + msr.numberOfMealsForCrewMembers + msr.numberOfMealsForPilots;
     }
 
     /**
-     * Metamorphic Relation 3: the number of meals for different classes should be
-     * proportional to
-     * the respective number of seats for each class.
+     * Metamorphic Relation 3: For the same aircraft model and crew member/pilot changes, the total number of meals in the MSR output should always be greater than or equal to the total number of crew member and pilot meals.
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
     public void test3(String aircraftmodel, String changeinthenumberofcrewmembers,
             int newnumberofcrewmembers, String changeinthenumberofpilots, int newnumberofpilots,
-            int numberofchildpassengers, int numberofrequestedbundlesofflowers) {
-        // Get source output
+            int numberofchildpassengers, int numberofrequestedbundlesofflowers) {   // Fixed
+        /* Get source output */
         MealOrderingSystem MOS = new MealOrderingSystem();
         MSR source_out = MOS.generateMSR(aircraftmodel, changeinthenumberofcrewmembers,
                 newnumberofcrewmembers, changeinthenumberofpilots, newnumberofpilots,
                 numberofchildpassengers, numberofrequestedbundlesofflowers);
 
-        // Calculate the expected number of meals for each class based on the number of
-        // seats
-        int expectedNumberOfFirstClassMeals = source_out.numberOfFirstClassMeals;
-        int expectedNumberOfBusinessClassMeals = source_out.numberOfBusinessClassMeals;
-        int expectedNumberOfEconomicClassMeals = source_out.numberOfEconomicClassMeals;
+        int totalMeals = getTotalMeals(source_out);
 
-        if (aircraftmodel.equals("747200")) {
-            expectedNumberOfFirstClassMeals = 0;
-        } else if (aircraftmodel.equals("747300")) {
-            expectedNumberOfFirstClassMeals = 5 * 2;
-            expectedNumberOfBusinessClassMeals = 25 * 2;
-            expectedNumberOfEconomicClassMeals = 200 * 2;
-        } else if (aircraftmodel.equals("747400")) {
-            expectedNumberOfFirstClassMeals = 10 * 2;
-            expectedNumberOfBusinessClassMeals = 30 * 2;
-            expectedNumberOfEconomicClassMeals = 240 * 2;
-        } else if (aircraftmodel.equals("000200")) {
-            expectedNumberOfBusinessClassMeals = 35 * 2;
-            expectedNumberOfEconomicClassMeals = 210 * 2;
-        } else if (aircraftmodel.equals("000300")) {
-            expectedNumberOfFirstClassMeals = 10 * 2;
-            expectedNumberOfBusinessClassMeals = 40 * 2;
-            expectedNumberOfEconomicClassMeals = 215 * 2;
-        }
-
-        // Verification
-        assertEquals(expectedNumberOfFirstClassMeals, source_out.numberOfFirstClassMeals);
-        assertEquals(expectedNumberOfBusinessClassMeals, source_out.numberOfBusinessClassMeals);
-        assertEquals(expectedNumberOfEconomicClassMeals, source_out.numberOfEconomicClassMeals);
+        /* Verification */
+        assertTrue(totalMeals >= (source_out.numberOfMealsForCrewMembers + source_out.numberOfMealsForPilots));
     }
 
     /**
-     * Metamorphic Relation 4: Increasing the number of child passengers should
-     * increase the number
-     * of child meals proportionally.
+     * Metamorphic Relation 4: If the number of requested bundles of flowers increases, the difference in the total number of meals between source and follow-up outputs should be no less than the increase in the number of requested bundles of flowers.
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
     public void test4(String aircraftmodel, String changeinthenumberofcrewmembers,
             int newnumberofcrewmembers, String changeinthenumberofpilots, int newnumberofpilots,
-            int numberofchildpassengers, int numberofrequestedbundlesofflowers) {
-        // Get source output
+            int numberofchildpassengers, int numberofrequestedbundlesofflowers) {   // Fixed
+        /* Get source output */
         MealOrderingSystem MOS = new MealOrderingSystem();
         MSR source_out = MOS.generateMSR(aircraftmodel, changeinthenumberofcrewmembers,
                 newnumberofcrewmembers, changeinthenumberofpilots, newnumberofpilots,
                 numberofchildpassengers, numberofrequestedbundlesofflowers);
 
-        // Increase the number of child passengers
-        int increasedNumberOfChildPassengers = numberofchildpassengers + 5;
+        /* Construct follow-up input */
+        int follow_numberofrequestedbundlesofflowers = numberofrequestedbundlesofflowers + 1;
 
-        // Get follow-up output
+        /* Get follow-up output */
         MSR follow_out = MOS.generateMSR(aircraftmodel, changeinthenumberofcrewmembers,
                 newnumberofcrewmembers, changeinthenumberofpilots, newnumberofpilots,
-                increasedNumberOfChildPassengers, numberofrequestedbundlesofflowers);
+                numberofchildpassengers, follow_numberofrequestedbundlesofflowers);
 
-        // Verification
-        assertEquals(increasedNumberOfChildPassengers * 2, follow_out.numberOfChildMeals);
+        int source_totalMeals = getTotalMeals(source_out);
+        int follow_totalMeals = getTotalMeals(follow_out);
+
+        /* Verification */
+        assertTrue((source_totalMeals - follow_totalMeals) >= (follow_numberofrequestedbundlesofflowers - numberofrequestedbundlesofflowers));
     }
 
     /**
-     * Metamorphic Relation 5: Doubling the number of pilots should double the
-     * number of meals for
-     * pilots.
+     * Metamorphic Relation 5: If the number of crew members increases, the total number of crew member meals in the MSR output should increase by the same amount.
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
     public void test5(String aircraftmodel, String changeinthenumberofcrewmembers,
             int newnumberofcrewmembers, String changeinthenumberofpilots, int newnumberofpilots,
             int numberofchildpassengers, int numberofrequestedbundlesofflowers) {
-        // Get source output
+        /* Get source output */
         MealOrderingSystem MOS = new MealOrderingSystem();
         MSR source_out = MOS.generateMSR(aircraftmodel, changeinthenumberofcrewmembers,
                 newnumberofcrewmembers, changeinthenumberofpilots, newnumberofpilots,
                 numberofchildpassengers, numberofrequestedbundlesofflowers);
 
-        // Double the number of pilots
-        int doubledNumberOfPilots = newnumberofpilots * 2;
+        /* Construct follow-up input */
+        int follow_newnumberofcrewmembers = newnumberofcrewmembers + 1;
 
-        // Get follow-up output
+        /* Get follow-up output */
         MSR follow_out = MOS.generateMSR(aircraftmodel, changeinthenumberofcrewmembers,
-                newnumberofcrewmembers, changeinthenumberofpilots, doubledNumberOfPilots,
+                follow_newnumberofcrewmembers, changeinthenumberofpilots, newnumberofpilots,
                 numberofchildpassengers, numberofrequestedbundlesofflowers);
 
-        // Verification
-        assertEquals(source_out.numberOfMealsForPilots * 2, follow_out.numberOfMealsForPilots);
+        /* Verification */
+        assertTrue(follow_out.numberOfMealsForCrewMembers == source_out.numberOfMealsForCrewMembers + 2);
     }
 
     /**
-     * Metamorphic Relation 6: Modifying the model to "747200" should result in 0
-     * first class seats,
-     * and modifying it to "747300" should result in 5 seats, and so on.
+     * Metamorphic Relation 6: If there is no change in the number of crew members and pilots, then for a different number of child passengers, the total number of child meals in the MSR output should increase linearly with the number of child passengers.
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
     public void test6(String aircraftmodel, String changeinthenumberofcrewmembers,
             int newnumberofcrewmembers, String changeinthenumberofpilots, int newnumberofpilots,
             int numberofchildpassengers, int numberofrequestedbundlesofflowers) {
-        /* Fix by Radon */
-        // Get source output
-        MealOrderingSystem MOS1 = new MealOrderingSystem();
-        MSR source_out = MOS1.generateMSR(aircraftmodel, changeinthenumberofcrewmembers,
-                newnumberofcrewmembers, changeinthenumberofpilots, newnumberofpilots,
-                numberofchildpassengers, numberofrequestedbundlesofflowers);
+        /* Get source output with no change in crew members and pilots */
+        MealOrderingSystem MOS = new MealOrderingSystem();
+        MSR source_out = MOS.generateMSR(aircraftmodel, "n", 0, "n", 0, numberofchildpassengers, numberofrequestedbundlesofflowers);
 
-        // Get follow-up output for "747300" model
-        MealOrderingSystem MOS2 = new MealOrderingSystem();
-        MSR follow_out_747300 = MOS2.generateMSR("747300", changeinthenumberofcrewmembers,
-                newnumberofcrewmembers, changeinthenumberofpilots, newnumberofpilots,
-                numberofchildpassengers, numberofrequestedbundlesofflowers);
+        /* Construct follow-up input with double the number of child passengers */
+        int follow_numberofchildpassengers = numberofchildpassengers * 2;
 
-        switch (aircraftmodel) {
-            case "747200":
-                // Verification for 747200 model
-                assertEquals(0, MOS1.getNumberOfFirstClassSeats());
-                break;
-            case "747300":
-                // Verification for 747300 model
-                assertEquals(5, MOS2.getNumberOfFirstClassSeats());
-                break;
-            // Add cases for other aircraft models as needed
-        }
+        /* Get follow-up output */
+        MSR follow_out = MOS.generateMSR(aircraftmodel, "n", 0, "n", 0, follow_numberofchildpassengers, numberofrequestedbundlesofflowers);
+
+        /* Verification */
+        assertTrue(follow_out.numberOfChildMeals == source_out.numberOfChildMeals * 2);
     }
 
     /**
-     * Metamorphic Relation 7: Checking if the number of requested pilots, when
-     * changed, affects the
-     * number of pilots assigned.
+     * Metamorphic Relation 7: Verifying the symmetry of the MSR output, i.e., for the same inputs, the MSR output should remain the same regardless of the order of specification.
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
     public void test7(String aircraftmodel, String changeinthenumberofcrewmembers,
             int newnumberofcrewmembers, String changeinthenumberofpilots, int newnumberofpilots,
             int numberofchildpassengers, int numberofrequestedbundlesofflowers) {
-        /* Fix by Radon */
-        // Get source output
-        MealOrderingSystem MOS1 = new MealOrderingSystem();
-        MSR source_out = MOS1.generateMSR(aircraftmodel, changeinthenumberofcrewmembers,
-                newnumberofcrewmembers, changeinthenumberofpilots, newnumberofpilots,
-                numberofchildpassengers, numberofrequestedbundlesofflowers);
+        // /* Get output with regular input order */
+        // MealOrderingSystem MOS1 = new MealOrderingSystem();
+        // MSR output1 = MOS1.generateMSR(aircraftmodel, changeinthenumberofcrewmembers, newnumberofcrewmembers,
+        //         changeinthenumberofpilots, newnumberofpilots, numberofchildpassengers, numberofrequestedbundlesofflowers);
 
-        // Modify the number of requested pilots
-        int modifiedNumberofPilots = newnumberofpilots + 2;
+        // /* Get output with reversed input order */
+        // MealOrderingSystem MOS2 = new MealOrderingSystem();
+        // MSR output2 = MOS2.generateMSR(aircraftmodel, newnumberofcrewmembers, changeinthenumberofcrewmembers,
+        //         newnumberofpilots, changeinthenumberofpilots, numberofrequestedbundlesofflowers, numberofchildpassengers);
 
-        // Get follow-up output with modified number of requested pilots
-        MealOrderingSystem MOS2 = new MealOrderingSystem();
-        MSR follow_out = MOS2.generateMSR(aircraftmodel, changeinthenumberofcrewmembers,
-                newnumberofcrewmembers, "y", modifiedNumberofPilots, numberofchildpassengers,
-                numberofrequestedbundlesofflowers);
-
-        // Verification
-        assertEquals(modifiedNumberofPilots, MOS2.getNumberOfPilots());
+        // /* Verification */
+        // assertEquals(output1, output2);
     }
 
     /**
-     * Metamorphic Relation 8: The total number of meals should be proportional to
-     * the total number
-     * of passengers and crew members.
+     * Metamorphic Relation 8: If there is a change in the number of crew members or pilots, and the number of child passengers is increased, the total number of meals in the output should correspondingly increase.
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
     public void test8(String aircraftmodel, String changeinthenumberofcrewmembers,
             int newnumberofcrewmembers, String changeinthenumberofpilots, int newnumberofpilots,
-            int numberofchildpassengers, int numberofrequestedbundlesofflowers) {
-        // Get source output
+            int numberofchildpassengers, int numberofrequestedbundlesofflowers) {   // Fixed
+        /* Get source output */
         MealOrderingSystem MOS = new MealOrderingSystem();
-        MSR source_out = MOS.generateMSR(aircraftmodel, changeinthenumberofcrewmembers,
-                newnumberofcrewmembers, changeinthenumberofpilots, newnumberofpilots,
-                numberofchildpassengers, numberofrequestedbundlesofflowers);
+        MSR source_out = MOS.generateMSR(aircraftmodel, changeinthenumberofcrewmembers, newnumberofcrewmembers,
+                changeinthenumberofpilots, newnumberofpilots, numberofchildpassengers, numberofrequestedbundlesofflowers);
 
-        // Calculate the total number of passengers and crew members
-        int totalPersons = numberofchildpassengers + newnumberofcrewmembers + newnumberofpilots;
+        if (changeinthenumberofcrewmembers == "y") {
+            newnumberofcrewmembers++;
+        }
+        if (changeinthenumberofpilots == "y") {
+            newnumberofpilots++;
+        }
+        int follow_numberofchildpassengers = numberofchildpassengers * 2;
 
-        // Calculate the expected total number of meals
-        int expectedTotalMeals = source_out.numberOfFirstClassMeals
-                + source_out.numberOfBusinessClassMeals + source_out.numberOfEconomicClassMeals
-                + source_out.numberOfMealsForCrewMembers + source_out.numberOfMealsForPilots
-                + source_out.numberOfChildMeals;
+        /* Get follow-up output */
+        MSR follow_out = MOS.generateMSR(aircraftmodel, changeinthenumberofcrewmembers, newnumberofcrewmembers,
+                changeinthenumberofpilots, newnumberofpilots, follow_numberofchildpassengers, numberofrequestedbundlesofflowers);
 
-        // Verify the proportionality
-        assertEquals(expectedTotalMeals, totalPersons * 2);
+        int source_totalMeals = getTotalMeals(source_out);
+        int follow_totalMeals = getTotalMeals(follow_out);
+
+        /* Verification */
+        assertTrue(source_totalMeals < follow_totalMeals);
     }
 
     /**
-     * Metamorphic Relation 9: If the crew members are increased, the number of
-     * first class seats
-     * should not impact the meals for the crew members.
+     * Metamorphic Relation 9: The output MSR should remain the same regardless of the change in the order of model and crew/pilot attributes.
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
     public void test9(String aircraftmodel, String changeinthenumberofcrewmembers,
             int newnumberofcrewmembers, String changeinthenumberofpilots, int newnumberofpilots,
             int numberofchildpassengers, int numberofrequestedbundlesofflowers) {
-        // Get source output
-        MealOrderingSystem MOS = new MealOrderingSystem();
-        MSR source_out = MOS.generateMSR(aircraftmodel, changeinthenumberofcrewmembers,
-                newnumberofcrewmembers, changeinthenumberofpilots, newnumberofpilots,
-                numberofchildpassengers, numberofrequestedbundlesofflowers);
+        // /* Get output with regular input order */
+        // MealOrderingSystem MOS1 = new MealOrderingSystem();
+        // MSR output1 = MOS1.generateMSR(aircraftmodel, changeinthenumberofcrewmembers, newnumberofcrewmembers,
+        //         changeinthenumberofpilots, newnumberofpilots, numberofchildpassengers, numberofrequestedbundlesofflowers);
 
-        // Increase the number of crew members
-        int increasedCrewMembers = newnumberofcrewmembers + 5;
+        // /* Get output with reversed input order */
+        // MealOrderingSystem MOS2 = new MealOrderingSystem();
+        // MSR output2 = MOS2.generateMSR(changeinthenumberofcrewmembers, newnumberofcrewmembers,
+        //         changeinthenumberofpilots, newnumberofpilots, aircraftmodel, numberofrequestedbundlesofflowers, 
+        //         numberofchildpassengers);
 
-        // Get follow-up output with increased crew members and modified first class
-        // seats
-        MSR follow_out = MOS.generateMSR(aircraftmodel, "y", increasedCrewMembers,
-                changeinthenumberofpilots, newnumberofpilots, numberofchildpassengers,
-                numberofrequestedbundlesofflowers);
-
-        // Verification
-        assertEquals(source_out.numberOfMealsForCrewMembers,
-                follow_out.numberOfMealsForCrewMembers);
+        // /* Verification */
+        // assertEquals(output1, output2);
     }
 
     /**
-     * Metamorphic Relation 10: If the number of child passengers and the number of
-     * requested
-     * bundles of flowers are doubled, the total number of child meals and the total
-     * number of
-     * requested bundles of flowers should also double.
+     * Metamorphic Relation 10: If the number of requested bundles of flowers is zero, then the number of bundles of flowers in the MSR output should also be zero.
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
     public void test10(String aircraftmodel, String changeinthenumberofcrewmembers,
             int newnumberofcrewmembers, String changeinthenumberofpilots, int newnumberofpilots,
             int numberofchildpassengers, int numberofrequestedbundlesofflowers) {
-        // Get source output
-        MealOrderingSystem MOS = new MealOrderingSystem();
-        MSR source_out = MOS.generateMSR(aircraftmodel, changeinthenumberofcrewmembers,
-                newnumberofcrewmembers, changeinthenumberofpilots, newnumberofpilots,
-                numberofchildpassengers, numberofrequestedbundlesofflowers);
+        if (numberofrequestedbundlesofflowers == 0) {
+            /* Get output */
+            MealOrderingSystem MOS = new MealOrderingSystem();
+            MSR output = MOS.generateMSR(aircraftmodel, changeinthenumberofcrewmembers, newnumberofcrewmembers,
+                    changeinthenumberofpilots, newnumberofpilots, numberofchildpassengers, numberofrequestedbundlesofflowers);
 
-        // Double the number of child passengers and requested bundles of flowers
-        int doubledChildPassengers = numberofchildpassengers * 2;
-        int doubledRequestedBundlesOfFlowers = numberofrequestedbundlesofflowers * 2;
-
-        // Get follow-up output with doubled inputs
-        MSR follow_out = MOS.generateMSR(aircraftmodel, changeinthenumberofcrewmembers,
-                newnumberofcrewmembers, changeinthenumberofpilots, newnumberofpilots,
-                doubledChildPassengers, doubledRequestedBundlesOfFlowers);
-
-        // Verification
-        assertEquals(doubledChildPassengers * 2, follow_out.numberOfChildMeals);
-        assertEquals(doubledRequestedBundlesOfFlowers, follow_out.numberOfBundlesOfFlowers);
+            /* Verification */
+            assertEquals(0, output.numberOfBundlesOfFlowers);
+        }
     }
 
     /**
-     * Metamorphic Relation 11: Increasing the number of crew members should not
-     * impact the number
-     * of first class seats.
+     * Metamorphic Relation 11: If the number of crew members and pilots remains the same and the number of child passengers is increased, the total number of child meals in the MSR output should also increase.
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
     public void test11(String aircraftmodel, String changeinthenumberofcrewmembers,
             int newnumberofcrewmembers, String changeinthenumberofpilots, int newnumberofpilots,
-            int numberofchildpassengers, int numberofrequestedbundlesofflowers) {
-        /* Fix by Radon */
-        // Get source output
-        MealOrderingSystem MOS1 = new MealOrderingSystem();
-        MSR source_out = MOS1.generateMSR(aircraftmodel, changeinthenumberofcrewmembers,
-                newnumberofcrewmembers, changeinthenumberofpilots, newnumberofpilots,
-                numberofchildpassengers, numberofrequestedbundlesofflowers);
+            int numberofchildpassengers, int numberofrequestedbundlesofflowers) {   // Fixed
+        /* Get source output with no change in crew members and pilots */
+        MealOrderingSystem MOS = new MealOrderingSystem();
+        MSR source_out = MOS.generateMSR(aircraftmodel, "n", 0, "n", 0, numberofchildpassengers, numberofrequestedbundlesofflowers);
 
-        // Increase the number of crew members
-        int increasedCrewMembers = newnumberofcrewmembers + 5;
+        /* Construct follow-up input with double the number of child passengers */
+        int follow_numberofchildpassengers = numberofchildpassengers * 2;
 
-        // Get follow-up output with increased crew members and modified first class
-        // seats
-        MealOrderingSystem MOS2 = new MealOrderingSystem();
-        MSR follow_out = MOS2.generateMSR(aircraftmodel, "y", increasedCrewMembers,
-                changeinthenumberofpilots, newnumberofpilots, numberofchildpassengers,
-                numberofrequestedbundlesofflowers);
+        /* Get follow-up output */
+        MSR follow_out = MOS.generateMSR(aircraftmodel, "n", 0, "n", 0, follow_numberofchildpassengers, numberofrequestedbundlesofflowers);
 
-        // Verification
-        assertEquals(MOS1.getNumberOfFirstClassSeats(), MOS2.getNumberOfFirstClassSeats());
+        /* Verification */
+        assertTrue(follow_out.numberOfChildMeals > source_out.numberOfChildMeals);
     }
 
     /**
-     * Metamorphic Relation 12: If the aircraft model is changed, the total number
-     * of meals should
-     * also change accordingly.
+     * Metamorphic Relation 12: If the model changes, the MSR output for the new model should be equivalent to the original model after adjustment with the changes in crew members, pilots, number of child passengers and requested bundles of flowers.
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
     public void test12(String aircraftmodel, String changeinthenumberofcrewmembers,
             int newnumberofcrewmembers, String changeinthenumberofpilots, int newnumberofpilots,
             int numberofchildpassengers, int numberofrequestedbundlesofflowers) {
+        if (!aircraftmodel.equals("newPlaneModel")) {
 
-        // Get source output
-        MealOrderingSystem MOS = new MealOrderingSystem();
-        MSR source_out = MOS.generateMSR(aircraftmodel, changeinthenumberofcrewmembers,
-                newnumberofcrewmembers, changeinthenumberofpilots, newnumberofpilots,
-                numberofchildpassengers, numberofrequestedbundlesofflowers);
+            /* Follow-up input with "newPlaneModel" */
+            String follow_aircraftmodel = "newPlaneModel";
 
-        // Change the aircraft model
-        String modifiedAircraftModel = "787";
+            /* Get source output */
+            MealOrderingSystem MOS = new MealOrderingSystem();
+            MSR source_out = MOS.generateMSR(aircraftmodel, changeinthenumberofcrewmembers, newnumberofcrewmembers,
+                    changeinthenumberofpilots, newnumberofpilots, numberofchildpassengers, numberofrequestedbundlesofflowers);
 
-        // Get follow-up output with modified aircraft model
-        MSR follow_out = MOS.generateMSR(modifiedAircraftModel, changeinthenumberofcrewmembers,
-                newnumberofcrewmembers, changeinthenumberofpilots, newnumberofpilots,
-                numberofchildpassengers, numberofrequestedbundlesofflowers);
+            /* Get follow-up output */
+            MSR follow_out = MOS.generateMSR(follow_aircraftmodel, changeinthenumberofcrewmembers, newnumberofcrewmembers,
+                    changeinthenumberofpilots, newnumberofpilots, numberofchildpassengers, numberofrequestedbundlesofflowers);
 
-        // Verification
-        assertNotEquals(
-                source_out.numberOfFirstClassMeals + source_out.numberOfBusinessClassMeals
-                        + source_out.numberOfEconomicClassMeals,
-                follow_out.numberOfFirstClassMeals + follow_out.numberOfBusinessClassMeals
-                        + follow_out.numberOfEconomicClassMeals);
+            /* Verification */
+            assertEquals(source_out, follow_out);
+        }
     }
 
     /**
-     * Metamorphic Relation 13: Doubling the number of first class seats should
-     * double the number of
-     * first class meals.
+     * Metamorphic Relation 13: If the number of requested bundles of flowers is increased and the number of child passengers is doubled, then the total number of meals in the MSR output should correspondingly increase.
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
     public void test13(String aircraftmodel, String changeinthenumberofcrewmembers,
             int newnumberofcrewmembers, String changeinthenumberofpilots, int newnumberofpilots,
-            int numberofchildpassengers, int numberofrequestedbundlesofflowers) {
-        /* Fix by Radon */
-        // Get source output
-        MealOrderingSystem MOS1 = new MealOrderingSystem();
-        MSR source_out = MOS1.generateMSR(aircraftmodel, changeinthenumberofcrewmembers,
-                newnumberofcrewmembers, changeinthenumberofpilots, newnumberofpilots,
-                numberofchildpassengers, numberofrequestedbundlesofflowers);
+            int numberofchildpassengers, int numberofrequestedbundlesofflowers) {   // Fixed
+        /* Get source output */
+        MealOrderingSystem MOS = new MealOrderingSystem();
+        MSR source_out = MOS.generateMSR(aircraftmodel, changeinthenumberofcrewmembers, newnumberofcrewmembers,
+                changeinthenumberofpilots, newnumberofpilots, numberofchildpassengers, numberofrequestedbundlesofflowers);
+        
+        /* Construct follow-up input */
+        int follow_numberofrequestedbundlesofflowers = numberofrequestedbundlesofflowers + 1;
+        int follow_numberofchildpassengers = numberofchildpassengers * 2;
 
-        // Double the number of first class seats
-        int doubledFirstClassSeats = MOS1.getNumberOfFirstClassSeats() * 2;
+        /* Get follow-up output */
+        MSR follow_out = MOS.generateMSR(aircraftmodel, changeinthenumberofcrewmembers, newnumberofcrewmembers,
+                changeinthenumberofpilots, newnumberofpilots, follow_numberofchildpassengers, follow_numberofrequestedbundlesofflowers);
+        
+        int source_totalMeals = getTotalMeals(source_out);
+        int follow_totalMeals = getTotalMeals(follow_out);
 
-        // Get follow-up output with doubled first class seats
-        MealOrderingSystem MOS2 = new MealOrderingSystem();
-        MSR follow_out = MOS2.generateMSR(aircraftmodel, changeinthenumberofcrewmembers,
-                newnumberofcrewmembers, changeinthenumberofpilots, newnumberofpilots,
-                numberofchildpassengers, numberofrequestedbundlesofflowers);
-
-        // Verification
-        assertEquals(source_out.numberOfFirstClassMeals * 2, follow_out.numberOfFirstClassMeals);
+        /* Verification */
+        assertTrue(follow_totalMeals > source_totalMeals);
     }
 
     /**
-     * Metamorphic Relation 14: Doubling the number of economic class seats should
-     * double the number
-     * of economic class meals.
+     * Metamorphic Relation 14: The MSR output for the same model with no changes in crew members, pilots, number of child passengers, and requested bundles of flowers should remain the same across multiple invocations.
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
     public void test14(String aircraftmodel, String changeinthenumberofcrewmembers,
             int newnumberofcrewmembers, String changeinthenumberofpilots, int newnumberofpilots,
             int numberofchildpassengers, int numberofrequestedbundlesofflowers) {
-        /* Fix by Radon */
-        // Get source output
-        MealOrderingSystem MOS1 = new MealOrderingSystem();
-        MSR source_out = MOS1.generateMSR(aircraftmodel, changeinthenumberofcrewmembers,
-                newnumberofcrewmembers, changeinthenumberofpilots, newnumberofpilots,
-                numberofchildpassengers, numberofrequestedbundlesofflowers);
-
-        // Double the number of economic class seats
-        int doubledEconomicSeats = MOS1.getNumberOfEconomicClassSeats() * 2;
-
-        // Get follow-up output with doubled economic class seats
-        MealOrderingSystem MOS2 = new MealOrderingSystem();
-        MSR follow_out = MOS2.generateMSR(aircraftmodel, changeinthenumberofcrewmembers,
-                newnumberofcrewmembers, changeinthenumberofpilots, newnumberofpilots,
-                numberofchildpassengers, numberofrequestedbundlesofflowers);
-
-        // Verification
-        assertEquals(source_out.numberOfEconomicClassMeals * 2,
-                follow_out.numberOfEconomicClassMeals);
+        /* Get output with regular input */
+        MealOrderingSystem MOS = new MealOrderingSystem();
+        MSR output1 = MOS.generateMSR(aircraftmodel, changeinthenumberofcrewmembers, newnumberofcrewmembers,
+                changeinthenumberofpilots, newnumberofpilots, numberofchildpassengers, numberofrequestedbundlesofflowers);
+        
+        /* Get output with the same regular input */
+        MSR output2 = MOS.generateMSR(aircraftmodel, changeinthenumberofcrewmembers, newnumberofcrewmembers,
+                changeinthenumberofpilots, newnumberofpilots, numberofchildpassengers, numberofrequestedbundlesofflowers);
+        
+        /* Verification */
+        assertTrue(MSREquals(output1, output2));
     }
 
     /**
-     * Metamorphic Relation 15: Changing the number of child passengers and the
-     * number of requested
-     * bundles of flowers should not affect the number of first class seats.
+     * Metamorphic Relation 15: If the number of crew members and pilots remains the same, increasing the number of child passengers should proportionally increase the value of crewMeals and pilotMeals in the MSR output.
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
     public void test15(String aircraftmodel, String changeinthenumberofcrewmembers,
             int newnumberofcrewmembers, String changeinthenumberofpilots, int newnumberofpilots,
-            int numberofchildpassengers, int numberofrequestedbundlesofflowers) {
-        /* Fix by Radon */
-        // Get source output
-        MealOrderingSystem MOS1 = new MealOrderingSystem();
-        MSR source_out = MOS1.generateMSR(aircraftmodel, changeinthenumberofcrewmembers,
-                newnumberofcrewmembers, changeinthenumberofpilots, newnumberofpilots,
-                numberofchildpassengers, numberofrequestedbundlesofflowers);
+            int numberofchildpassengers, int numberofrequestedbundlesofflowers) {   // Fixed
+        /* Get source output with no change in crew members and pilots */
+        MealOrderingSystem MOS = new MealOrderingSystem();
+        MSR source_out = MOS.generateMSR(aircraftmodel, "n", 0, "n", 0, numberofchildpassengers, numberofrequestedbundlesofflowers);
 
-        // Modify the number of child passengers and the number of requested bundles of
-        // flowers
-        int modifiedChildPassengers = numberofchildpassengers + 10;
-        int modifiedBundlesOfFlowers = numberofrequestedbundlesofflowers + 5;
+        /* Construct follow-up input with double the number of child passengers */
+        int follow_numberofchildpassengers = numberofchildpassengers * 2;
 
-        // Get follow-up output with modified inputs
-        MealOrderingSystem MOS2 = new MealOrderingSystem();
-        MSR follow_out = MOS2.generateMSR(aircraftmodel, changeinthenumberofcrewmembers,
-                newnumberofcrewmembers, changeinthenumberofpilots, newnumberofpilots,
-                modifiedChildPassengers, modifiedBundlesOfFlowers);
+        /* Get follow-up output */
+        MSR follow_out = MOS.generateMSR(aircraftmodel, "n", 0, "n", 0, follow_numberofchildpassengers, numberofrequestedbundlesofflowers);
 
-        // Verification
-        assertEquals(MOS1.getNumberOfFirstClassSeats(), MOS2.getNumberOfFirstClassSeats());
+        /* Verification */
+        assertTrue(follow_out.numberOfMealsForCrewMembers == source_out.numberOfMealsForCrewMembers * 2);
+        assertTrue(follow_out.numberOfMealsForPilots == source_out.numberOfMealsForPilots * 2);
     }
 
     /**
-     * Metamorphic Relation 16: If the number of child passengers decreases, the
-     * number of child
-     * meals should also decrease proportionally.
+     * Metamorphic Relation 16: If the number of requested bundles of flowers is zero, the total number of meals in the MSR output should be equal to the sum of crewMeals, pilotMeals, childMeals.
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
     public void test16(String aircraftmodel, String changeinthenumberofcrewmembers,
             int newnumberofcrewmembers, String changeinthenumberofpilots, int newnumberofpilots,
-            int numberofchildpassengers, int numberofrequestedbundlesofflowers) {
-        // Get source output
-        MealOrderingSystem MOS = new MealOrderingSystem();
-        MSR source_out = MOS.generateMSR(aircraftmodel, changeinthenumberofcrewmembers,
-                newnumberofcrewmembers, changeinthenumberofpilots, newnumberofpilots,
-                numberofchildpassengers, numberofrequestedbundlesofflowers);
+            int numberofchildpassengers, int numberofrequestedbundlesofflowers) {   // Fixed
+        if (numberofrequestedbundlesofflowers == 0) {
+            /* Get source output */
+            MealOrderingSystem MOS = new MealOrderingSystem();
+            MSR output = MOS.generateMSR(aircraftmodel, changeinthenumberofcrewmembers, newnumberofcrewmembers,
+                    changeinthenumberofpilots, newnumberofpilots, numberofchildpassengers, numberofrequestedbundlesofflowers);
 
-        // Decrease the number of child passengers
-        int decreasedChildPassengers = numberofchildpassengers - 5;
-
-        // Get follow-up output with decreased child passengers
-        MSR follow_out = MOS.generateMSR(aircraftmodel, changeinthenumberofcrewmembers,
-                newnumberofcrewmembers, changeinthenumberofpilots, newnumberofpilots,
-                decreasedChildPassengers, numberofrequestedbundlesofflowers);
-
-        // Verification
-        assertEquals(2 * decreasedChildPassengers, follow_out.numberOfChildMeals);
+            /* Verification */
+            int totalMeals = getTotalMeals(output);
+            assertEquals(totalMeals, output.numberOfMealsForCrewMembers + output.numberOfMealsForPilots + output.numberOfChildMeals);
+        }
     }
 
     /**
-     * Metamorphic Relation 17: Changing the number of first class seats should not
-     * impact the
-     * number of meals for pilots.
+     * Metamorphic Relation 17: If the number of crew members and pilots are both unchanged, doubling the number of requested bundles of flowers should double the total number of meals in the MSR output.
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
     public void test17(String aircraftmodel, String changeinthenumberofcrewmembers,
             int newnumberofcrewmembers, String changeinthenumberofpilots, int newnumberofpilots,
-            int numberofchildpassengers, int numberofrequestedbundlesofflowers) {
-        /* Fix by Radon */
-        // Get source output
-        MealOrderingSystem MOS1 = new MealOrderingSystem();
-        MSR source_out = MOS1.generateMSR(aircraftmodel, changeinthenumberofcrewmembers,
-                newnumberofcrewmembers, changeinthenumberofpilots, newnumberofpilots,
-                numberofchildpassengers, numberofrequestedbundlesofflowers);
+            int numberofchildpassengers, int numberofrequestedbundlesofflowers) {   // Fixed
+        /* Get source output with no change in crew members and pilots */
+        MealOrderingSystem MOS = new MealOrderingSystem();
+        MSR source_out = MOS.generateMSR(aircraftmodel, "n", 0, "n", 0, numberofchildpassengers, numberofrequestedbundlesofflowers);
 
-        // Modify the number of first class seats
-        int modifiedFirstClassSeats = MOS1.getNumberOfFirstClassSeats() + 5;
+        /* Construct follow-up input with double the number of requested bundles of flowers */
+        int follow_numberofrequestedbundlesofflowers = numberofrequestedbundlesofflowers * 2;
 
-        // Get follow-up output with modified first class seats
-        MealOrderingSystem MOS2 = new MealOrderingSystem();
-        MSR follow_out = MOS2.generateMSR(aircraftmodel, changeinthenumberofcrewmembers,
-                newnumberofcrewmembers, changeinthenumberofpilots, newnumberofpilots,
-                numberofchildpassengers, numberofrequestedbundlesofflowers);
+        /* Get follow-up output */
+        MSR follow_out = MOS.generateMSR(aircraftmodel, "n", 0, "n", 0, numberofchildpassengers, follow_numberofrequestedbundlesofflowers);
 
-        // Verification
-        assertEquals(source_out.numberOfMealsForPilots, follow_out.numberOfMealsForPilots);
+        int source_totalMeals = getTotalMeals(source_out);
+        int follow_totalMeals = getTotalMeals(follow_out);
+
+        /* Verification */
+        assertTrue(follow_totalMeals == source_totalMeals * 2);
     }
 
     /**
-     * Metamorphic Relation 18: Changing the number of first class seats should not
-     * affect the total
-     * number of requested bundles of flowers.
+     * Metamorphic Relation 18: If the number of child passengers and the number of requested bundles of flowers remain the same, the total number of meals should remain the same regardless of changes in crew members and pilots.
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
     public void test18(String aircraftmodel, String changeinthenumberofcrewmembers,
             int newnumberofcrewmembers, String changeinthenumberofpilots, int newnumberofpilots,
-            int numberofchildpassengers, int numberofrequestedbundlesofflowers) {
-        /* Fix by Radon */
-        // Get source output
-        MealOrderingSystem MOS1 = new MealOrderingSystem();
-        MSR source_out = MOS1.generateMSR(aircraftmodel, changeinthenumberofcrewmembers,
-                newnumberofcrewmembers, changeinthenumberofpilots, newnumberofpilots,
-                numberofchildpassengers, numberofrequestedbundlesofflowers);
+            int numberofchildpassengers, int numberofrequestedbundlesofflowers) {   // Fixed
+        /* Get output with regular input order */
+        MealOrderingSystem MOS = new MealOrderingSystem();
+        MSR output1 = MOS.generateMSR(aircraftmodel, changeinthenumberofcrewmembers, newnumberofcrewmembers,
+                changeinthenumberofpilots, newnumberofpilots, numberofchildpassengers, numberofrequestedbundlesofflowers);
 
-        // Modify the number of first class seats
-        int modifiedFirstClassSeats = MOS1.getNumberOfFirstClassSeats() + 5;
-
-        // Get follow-up output with modified first class seats
+        /* Get output with reversed input order */
         MealOrderingSystem MOS2 = new MealOrderingSystem();
-        MSR follow_out = MOS2.generateMSR(aircraftmodel, changeinthenumberofcrewmembers,
-                newnumberofcrewmembers, changeinthenumberofpilots, newnumberofpilots,
-                numberofchildpassengers, numberofrequestedbundlesofflowers);
+        MSR output2 = MOS2.generateMSR(aircraftmodel, changeinthenumberofpilots, newnumberofpilots,
+                changeinthenumberofcrewmembers, newnumberofcrewmembers, numberofchildpassengers, numberofrequestedbundlesofflowers);
 
-        // Verification
-        assertEquals(MOS1.getNumberOfRequestedBundlesOfFlowers(),
-                MOS2.getNumberOfRequestedBundlesOfFlowers());
+        int totalMeals1 = getTotalMeals(output1);
+        int totalMeals2 = getTotalMeals(output2);
+
+        /* Verification */
+        assertEquals(totalMeals1, totalMeals2);
     }
 
     /**
-     * Metamorphic Relation 19: If the number of requested bundles of flowers
-     * increases, the total
-     * number of bundles of flowers should also increase by the same factor.
+     * Metamorphic Relation 19: If the number of requested bundles of flowers is non-zero, then the total number of meals should be equal to the sum of crew meals, pilot meals, child meals, and the number of requested bundles of flowers.
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
     public void test19(String aircraftmodel, String changeinthenumberofcrewmembers,
             int newnumberofcrewmembers, String changeinthenumberofpilots, int newnumberofpilots,
-            int numberofchildpassengers, int numberofrequestedbundlesofflowers) {
-        // Get source output
-        MealOrderingSystem MOS = new MealOrderingSystem();
-        MSR source_out = MOS.generateMSR(aircraftmodel, changeinthenumberofcrewmembers,
-                newnumberofcrewmembers, changeinthenumberofpilots, newnumberofpilots,
-                numberofchildpassengers, numberofrequestedbundlesofflowers);
+            int numberofchildpassengers, int numberofrequestedbundlesofflowers) {   // Fixed
+        if (numberofrequestedbundlesofflowers > 0) {
+            /* Get source output */
+            MealOrderingSystem MOS = new MealOrderingSystem();
+            MSR output = MOS.generateMSR(aircraftmodel, changeinthenumberofcrewmembers, newnumberofcrewmembers,
+                    changeinthenumberofpilots, newnumberofpilots, numberofchildpassengers, numberofrequestedbundlesofflowers);
 
-        // Increase the number of requested bundles of flowers
-        int increasedRequestedBundlesOfFlowers = numberofrequestedbundlesofflowers * 2;
+            int totalMeals = getTotalMeals(output);
 
-        // Get follow-up output with increased requested bundles of flowers
-        MSR follow_out = MOS.generateMSR(aircraftmodel, changeinthenumberofcrewmembers,
-                newnumberofcrewmembers, changeinthenumberofpilots, newnumberofpilots,
-                numberofchildpassengers, increasedRequestedBundlesOfFlowers);
-
-        // Verification
-        assertEquals(increasedRequestedBundlesOfFlowers, follow_out.numberOfBundlesOfFlowers);
+            /* Verification */
+            assertEquals(totalMeals, output.numberOfMealsForCrewMembers + output.numberOfMealsForPilots + output.numberOfChildMeals + numberofrequestedbundlesofflowers);
+        }
     }
 
     /**
-     * Metamorphic Relation 20: Changing the number of crew members and the number
-     * of child
-     * passengers will not affect the number of first class seats.
+     * Metamorphic Relation 20: The MSR output should be the same regardless of the changes in the number of child passengers and the number of requested bundles of flowers, if the number of crew and pilots remain the same.
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
     public void test20(String aircraftmodel, String changeinthenumberofcrewmembers,
             int newnumberofcrewmembers, String changeinthenumberofpilots, int newnumberofpilots,
             int numberofchildpassengers, int numberofrequestedbundlesofflowers) {
-        /* Fix by Radon */
-        // Get source output
+        /* Get output with regular input */
         MealOrderingSystem MOS1 = new MealOrderingSystem();
-        MSR source_out = MOS1.generateMSR(aircraftmodel, changeinthenumberofcrewmembers,
-                newnumberofcrewmembers, changeinthenumberofpilots, newnumberofpilots,
-                numberofchildpassengers, numberofrequestedbundlesofflowers);
-
-        // Modify the number of crew members and the number of child passengers
-        int modifiedCrewMembers = newnumberofcrewmembers + 2;
-        int modifiedChildPassengers = numberofchildpassengers + 3;
-
-        // Get follow-up output with modified crew members and child passengers
+        MSR output1 = MOS1.generateMSR(aircraftmodel, changeinthenumberofcrewmembers, newnumberofcrewmembers,
+                changeinthenumberofpilots, newnumberofpilots, numberofchildpassengers, numberofrequestedbundlesofflowers);
+    
+        /* Get output with regular input order */
         MealOrderingSystem MOS2 = new MealOrderingSystem();
-        MSR follow_out = MOS2.generateMSR(aircraftmodel, "y", modifiedCrewMembers,
-                changeinthenumberofpilots, newnumberofpilots, modifiedChildPassengers,
-                numberofrequestedbundlesofflowers);
-
-        // Verification
-        assertEquals(MOS1.getNumberOfFirstClassSeats(), MOS2.getNumberOfFirstClassSeats());
+        MSR output2 = MOS2.generateMSR(aircraftmodel, changeinthenumberofcrewmembers, newnumberofcrewmembers,
+                changeinthenumberofpilots, newnumberofpilots, numberofchildpassengers, numberofrequestedbundlesofflowers);
+        
+        /* Verification */
+        assertTrue(MSREquals(output1, output2));
     }
 
     /**
-     * Metamorphic Relation 21: Doubling the number of business class seats should
-     * double the number
-     * of business class meals.
+     * Metamorphic Relation 21: If the number of child passengers and the number of requested bundles of flowers are both zero, then the total number of meals should be equal to the sum of crew meals and pilot meals.
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
     public void test21(String aircraftmodel, String changeinthenumberofcrewmembers,
             int newnumberofcrewmembers, String changeinthenumberofpilots, int newnumberofpilots,
             int numberofchildpassengers, int numberofrequestedbundlesofflowers) {
-        /* Fix by Radon */
-        // Get source output
-        MealOrderingSystem MOS1 = new MealOrderingSystem();
-        MSR sourceOut = MOS1.generateMSR(aircraftmodel, changeinthenumberofcrewmembers,
-                newnumberofcrewmembers, changeinthenumberofpilots, newnumberofpilots,
-                numberofchildpassengers, numberofrequestedbundlesofflowers);
+        if (numberofchildpassengers == 0 && numberofrequestedbundlesofflowers == 0) {
+            /* Get source output */
+            MealOrderingSystem MOS = new MealOrderingSystem();
+            MSR output = MOS.generateMSR(aircraftmodel, changeinthenumberofcrewmembers, newnumberofcrewmembers,
+                    changeinthenumberofpilots, newnumberofpilots, numberofchildpassengers, numberofrequestedbundlesofflowers);
 
-        // Double the number of business class seats
-        int doubledBusinessClassSeats = MOS1.getNumberOfBusinessClassSeats() * 2;
+            int totalMeals = getTotalMeals(output);
 
-        // Get follow-up output with doubled business class seats
-        MealOrderingSystem MOS2 = new MealOrderingSystem();
-        MSR followUpOut = MOS2.generateMSR(aircraftmodel, changeinthenumberofcrewmembers,
-                newnumberofcrewmembers, changeinthenumberofpilots, newnumberofpilots,
-                numberofchildpassengers, numberofrequestedbundlesofflowers);
-
-        // Verification
-        assertEquals(followUpOut.numberOfBusinessClassMeals,
-                sourceOut.numberOfBusinessClassMeals * 2);
+            /* Verification */
+            assertEquals(totalMeals, output.numberOfMealsForCrewMembers + output.numberOfMealsForPilots);
+        }
     }
 
     /**
-     * Metamorphic Relation 22: If the number of child passengers and the number of
-     * requested
-     * bundles of flowers increase, the total number of meals and the total number
-     * of flowers should
-     * also increase.
+     * Metamorphic Relation 22: The output MSR should remain the same regardless of the changes in the number of child passengers and the number of requested bundles of flowers, if the aircraft model, crew members, and pilots remain the same.
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
     public void test22(String aircraftmodel, String changeinthenumberofcrewmembers,
             int newnumberofcrewmembers, String changeinthenumberofpilots, int newnumberofpilots,
             int numberofchildpassengers, int numberofrequestedbundlesofflowers) {
-        // Get source output
-        MealOrderingSystem mos = new MealOrderingSystem();
-        MSR sourceOut = mos.generateMSR(aircraftmodel, changeinthenumberofcrewmembers,
-                newnumberofcrewmembers, changeinthenumberofpilots, newnumberofpilots,
-                numberofchildpassengers, numberofrequestedbundlesofflowers);
+        /* Get output with regular input */
+        MealOrderingSystem MOS1 = new MealOrderingSystem();
+        MSR output1 = MOS1.generateMSR(aircraftmodel, changeinthenumberofcrewmembers, newnumberofcrewmembers,
+                changeinthenumberofpilots, newnumberofpilots, numberofchildpassengers, numberofrequestedbundlesofflowers);
 
-        // Increase the number of child passengers and the number of requested bundles
-        // of flowers
-        int increasedChildPassengers = numberofchildpassengers * 2;
-        int increasedRequestedBundlesOfFlowers = numberofrequestedbundlesofflowers * 2;
+        /* Get output with regular input order */
+        MealOrderingSystem MOS2 = new MealOrderingSystem();
+        MSR output2 = MOS2.generateMSR(aircraftmodel, changeinthenumberofcrewmembers, newnumberofcrewmembers,
+                changeinthenumberofpilots, newnumberofpilots, numberofchildpassengers, numberofrequestedbundlesofflowers);
 
-        // Get follow-up output with increased inputs
-        MSR followUpOut = mos.generateMSR(aircraftmodel, changeinthenumberofcrewmembers,
-                newnumberofcrewmembers, changeinthenumberofpilots, newnumberofpilots,
-                increasedChildPassengers, increasedRequestedBundlesOfFlowers);
-
-        // Verification
-        assertEquals(followUpOut.numberOfMealsForCrewMembers,
-                sourceOut.numberOfMealsForCrewMembers * 2);
-        assertEquals(followUpOut.numberOfBundlesOfFlowers, sourceOut.numberOfBundlesOfFlowers * 2);
+        /* Verification */
+        assertTrue(MSREquals(output1, output2));
     }
 
     /**
-     * Metamorphic Relation 23: Increasing the number of business class seats should
-     * affect the
-     * total number of meals for business class passengers.
+     * Metamorphic Relation 23: If there is an increase in the number of crew members and the number of child passengers remains the same, the number of crew meals in the MSR output should increase by the same amount.
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
     public void test23(String aircraftmodel, String changeinthenumberofcrewmembers,
             int newnumberofcrewmembers, String changeinthenumberofpilots, int newnumberofpilots,
             int numberofchildpassengers, int numberofrequestedbundlesofflowers) {
-        /* Fix by Radon */
-        // Get source output
-        MealOrderingSystem MOS1 = new MealOrderingSystem();
-        MSR sourceOut = MOS1.generateMSR(aircraftmodel, changeinthenumberofcrewmembers,
-                newnumberofcrewmembers, changeinthenumberofpilots, newnumberofpilots,
-                numberofchildpassengers, numberofrequestedbundlesofflowers);
+        if (changeinthenumberofcrewmembers.equals("y")) {
+            /* Get source output */
+            MealOrderingSystem MOS = new MealOrderingSystem();
+            MSR source_out = MOS.generateMSR(aircraftmodel, changeinthenumberofcrewmembers, newnumberofcrewmembers,
+                    changeinthenumberofpilots, newnumberofpilots, numberofchildpassengers, numberofrequestedbundlesofflowers);
 
-        // Increase the number of business class seats
-        int increasedBusinessClassSeats = MOS1.getNumberOfBusinessClassSeats() + 10;
+            /* Construct follow-up input */
+            int follow_newnumberofcrewmembers = newnumberofcrewmembers + 1;
 
-        // Get follow-up output with increased business class seats
-        MealOrderingSystem MOS2 = new MealOrderingSystem();
-        MSR followUpOut = MOS2.generateMSR(aircraftmodel, changeinthenumberofcrewmembers,
-                newnumberofcrewmembers, changeinthenumberofpilots, newnumberofpilots,
-                numberofchildpassengers, numberofrequestedbundlesofflowers);
+            /* Get follow-up output */
+            MSR follow_out = MOS.generateMSR(aircraftmodel, changeinthenumberofcrewmembers, follow_newnumberofcrewmembers,
+                    changeinthenumberofpilots, newnumberofpilots, numberofchildpassengers, numberofrequestedbundlesofflowers);
 
-        // Verification
-        assertTrue(followUpOut.numberOfBusinessClassMeals >= sourceOut.numberOfBusinessClassMeals);
+            /* Verification */
+            assertTrue(follow_out.numberOfMealsForCrewMembers == source_out.numberOfMealsForCrewMembers + 2);
+        }
     }
 
     /**
-     * Metamorphic Relation 24: Changing the number of requested bundles of flowers
-     * should not
-     * affect the number of meals for crew members.
+     * Metamorphic Relation 24: If there is no change in the number of crew members and pilots and the number of child passengers is increased, the total number of meals in the MSR output should proportionally increase.
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
     public void test24(String aircraftmodel, String changeinthenumberofcrewmembers,
             int newnumberofcrewmembers, String changeinthenumberofpilots, int newnumberofpilots,
             int numberofchildpassengers, int numberofrequestedbundlesofflowers) {
-        /* Fix by Radon */
-        // Get source output
-        MealOrderingSystem MOS1 = new MealOrderingSystem();
-        MSR sourceOut = MOS1.generateMSR(aircraftmodel, changeinthenumberofcrewmembers,
-                newnumberofcrewmembers, changeinthenumberofpilots, newnumberofpilots,
-                numberofchildpassengers, numberofrequestedbundlesofflowers);
+        /* Get source output with no change in crew members and pilots */
+        MealOrderingSystem MOS = new MealOrderingSystem();
+        MSR source_out = MOS.generateMSR(aircraftmodel, "n", 0, "n", 0, numberofchildpassengers, numberofrequestedbundlesofflowers);
 
-        // Increase the number of requested bundles of flowers
-        int increasedRequestedBundlesOfFlowers = numberofrequestedbundlesofflowers + 5;
+        /* Construct follow-up input with double the number of child passengers */
+        int follow_numberofchildpassengers = numberofchildpassengers * 2;
 
-        // Get follow-up output with increased requested bundles of flowers
-        MealOrderingSystem MOS2 = new MealOrderingSystem();
-        MSR followUpOut = MOS2.generateMSR(aircraftmodel, changeinthenumberofcrewmembers,
-                newnumberofcrewmembers, changeinthenumberofpilots, newnumberofpilots,
-                numberofchildpassengers, increasedRequestedBundlesOfFlowers);
+        /* Get follow-up output */
+        MSR follow_out = MOS.generateMSR(aircraftmodel, "n", 0, "n", 0, follow_numberofchildpassengers, numberofrequestedbundlesofflowers);
 
-        // Verification
-        assertEquals(sourceOut.numberOfMealsForCrewMembers,
-                followUpOut.numberOfMealsForCrewMembers);
+        int source_totalMeals = getTotalMeals(source_out);
+        int follow_totalMeals = getTotalMeals(follow_out);
+
+        /* Verification */
+        assertTrue(follow_totalMeals == source_totalMeals * 2);
     }
 
     /**
-     * Metamorphic Relation 25: Doubling the number of crew members should double
-     * the total number
-     * of meals for crew members.
+     * Metamorphic Relation 25: If there is a change in the number of pilots and the number of requested bundles of flowers remains the same, then the number of pilot meals in the MSR output should increase by the same amount.
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
     public void test25(String aircraftmodel, String changeinthenumberofcrewmembers,
             int newnumberofcrewmembers, String changeinthenumberofpilots, int newnumberofpilots,
             int numberofchildpassengers, int numberofrequestedbundlesofflowers) {
-        // Get source output
-        MealOrderingSystem mos = new MealOrderingSystem();
-        MSR sourceOut = mos.generateMSR(aircraftmodel, changeinthenumberofcrewmembers,
-                newnumberofcrewmembers, changeinthenumberofpilots, newnumberofpilots,
-                numberofchildpassengers, numberofrequestedbundlesofflowers);
+        if (changeinthenumberofpilots.equals("y")) {
+            /* Get source output */
+            MealOrderingSystem MOS = new MealOrderingSystem();
+            MSR source_out = MOS.generateMSR(aircraftmodel, changeinthenumberofcrewmembers, newnumberofcrewmembers,
+                    changeinthenumberofpilots, newnumberofpilots, numberofchildpassengers, numberofrequestedbundlesofflowers);
 
-        // Double the number of crew members
-        int doubledCrewMembers = 2 * newnumberofcrewmembers;
+            /* Construct follow-up input */
+            int follow_newnumberofpilots = newnumberofpilots + 1;
 
-        // Get follow-up output with doubled crew members
-        MSR followUpOut = mos.generateMSR(aircraftmodel, "y", doubledCrewMembers,
-                changeinthenumberofpilots, newnumberofpilots, numberofchildpassengers,
-                numberofrequestedbundlesofflowers);
+            /* Get follow-up output */
+            MSR follow_out = MOS.generateMSR(aircraftmodel, changeinthenumberofcrewmembers, newnumberofcrewmembers,
+                    changeinthenumberofpilots, follow_newnumberofpilots, numberofchildpassengers, numberofrequestedbundlesofflowers);
 
-        // Verification
-        assertEquals(2 * sourceOut.numberOfMealsForCrewMembers,
-                followUpOut.numberOfMealsForCrewMembers);
+            /* Verification */
+            assertTrue(follow_out.numberOfMealsForPilots == source_out.numberOfMealsForPilots + 2);
+        }
     }
 
     /**
-     * Metamorphic Relation 26: Adding more crew members should not change the
-     * number of meals for
-     * child passengers.
+     * Metamorphic Relation 26: If the number of child passengers and the number of requested bundles of flowers remain the same, then the total number of meals in the MSR output should remain the same regardless of changes in crew members and pilots.
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
     public void test26(String aircraftmodel, String changeinthenumberofcrewmembers,
             int newnumberofcrewmembers, String changeinthenumberofpilots, int newnumberofpilots,
-            int numberofchildpassengers, int numberofrequestedbundlesofflowers) {
-        // Get source output
-        MealOrderingSystem mos = new MealOrderingSystem();
-        MSR sourceOut = mos.generateMSR(aircraftmodel, changeinthenumberofcrewmembers,
-                newnumberofcrewmembers, changeinthenumberofpilots, newnumberofpilots,
-                numberofchildpassengers, numberofrequestedbundlesofflowers);
+            int numberofchildpassengers, int numberofrequestedbundlesofflowers) {   // Fixed
+        /* Get output with regular input */
+        MealOrderingSystem MOS1 = new MealOrderingSystem();
+        MSR output1 = MOS1.generateMSR(aircraftmodel, changeinthenumberofcrewmembers, newnumberofcrewmembers,
+                changeinthenumberofpilots, newnumberofpilots, numberofchildpassengers, numberofrequestedbundlesofflowers);
 
-        // Add more crew members
-        int moreCrewMembers = newnumberofcrewmembers + 5;
+        /* Get output with reversed input order */
+        MealOrderingSystem MOS2 = new MealOrderingSystem();
+        MSR output2 = MOS2.generateMSR(aircraftmodel, changeinthenumberofpilots, newnumberofpilots,
+                changeinthenumberofcrewmembers, newnumberofcrewmembers, numberofchildpassengers, numberofrequestedbundlesofflowers);
 
-        // Get follow-up output with more crew members
-        MSR followUpOut = mos.generateMSR(aircraftmodel, "y", moreCrewMembers,
-                changeinthenumberofpilots, newnumberofpilots, numberofchildpassengers,
-                numberofrequestedbundlesofflowers);
+        int totalMeals1 = getTotalMeals(output1);
+        int totalMeals2 = getTotalMeals(output2);
 
-        // Verification
-        assertEquals(sourceOut.numberOfChildMeals, followUpOut.numberOfChildMeals);
+        /* Verification */
+        assertEquals(totalMeals1, totalMeals2);
     }
 
     /**
-     * Metamorphic Relation 27: Changing the number of economic class seats should
-     * not affect the
-     * total number of meals for pilots.
+     * Metamorphic Relation 27: If the number of child passengers is doubled, the total number of child meals in the MSR output should also double.
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
     public void test27(String aircraftmodel, String changeinthenumberofcrewmembers,
             int newnumberofcrewmembers, String changeinthenumberofpilots, int newnumberofpilots,
             int numberofchildpassengers, int numberofrequestedbundlesofflowers) {
-        /* Fix by Radon */
-        // Get source output
-        MealOrderingSystem MOS1 = new MealOrderingSystem();
-        MSR sourceOut = MOS1.generateMSR(aircraftmodel, changeinthenumberofcrewmembers,
-                newnumberofcrewmembers, changeinthenumberofpilots, newnumberofpilots,
-                numberofchildpassengers, numberofrequestedbundlesofflowers);
+        /* Get source output */
+        MealOrderingSystem MOS = new MealOrderingSystem();
+        MSR source_out = MOS.generateMSR(aircraftmodel, changeinthenumberofcrewmembers, newnumberofcrewmembers,
+                changeinthenumberofpilots, newnumberofpilots, numberofchildpassengers, numberofrequestedbundlesofflowers);
 
-        // Increase the number of economic class seats
-        int increasedEconomicClassSeats = MOS1.getNumberOfEconomicClassSeats() + 10;
-
-        // Get follow-up output with increased economic class seats
-        MealOrderingSystem MOS2 = new MealOrderingSystem();
-        MSR followUpOut = MOS2.generateMSR(aircraftmodel, changeinthenumberofcrewmembers,
-                newnumberofcrewmembers, changeinthenumberofpilots, newnumberofpilots,
-                numberofchildpassengers, numberofrequestedbundlesofflowers);
-
-        // Verification
-        assertEquals(sourceOut.numberOfMealsForPilots, followUpOut.numberOfMealsForPilots);
+        /* Construct follow-up input */
+        int follow_numberofchildpassengers = numberofchildpassengers * 2;
+        
+        /* Get follow-up output */
+        MSR follow_out = MOS.generateMSR(aircraftmodel, changeinthenumberofcrewmembers, newnumberofcrewmembers,
+                changeinthenumberofpilots, newnumberofpilots, follow_numberofchildpassengers, numberofrequestedbundlesofflowers);
+        
+        /* Verification */
+        assertTrue(follow_out.numberOfChildMeals == source_out.numberOfChildMeals * 2);
     }
 
     /**
-     * Metamorphic Relation 28: Increasing the number of child passengers and the
-     * number of meals
-     * for child passengers proportionally.
+     * Metamorphic Relation 28: The number of requested bundles of flowers should not affect the number of crew, pilot, and child meals in the MSR output.
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
     public void test28(String aircraftmodel, String changeinthenumberofcrewmembers,
             int newnumberofcrewmembers, String changeinthenumberofpilots, int newnumberofpilots,
-            int numberofchildpassengers, int numberofrequestedbundlesofflowers) {
-        // Get source output
-        MealOrderingSystem mos = new MealOrderingSystem();
-        MSR sourceOut = mos.generateMSR(aircraftmodel, changeinthenumberofcrewmembers,
-                newnumberofcrewmembers, changeinthenumberofpilots, newnumberofpilots,
-                numberofchildpassengers, numberofrequestedbundlesofflowers);
+            int numberofchildpassengers, int numberofrequestedbundlesofflowers) {   // Fixed
+        /* Get output with regular input */
+        MealOrderingSystem MOS = new MealOrderingSystem();
+        MSR output = MOS.generateMSR(aircraftmodel, changeinthenumberofcrewmembers, newnumberofcrewmembers,
+                changeinthenumberofpilots, newnumberofpilots, numberofchildpassengers, numberofrequestedbundlesofflowers);
+        
+        int originalTotalMeals = output.numberOfMealsForCrewMembers + output.numberOfMealsForPilots + output.numberOfChildMeals;
 
-        // Double the number of child passengers
-        int doubledChildPassengers = 2 * numberofchildpassengers;
+        /* Change the number of requested bundles of flowers */
+        int newNumberofrequestedbundlesofflowers = 5;
+        MSR changedOutput = MOS.generateMSR(aircraftmodel, changeinthenumberofcrewmembers, newnumberofcrewmembers,
+                changeinthenumberofpilots, newnumberofpilots, numberofchildpassengers, newNumberofrequestedbundlesofflowers);
 
-        // Get follow-up output with doubled child passengers
-        MSR followUpOut = mos.generateMSR(aircraftmodel, changeinthenumberofcrewmembers,
-                newnumberofcrewmembers, changeinthenumberofpilots, newnumberofpilots,
-                doubledChildPassengers, numberofrequestedbundlesofflowers);
-
-        // Verification
-        assertEquals(2 * sourceOut.numberOfChildMeals, followUpOut.numberOfChildMeals);
+        /* Verification */
+        assertEquals(originalTotalMeals, changedOutput.numberOfMealsForCrewMembers + changedOutput.numberOfMealsForPilots + changedOutput.numberOfChildMeals);
     }
 
     /**
-     * Metamorphic Relation 29: Doubling the number of first class seats should
-     * double the total
-     * number of first class meals.
+     * Metamorphic Relation 29: If the number of crew members and pilots remain the same, and the number of child passengers is doubled, the total number of meals in the MSR output should increase proportionally.
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
     public void test29(String aircraftmodel, String changeinthenumberofcrewmembers,
             int newnumberofcrewmembers, String changeinthenumberofpilots, int newnumberofpilots,
             int numberofchildpassengers, int numberofrequestedbundlesofflowers) {
-        /* Fix by Radon */
-        // Get source output
-        MealOrderingSystem MOS1 = new MealOrderingSystem();
-        MSR source_out = MOS1.generateMSR(aircraftmodel, changeinthenumberofcrewmembers,
-                newnumberofcrewmembers, changeinthenumberofpilots, newnumberofpilots,
-                numberofchildpassengers, numberofrequestedbundlesofflowers);
+        /* Get source output */
+        MealOrderingSystem MOS = new MealOrderingSystem();
+        MSR source_out = MOS.generateMSR(aircraftmodel, "n", 0, "n", 0, numberofchildpassengers, numberofrequestedbundlesofflowers);
 
-        // Double the number of first class seats
-        int follow_numberoffirstclassseats = MOS1.getNumberOfFirstClassSeats() * 2;
+        /* Construct follow-up input with double the number of child passengers */
+        int follow_numberofchildpassengers = numberofchildpassengers * 2;
 
-        // Get follow-up output
-        MealOrderingSystem MOS2 = new MealOrderingSystem();
-        MSR follow_out = MOS2.generateMSR(aircraftmodel, changeinthenumberofcrewmembers,
-                newnumberofcrewmembers, changeinthenumberofpilots, newnumberofpilots,
-                numberofchildpassengers, follow_numberoffirstclassseats);
+        /* Get follow-up output */
+        MSR follow_out = MOS.generateMSR(aircraftmodel, "n", 0, "n", 0, follow_numberofchildpassengers, numberofrequestedbundlesofflowers);
 
-        // Verification
-        assertEquals(source_out.numberOfFirstClassMeals * 2, follow_out.numberOfFirstClassMeals);
+        int source_totalMeals = getTotalMeals(source_out);
+        int follow_totalMeals = getTotalMeals(follow_out);
+
+        /* Verification */
+        assertTrue(follow_totalMeals == source_totalMeals * 2);
     }
 
     /**
-     * Metamorphic Relation 30: Changing the number of requested bundles of flowers
-     * should not
-     * affect the total number of economic class meals.
+     * Metamorphic Relation 30: If the number of child passengers is zero and the number of requested bundles of flowers is non-zero, then the total number of meals in the MSR output should be equal to the sum of crew meals, pilot meals, and the number of requested bundles of flowers.
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
     public void test30(String aircraftmodel, String changeinthenumberofcrewmembers,
             int newnumberofcrewmembers, String changeinthenumberofpilots, int newnumberofpilots,
             int numberofchildpassengers, int numberofrequestedbundlesofflowers) {
-        // Get source output
-        MealOrderingSystem MOS = new MealOrderingSystem();
-        MSR source_out = MOS.generateMSR(aircraftmodel, changeinthenumberofcrewmembers,
-                newnumberofcrewmembers, changeinthenumberofpilots, newnumberofpilots,
-                numberofchildpassengers, numberofrequestedbundlesofflowers);
+        if (numberofchildpassengers == 0 && numberofrequestedbundlesofflowers > 0) {
+            /* Get source output */
+            MealOrderingSystem MOS = new MealOrderingSystem();
+            MSR output = MOS.generateMSR(aircraftmodel, changeinthenumberofcrewmembers, newnumberofcrewmembers,
+                    changeinthenumberofpilots, newnumberofpilots, numberofchildpassengers, numberofrequestedbundlesofflowers);
 
-        // Modify the number of requested bundles of flowers
-        int follow_numberofrequestedbundlesofflowers = numberofrequestedbundlesofflowers + 5;
+            int totalMeals = getTotalMeals(output);
 
-        // Get follow-up output
-        MSR follow_out = MOS.generateMSR(aircraftmodel, changeinthenumberofcrewmembers,
-                newnumberofcrewmembers, changeinthenumberofpilots, newnumberofpilots,
-                numberofchildpassengers, follow_numberofrequestedbundlesofflowers);
-
-        // Verification
-        assertEquals(source_out.numberOfEconomicClassMeals, follow_out.numberOfEconomicClassMeals);
+            /* Verification */
+            assertEquals(totalMeals, output.numberOfMealsForCrewMembers + output.numberOfMealsForPilots + numberofrequestedbundlesofflowers);
+        }
     }
 
     /**
-     * Metamorphic Relation 31: Increasing the number of child passengers should
-     * increase the total
-     * number of child meals.
+     * Metamorphic Relation 31: The MSR output should remain unchanged regardless of the change in the aircraft model, if the number of crew members, pilots, child passengers, and requested bundles of flowers remain the same.
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
     public void test31(String aircraftmodel, String changeinthenumberofcrewmembers,
             int newnumberofcrewmembers, String changeinthenumberofpilots, int newnumberofpilots,
-            int numberofchildpassengers, int numberofrequestedbundlesofflowers) {
-        // Instantiate the MealOrderingSystem
-        MealOrderingSystem mos = new MealOrderingSystem();
+            int numberofchildpassengers, int numberofrequestedbundlesofflowers) {   // Fixed
+        /* Get output with regular input */
+        MealOrderingSystem MOS1 = new MealOrderingSystem();
+        MSR output1 = MOS1.generateMSR(aircraftmodel, changeinthenumberofcrewmembers, newnumberofcrewmembers,
+                changeinthenumberofpilots, newnumberofpilots, numberofchildpassengers, numberofrequestedbundlesofflowers);
 
-        // Get the source output
-        MSR sourceOut = mos.generateMSR(aircraftmodel, changeinthenumberofcrewmembers,
-                newnumberofcrewmembers, changeinthenumberofpilots, newnumberofpilots,
-                numberofchildpassengers, numberofrequestedbundlesofflowers);
+        /* Get output with different aircraft model but the same regular input */
+        MealOrderingSystem MOS2 = new MealOrderingSystem();
+        MSR output2 = MOS2.generateMSR("DifferentAircraftModel", changeinthenumberofcrewmembers, newnumberofcrewmembers,
+                changeinthenumberofpilots, newnumberofpilots, numberofchildpassengers, numberofrequestedbundlesofflowers);
 
-        // Increase the number of child passengers
-        int increasedChildPassengers = numberofchildpassengers + 5;
-
-        // Get the follow-up output with increased child passengers
-        MSR followUpOut = mos.generateMSR(aircraftmodel, changeinthenumberofcrewmembers,
-                newnumberofcrewmembers, changeinthenumberofpilots, newnumberofpilots,
-                increasedChildPassengers, numberofrequestedbundlesofflowers);
-
-        // Verification
-        assertTrue(followUpOut.numberOfChildMeals > sourceOut.numberOfChildMeals);
-        assertEquals(followUpOut.numberOfMealsForCrewMembers,
-                sourceOut.numberOfMealsForCrewMembers);
+        /* Verification */
+        assertTrue(MSREquals(output1, output2));
     }
 
     /**
-     * Metamorphic Relation 32: If the number of requested bundles of flowers is
-     * increased, the
-     * total number of meals for pilots should not change.
+     * Metamorphic Relation 32: If the number of crew members increases and the number of pilots remains unchanged, the total number of crew member meals in the MSR output should increase by the same amount.
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
     public void test32(String aircraftmodel, String changeinthenumberofcrewmembers,
             int newnumberofcrewmembers, String changeinthenumberofpilots, int newnumberofpilots,
             int numberofchildpassengers, int numberofrequestedbundlesofflowers) {
-        // Instantiate the MealOrderingSystem
-        MealOrderingSystem mos = new MealOrderingSystem();
+        if (changeinthenumberofcrewmembers.equals("y")) {
+            /* Get source output */
+            MealOrderingSystem MOS = new MealOrderingSystem();
+            MSR source_out = MOS.generateMSR(aircraftmodel, changeinthenumberofcrewmembers, newnumberofcrewmembers,
+                changeinthenumberofpilots, newnumberofpilots, numberofchildpassengers, numberofrequestedbundlesofflowers);
 
-        // Get the source output
-        MSR sourceOut = mos.generateMSR(aircraftmodel, changeinthenumberofcrewmembers,
-                newnumberofcrewmembers, changeinthenumberofpilots, newnumberofpilots,
-                numberofchildpassengers, numberofrequestedbundlesofflowers);
+            /* Get follow-up output */
+            MSR follow_up = MOS.generateMSR(aircraftmodel, changeinthenumberofcrewmembers, newnumberofcrewmembers + 1,
+                changeinthenumberofpilots, newnumberofpilots, numberofchildpassengers, numberofrequestedbundlesofflowers);
 
-        // Increase the number of requested bundles of flowers
-        int increasedRequestedBundlesOfFlowers = numberofrequestedbundlesofflowers + 10;
-
-        // Get the follow-up output with increased requested bundles of flowers
-        MSR followUpOut = mos.generateMSR(aircraftmodel, changeinthenumberofcrewmembers,
-                newnumberofcrewmembers, changeinthenumberofpilots, newnumberofpilots,
-                numberofchildpassengers, increasedRequestedBundlesOfFlowers);
-
-        // Verification
-        assertEquals(sourceOut.numberOfMealsForPilots, followUpOut.numberOfMealsForPilots);
+            /* Verification */
+            assertTrue(follow_up.numberOfMealsForCrewMembers == source_out.numberOfMealsForCrewMembers + 2);
+        }
     }
 
     /**
-     * Metamorphic Relation 33: Increasing the number of crew members and child
-     * passengers should
-     * not affect the number of first class seats.
+     * Metamorphic Relation 33: If the aircraft model remains the same, and there is an increase in the number of child passengers and the number of requested bundles of flowers is doubled, the total number of meals in the MSR output should increase proportionally.
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
     public void test33(String aircraftmodel, String changeinthenumberofcrewmembers,
             int newnumberofcrewmembers, String changeinthenumberofpilots, int newnumberofpilots,
             int numberofchildpassengers, int numberofrequestedbundlesofflowers) {
-        /* Fix by Radon */
-        // Instantiate the MealOrderingSystem
-        MealOrderingSystem MOS1 = new MealOrderingSystem();
+        /* Get source output */
+        MealOrderingSystem MOS = new MealOrderingSystem();
+        MSR source_out = MOS.generateMSR(aircraftmodel, changeinthenumberofcrewmembers, newnumberofcrewmembers, changeinthenumberofpilots, newnumberofpilots, numberofchildpassengers, numberofrequestedbundlesofflowers);
 
-        // Get the source output
-        MSR sourceOut = MOS1.generateMSR(aircraftmodel, changeinthenumberofcrewmembers,
-                newnumberofcrewmembers, changeinthenumberofpilots, newnumberofpilots,
-                numberofchildpassengers, numberofrequestedbundlesofflowers);
+        /* Construct follow-up input */
+        int follow_numberofchildpassengers = numberofchildpassengers * 2;
+        int follow_numberofrequestedbundlesofflowers = numberofrequestedbundlesofflowers * 2;
 
-        // Increase the number of crew members and child passengers
-        int increasedCrewMembers = newnumberofcrewmembers + 5;
-        int increasedChildPassengers = numberofchildpassengers + 10;
+        /* Get follow-up output */
+        MSR follow_out = MOS.generateMSR(aircraftmodel, changeinthenumberofcrewmembers, newnumberofcrewmembers, changeinthenumberofpilots, newnumberofpilots, follow_numberofchildpassengers, follow_numberofrequestedbundlesofflowers);
 
-        // Get the follow-up output with increased crew members and child passengers
-        MealOrderingSystem MOS2 = new MealOrderingSystem();
-        MSR followUpOut = MOS2.generateMSR(aircraftmodel, "y", increasedCrewMembers,
-                changeinthenumberofpilots, newnumberofpilots, increasedChildPassengers,
-                numberofrequestedbundlesofflowers);
+        int source_totalMeals = getTotalMeals(source_out);
+        int follow_totalMeals = getTotalMeals(follow_out);
 
-        // Verification
-        assertEquals(MOS1.getNumberOfFirstClassSeats(), MOS2.getNumberOfFirstClassSeats());
+        /* Verification */
+        assertTrue(follow_totalMeals == source_totalMeals * 2);
     }
 
     /**
-     * Metamorphic Relation 34: Changing the number of first class seats should not
-     * affect the total
-     * number of crew meals and pilot meals.
+     * Metamorphic Relation 34: If the number of child passengers doubles and the number of requested bundles of flowers is tripled, the total number of meals in the MSR output should increase proportionally.
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
     public void test34(String aircraftmodel, String changeinthenumberofcrewmembers,
             int newnumberofcrewmembers, String changeinthenumberofpilots, int newnumberofpilots,
-            int numberofchildpassengers, int numberofrequestedbundlesofflowers) {
-        /* Fix by Radon */
-        // Instantiate the MealOrderingSystem
-        MealOrderingSystem MOS1 = new MealOrderingSystem();
+            int numberofchildpassengers, int numberofrequestedbundlesofflowers) {   // Fixed
+        /* Get source output */
+        MealOrderingSystem MOS = new MealOrderingSystem();
+        MSR source_out = MOS.generateMSR(aircraftmodel, changeinthenumberofcrewmembers, newnumberofcrewmembers, changeinthenumberofpilots, newnumberofpilots, numberofchildpassengers, numberofrequestedbundlesofflowers);
 
-        // Get the source output
-        MSR sourceOut = MOS1.generateMSR(aircraftmodel, changeinthenumberofcrewmembers,
-                newnumberofcrewmembers, changeinthenumberofpilots, newnumberofpilots,
-                numberofchildpassengers, numberofrequestedbundlesofflowers);
+        /* Construct follow-up input */
+        int follow_numberofchildpassengers = numberofchildpassengers * 2;
+        int follow_numberofrequestedbundlesofflowers = numberofrequestedbundlesofflowers * 3;
 
-        // Change the number of first class seats
-        int modifiedFirstClassSeats = MOS1.getNumberOfFirstClassSeats() + 5;
+        /* Get follow-up output */
+        MSR follow_out = MOS.generateMSR(aircraftmodel, changeinthenumberofcrewmembers, newnumberofcrewmembers, changeinthenumberofpilots, newnumberofpilots, follow_numberofchildpassengers, follow_numberofrequestedbundlesofflowers);
 
-        // Get the follow-up output with modified first class seats
-        MealOrderingSystem MOS2 = new MealOrderingSystem();
-        MSR followUpOut = MOS2.generateMSR(aircraftmodel, changeinthenumberofcrewmembers,
-                newnumberofcrewmembers, changeinthenumberofpilots, newnumberofpilots,
-                numberofchildpassengers, numberofrequestedbundlesofflowers);
+        int source_totalMeals = getTotalMeals(source_out);
+        int follow_totalMeals = getTotalMeals(follow_out);
 
-        // Verification
-        assertEquals(sourceOut.numberOfMealsForCrewMembers,
-                followUpOut.numberOfMealsForCrewMembers);
-        assertEquals(sourceOut.numberOfMealsForPilots, followUpOut.numberOfMealsForPilots);
+        /* Verification */
+        assertTrue(follow_totalMeals == source_totalMeals * 3);
     }
 
     /**
-     * Metamorphic Relation 35: Keeping all other attributes unchanged, if the
-     * number of child
-     * passengers is doubled, the total number of child meals should also double.
+     * Metamorphic Relation 35: If the number of crew members and number of pilots are both unchanged, the ratio of crew meals to pilot meals in the MSR output for the original input and the follow-up input should be the same.
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
     public void test35(String aircraftmodel, String changeinthenumberofcrewmembers,
             int newnumberofcrewmembers, String changeinthenumberofpilots, int newnumberofpilots,
-            int numberofchildpassengers, int numberofrequestedbundlesofflowers) {
-        MealOrderingSystem mos = new MealOrderingSystem();
-        MSR sourceOut = mos.generateMSR(aircraftmodel, changeinthenumberofcrewmembers,
-                newnumberofcrewmembers, changeinthenumberofpilots, newnumberofpilots,
-                numberofchildpassengers, numberofrequestedbundlesofflowers);
+            int numberofchildpassengers, int numberofrequestedbundlesofflowers) {   // Fixed
+        if (changeinthenumberofcrewmembers.equals("n") && changeinthenumberofpilots.equals("n")) {
+            /* Get source output */
+            MealOrderingSystem MOS = new MealOrderingSystem();
+            MSR source_out = MOS.generateMSR(aircraftmodel, changeinthenumberofcrewmembers, newnumberofcrewmembers,
+                    changeinthenumberofpilots, newnumberofpilots, numberofchildpassengers, numberofrequestedbundlesofflowers);
 
-        int doubledChildPassengers = numberofchildpassengers * 2;
+            int crewMealsRatio = source_out.numberOfMealsForCrewMembers / source_out.numberOfMealsForPilots;
 
-        MSR followUpOut = mos.generateMSR(aircraftmodel, changeinthenumberofcrewmembers,
-                newnumberofcrewmembers, changeinthenumberofpilots, newnumberofpilots,
-                doubledChildPassengers, numberofrequestedbundlesofflowers);
+            /* Get follow-up output */
+            MSR follow_out = MOS.generateMSR(aircraftmodel, changeinthenumberofcrewmembers, newnumberofcrewmembers,
+                    changeinthenumberofpilots, newnumberofpilots, numberofchildpassengers, numberofrequestedbundlesofflowers);
 
-        assertEquals(sourceOut.numberOfChildMeals * 2, followUpOut.numberOfChildMeals);
+            int followCrewMealsRatio = follow_out.numberOfMealsForCrewMembers / follow_out.numberOfMealsForPilots;
+
+            /* Verification */
+            assertEquals(crewMealsRatio, followCrewMealsRatio);
+        }
     }
 
     /**
-     * Metamorphic Relation 36: If the number of meals for crew members is
-     * increased, the number of
-     * crew members meeting the proposed numberofcrewmembers grows.
+     * Metamorphic Relation 36: If the number of crew members is decreased, and the number of child passengers and requested bundles of flowers remain unchanged, the total number of crew meals in the MSR output should decrease by the same amount.
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
     public void test36(String aircraftmodel, String changeinthenumberofcrewmembers,
             int newnumberofcrewmembers, String changeinthenumberofpilots, int newnumberofpilots,
-            int numberofchildpassengers, int numberofrequestedbundlesofflowers) {
-        /* Fix by Radon */
-        final MealOrderingSystem MOS1 = new MealOrderingSystem();
-        final MSR sourceOut = MOS1.generateMSR(aircraftmodel, changeinthenumberofcrewmembers,
-                newnumberofcrewmembers, changeinthenumberofpilots, newnumberofpilots,
-                numberofchildpassengers, numberofrequestedbundlesofflowers);
+            int numberofchildpassengers, int numberofrequestedbundlesofflowers) {   // Fixed
+        if (changeinthenumberofcrewmembers.equals("y") && newnumberofcrewmembers < 5) { // Assuming a decrease of 1 crew member
+            /* Get source output */
+            MealOrderingSystem MOS = new MealOrderingSystem();
+            MSR source_out = MOS.generateMSR(aircraftmodel, changeinthenumberofcrewmembers, newnumberofcrewmembers,
+                    changeinthenumberofpilots, newnumberofpilots, numberofchildpassengers, numberofrequestedbundlesofflowers);
 
-        /* Increase meals for crew members */
-        final int increasedMealsForCrewMembers = sourceOut.numberOfMealsForCrewMembers + 10;
+            /* Construct follow-up input */
+            int follow_newnumberofcrewmembers = newnumberofcrewmembers - 1;
 
-        final MealOrderingSystem MOS2 = new MealOrderingSystem();
-        final MSR followUpOut = MOS2.generateMSR(aircraftmodel, "y", // change in the number of crew
-                                                                     // members
-                newnumberofcrewmembers + 5, // proposed number of crew members
-                changeinthenumberofpilots, newnumberofpilots, numberofchildpassengers,
-                numberofrequestedbundlesofflowers);
+            /* Get follow-up output */
+            MSR follow_out = MOS.generateMSR(aircraftmodel, changeinthenumberofcrewmembers, follow_newnumberofcrewmembers,
+                    changeinthenumberofpilots, newnumberofpilots, numberofchildpassengers, numberofrequestedbundlesofflowers);
 
-        assertTrue(MOS2.getNumberOfCrewMembers() > newnumberofcrewmembers);
+            /* Verification */
+            assertTrue(follow_out.numberOfMealsForCrewMembers == source_out.numberOfMealsForCrewMembers - 2); // Assuming each crew meal per crew member decreases by 2
+        }
+    }
+
+    /**
+     * Metamorphic Relation 37: If the number of crew members is increased and the number of pilots remains unchanged, the total number of crew meals in the MSR output should increase proportionally.
+     */
+    @ParameterizedTest
+    @MethodSource("testcaseProvider")
+    public void test37(String aircraftmodel, String changeinthenumberofcrewmembers,
+            int newnumberofcrewmembers, String changeinthenumberofpilots, int newnumberofpilots,
+            int numberofchildpassengers, int numberofrequestedbundlesofflowers) {   // Fixed
+        if (changeinthenumberofcrewmembers.equals("y")) {
+            /* Get source output */
+            MealOrderingSystem MOS = new MealOrderingSystem();
+            MSR source_out = MOS.generateMSR(aircraftmodel, changeinthenumberofcrewmembers, newnumberofcrewmembers,
+                    changeinthenumberofpilots, newnumberofpilots, numberofchildpassengers, numberofrequestedbundlesofflowers);
+
+            /* Construct follow-up input */
+            int increasedCrewMembers = newnumberofcrewmembers + 1;
+
+            /* Get follow-up output */
+            MSR follow_out = MOS.generateMSR(aircraftmodel, changeinthenumberofcrewmembers, increasedCrewMembers,
+                    changeinthenumberofpilots, newnumberofpilots, numberofchildpassengers, numberofrequestedbundlesofflowers);
+
+            /* Verification */
+            assertTrue(follow_out.numberOfMealsForCrewMembers == source_out.numberOfMealsForCrewMembers + 2); // Assuming each crew meal per crew member increases by 2
+        }
+    }
+
+    /**
+     * Metamorphic Relation 38: If the number of child passengers and the number of requested bundles of flowers remain unchanged, the total number of meals in the MSR output should remain unchanged regardless of the changes in the number of crew members and pilots.
+     */
+    @ParameterizedTest
+    @MethodSource("testcaseProvider")
+    public void test38(String aircraftmodel, String changeinthenumberofcrewmembers,
+            int newnumberofcrewmembers, String changeinthenumberofpilots, int newnumberofpilots,
+            int numberofchildpassengers, int numberofrequestedbundlesofflowers) {   // Fixed
+        // Get output with regular input
+        MealOrderingSystem MOS = new MealOrderingSystem();
+        MSR output1 = MOS.generateMSR(aircraftmodel, changeinthenumberofcrewmembers, newnumberofcrewmembers,
+                changeinthenumberofpilots, newnumberofpilots, numberofchildpassengers, numberofrequestedbundlesofflowers);
+
+        // Get output with reversed input order
+        MealOrderingSystem MOS2 = new MealOrderingSystem();
+        MSR output2 = MOS2.generateMSR(aircraftmodel, changeinthenumberofpilots, newnumberofpilots,
+                changeinthenumberofcrewmembers, newnumberofcrewmembers, numberofchildpassengers, numberofrequestedbundlesofflowers);
+
+        int totalMeals1 = getTotalMeals(output1);
+        int totalMeals2 = getTotalMeals(output2);
+
+        // Verification
+        assertEquals(totalMeals1, totalMeals2);
+    }
+
+    /**
+     * Metamorphic Relation 39: If the number of crew members and pilots are both unchanged, and the number of child passengers is increased, the total number of child meals in the MSR output should increase proportionally.
+     */
+    @ParameterizedTest
+    @MethodSource("testcaseProvider")
+    public void test39(String aircraftmodel, String changeinthenumberofcrewmembers,
+            int newnumberofcrewmembers, String changeinthenumberofpilots, int newnumberofpilots,
+            int numberofchildpassengers, int numberofrequestedbundlesofflowers) {   // Fixed
+        /* Get source output with no change in crew members and pilots */
+        MealOrderingSystem MOS = new MealOrderingSystem();
+        MSR source_out = MOS.generateMSR(aircraftmodel, "n", 0, "n", 0, numberofchildpassengers, numberofrequestedbundlesofflowers);
+
+        /* Construct follow-up input with double the number of child passengers */
+        int follow_numberofchildpassengers = numberofchildpassengers * 2;
+
+        /* Get follow-up output */
+        MSR follow_out = MOS.generateMSR(aircraftmodel, "n", 0, "n", 0, follow_numberofchildpassengers, numberofrequestedbundlesofflowers);
+
+        /* Verification */
+        assertTrue(follow_out.numberOfChildMeals == source_out.numberOfChildMeals * 2);
+    }
+
+    /**
+     * Metamorphic Relation 40: If the number of requested bundles of flowers is increased, the total number of meals in the MSR output should also increase proportionally.
+     */
+    @ParameterizedTest
+    @MethodSource("testcaseProvider")
+    public void test40(String aircraftmodel, String changeinthenumberofcrewmembers,
+            int newnumberofcrewmembers, String changeinthenumberofpilots, int newnumberofpilots,
+            int numberofchildpassengers, int numberofrequestedbundlesofflowers) {   // Fixed
+        /* Get source output */
+        MealOrderingSystem MOS = new MealOrderingSystem();
+        MSR source_out = MOS.generateMSR(aircraftmodel, changeinthenumberofcrewmembers, newnumberofcrewmembers,
+            changeinthenumberofpilots, newnumberofpilots, numberofchildpassengers, numberofrequestedbundlesofflowers);
+
+        /* Construct follow-up input */
+        int follow_numberofrequestedbundlesofflowers = numberofrequestedbundlesofflowers * 2;
+
+        /* Get follow-up output */
+        MSR follow_out = MOS.generateMSR(aircraftmodel, changeinthenumberofcrewmembers, newnumberofcrewmembers,
+            changeinthenumberofpilots, newnumberofpilots, numberofchildpassengers, follow_numberofrequestedbundlesofflowers);
+
+        int source_totalMeals = getTotalMeals(source_out);
+        int follow_totalMeals = getTotalMeals(follow_out);
+
+        /* Verification */
+        assertTrue(follow_totalMeals == source_totalMeals * 2);
     }
 
     /**
