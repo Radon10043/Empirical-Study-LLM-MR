@@ -3,10 +3,12 @@
 # $1: 哪个测试文件夹
 # $2: 哪个MR
 # $3: 重复几次
+
 echo "# $2.py"
 
 for ((i=1; i<=$3; i++)); do
-    venv/Scripts/python test/$1/$2.py > testcases.output.txt 2>&1
+    # venv/Scripts/python test/$1/$2.py > testcases.output.txt 2>&1
+    venv/bin/python3 test/$1/$2.py > testcases.output.txt 2>&1
     ret=$?
     if [ $ret -eq 0 ]; then
         echo "$2.py Test $i success  "
