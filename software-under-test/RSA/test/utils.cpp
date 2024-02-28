@@ -2,6 +2,7 @@
 #include <iostream>
 #include <random>
 #include <vector>
+#include <algorithm>
 
 #include "utils.h"
 
@@ -16,7 +17,13 @@ vector<RSAInput> gen_tcs_randomly() {
 
     /* 构建测试用例 */
     for (int i = 0; i < TESTCASE_NUM; i++) {
-        int p = prime_nums[dist1(rng)], q = prime_nums[dist1(rng)], e = prime_nums[dist1(rng)];
+        int p = prime_nums[dist1(rng)], q = prime_nums[dist1(rng)];
+        int e = 2;
+        for (; e < (p - 1) * (q - 1) / 2; e++) {
+            if (__gcd(e, (p - 1) * (q - 1)) == 1) {
+                break;
+            }
+        }
         int m = dist2(rng);
         tcs.push_back(RSAInput(m, e, p, q));
     }
