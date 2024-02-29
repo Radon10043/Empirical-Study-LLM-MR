@@ -584,22 +584,11 @@ bool checkMR19(const vector<int>& source, const vector<int>& follow) {
     return source.size() == follow.size();
 }*/
 
-//fixed
 /**
- * @brief Metamorphic Relation 20: Randomly swapping two columns in the matrix, 
- * then the output may not change.
- *
+ * @brief Metamorphic Relation 20: Adding a key row that is a circular shift of an existing key row in the matrix, 
+ * then the output will not change.
  */
 TEST_P(KLPParamTest, MR20) {
-    /* Define checkMR20 function */
-    auto checkMR20 = [](const vector<int>& source, const vector<int>& follow) {
-        // Perform statistical testing to check if the output is consistent with the metamorphic relation
-        // (e.g., running multiple times and checking if the outputs follow the same pattern)
-
-        // For demonstration purposes, let's assume that the condition is met if the outputs have the same size
-        return source.size() == follow.size();
-    };
-
     /* Get source input */
     KLPInput input = GetParam();
     vector<vector<int>> matrix = input.matrix;
@@ -609,21 +598,16 @@ TEST_P(KLPParamTest, MR20) {
 
     /* Construct follow-up input */
     vector<vector<int>> follow_matrix = matrix;
-    if (follow_matrix.size() > 0) {
-        int col1 = rand() % (follow_matrix[0].size());
-        int col2 = rand() % (follow_matrix[0].size());
-        for (auto &row : follow_matrix) {
-            swap(row[col1], row[col2]);
-        }
+    if (!follow_matrix.empty()) {
+        int row_index = rand() % follow_matrix.size();
+        rotate(follow_matrix[row_index].rbegin(), follow_matrix[row_index].rbegin() + 1, follow_matrix[row_index].rend());
     }
 
     /* Get follow-up output */
     vector<int> follow_out = KLP(follow_matrix);
 
     /* Verification */
-    // Note: In this case, the output may or may not be the same due to the randomness of column swapping
-    // Hence, we need to apply statistical testing (e.g., using multiple runs) to confirm the metamorphic relation
-    ASSERT_TRUE(checkMR20(source_out, follow_out));
+    EXPECT_EQ(source_out, follow_out);
 }
 
 /**
@@ -699,9 +683,7 @@ bool checkMR21(const vector<int>& source, const vector<int>& follow) {
 }*/
 
 /**
- * @brief Metamorphic Relation 22: Removing a random subset of columns from the matrix, 
- * then the output may not change.
- *
+ * @brief Metamorphic Relation 22: Adding a key row that is a circular rotation of an existing key row in the matrix, then the output will not change.
  */
 TEST_P(KLPParamTest, MR22) {
     /* Get source input */
@@ -711,29 +693,22 @@ TEST_P(KLPParamTest, MR22) {
     /* Get source output */
     vector<int> source_out = KLP(matrix);
 
-    if (matrix[0].size() > 1) {
-        /* Construct follow-up input */
-        vector<vector<int>> follow_matrix = matrix;
-        int cols_to_remove = rand() % (matrix[0].size() - 1) + 1;
-        for (int i = 0; i < cols_to_remove; ++i) {
-            int col_idx = rand() % follow_matrix[0].size();
-            for (auto &row : follow_matrix) {
-                row.erase(row.begin() + col_idx);
-            }
-        }
-
-        /* Get follow-up output */
-        vector<int> follow_out = KLP(follow_matrix);
-
-        /* Verification */
-        // You can perform appropriate statistical testing to validate the metamorphic relation result
+    /* Construct follow-up input */
+    vector<vector<int>> follow_matrix = matrix;
+    if (!follow_matrix.empty()) {
+        int row_index = rand() % follow_matrix.size();
+        rotate(follow_matrix[row_index].begin(), follow_matrix[row_index].begin() + 1, follow_matrix[row_index].end());
     }
+
+    /* Get follow-up output */
+    vector<int> follow_out = KLP(follow_matrix);
+
+    /* Verification */
+    EXPECT_EQ(source_out, follow_out);
 }
 
 /**
- * @brief Metamorphic Relation 23: Replacing each element of the matrix with a random value (0 or 1), 
- * then the output may not change.
- *
+ * @brief Metamorphic Relation 23: Adding a lock column that is a circular rotation of an existing lock column in the matrix, then the output will not change.
  */
 TEST_P(KLPParamTest, MR23) {
     /* Get source input */
@@ -745,18 +720,20 @@ TEST_P(KLPParamTest, MR23) {
 
     /* Construct follow-up input */
     vector<vector<int>> follow_matrix = matrix;
-    for (auto &row : follow_matrix) {
-        for (int &val : row) {
-            val = rand() % 2;  // Assigning a random value of 0 or 1
-        }
+
+    // In this MR, we assume that the matrix has at least one row and multiple columns
+    if (!follow_matrix.empty() && follow_matrix[0].size() > 1) {
+        int col_index = rand() % follow_matrix[0].size();
+        rotate(follow_matrix.begin(), follow_matrix.end() - 1, follow_matrix.end());
     }
 
     /* Get follow-up output */
     vector<int> follow_out = KLP(follow_matrix);
 
     /* Verification */
-    // You can perform appropriate statistical testing to validate the metamorphic relation result
+    EXPECT_EQ(source_out, follow_out);
 }
+
 
 /**
  * @brief Metamorphic Relation 24: Adding a key row that is a reverse of an existing key row in the matrix,

@@ -135,6 +135,7 @@ public class TriSquareTestGPT3D5New {
         assertEquals(follow_area, Math.pow(source_area, 2));
     }
 
+    //fixed
     /**
      * Metamorphic Relation 6: If two sides of the triangle are equal, and a new triangle is formed by scaling the sides by a factor, then the triangle type will remain the same, but the area of the second triangle will be the square of the scaling factor times the area of the first triangle.
      */
@@ -158,7 +159,7 @@ public class TriSquareTestGPT3D5New {
         int source_type = source_out.getKey().intValue(), follow_type = source_out.getKey().intValue();
         double source_area = source_out.getValue().doubleValue(), follow_area = follow_out.getValue().doubleValue();
         assertEquals(source_type, follow_type);
-        assertEquals(follow_area, Math.pow(scalingFactor, 2) * source_area);
+        assertEquals(follow_area, Math.pow(scalingFactor, 2) * source_area, 0.001);
     }
 
     /**
@@ -274,6 +275,7 @@ public class TriSquareTestGPT3D5New {
         }
     }
 
+    //fixed
     /**
      * Metamorphic Relation 11: If we scale all sides of the triangle by a positive constant, the type of the triangle remains the same, and the area of the second triangle is the square of the scaling factor times the area of the first triangle.
      */
@@ -297,7 +299,7 @@ public class TriSquareTestGPT3D5New {
         int source_type = source_out.getKey().intValue(), follow_type = source_out.getKey().intValue();
         double source_area = source_out.getValue().doubleValue(), follow_area = follow_out.getValue().doubleValue();
         assertEquals(source_type, follow_type);
-        assertEquals(follow_area, Math.pow(scalingFactor, 2) * source_area);
+        assertEquals(follow_area, Math.pow(scalingFactor, 2) * source_area, 0.001);
     }
 
     /**
@@ -685,6 +687,7 @@ public class TriSquareTestGPT3D5New {
         assertEquals(source_out, follow_out);
     }
 
+    //fixed
     /**
      * Metamorphic Relation 27: If the sides of the triangle form an arithmetic sequence, then scaling all sides by the same positive constant will result in a triangle with the same type and an area scaled by the squared value of the constant.
      */
@@ -709,7 +712,7 @@ public class TriSquareTestGPT3D5New {
         int source_type = source_out.getKey().intValue(), follow_type = source_out.getKey().intValue();
         double source_area = source_out.getValue().doubleValue(), follow_area = follow_out.getValue().doubleValue();
         assertEquals(source_type, follow_type);
-        assertEquals(source_area * Math.pow(scalingFactor, 2), follow_area);
+        assertEquals(source_area * Math.pow(scalingFactor, 2), follow_area, 0.001);
     }
 
     /**
