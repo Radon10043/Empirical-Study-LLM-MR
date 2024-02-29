@@ -598,6 +598,7 @@ TEST_P(InterleavingStringParamTest, MR24) {
     EXPECT_EQ(source_out, follow_out);
 }
 
+//fixed
 /**
  * @brief Metamorphic Relation 25: Replacing each character in A with its ASCII value and keeping B, C unchanged, the result will be the same.
  *
@@ -612,7 +613,8 @@ TEST_P(InterleavingStringParamTest, MR25) {
 
     /* Construct follow-up input */
     for (char &c : A) {
-        c = to_string((int)c)[0];
+        //c = to_string((int)c)[0];
+        c = static_cast<char>(static_cast<int>(c));
     }
 
     /* Get follow-up output */

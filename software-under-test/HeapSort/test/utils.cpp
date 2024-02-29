@@ -12,7 +12,7 @@ vector<HeapSortInput> gen_tcs_randomly() {
 
     /* clang-format off */
     uniform_int_distribution<int> dist_size(1, 1000),       /* 数组长度范围 */
-                                  dist_value(1, 1000);      /* 元素取值范围 */
+                                  dist_value(-1000, 1000);      /* 元素取值范围 */
     /* clang-format on */
 
     /* 构建测试用例 */

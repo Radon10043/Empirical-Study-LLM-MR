@@ -718,26 +718,34 @@ TEST_P(MultiMAXSUMParamTest, MR27) {
     EXPECT_LE(follow_out, source_out);
 }
 
+/**
+ * @brief Metamorphic Relation 28: Adding a constant to all elements of the input array, the follow-up output should be increased by the sum of the array multiplied by the constant.
+ *
+ */
 TEST_P(MultiMAXSUMParamTest, MR28) {
     /* Get source input */
     MultiMAXSUMInput input = GetParam();
     vector<int> source_vec = input.vec;
     int source_m = input.m;
-
+    int constant = 2;  // Example constant value
+    
     /* Get source output */
     int source_out = multi_maxsum(source_vec, source_m);
 
-    /* Construct follow-up input by taking the absolute value of each element */
-    vector<int> follow_vec = source_vec;
-    for (int i = 0; i < follow_vec.size(); ++i) {
-        follow_vec[i] = abs(follow_vec[i]);
+    /* Construct follow-up input */
+    vector<int> follow_vec;
+    for (int val : source_vec) {
+        follow_vec.push_back(val + constant);
     }
 
     /* Get follow-up output */
-    int follow_out = multi_maxsum(follow_vec, source_m);
+    int follow_up_out = multi_maxsum(follow_vec, source_m);
+
+    /* Calculate the expected follow-up output */
+    int expected_follow_up_out = source_out + accumulate(source_vec.begin(), source_vec.end(), 0) * constant;
 
     /* Verification */
-    EXPECT_EQ(follow_out, source_out);
+    EXPECT_EQ(follow_up_out, expected_follow_up_out);
 }
 
 /**
