@@ -14,7 +14,7 @@ using namespace std;
 class HeapSortParamTest : public ::testing::TestWithParam<HeapSortInput> {};
 
 /**
- * @brief Metamorphic Relation 1: Reversing the elements in the input array, the output will be sorted in ascending order.
+ * @brief Metamorphic Relation 1: Reversing the elements in the input array, the output will be sorted in descending order.
  *
  */
 TEST_P(HeapSortParamTest, MR1) {
@@ -33,70 +33,93 @@ TEST_P(HeapSortParamTest, MR1) {
     vector<int> follow_out = heap_sort(follow_vec);
 
     /* Verification */
+    sort(source_out.begin(), source_out.end(), greater<int>());
+    EXPECT_EQ(follow_out, source_out);
+}
+
+/**
+ * @brief Metamorphic Relation 2: Adding a constant to each element in the input array, then the output will be sorted in ascending order, and all elements will be larger by the constant.
+ *
+ */
+TEST_P(HeapSortParamTest, MR2) {
+    int constant = 5;
+
+    /* Get source input */
+    HeapSortInput input = GetParam();
+    vector<int> source_vec = input.vec;
+
+    /* Get source output */
+    vector<int> source_out = heap_sort(source_vec);
+
+    /* Construct follow-up input */
+    vector<int> follow_vec = source_vec;
+    for (auto &elem : follow_vec)
+        elem += constant;
+
+    /* Get follow-up output */
+    vector<int> follow_out = heap_sort(follow_vec);
+
+    /* Verification */
+    sort(source_out.begin(), source_out.end());
+    for (auto &elem : follow_out)
+        elem -= constant;
+    EXPECT_EQ(follow_out, source_out);
+}
+
+/**
+ * @brief Metamorphic Relation 3: Multiplying -1 to each element in the input array, then the output will be sorted in descending order, and if we multiply -1 to each element of the output array, it should be the same as the source output array.
+ *
+ */
+TEST_P(HeapSortParamTest, MR3) {
+    /* Get source input */
+    HeapSortInput input = GetParam();
+    vector<int> source_vec = input.vec;
+
+    /* Get source output */
+    vector<int> source_out = heap_sort(source_vec);
+
+    /* Construct follow-up input */
+    vector<int> follow_vec = source_vec;
+    for (auto &elem : follow_vec)
+        elem *= -1;
+
+    /* Get follow-up output */
+    vector<int> follow_out = heap_sort(follow_vec);
+
+    /* Verification */
+    sort(source_out.begin(), source_out.end(), greater<int>());
+    for (auto &elem : follow_out)
+        elem *= -1;
+    EXPECT_EQ(follow_out, source_out);
+}
+
+/**
+ * @brief Metamorphic Relation 4: Replacing elements in the input array with their square, then the output will be in ascending sorted order.
+ *
+ */
+TEST_P(HeapSortParamTest, MR4) {
+    /* Get source input */
+    HeapSortInput input = GetParam();
+    vector<int> source_vec = input.vec;
+
+    /* Get source output */
+    vector<int> source_out = heap_sort(source_vec);
+
+    /* Construct follow-up input */
+    vector<int> follow_vec = source_vec;
+    for (auto &elem : follow_vec)
+        elem = elem * elem;
+
+    /* Get follow-up output */
+    vector<int> follow_out = heap_sort(follow_vec);
+
+    /* Verification */
     sort(source_out.begin(), source_out.end());
     EXPECT_EQ(follow_out, source_out);
 }
 
 /**
- * @brief Metamorphic Relation 2: Deleting a constant from each element in the input array, then each element of the output array will be smaller by the
- * constant than the element at the same location of the source input.
- *
- */
-TEST_P(HeapSortParamTest, MR2) {
-    int constant = 3;
-
-    /* Get source input */
-    HeapSortInput input = GetParam();
-    vector<int> source_vec = input.vec;
-
-    /* Get source output */
-    vector<int> source_out = heap_sort(source_vec);
-
-    /* Construct follow-up input */
-    vector<int> follow_vec = source_vec;
-    for (auto &elem : follow_vec)
-        elem -= constant;
-
-    /* Get follow-up output */
-    vector<int> follow_out = heap_sort(follow_vec);
-
-    /* Verification */
-    for (auto &elem : follow_out)
-        elem += constant;
-    EXPECT_EQ(follow_out, source_out);
-}
-
-/**
- * @brief Metamorphic Relation 4: Adding a constant to each element in the input array, then the output should be the same as the original output array shifted
- * to the right by 1 position.
- *
- */
-TEST_P(HeapSortParamTest, MR4) {
-    int constant = 2;
-
-    /* Get source input */
-    HeapSortInput input = GetParam();
-    vector<int> source_vec = input.vec;
-
-    /* Get source output */
-    vector<int> source_out = heap_sort(source_vec);
-
-    /* Construct follow-up input */
-    vector<int> follow_vec = source_vec;
-    for (auto &elem : follow_vec)
-        elem += constant;
-
-    /* Get follow-up output */
-    vector<int> follow_out = heap_sort(follow_vec);
-
-    /* Verification */
-    rotate(source_out.rbegin(), source_out.rbegin() + 1, source_out.rend());
-    EXPECT_EQ(follow_out, source_out);
-}
-
-/**
- * @brief Metamorphic Relation 5: Replacing all even elements in the input array with their squares, and all odd elements in the input array with their cubes,
- * the output array should still be sorted in descending order.
+ * @brief Metamorphic Relation 5: Replacing elements in the input array with their absolute values, then the output will be the same as if the input array remained unchanged.
  *
  */
 TEST_P(HeapSortParamTest, MR5) {
@@ -109,13 +132,8 @@ TEST_P(HeapSortParamTest, MR5) {
 
     /* Construct follow-up input */
     vector<int> follow_vec = source_vec;
-    for (auto &elem : follow_vec) {
-        if (elem % 2 == 0) {
-            elem = elem * elem;
-        } else {
-            elem = elem * elem * elem;
-        }
-    }
+    for (auto &elem : follow_vec)
+        elem = abs(elem);
 
     /* Get follow-up output */
     vector<int> follow_out = heap_sort(follow_vec);
@@ -125,7 +143,7 @@ TEST_P(HeapSortParamTest, MR5) {
 }
 
 /**
- * @brief Metamorphic Relation 6: Repeating the elements in the input array, the output array should remain unchanged.
+ * @brief Metamorphic Relation 6: Replacing elements in the input array with their negative values, then if we multiply -1 to each element of the output array, it should be the same as the source output array but in reverse order.
  *
  */
 TEST_P(HeapSortParamTest, MR6) {
@@ -137,21 +155,22 @@ TEST_P(HeapSortParamTest, MR6) {
     vector<int> source_out = heap_sort(source_vec);
 
     /* Construct follow-up input */
-    vector<int> follow_vec;
-    for (auto elem : source_vec) {
-        follow_vec.push_back(elem);
-        follow_vec.push_back(elem);
-    }
+    vector<int> follow_vec = source_vec;
+    for (auto &elem : follow_vec)
+        elem = -elem;
 
     /* Get follow-up output */
     vector<int> follow_out = heap_sort(follow_vec);
 
     /* Verification */
+    for (auto &elem : follow_out)
+        elem *= -1;
+    reverse(follow_out.begin(), follow_out.end());
     EXPECT_EQ(follow_out, source_out);
 }
 
 /**
- * @brief Metamorphic Relation 7: Reversing the order of elements in the input array, the output array should also be reversed from the original output array.
+ * @brief Metamorphic Relation 7: Replacing the input array with its reverse, then the output will be in descending sorted order.
  *
  */
 TEST_P(HeapSortParamTest, MR7) {
@@ -170,141 +189,15 @@ TEST_P(HeapSortParamTest, MR7) {
     vector<int> follow_out = heap_sort(follow_vec);
 
     /* Verification */
-    reverse(source_out.begin(), source_out.end());
+    sort(source_out.begin(), source_out.end(), greater<int>());
     EXPECT_EQ(follow_out, source_out);
 }
 
 /**
- * @brief Metamorphic Relation 8: Multiplying each element in the input array by a constant factor, the output array should also be multiplied by the same
- * constant factor.
+ * @brief Metamorphic Relation 8: Scaling all elements in the input array by a constant, then the output will be sorted in ascending order, and all elements will be scaled by the constant.
  *
  */
 TEST_P(HeapSortParamTest, MR8) {
-    int factor = 5;
-
-    /* Get source input */
-    HeapSortInput input = GetParam();
-    vector<int> source_vec = input.vec;
-
-    /* Get source output */
-    vector<int> source_out = heap_sort(source_vec);
-
-    /* Construct follow-up input */
-    vector<int> follow_vec = source_vec;
-    for (auto &elem : follow_vec)
-        elem *= factor;
-
-    /* Get follow-up output */
-    vector<int> follow_out = heap_sort(follow_vec);
-
-    /* Verification */
-    for (auto &elem : source_out)
-        elem *= factor;
-    EXPECT_EQ(follow_out, source_out);
-}
-
-/**
- * @brief Metamorphic Relation 9: Using the negative of each element in the input array to produce the follow-up input, the output array should also be the
- * negative of the original output array.
- *
- */
-TEST_P(HeapSortParamTest, MR9) {
-    /* Get source input */
-    HeapSortInput input = GetParam();
-    vector<int> source_vec = input.vec;
-
-    /* Get source output */
-    vector<int> source_out = heap_sort(source_vec);
-
-    /* Construct follow-up input */
-    vector<int> follow_vec = source_vec;
-    for (auto &elem : follow_vec)
-        elem = -elem;
-
-    /* Get follow-up output */
-    vector<int> follow_out = heap_sort(follow_vec);
-
-    /* Verification */
-    for (auto &elem : source_out)
-        elem = -elem;
-    EXPECT_EQ(follow_out, source_out);
-}
-
-/**
- * @brief Metamorphic Relation 10: Repeating the elements in the input array, the output array should remain unchanged.
- */
-TEST_P(HeapSortParamTest, MR10) {
-    /* Get source input */
-    HeapSortInput input = GetParam();
-    vector<int> source_vec = input.vec;
-
-    /* Get source output */
-    vector<int> source_out = heap_sort(source_vec);
-
-    /* Construct follow-up input by repeating elements */
-    vector<int> follow_vec;
-    for (auto elem : source_vec) {
-        follow_vec.push_back(elem);
-        follow_vec.push_back(elem);
-    }
-
-    /* Get follow-up output */
-    vector<int> follow_out = heap_sort(follow_vec);
-
-    /* Verification */
-    EXPECT_EQ(follow_out, source_out);
-}
-
-/**
- * @brief Metamorphic Relation 11: Taking the absolute value of each element in the input array, the output array should remain unchanged.
- */
-TEST_P(HeapSortParamTest, MR11) {
-    /* Get source input */
-    HeapSortInput input = GetParam();
-    vector<int> source_vec = input.vec;
-
-    /* Get source output */
-    vector<int> source_out = heap_sort(source_vec);
-
-    /* Construct follow-up input by taking absolute value of elements */
-    vector<int> follow_vec = source_vec;
-    for (auto &elem : follow_vec)
-        elem = abs(elem);
-
-    /* Get follow-up output */
-    vector<int> follow_out = heap_sort(follow_vec);
-
-    /* Verification */
-    EXPECT_EQ(follow_out, source_out);
-}
-
-/**
- * @brief Metamorphic Relation 12: Applying a transformation function to elements in the input array, the output array should reflect the transformation.
- */
-TEST_P(HeapSortParamTest, MR12) {
-    /* Get source input */
-    HeapSortInput input = GetParam();
-    vector<int> source_vec = input.vec;
-
-    /* Get source output */
-    vector<int> source_out = heap_sort(source_vec);
-
-    /* Construct follow-up input by applying a transformation function */
-    vector<int> follow_vec = source_vec;
-    transform(follow_vec.begin(), follow_vec.end(), follow_vec.begin(), [](int x) { return x * x + 1; });
-
-    /* Get follow-up output */
-    vector<int> follow_out = heap_sort(follow_vec);
-
-    /* Verification */
-    EXPECT_EQ(follow_out, source_out);
-}
-
-/**
- * @brief Metamorphic Relation 13: Multiplying each element in the input array by a constant, then sorting should yield the same result as sorting the original
- * array and multiplying the result by the constant.
- */
-TEST_P(HeapSortParamTest, MR13) {
     int constant = 2;
 
     /* Get source input */
@@ -314,81 +207,26 @@ TEST_P(HeapSortParamTest, MR13) {
     /* Get source output */
     vector<int> source_out = heap_sort(source_vec);
 
-    /* Apply constant multiplication to source vector for follow-up input */
+    /* Construct follow-up input */
     vector<int> follow_vec = source_vec;
     for (auto &elem : follow_vec)
         elem *= constant;
 
-    /* Get sorted output for follow-up input */
-    vector<int> sorted_follow_vec = heap_sort(follow_vec);
-    for (auto &elem : sorted_follow_vec)
-        elem *= constant;
+    /* Get follow-up output */
+    vector<int> follow_out = heap_sort(follow_vec);
 
     /* Verification */
-    EXPECT_EQ(sorted_follow_vec, source_out);
+    sort(source_out.begin(), source_out.end());
+    for (auto &elem : follow_out)
+        elem /= constant;
+    EXPECT_EQ(follow_out, source_out);
 }
 
 /**
- * @brief Metamorphic Relation 14: Concatenating two input arrays and sorting should yield the same result as merging the sorted arrays for each input and then
- * sorting the merged array.
+ * @brief Metamorphic Relation 9: Adding a constant to each element in the input array, then the output will be sorted in ascending order, and all elements will be larger by the constant.
+ *
  */
-TEST_P(HeapSortParamTest, MR14) {
-    /* Get source input */
-    HeapSortInput input = GetParam();
-    vector<int> source_vec = input.vec;
-
-    /* Generate a second input array */
-    vector<int> second_vec;
-    int size = source_vec.size();
-    for (int i = 0; i < size; i++) {
-        second_vec.push_back(size + i); // Elements are similar to source_vec but shifted
-    }
-
-    /* Concatenate the input arrays */
-    vector<int> combined_vec = source_vec;
-    combined_vec.insert(combined_vec.end(), second_vec.begin(), second_vec.end());
-
-    /* Sorting the combined input */
-    vector<int> combined_out = heap_sort(combined_vec);
-
-    /* Sorting the individual inputs and merging */
-    vector<int> sorted_source_vec = heap_sort(source_vec);
-    vector<int> sorted_second_vec = heap_sort(second_vec);
-    vector<int> merged_sorted_vec = sorted_source_vec;
-    merged_sorted_vec.insert(merged_sorted_vec.end(), sorted_second_vec.begin(), sorted_second_vec.end());
-    vector<int> sorted_merged_vec = heap_sort(merged_sorted_vec);
-
-    /* Verification */
-    EXPECT_EQ(combined_out, sorted_merged_vec);
-}
-
-/**
- * @brief Metamorphic Relation 15: Randomly shuffling the input array should yield the same result as sorting the shuffled input.
- */
-TEST_P(HeapSortParamTest, MR15) {
-    /* Get source input */
-    HeapSortInput input = GetParam();
-    vector<int> source_vec = input.vec;
-
-    /* Shuffle the input array */
-    vector<int> shuffled_vec = source_vec;
-    random_shuffle(shuffled_vec.begin(), shuffled_vec.end());
-
-    /* Get sorted output for shuffled input */
-    vector<int> shuffled_out = heap_sort(shuffled_vec);
-
-    /* Get sorted output for original input */
-    vector<int> source_out = heap_sort(source_vec);
-
-    /* Verification */
-    EXPECT_EQ(shuffled_out, source_out);
-}
-
-/**
- * @brief Metamorphic Relation 16: Adding a constant to each element in the input array, then sorting should yield the same result as sorting the original array
- * and adding the constant to the result.
- */
-TEST_P(HeapSortParamTest, MR16) {
+TEST_P(HeapSortParamTest, MR9) {
     int constant = 10;
 
     /* Get source input */
@@ -398,687 +236,863 @@ TEST_P(HeapSortParamTest, MR16) {
     /* Get source output */
     vector<int> source_out = heap_sort(source_vec);
 
-    /* Apply constant addition to source vector for follow-up input */
+    /* Construct follow-up input */
     vector<int> follow_vec = source_vec;
     for (auto &elem : follow_vec)
         elem += constant;
 
-    /* Get sorted output for follow-up input */
-    vector<int> sorted_follow_vec = heap_sort(follow_vec);
-    for (auto &elem : sorted_follow_vec)
-        elem += constant;
+    /* Get follow-up output */
+    vector<int> follow_out = heap_sort(follow_vec);
 
     /* Verification */
-    EXPECT_EQ(sorted_follow_vec, source_out);
+    sort(source_out.begin(), source_out.end());
+    for (auto &elem : follow_out)
+        elem -= constant;
+    EXPECT_EQ(follow_out, source_out);
 }
 
 /**
- * @brief Metamorphic Relation 17: Sorting the input array in ascending order and then reversing it should yield the same result as sorting the original array
- * in descending order.
+ * @brief Metamorphic Relation 10: Sorting a subset of the input array, then the output will be the same as the result of sorting the entire input array.
+ *
+ */
+TEST_P(HeapSortParamTest, MR10) {
+    /* Get source input */
+    HeapSortInput input = GetParam();
+    vector<int> source_vec = input.vec;
+
+    // Generate a random subset size
+    int subset_size = rand() % source_vec.size();
+
+    // Select random subset indices
+    vector<int> indices(subset_size);
+    iota(indices.begin(), indices.end(), 0);
+    random_shuffle(indices.begin(), indices.end(), [](int i) { return rand() % i; });
+
+    // Sort the subset
+    sort(indices.begin(), indices.end(), [&](int i, int j) { return source_vec[i] < source_vec[j]; });
+
+    // Copy the sorted subset to a new vector
+    vector<int> sorted_subset(subset_size);
+    transform(indices.begin(), indices.end(), sorted_subset.begin(), [&](int idx) { return source_vec[idx]; });
+
+    /* Get source output */
+    vector<int> source_out = heap_sort(source_vec);
+
+    /* Construct follow-up input */
+    vector<int> follow_vec = source_vec;
+    for (int i = 0; i < subset_size; i++)
+        follow_vec[indices[i]] = sorted_subset[i];
+
+    /* Get follow-up output */
+    vector<int> follow_out = heap_sort(follow_vec);
+
+    /* Verification */
+    EXPECT_EQ(follow_out, source_out);
+}
+
+/**
+ * @brief Metamorphic Relation 11: Replacing the input array with its prefix sum, then the output will be sorted in ascending order.
+ *
+ */
+TEST_P(HeapSortParamTest, MR11) {
+    /* Get source input */
+    HeapSortInput input = GetParam();
+    vector<int> source_vec = input.vec;
+
+    /* Get source output */
+    vector<int> source_out = heap_sort(source_vec);
+
+    /* Construct follow-up input */
+    vector<int> follow_vec(source_vec.size());
+    partial_sum(source_vec.begin(), source_vec.end(), follow_vec.begin());
+
+    /* Get follow-up output */
+    vector<int> follow_out = heap_sort(follow_vec);
+
+    /* Verification */
+    sort(source_out.begin(), source_out.end());
+    EXPECT_EQ(follow_out, source_out);
+}
+
+/**
+ * @brief Metamorphic Relation 12: Replacing the input array with its suffix sum, then the output will be sorted in ascending order.
+ *
+ */
+TEST_P(HeapSortParamTest, MR12) {
+    /* Get source input */
+    HeapSortInput input = GetParam();
+    vector<int> source_vec = input.vec;
+
+    /* Get source output */
+    vector<int> source_out = heap_sort(source_vec);
+
+    /* Construct follow-up input */
+    vector<int> follow_vec(source_vec.size());
+    partial_sum(source_vec.rbegin(), source_vec.rend(), follow_vec.rbegin());
+
+    /* Get follow-up output */
+    vector<int> follow_out = heap_sort(follow_vec);
+
+    /* Verification */
+    sort(source_out.begin(), source_out.end());
+    EXPECT_EQ(follow_out, source_out);
+}
+
+/**
+ * @brief Metamorphic Relation 13: Replacing the input array with a sorted array, then the output will be the same as the result of sorting the original input array.
+ *
+ */
+TEST_P(HeapSortParamTest, MR13) {
+    /* Get source input */
+    HeapSortInput input = GetParam();
+    vector<int> source_vec = input.vec;
+
+    /* Sort the source input */
+    sort(source_vec.begin(), source_vec.end());
+
+    /* Get source output */
+    vector<int> source_out = heap_sort(source_vec);
+
+    /* Construct follow-up input */
+    vector<int> follow_vec = source_vec;
+
+    /* Get follow-up output */
+    vector<int> follow_out = heap_sort(follow_vec);
+
+    /* Verification */
+    EXPECT_EQ(follow_out, source_out);
+}
+
+/**
+ * @brief Metamorphic Relation 14: Reversing the input array and then reversing the range [l, r] in the array, then the output will remain the same after reversing the range [l, r] in the initial input.
+ *
+ */
+TEST_P(HeapSortParamTest, MR14) {
+    /* Get source input */
+    HeapSortInput input = GetParam();
+    vector<int> source_vec = input.vec;
+
+    /* Get source output */
+    vector<int> source_out = heap_sort(source_vec);
+
+    /* Reverse the input array */
+    reverse(source_vec.begin(), source_vec.end());
+
+    /* Randomly select range [l, r] */
+    int l = rand() % source_vec.size();
+    int r = rand() % source_vec.size();
+    if (l > r) swap(l, r);
+
+    /* Reverse the range [l, r] in the reversed array */
+    reverse(source_vec.begin() + l, source_vec.begin() + r + 1);
+
+    /* Get follow-up output */
+    vector<int> follow_out = heap_sort(source_vec);
+
+    /* Reverse the range [l, r] in the initial input array */
+    reverse(source_out.begin() + l, source_out.begin() + r + 1);
+
+    /* Verification */
+    EXPECT_EQ(follow_out, source_out);
+}
+
+/**
+ * @brief Metamorphic Relation 15: Reversing the input array and then reversing the range [l, r] in the array, then the output will be the same as reversing the original range [l, r] in the output obtained from the initial input.
+ *
+ */
+TEST_P(HeapSortParamTest, MR15) {
+    /* Get source input */
+    HeapSortInput input = GetParam();
+    vector<int> source_vec = input.vec;
+
+    /* Get source output */
+    vector<int> source_out = heap_sort(source_vec);
+
+    /* Reverse the input array */
+    reverse(source_vec.begin(), source_vec.end());
+
+    /* Randomly select range [l, r] */
+    int l = rand() % source_vec.size();
+    int r = rand() % source_vec.size();
+    if (l > r) swap(l, r);
+
+    /* Reverse the range [l, r] in the reversed array */
+    reverse(source_vec.begin() + l, source_vec.begin() + r + 1);
+
+    /* Get follow-up output */
+    vector<int> follow_out = heap_sort(source_vec);
+
+    /* Reverse the range [l, r] in the initial output array */
+    reverse(source_out.begin() + l, source_out.begin() + r + 1);
+
+    /* Verification */
+    EXPECT_EQ(follow_out, source_out);
+}
+
+/**
+ * @brief Metamorphic Relation 16: Replacing the input array with its kth permutation, then the output will be sorted in ascending order.
+ *
+ */
+TEST_P(HeapSortParamTest, MR16) {
+    /* Get source input */
+    HeapSortInput input = GetParam();
+    vector<int> source_vec = input.vec;
+
+    /* Constants */
+    const int k = 3;
+
+    /* Get source output */
+    vector<int> source_out = heap_sort(source_vec);
+
+    /* Construct follow-up input */
+    vector<int> follow_vec = source_vec;
+    for (int i = 0; i < k; ++i) {
+        next_permutation(follow_vec.begin(), follow_vec.end());
+    }
+
+    /* Get follow-up output */
+    vector<int> follow_out = heap_sort(follow_vec);
+
+    /* Verification */
+    sort(source_out.begin(), source_out.end());
+    EXPECT_EQ(follow_out, source_out);
+}
+
+/**
+ * @brief Metamorphic Relation 17: Replacing the input array with elements in non-decreasing order, then the output will be the same as the result of sorting the original input array.
+ *
  */
 TEST_P(HeapSortParamTest, MR17) {
     /* Get source input */
     HeapSortInput input = GetParam();
     vector<int> source_vec = input.vec;
 
-#if INVALID
-    /* Get ascending sort output */
-    vector<int> asc_sorted_out = heap_sort(source_vec, true);
+    /* Sort the source input in non-decreasing order */
+    sort(source_vec.begin(), source_vec.end());
 
-    /* Reverse the ascending sort output */
-    vector<int> reversed_asc_sorted_out = asc_sorted_out;
-    reverse(reversed_asc_sorted_out.begin(), reversed_asc_sorted_out.end());
+    /* Get source output */
+    vector<int> source_out = heap_sort(source_vec);
 
-    /* Get descending sort output */
-    vector<int> desc_sorted_out = heap_sort(source_vec);
-#else
-    /* Fix by Radon */
-    /* Get ascending sort output */
-    vector<int> asc_sorted_out = heap_sort(source_vec);
+    /* Construct follow-up input */
+    vector<int> follow_vec = source_vec;
 
-    /* Reverse the ascending sort output */
-    vector<int> reversed_asc_sorted_out = asc_sorted_out;
-    reverse(reversed_asc_sorted_out.begin(), reversed_asc_sorted_out.end());
-
-    /* Get descending sort output */
-    vector<int> desc_sorted_out = source_vec;
-    sort(desc_sorted_out.begin(), desc_sorted_out.end(), greater<int>());
-#endif
+    /* Get follow-up output */
+    vector<int> follow_out = heap_sort(follow_vec);
 
     /* Verification */
-    EXPECT_EQ(reversed_asc_sorted_out, desc_sorted_out);
+    EXPECT_EQ(follow_out, source_out);
 }
 
 /**
- * @brief Metamorphic Relation 18: Reversing the order of elements in the input array, the resulting sorted array should also be reversed.
+ * @brief Metamorphic Relation 18: Replacing the array with all the same elements, then the output will remain the same as the result of sorting the original input array.
+ *
  */
 TEST_P(HeapSortParamTest, MR18) {
     /* Get source input */
     HeapSortInput input = GetParam();
     vector<int> source_vec = input.vec;
 
-    /* Sort the input array */
-    vector<int> source_out = heap_sort(source_vec);
-
-    /* Reverse the sorted output from the original input */
-    vector<int> reversed_sorted_output;
-    for (auto it = source_out.rbegin(); it != source_out.rend(); ++it) {
-        reversed_sorted_output.push_back(*it);
+    /* Set all elements in the source input to the first element */
+    for (int i = 1; i < source_vec.size(); ++i) {
+        source_vec[i] = source_vec[0];
     }
 
-    /* Reverse the original input */
-    vector<int> reversed_input = source_vec;
-    reverse(reversed_input.begin(), reversed_input.end());
+    /* Get source output */
+    vector<int> source_out = heap_sort(source_vec);
 
-    /* Get sorted output for reversed input */
-    vector<int> reversed_out = heap_sort(reversed_input);
+    /* Construct follow-up input */
+    vector<int> follow_vec = source_vec;
+
+    /* Get follow-up output */
+    vector<int> follow_out = heap_sort(follow_vec);
 
     /* Verification */
-    EXPECT_EQ(reversed_out, reversed_sorted_output);
+    EXPECT_EQ(follow_out, source_out);
 }
 
 /**
- * @brief Metamorphic Relation 19: Selecting a subset of the input array and sorting it should yield a result that is a subset of the sorted array from the
- * original input.
+ * @brief Metamorphic Relation 19: Replacing the input array with a sequence of consecutive integers, then the output will be the same as the result of sorting the original input array.
+ *
  */
 TEST_P(HeapSortParamTest, MR19) {
     /* Get source input */
     HeapSortInput input = GetParam();
     vector<int> source_vec = input.vec;
 
-    /* Randomly shuffle the input array */
-    vector<int> shuffled_vec = source_vec;
-    random_shuffle(shuffled_vec.begin(), shuffled_vec.end());
+    /* Generate a sequence of consecutive integers */
+    for (int i = 0; i < source_vec.size(); ++i) {
+        source_vec[i] = i;
+    }
 
-    /* Select a subset (first half) of the shuffled array */
-    vector<int> subset(shuffled_vec.begin(), shuffled_vec.begin() + (shuffled_vec.size() / 2));
+    /* Get source output */
+    vector<int> source_out = heap_sort(input.vec);
 
-    /* Get sorted output for the subset */
-    vector<int> subset_out = heap_sort(subset);
+    /* Construct follow-up input */
+    vector<int> follow_vec = source_vec;
 
-    /* Get sorted output for original input */
-    vector<int> source_out = heap_sort(source_vec);
+    /* Get follow-up output */
+    vector<int> follow_out = heap_sort(input.vec);
 
     /* Verification */
-    bool is_subset = true;
-    for (int elem : subset_out) {
-        if (find(source_out.begin(), source_out.end(), elem) == source_out.end()) {
-            is_subset = false;
-            break;
-        }
-    }
-    EXPECT_TRUE(is_subset);
+    EXPECT_EQ(follow_out, source_out);
 }
 
 /**
- * @brief Metamorphic Relation 20: Applying a transformation to the elements in the input array and then sorting should yield the same result as sorting the
- * original array and then applying the same transformation to the result.
+ * @brief Metamorphic Relation 20: Replacing the input array with its prefix array, then the output will remain the same as the result of sorting the original input array.
+ *
  */
 TEST_P(HeapSortParamTest, MR20) {
     /* Get source input */
     HeapSortInput input = GetParam();
     vector<int> source_vec = input.vec;
 
-    /* Get sorted output for original input */
-    vector<int> source_out = heap_sort(source_vec);
+    /* Get prefix sum array */
+    partial_sum(source_vec.begin(), source_vec.end(), source_vec.begin());
 
-    /* Applying a transformation to the sorted output */
-    vector<int> transformed_sorted_output = source_out;
-    for (int &elem : transformed_sorted_output) {
-        elem = pow(elem, 2); // For example, squaring each element
-    }
+    /* Get source output */
+    vector<int> source_out = heap_sort(input.vec);
 
-    /* Applying the same transformation to the original input and then sorting */
-    vector<int> transformed_input = source_vec;
-    for (int &elem : transformed_input) {
-        elem = pow(elem, 2); // Applying the same transformation
-    }
-    vector<int> sorted_transformed_input = heap_sort(transformed_input);
+    /* Construct follow-up input */
+    vector<int> follow_vec = source_vec;
+    rotate(follow_vec.begin(), follow_vec.begin() + 1, follow_vec.end()); // Right rotate one position
+
+    /* Get follow-up output */
+    vector<int> follow_out = heap_sort(follow_vec);
 
     /* Verification */
-    EXPECT_EQ(transformed_sorted_output, sorted_transformed_input);
+    EXPECT_EQ(follow_out, source_out);
 }
 
 /**
- * @brief Metamorphic Relation 21: Reversing the input array twice should yield the same sorted array as the original input.
+ * @brief Metamorphic Relation 21: Replacing the input array with its suffix array, then the output will remain the same as the result of sorting the original input array.
+ *
  */
 TEST_P(HeapSortParamTest, MR21) {
     /* Get source input */
     HeapSortInput input = GetParam();
     vector<int> source_vec = input.vec;
 
-    /* Reverse the input array */
-    reverse(source_vec.begin(), source_vec.end());
+    /* Get suffix sum array */
+    partial_sum(source_vec.rbegin(), source_vec.rend(), source_vec.rbegin());
 
-    /* Sort the reversed input array */
-    vector<int> reversed_sorted_output = heap_sort(source_vec);
-
-    /* Sort the original input */
+    /* Get source output */
     vector<int> source_out = heap_sort(input.vec);
 
-    /* Reverse the sorted output from the original input */
-    reverse(reversed_sorted_output.begin(), reversed_sorted_output.end());
+    /* Construct follow-up input */
+    vector<int> follow_vec = source_vec;
+    rotate(follow_vec.rbegin(), follow_vec.rbegin() + 1, follow_vec.rend()); // Right rotate one position
+
+    /* Get follow-up output */
+    vector<int> follow_out = heap_sort(follow_vec);
 
     /* Verification */
-    EXPECT_EQ(reversed_sorted_output, source_out);
+    EXPECT_EQ(follow_out, source_out);
 }
 
 /**
- * @brief Metamorphic Relation 22: Sorting an array with duplicate elements should yield the same result as sorting an array with the same elements, but without
- * duplicates.
+ * @brief Metamorphic Relation 22: Negating all elements in the input array, then the output will be the same as the result of sorting the original input array in reverse order.
+ *
  */
 TEST_P(HeapSortParamTest, MR22) {
     /* Get source input */
     HeapSortInput input = GetParam();
     vector<int> source_vec = input.vec;
 
-    /* Introduce duplicates in the input array */
-    vector<int> duplicate_vec = source_vec;
-    duplicate_vec.insert(duplicate_vec.end(), source_vec.begin(), source_vec.end());
+    /* Negate all elements in the source input */
+    for (int i = 0; i < source_vec.size(); ++i) {
+        source_vec[i] = -source_vec[i];
+    }
 
-    /* Sort the array with duplicates */
-    vector<int> duplicate_out = heap_sort(duplicate_vec);
+    /* Get source output */
+    vector<int> source_out = heap_sort(input.vec);
 
-    /* Sort the array without duplicates */
-    sort(source_vec.begin(), source_vec.end());
-    vector<int> source_out = heap_sort(source_vec);
+    /* Construct follow-up input */
+    vector<int> follow_vec = source_vec;
+
+    /* Get follow-up output */
+    vector<int> follow_out = heap_sort(follow_vec);
+    reverse(follow_out.begin(), follow_out.end()); // Reverse the output
 
     /* Verification */
-    EXPECT_EQ(duplicate_out, source_out);
+    EXPECT_EQ(follow_out, source_out);
 }
 
 /**
- * @brief Metamorphic Relation 23: Sorting an already sorted array should result in the same array.
+ * @brief Metamorphic Relation 23: Replacing the input array with its square root, then the output will remain the same as the result of sorting the original input array.
+ *
  */
 TEST_P(HeapSortParamTest, MR23) {
     /* Get source input */
     HeapSortInput input = GetParam();
     vector<int> source_vec = input.vec;
 
-    /* Sort the original input array */
-    vector<int> sorted_output = heap_sort(source_vec);
+    /* Replace elements in the source input with their square root */
+    for (int i = 0; i < source_vec.size(); ++i) {
+        source_vec[i] = sqrt(source_vec[i]);
+    }
 
-    /* Sort the already sorted array */
-    vector<int> re_sorted_output = heap_sort(sorted_output);
+    /* Get source output */
+    vector<int> source_out = heap_sort(input.vec);
+
+    /* Construct follow-up input */
+    vector<int> follow_vec = source_vec;
+
+    /* Get follow-up output */
+    vector<int> follow_out = heap_sort(follow_vec);
 
     /* Verification */
-    EXPECT_EQ(re_sorted_output, sorted_output);
+    EXPECT_EQ(follow_out, source_out);
 }
 
 /**
- * @brief Metamorphic Relation 24: Sorting the input array and then applying a shift operation should yield the same result as applying the shift operation to
- * the input array and then sorting it.
+ * @brief Metamorphic Relation 24: Replacing the input array with elements in descending order, then the output will be the same as the result of sorting the original input array in reverse order.
+ *
  */
 TEST_P(HeapSortParamTest, MR24) {
-    int shiftAmount = 3;
-
     /* Get source input */
     HeapSortInput input = GetParam();
     vector<int> source_vec = input.vec;
 
-    /* Sort the original input array */
-    vector<int> original_sorted_output = heap_sort(source_vec);
+    /* Sort the source input in descending order */
+    sort(source_vec.begin(), source_vec.end(), greater<int>());
 
-    /* Apply the shift operation to the original sorted output */
-    vector<int> shifted_original_sorted_output = original_sorted_output;
-    rotate(shifted_original_sorted_output.rbegin(), shifted_original_sorted_output.rbegin() + shiftAmount, shifted_original_sorted_output.rend());
+    /* Get source output */
+    vector<int> source_out = heap_sort(input.vec);
 
-    /* Apply the shift operation to the original input and then sort it */
-    vector<int> shifted_source_vec = source_vec;
-    rotate(shifted_source_vec.rbegin(), shifted_source_vec.rbegin() + shiftAmount, shifted_source_vec.rend());
-    vector<int> shifted_sorted_output = heap_sort(shifted_source_vec);
+    /* Construct follow-up input */
+    vector<int> follow_vec = source_vec;
+
+    /* Get follow-up output */
+    vector<int> follow_out = heap_sort(follow_vec);
+    reverse(follow_out.begin(), follow_out.end()); // Reverse the output
 
     /* Verification */
-    EXPECT_EQ(shifted_original_sorted_output, shifted_sorted_output);
+    EXPECT_EQ(follow_out, source_out);
 }
 
 /**
- * @brief Metamorphic Relation 25: Sorting the input array and then reversing its every kth element should yield the same result as reversing the every kth
- * element of the input array and then sorting it.
+ * @brief Metamorphic Relation 25: Replacing the input array with its cumulative product, then the output will be sorted in ascending order.
+ *
  */
 TEST_P(HeapSortParamTest, MR25) {
-    int k = 3;
-
     /* Get source input */
     HeapSortInput input = GetParam();
     vector<int> source_vec = input.vec;
 
-    /* Sort the original input array */
-    vector<int> original_sorted_output = heap_sort(source_vec);
-
-    /* Reverse every kth element of the original sorted output */
-    vector<int> reversed_kth_original_sorted_output = original_sorted_output;
-    for (size_t i = k - 1; i < reversed_kth_original_sorted_output.size(); i += k) {
-        reverse(reversed_kth_original_sorted_output.begin() + i - k + 1, reversed_kth_original_sorted_output.begin() + i + 1);
+    /* Compute the cumulative product of the source input */
+    for (int i = 1; i < source_vec.size(); ++i) {
+        source_vec[i] *= source_vec[i - 1];
     }
 
-    /* Reverse every kth element of the input and then sort it */
-    vector<int> reversed_kth_source_vec = source_vec;
-    for (size_t i = k - 1; i < reversed_kth_source_vec.size(); i += k) {
-        reverse(reversed_kth_source_vec.begin() + i - k + 1, reversed_kth_source_vec.begin() + i + 1);
-    }
-    vector<int> reversed_kth_sorted_output = heap_sort(reversed_kth_source_vec);
+    /* Get source output */
+    vector<int> source_out = heap_sort(input.vec);
+
+    /* Construct follow-up input */
+    vector<int> follow_vec = source_vec;
+
+    /* Get follow-up output */
+    vector<int> follow_out = heap_sort(follow_vec);
 
     /* Verification */
-    EXPECT_EQ(reversed_kth_original_sorted_output, reversed_kth_sorted_output);
+    EXPECT_EQ(follow_out, source_out);
 }
 
 /**
- * @brief Metamorphic Relation 26: Sorting the distinct elements of the input array should yield the same result as sorting the original array with duplicates
- * and then removing the duplicates.
+ * @brief Metamorphic Relation 26: Replacing the input array with elements in ascending order, then the output will be sorted in ascending order.
+ *
  */
 TEST_P(HeapSortParamTest, MR26) {
     /* Get source input */
     HeapSortInput input = GetParam();
     vector<int> source_vec = input.vec;
 
-    /* Introduce duplicates in the input array */
-    vector<int> duplicate_vec = source_vec;
-    duplicate_vec.insert(duplicate_vec.end(), source_vec.begin(), source_vec.end());
+    /* Sort the source input in ascending order */
+    sort(source_vec.begin(), source_vec.end());
 
-#if INVALID
-    /* Sort the distinct elements of the original input */
-    vector<int> distinct_sorted_output = heap_sort(set<int>(source_vec.begin(), source_vec.end()));
-#else
-    /* Fix by Radon */
-    set<int> tmp = set<int>(source_vec.begin(), source_vec.end());
-    vector<int> distinct_sorted_output = heap_sort(vector<int>(tmp.begin(), tmp.end()));
-#endif
+    /* Get source output */
+    vector<int> source_out = heap_sort(input.vec);
 
-    /* Sort the array with duplicates and then remove duplicates */
-    sort(duplicate_vec.begin(), duplicate_vec.end());
-    duplicate_vec.erase(unique(duplicate_vec.begin(), duplicate_vec.end()), duplicate_vec.end());
-    vector<int> sorted_without_duplicates_output = heap_sort(duplicate_vec);
+    /* Construct follow-up input */
+    vector<int> follow_vec = source_vec;
+
+    /* Get follow-up output */
+    vector<int> follow_out = heap_sort(follow_vec);
 
     /* Verification */
-    EXPECT_EQ(distinct_sorted_output, sorted_without_duplicates_output);
+    EXPECT_EQ(follow_out, source_out);
 }
 
 /**
- * @brief Metamorphic Relation 27: Sorting the input array should yield the same result as sorting a subarray of the input array.
+ * @brief Metamorphic Relation 27: Replacing the input array with elements in descending order, then the output will be sorted in descending order.
+ *
  */
 TEST_P(HeapSortParamTest, MR27) {
     /* Get source input */
     HeapSortInput input = GetParam();
     vector<int> source_vec = input.vec;
-    int size = source_vec.size();
 
-    // Sort the entire input array
-    vector<int> sorted_output = heap_sort(source_vec);
+    /* Sort the source input in descending order */
+    sort(source_vec.rbegin(), source_vec.rend());
 
-    // Sort a subarray of the input array
-    vector<int> subarray(source_vec.begin() + 2, source_vec.begin() + size - 1);
-    vector<int> subarray_sorted_output = heap_sort(subarray);
+    /* Get source output */
+    vector<int> source_out = heap_sort(input.vec);
 
-    // Verification
-    EXPECT_EQ(sorted_output, subarray_sorted_output);
+    /* Construct follow-up input */
+    vector<int> follow_vec = source_vec;
+
+    /* Get follow-up output */
+    vector<int> follow_out = heap_sort(follow_vec);
+
+    /* Verification */
+    sort(source_out.begin(), source_out.end(), greater<int>());
+    EXPECT_EQ(follow_out, source_out);
 }
 
 /**
- * @brief Metamorphic Relation 28: Sorting the input array should yield the same result as sorting the input array after removing one element.
+ * @brief Metamorphic Relation 28: Rotating the input array to the left, then the output will be the same as the result of sorting the original input array.
+ *
  */
 TEST_P(HeapSortParamTest, MR28) {
     /* Get source input */
     HeapSortInput input = GetParam();
     vector<int> source_vec = input.vec;
-    int size = source_vec.size();
 
-    // Sort the entire input array
-    vector<int> sorted_output = heap_sort(source_vec);
+    /* Get source output */
+    vector<int> source_out = heap_sort(source_vec);
 
-    // Sort the input array after removing the first element
-    vector<int> modified_input(source_vec.begin() + 1, source_vec.end());
-    vector<int> modified_input_sorted_output = heap_sort(modified_input);
+    /* Left rotate the source input */
+    rotate(source_vec.begin(), source_vec.begin() + 1, source_vec.end());
 
-    // Verification
-    EXPECT_EQ(sorted_output, modified_input_sorted_output);
+    /* Get follow-up output */
+    vector<int> follow_out = heap_sort(source_vec);
+
+    /* Verification */
+    EXPECT_EQ(follow_out, source_out);
 }
 
 /**
- * @brief Metamorphic Relation 29: Sorting the input array should yield the same result as sorting the input array after replacing one element with another.
+ * @brief Metamorphic Relation 29: Rotating the input array to the right, then the output will be the same as the result of sorting the original input array.
+ *
  */
 TEST_P(HeapSortParamTest, MR29) {
     /* Get source input */
     HeapSortInput input = GetParam();
     vector<int> source_vec = input.vec;
-    int size = source_vec.size();
 
-    // Sort the entire input array
-    vector<int> sorted_output = heap_sort(source_vec);
+    /* Get source output */
+    vector<int> source_out = heap_sort(source_vec);
 
-    // Replace one element with another and sort the modified input array
-    vector<int> modified_input = source_vec;
-    modified_input[0] = 10; // Replace the first element with 10
-    vector<int> modified_input_sorted_output = heap_sort(modified_input);
+    /* Right rotate the source input */
+    rotate(source_vec.rbegin(), source_vec.rbegin() + 1, source_vec.rend());
 
-    // Verification
-    EXPECT_EQ(sorted_output, modified_input_sorted_output);
+    /* Get follow-up output */
+    vector<int> follow_out = heap_sort(source_vec);
+
+    /* Verification */
+    EXPECT_EQ(follow_out, source_out);
 }
 
 /**
- * @brief Metamorphic Relation 30: Sorting the input array should yield the same result as sorting the input array after reversing its elements.
+ * @brief Metamorphic Relation 30: Replacing the input array with a random permutation, then the output will be sorted in ascending order.
+ *
  */
 TEST_P(HeapSortParamTest, MR30) {
     /* Get source input */
     HeapSortInput input = GetParam();
     vector<int> source_vec = input.vec;
 
-    // Sort the entire input array
-    vector<int> sorted_output = heap_sort(source_vec);
+    /* Get source output */
+    vector<int> source_out = heap_sort(input.vec);
 
-    // Reverse the input array
-    reverse(source_vec.begin(), source_vec.end());
+    /* Generate a random permutation */
+    random_shuffle(source_vec.begin(), source_vec.end());
 
-    // Sort the reversed input array
-    vector<int> reversed_sorted_output = heap_sort(source_vec);
+    /* Get follow-up output */
+    vector<int> follow_out = heap_sort(source_vec);
 
-    // Verification
-    EXPECT_EQ(sorted_output, reversed_sorted_output);
+    /* Verification */
+    sort(source_out.begin(), source_out.end());
+    EXPECT_EQ(follow_out, source_out);
 }
 
 /**
- * @brief Metamorphic Relation 31: Sorting the input array should yield the same result as sorting the input array with elements squared.
+ * @brief Metamorphic Relation 31: Appending a constant value to each element in the input array, then the output will be sorted in ascending order and all elements will be greater by the constant.
+ *
  */
 TEST_P(HeapSortParamTest, MR31) {
+    const int constant = 5;
+
     /* Get source input */
     HeapSortInput input = GetParam();
     vector<int> source_vec = input.vec;
 
-    // Sort the entire input array
-    vector<int> sorted_output = heap_sort(source_vec);
+    /* Get source output */
+    vector<int> source_out = heap_sort(source_vec);
 
-    // Square each element in the input array
-    for (int &elem : source_vec) {
-        elem = elem * elem;
-    }
+    /* Construct follow-up input */
+    vector<int> follow_vec = source_vec;
+    for (auto& elem : follow_vec)
+        elem += constant;
 
-    // Sort the squared input array
-    vector<int> squared_sorted_output = heap_sort(source_vec);
+    /* Get follow-up output */
+    vector<int> follow_out = heap_sort(follow_vec);
 
-    // Verification
-    EXPECT_EQ(sorted_output, squared_sorted_output);
+    /* Verification */
+    for (auto& elem : follow_out)
+        elem -= constant;
+    EXPECT_EQ(follow_out, source_out);
 }
 
 /**
- * @brief Metamorphic Relation 32: Sorting the input array should yield the same result as sorting a subarray of the input array (taking elements from the
- * middle).
+ * @brief Metamorphic Relation 32: Multiplying each element in the input array by a constant value, then the output will be sorted in ascending order and all elements will be larger by a factor of the constant.
+ *
  */
 TEST_P(HeapSortParamTest, MR32) {
+    const int constant = 3;
+
     /* Get source input */
     HeapSortInput input = GetParam();
     vector<int> source_vec = input.vec;
-    int size = source_vec.size();
 
-    // Sort the entire input array
-    vector<int> sorted_output = heap_sort(source_vec);
+    /* Get source output */
+    vector<int> source_out = heap_sort(source_vec);
 
-    // Sort a subarray of the input array (taking elements from the middle)
-    int start = size / 4;
-    int end = start + size / 2;
-    vector<int> subarray_sorted_output = heap_sort(vector<int>(source_vec.begin() + start, source_vec.begin() + end));
+    /* Construct follow-up input */
+    vector<int> follow_vec = source_vec;
+    for (auto& elem : follow_vec)
+        elem *= constant;
 
-    // Verification
-    EXPECT_EQ(sorted_output, subarray_sorted_output);
+    /* Get follow-up output */
+    vector<int> follow_out = heap_sort(follow_vec);
+
+    /* Verification */
+    for (auto& elem : follow_out)
+        elem /= constant;
+    EXPECT_EQ(follow_out, source_out);
 }
 
 /**
- * @brief Metamorphic Relation 33: Sorting the input array and then replacing negative elements with their absolute values should yield the same result as
- * replacing negative elements with their absolute values and then sorting the array.
+ * @brief Metamorphic Relation 33: Subtracting each element in the input array by a constant value, then the output will be sorted in ascending order and all elements will be reduced by the constant.
+ *
  */
 TEST_P(HeapSortParamTest, MR33) {
+    const int constant = 4;
+
     /* Get source input */
     HeapSortInput input = GetParam();
     vector<int> source_vec = input.vec;
 
-    /* Sort the original input array */
-    vector<int> sorted_output = heap_sort(source_vec);
+    /* Get source output */
+    vector<int> source_out = heap_sort(source_vec);
 
-    /* Replace negative elements with their absolute values in the sorted output */
-    vector<int> abs_sorted_output = sorted_output;
-    for (int &elem : abs_sorted_output) {
-        elem = abs(elem);
-    }
+    /* Construct follow-up input */
+    vector<int> follow_vec = source_vec;
+    for (auto& elem : follow_vec)
+        elem -= constant;
 
-    /* Replace negative elements with their absolute values in the original input array and then sort it */
-    vector<int> abs_source_vec = source_vec;
-    for (int &elem : abs_source_vec) {
-        elem = abs(elem);
-    }
-    vector<int> abs_sorted_input = heap_sort(abs_source_vec);
+    /* Get follow-up output */
+    vector<int> follow_out = heap_sort(follow_vec);
 
     /* Verification */
-    EXPECT_EQ(abs_sorted_output, abs_sorted_input);
+    for (auto& elem : follow_out)
+        elem += constant;
+    EXPECT_EQ(follow_out, source_out);
 }
 
 /**
- * @brief Metamorphic Relation 34: Sorting the input array and then multiplying each element by -1 should yield the same result as multiplying each element by
- * -1 and then sorting the array in reverse order.
+ * @brief Metamorphic Relation 34: Testing the algorithm with an empty input array, the output should also be an empty array or vector.
+ *
  */
-TEST_P(HeapSortParamTest, MR34) {
-    /* Get source input */
-    HeapSortInput input = GetParam();
-    vector<int> source_vec = input.vec;
+TEST(HeapSortTest, MR34) {
+    /* Prepare empty input */
+    vector<int> source_vec;
 
-    /* Sort the original input array */
-    vector<int> sorted_output = heap_sort(source_vec);
+    /* Call the function under test */
+    vector<int> result_vec = heap_sort(source_vec);
 
-    /* Multiply each element by -1 in the sorted output */
-    vector<int> neg_sorted_output = sorted_output;
-    for (int &elem : neg_sorted_output) {
-        elem *= -1;
-    }
-
-    /* Multiply each element by -1 in the original input array and then sort it in reverse order */
-    vector<int> neg_source_vec = source_vec;
-    for (int &elem : neg_source_vec) {
-        elem *= -1;
-    }
-    sort(neg_source_vec.begin(), neg_source_vec.end(), greater<int>());
-
-    /* Verification */
-    EXPECT_EQ(neg_sorted_output, neg_source_vec);
+    /* Verify that the result is also empty */
+    EXPECT_TRUE(result_vec.empty());
 }
 
 /**
- * @brief Metamorphic Relation 35: Sorting the input array and then taking the square root of each element should yield the same result as taking the square
- * root of each element and then sorting the array.
+ * @brief Metamorphic Relation 35: Repeating the same value in the input array, the output will also have the same repeated value.
+ *
  */
 TEST_P(HeapSortParamTest, MR35) {
     /* Get source input */
     HeapSortInput input = GetParam();
     vector<int> source_vec = input.vec;
 
-    /* Sort the original input array */
-    vector<int> sorted_output = heap_sort(source_vec);
-
-    /* Take the square root of each element in the sorted output */
-    vector<int> sqrt_sorted_output = sorted_output;
-    for (int &elem : sqrt_sorted_output) {
-        elem = sqrt(elem);
+    /* Set all elements in the source input to a specific value */
+    for (int i = 1; i < source_vec.size(); ++i) {
+        source_vec[i] = source_vec[0];
     }
 
-    /* Take the square root of each element in the original input array and then sort it */
-    vector<int> sqrt_source_vec = source_vec;
-    for (int &elem : sqrt_source_vec) {
-        elem = sqrt(elem);
-    }
-    vector<int> sqrt_sorted_input = heap_sort(sqrt_source_vec);
+    /* Get source output */
+    vector<int> source_out = heap_sort(input.vec);
+
+    /* Construct follow-up input */
+    vector<int> follow_vec = source_vec;
+
+    /* Get follow-up output */
+    vector<int> follow_out = heap_sort(follow_vec);
 
     /* Verification */
-    EXPECT_EQ(sqrt_sorted_output, sqrt_sorted_input);
+    EXPECT_EQ(follow_out, source_out);
 }
 
 /**
- * @brief Metamorphic Relation 36: Sorting the input array and then adding elements of a constant array should yield the same result as adding elements of the
- * constant array to the input array and then sorting it.
+ * @brief Metamorphic Relation 36: Reversing the array twice, the output should be the same as the initial input since the array is back to its original order.
+ *
  */
 TEST_P(HeapSortParamTest, MR36) {
     /* Get source input */
     HeapSortInput input = GetParam();
     vector<int> source_vec = input.vec;
 
-    // Create a constant array
-    vector<int> constants = {5, 3, 8, 2};
+    /* Get source output */
+    vector<int> source_out = heap_sort(source_vec);
 
-    // Sort the original input array
-    vector<int> sorted_output = heap_sort(source_vec);
+    /* Reverse the input array twice */
+    reverse(source_vec.begin(), source_vec.end());
+    reverse(source_vec.begin(), source_vec.end());
 
-    // Add elements of the constant array to the sorted output
-    vector<int> modified_sorted_output = sorted_output;
-    for (size_t i = 0; i < source_vec.size(); ++i) {
-        modified_sorted_output[i] += constants[i % constants.size()];
-    }
+    /* Get follow-up output */
+    vector<int> follow_out = heap_sort(source_vec);
 
-    // Add elements of the constant array to the original input array and then sort it
-    vector<int> modified_input = source_vec;
-    for (size_t i = 0; i < source_vec.size(); ++i) {
-        modified_input[i] += constants[i % constants.size()];
-    }
-    vector<int> modified_sorted_input = heap_sort(modified_input);
-
-    // Verification
-    EXPECT_EQ(modified_sorted_output, modified_sorted_input);
+    /* Verification */
+    EXPECT_EQ(follow_out, source_out);
 }
 
 /**
- * @brief Metamorphic Relation 37: Sorting the input array and then permuting its elements should yield the same result as permuting the input array and then
- * sorting it.
+ * @brief Metamorphic Relation 37: Applying the function on a monotonically increasing input array, the output should also be in ascending order.
+ *
  */
 TEST_P(HeapSortParamTest, MR37) {
     /* Get source input */
     HeapSortInput input = GetParam();
     vector<int> source_vec = input.vec;
 
-    // Sort the original input array
-    vector<int> sorted_output = heap_sort(source_vec);
+    /* Get source output */
+    vector<int> source_out = heap_sort(input.vec);
 
-    // Permute the elements of the sorted output
-    random_shuffle(sorted_output.begin(), sorted_output.end());
+    /* Construct follow-up input */
+    vector<int> follow_vec = source_vec;
+    sort(follow_vec.begin(), follow_vec.end());
 
-    // Permute the input array and then sort it
-    vector<int> permuted_input = source_vec;
-    random_shuffle(permuted_input.begin(), permuted_input.end());
-    vector<int> permuted_sorted_input = heap_sort(permuted_input);
+    /* Get follow-up output */
+    vector<int> follow_out = heap_sort(follow_vec);
 
-    // Verification
-    EXPECT_EQ(sorted_output, permuted_sorted_input);
+    /* Verification */
+    EXPECT_EQ(follow_out, source_out);
 }
 
 /**
- * @brief Metamorphic Relation 38: Sorting the input array and then multiplying each element by a constant should yield the same result as multiplying each
- * element by the constant and then sorting the array.
+ * @brief Metamorphic Relation 38: Applying the function on a monotonically decreasing input array, the output should also be in ascending order.
+ *
  */
 TEST_P(HeapSortParamTest, MR38) {
     /* Get source input */
     HeapSortInput input = GetParam();
     vector<int> source_vec = input.vec;
-    int constant = 10;
 
-    // Sort the original input array
-    vector<int> sorted_output = heap_sort(source_vec);
+    /* Get source output */
+    vector<int> source_out = heap_sort(input.vec);
 
-    // Multiply each element by a constant in the sorted output
-    vector<int> multiplied_sorted_output = sorted_output;
-    for (int &elem : multiplied_sorted_output) {
-        elem *= constant;
-    }
+    /* Construct follow-up input */
+    vector<int> follow_vec = source_vec;
+    sort(follow_vec.rbegin(), follow_vec.rend());
 
-    // Multiply each element by the constant in the input array and then sort it
-    vector<int> multiplied_input = source_vec;
-    for (int &elem : multiplied_input) {
-        elem *= constant;
-    }
-    vector<int> multiplied_sorted_input = heap_sort(multiplied_input);
+    /* Get follow-up output */
+    vector<int> follow_out = heap_sort(follow_vec);
 
-    // Verification
-    EXPECT_EQ(multiplied_sorted_output, multiplied_sorted_input);
+    /* Verification */
+    sort(source_out.begin(), source_out.end());
+    EXPECT_EQ(follow_out, source_out);
 }
 
 /**
- * @brief Metamorphic Relation 39: Sorting non-positive elements of the input array should yield the same result as sorting the non-positive elements rest of
- * the elements in the input array and then concatenating the two sorted sets.
+ * @brief Metamorphic Relation 39: Applying the function on an array with all elements incrementing by 1, the output should also have elements incrementing by 1.
+ *
  */
 TEST_P(HeapSortParamTest, MR39) {
     /* Get source input */
     HeapSortInput input = GetParam();
     vector<int> source_vec = input.vec;
 
-    // Sort the entire input array
-    vector<int> sorted_output = heap_sort(source_vec);
+    /* Get source output */
+    vector<int> source_out = heap_sort(input.vec);
 
-    // Separate non-positive and positive elements
-    vector<int> non_positive_elements, remaining_elements;
-    for (int element : source_vec) {
-        if (element <= 0) {
-            non_positive_elements.push_back(element);
-        } else {
-            remaining_elements.push_back(element);
-        }
-    }
+    /* Construct follow-up input */
+    vector<int> follow_vec(source_vec.size());
+    iota(follow_vec.begin(), follow_vec.end(), source_vec[0]);
 
-    // Sort the non-positive elements
-    vector<int> sorted_non_positive_elements = heap_sort(non_positive_elements);
+    /* Get follow-up output */
+    vector<int> follow_out = heap_sort(follow_vec);
 
-    // Sort the remaining elements
-    vector<int> sorted_remaining_elements = heap_sort(remaining_elements);
-
-    // Merge the two sorted sets
-    sorted_non_positive_elements.insert(sorted_non_positive_elements.end(), sorted_remaining_elements.begin(), sorted_remaining_elements.end());
-
-    // Verification
-    EXPECT_EQ(sorted_output, sorted_non_positive_elements);
+    /* Verification */
+    EXPECT_EQ(follow_out, source_out);
 }
 
 /**
- * @brief Metamorphic Relation 40: Sorting the input array and then appending a constant element at the end should yield the same result as appending the
- * constant element to the input array and then sorting it.
+ * @brief Metamorphic Relation 40: Applying the function on an array with elements repeating in a pattern, the output should also repeat the same pattern.
+ *
  */
 TEST_P(HeapSortParamTest, MR40) {
     /* Get source input */
     HeapSortInput input = GetParam();
     vector<int> source_vec = input.vec;
-    // Constant to append
-    int constant = 100;
 
-    // Sort the original input array
-    vector<int> sorted_output = heap_sort(source_vec);
+    /* Get source output */
+    vector<int> source_out = heap_sort(input.vec);
 
-    // Append the constant element to the sorted output
-    vector<int> appended_sorted_output = sorted_output;
-    appended_sorted_output.push_back(constant);
+    /* Construct follow-up input with a repeating pattern */
+    vector<int> follow_vec(source_vec.size());
+    for (size_t i = 0; i < source_vec.size(); ++i)
+        follow_vec[i] = i % 2;  // Alternating 0s and 1s pattern
 
-    // Append the constant element to the original input array and then sort it
-    vector<int> appended_input = source_vec;
-    appended_input.push_back(constant);
-    vector<int> appended_sorted_input = heap_sort(appended_input);
+    /* Get follow-up output */
+    vector<int> follow_out = heap_sort(follow_vec);
 
-    // Verification
-    EXPECT_EQ(appended_sorted_output, appended_sorted_input);
+    /* Verification */
+    EXPECT_EQ(follow_out, source_out);
 }
 
 /**
- * @brief Metamorphic Relation 41: Sorting the input array and then rotating it rightwards by a certain number of positions should yield the same result as rotating the input array rightwards by the same number of positions and then sorting it.
+ * @brief Metamorphic Relation 41: Applying the function on an array with a single element, the output should be the same single element. 
+ * 
  */
-TEST_P(HeapSortParamTest, MR41) {
+TEST(HeapSortTest, MR41) {
+    /* Create input array with a single element */
+    vector<int> source_vec = {5};
+
+    /* Get source output */
+    vector<int> source_out = heap_sort(source_vec);
+
+    /* Expected output should be the same single element */
+    vector<int> expected_out = {5};
+
+    /* Verification */
+    EXPECT_EQ(source_out, expected_out);
+}
+
+/**
+ * @brief Metamorphic Relation 42: Applying the function on an array with all elements equal, the output should also have all elements equal.
+ * 
+ */
+TEST_P(HeapSortParamTest, MR42) {
     /* Get source input */
     HeapSortInput input = GetParam();
-    vector<int> source_vec = input.vec;
-    int shiftAmount = 3;
+    vector<int> source_vec(input.vec.size(), 10); // Initialize all elements with value 10
 
-    // Sort the original input array
-    vector<int> sorted_output = heap_sort(source_vec);
+    /* Get source output */
+    vector<int> source_out = heap_sort(input.vec);
 
-    // Rotate the sorted output rightwards
-    vector<int> rotated_sorted_output = sorted_output;
-    rotate(rotated_sorted_output.rbegin(), rotated_sorted_output.rbegin() + shiftAmount, rotated_sorted_output.rend());
+    /* Get follow-up output */
+    vector<int> follow_out = heap_sort(source_vec);
 
-    // Rotate the input array rightwards and then sort it
-    vector<int> rotated_input = source_vec;
-    rotate(rotated_input.rbegin(), rotated_input.rbegin() + shiftAmount, rotated_input.rend());
-    vector<int> rotated_sorted_input = heap_sort(rotated_input);
-
-    // Verification
-    EXPECT_EQ(rotated_sorted_output, rotated_sorted_input);
+    /* Verification */
+    EXPECT_EQ(follow_out, source_out);
 }
 
 INSTANTIATE_TEST_CASE_P(TrueReturn, HeapSortParamTest, testing::ValuesIn(gen_tcs_randomly()));
