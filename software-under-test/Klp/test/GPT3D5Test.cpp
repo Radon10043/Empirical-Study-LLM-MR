@@ -489,20 +489,6 @@ TEST_P(KLPParamTest, MR17) {
 }
 
 /**
- * @brief Generate a random row of 0s and 1s.
- *
- * @param size Size of the row
- * @return vector<int> Randomly generated row
- 
-vector<int> generateRandomRow(int size) {
-    vector<int> row;
-    for (int i = 0; i < size; ++i) {
-        row.push_back(rand() % 2);  // Generating random 0 or 1
-    }
-    return row;
-}*/
-
-/**
  * @brief Metamorphic Relation 18: Rearranging the order of the locks (columns) in the matrix, 
  * then the output will not change.
  *
@@ -570,21 +556,6 @@ TEST_P(KLPParamTest, MR19) {
 }
 
 /**
- * @brief Confirming whether the output of MR19 conforms to the metamorphic relation condition.
- *
- * @param source Output of the source input
- * @param follow Output of the follow-up input
- * @return bool Whether the metamorphic relation condition is satisfied
- 
-bool checkMR19(const vector<int>& source, const vector<int>& follow) {
-    // Perform statistical testing to check if the output is consistent with the metamorphic relation
-    // (e.g., running multiple times and checking if the outputs follow the same pattern)
-
-    // For demonstration purposes, let's assume that the condition is met if the outputs have the same size
-    return source.size() == follow.size();
-}*/
-
-/**
  * @brief Metamorphic Relation 20: Adding a key row that is a circular shift of an existing key row in the matrix, 
  * then the output will not change.
  */
@@ -609,21 +580,6 @@ TEST_P(KLPParamTest, MR20) {
     /* Verification */
     EXPECT_EQ(source_out, follow_out);
 }
-
-/**
- * @brief Confirming whether the output of MR20 conforms to the metamorphic relation condition.
- *
- * @param source Output of the source input
- * @param follow Output of the follow-up input
- * @return bool Whether the metamorphic relation condition is satisfied
- 
-bool checkMR20(const vector<int>& source, const vector<int>& follow) {
-    // Perform statistical testing to check if the output is consistent with the metamorphic relation
-    // (e.g., running multiple times and checking if the outputs follow the same pattern)
-
-    // For demonstration purposes, let's assume that the condition is met if the outputs have the same size
-    return source.size() == follow.size();
-}*/
 
 //fixed
 /**
@@ -666,21 +622,6 @@ TEST_P(KLPParamTest, MR21) {
     // Hence, we need to apply statistical testing (e.g., using multiple runs) to confirm the metamorphic relation
     ASSERT_TRUE(checkMR21(source_out, follow_out));
 }
-
-/**
- * @brief Confirming whether the output of MR21 conforms to the metamorphic relation condition.
- *
- * @param source Output of the source input
- * @param follow Output of the follow-up input
- * @return bool Whether the metamorphic relation condition is satisfied
- 
-bool checkMR21(const vector<int>& source, const vector<int>& follow) {
-    // Perform statistical testing to check if the output is consistent with the metamorphic relation
-    // (e.g., running multiple times and checking if the outputs follow the same pattern)
-
-    // For demonstration purposes, let's assume that the condition is met if the outputs have the same size
-    return source.size() == follow.size();
-}*/
 
 /**
  * @brief Metamorphic Relation 22: Adding a key row that is a circular rotation of an existing key row in the matrix, then the output will not change.
