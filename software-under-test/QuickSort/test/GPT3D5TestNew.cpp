@@ -138,6 +138,7 @@ TEST_P(QuickSortParamTest, MR5) {
     EXPECT_EQ(follow_out, source_out);
 }
 
+// fixed
 /**
  * @brief Metamorphic Relation 6: Appending the input array with an increasing sequence, the output array will be the same as the source output with the increasing sequence appended at the end.
  */
@@ -160,6 +161,9 @@ TEST_P(QuickSortParamTest, MR6) {
     vector<int> follow_out = quick_sort(follow_vec);
 
     /* Verification */
+    for (int i = max_elem; i < max_elem + source_vec.size(); ++i) {
+        source_out.push_back(i);
+    }
     EXPECT_EQ(follow_out, source_out);
 }
 
@@ -569,6 +573,8 @@ TEST_P(QuickSortParamTest, MR23) {
     vector<int> follow_out = quick_sort(follow_vec);
 
     /* Verification */
+    for (auto& elem : source_out)
+        elem += shift_value;
     EXPECT_EQ(follow_out, source_out);
 }
 
@@ -620,9 +626,8 @@ TEST_P(QuickSortParamTest, MR25) {
     vector<int> follow_out = quick_sort(follow_vec);
 
     /* Verification */
-     for (auto &elem : source_out)
-        elem = elem * multiplier + addend;  
-    sort(source_out.begin(), source_out.end()); 
+    for (auto &elem : source_out)
+        elem = elem * multiplier + addend;
     EXPECT_EQ(follow_out, source_out);
 }
 
@@ -737,7 +742,6 @@ TEST_P(QuickSortParamTest, MR29) {
     EXPECT_EQ(follow_out, expected_follow_out);
 }
 
-//fixed
 /**
  * @brief Metamorphic Relation 30: Swapping the first and last elements of the input array, the output array will have the same relative order as the source output, with the two elements swapped.
  */
@@ -757,9 +761,6 @@ TEST_P(QuickSortParamTest, MR30) {
 
     /* Get follow-up output */
     vector<int> follow_out = quick_sort(follow_vec);
-    if (!follow_out.empty()) {
-        swap(follow_out.front(), follow_out.back());
-    }
 
     /* Verification */
     EXPECT_EQ(follow_out, source_out);
