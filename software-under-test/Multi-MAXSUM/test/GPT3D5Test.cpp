@@ -1,6 +1,8 @@
 #include <algorithm>
 #include <gtest/gtest.h>
 #include <vector>
+#include <cmath>
+#include <random>
 
 #include "../src/function.h"
 #include "utils.h"
@@ -10,7 +12,30 @@ using namespace std;
 class MultiMAXSUMParamTest : public ::testing::TestWithParam<MultiMAXSUMInput> {};
 
 /**
- * @brief Metamorphic Relation 2: Reversing the order of the array, the output should be the same as the source output.
+ * @brief Metamorphic Relation 1: Increasing the value of m, the follow-up output should be the same as or larger than the source output.
+ *
+ */
+TEST_P(MultiMAXSUMParamTest, MR1) {
+    /* Get source input */
+    MultiMAXSUMInput input = GetParam();
+    vector<int> source_vec = input.vec;
+    int source_m = input.m;
+
+    /* Get source output */
+    int source_out = multi_maxsum(source_vec, source_m);
+
+    /* Construct follow-up input */
+    int follow_up_m = source_m + 1;
+
+    /* Get follow-up output */
+    int follow_out = multi_maxsum(source_vec, follow_up_m);
+
+    /* Verification */
+    EXPECT_GE(follow_out, source_out);
+}
+
+/**
+ * @brief Metamorphic Relation 2: Reversing the input array, the follow-up output should be the same as the source output.
  *
  */
 TEST_P(MultiMAXSUMParamTest, MR2) {
@@ -23,18 +48,17 @@ TEST_P(MultiMAXSUMParamTest, MR2) {
     int source_out = multi_maxsum(source_vec, source_m);
 
     /* Construct follow-up input */
-    vector<int> follow_vec = source_vec;
-    reverse(follow_vec.begin(), follow_vec.end());
+    reverse(source_vec.begin(), source_vec.end());
 
     /* Get follow-up output */
-    int follow_out = multi_maxsum(follow_vec, source_m);
+    int follow_out = multi_maxsum(source_vec, source_m);
 
     /* Verification */
     EXPECT_EQ(follow_out, source_out);
 }
 
 /**
- * @brief Metamorphic Relation 3: Multiplying all elements of the array by a positive scalar, the follow-up output should be `scalar * source_output`.
+ * @brief Metamorphic Relation 3: Adding a constant value to each element of the input array, the follow-up output should be increased by the constant times the number of subarrays (m).
  *
  */
 TEST_P(MultiMAXSUMParamTest, MR3) {
@@ -48,45 +72,47 @@ TEST_P(MultiMAXSUMParamTest, MR3) {
 
     /* Construct follow-up input */
     vector<int> follow_vec = source_vec;
-    int scalar = 2; // Example scalar value
-    transform(follow_vec.begin(), follow_vec.end(), follow_vec.begin(), [scalar](int i) { return i * scalar; });
+    int constant = 5; // Example constant value
+    for (int i = 0; i < follow_vec.size(); ++i) {
+        follow_vec[i] += constant;
+    }
 
     /* Get follow-up output */
     int follow_out = multi_maxsum(follow_vec, source_m);
 
     /* Verification */
-    EXPECT_EQ(follow_out, scalar * source_out);
+    EXPECT_EQ(follow_out, source_out + constant * source_m);
 }
 
 /**
- * @brief Metamorphic Relation 4: Adding an offset to each element of the array, the follow-up output should remain the same as the source output.
+ * @brief Metamorphic Relation 4: Multiplying each element of the input array by a constant value, the follow-up output should be multiplied by the constant to the power of the number of subarrays (m).
  *
  */
 TEST_P(MultiMAXSUMParamTest, MR4) {
     /* Get source input */
     MultiMAXSUMInput input = GetParam();
     vector<int> source_vec = input.vec;
-    int offset = 5; // Example offset value
-    for (int i = 0; i < source_vec.size(); i++) {
-        source_vec[i] += offset;
-    }
     int source_m = input.m;
 
     /* Get source output */
-    int source_out = multi_maxsum(input.vec, source_m);
+    int source_out = multi_maxsum(source_vec, source_m);
 
     /* Construct follow-up input */
     vector<int> follow_vec = source_vec;
+    int constant = 2; // Example constant value
+    for (int i = 0; i < follow_vec.size(); ++i) {
+        follow_vec[i] *= constant;
+    }
 
     /* Get follow-up output */
     int follow_out = multi_maxsum(follow_vec, source_m);
 
     /* Verification */
-    EXPECT_EQ(follow_out, source_out);
+    EXPECT_EQ(follow_out, pow(source_out, source_m) * pow(constant, source_m));
 }
 
 /**
- * @brief Metamorphic Relation 5: Using a subset of the array, the follow-up output should be less than or equal to the source output.
+ * @brief Metamorphic Relation 5: Reordering the elements of the input array, the follow-up output should be the same as the source output.
  *
  */
 TEST_P(MultiMAXSUMParamTest, MR5) {
@@ -96,20 +122,21 @@ TEST_P(MultiMAXSUMParamTest, MR5) {
     int source_m = input.m;
 
     /* Get source output */
-    int source_out = multi_maxsum(input.vec, source_m);
+    int source_out = multi_maxsum(source_vec, source_m);
 
     /* Construct follow-up input */
-    vector<int> follow_vec = vector<int>(source_vec.begin(), source_vec.begin() + source_vec.size() / 2); // Example using half of the array
+    vector<int> follow_vec = source_vec;
+    sort(follow_vec.begin(), follow_vec.end());
 
     /* Get follow-up output */
     int follow_out = multi_maxsum(follow_vec, source_m);
 
     /* Verification */
-    EXPECT_LE(follow_out, source_out);
+    EXPECT_EQ(follow_out, source_out);
 }
 
 /**
- * @brief Metamorphic Relation 6: Sorting the array in ascending order, the output should remain the same as the source output.
+ * @brief Metamorphic Relation 6: Scaling the input array by a factor, the follow-up output should be scaled by the same factor.
  *
  */
 TEST_P(MultiMAXSUMParamTest, MR6) {
@@ -121,18 +148,22 @@ TEST_P(MultiMAXSUMParamTest, MR6) {
     /* Get source output */
     int source_out = multi_maxsum(source_vec, source_m);
 
-    /* Sort the source vector */
-    sort(source_vec.begin(), source_vec.end());
+    /* Construct follow-up input */
+    vector<int> follow_vec = source_vec;
+    int scale_factor = 3; // Example scale factor
+    for (int i = 0; i < follow_vec.size(); ++i) {
+        follow_vec[i] *= scale_factor;
+    }
 
     /* Get follow-up output */
-    int follow_out = multi_maxsum(source_vec, source_m);
+    int follow_out = multi_maxsum(follow_vec, source_m);
 
     /* Verification */
-    EXPECT_EQ(follow_out, source_out);
+    EXPECT_EQ(follow_out, source_out * scale_factor);
 }
 
 /**
- * @brief Metamorphic Relation 7: Removing duplicate elements from the array, the output should remain the same as the source output.
+ * @brief Metamorphic Relation 7: Shifting all elements of the input array by a fixed number of positions to the left, the follow-up output should remain the same.
  *
  */
 TEST_P(MultiMAXSUMParamTest, MR7) {
@@ -144,20 +175,22 @@ TEST_P(MultiMAXSUMParamTest, MR7) {
     /* Get source output */
     int source_out = multi_maxsum(source_vec, source_m);
 
-    /* Remove duplicate elements from source vector */
-    sort(source_vec.begin(), source_vec.end());
-    source_vec.erase(unique(source_vec.begin(), source_vec.end()), source_vec.end());
+    /* Construct follow-up input */
+    vector<int> follow_vec = source_vec;
+    int shift = 2; // Example shift amount
+
+    /* Perform left shift */
+    rotate(follow_vec.begin(), follow_vec.begin() + shift, follow_vec.end());
 
     /* Get follow-up output */
-    int follow_out = multi_maxsum(source_vec, source_m);
+    int follow_out = multi_maxsum(follow_vec, source_m);
 
     /* Verification */
     EXPECT_EQ(follow_out, source_out);
 }
 
 /**
- * @brief Metamorphic Relation 8: Replacing all negative elements in the array with zeros, the follow-up output should be less than or equal to the source
- * output.
+ * @brief Metamorphic Relation 8: Performing a cyclic rotation on the input array, the follow-up output should remain the same.
  *
  */
 TEST_P(MultiMAXSUMParamTest, MR8) {
@@ -166,25 +199,24 @@ TEST_P(MultiMAXSUMParamTest, MR8) {
     vector<int> source_vec = input.vec;
     int source_m = input.m;
 
-    /* Replace negative elements with zeros */
-    for (auto &num : source_vec) {
-        if (num < 0) {
-            num = 0;
-        }
-    }
-
     /* Get source output */
     int source_out = multi_maxsum(source_vec, source_m);
 
+    /* Construct follow-up input */
+    vector<int> follow_vec = source_vec;
+
+    /* Perform cyclic rotation */
+    rotate(follow_vec.rbegin(), follow_vec.rbegin() + 1, follow_vec.rend());
+
     /* Get follow-up output */
-    int follow_out = multi_maxsum(source_vec, source_m);
+    int follow_out = multi_maxsum(follow_vec, source_m);
 
     /* Verification */
-    EXPECT_LE(follow_out, source_out);
+    EXPECT_EQ(follow_out, source_out);
 }
 
 /**
- * @brief Metamorphic Relation 9: Adding a constant value to the subarray, the sum should increase by the product of the constant value and the subarray length.
+ * @brief Metamorphic Relation 9: Multiplying all elements of the input array by -1, the follow-up output should remain the same.
  *
  */
 TEST_P(MultiMAXSUMParamTest, MR9) {
@@ -192,76 +224,78 @@ TEST_P(MultiMAXSUMParamTest, MR9) {
     MultiMAXSUMInput input = GetParam();
     vector<int> source_vec = input.vec;
     int source_m = input.m;
-    int constant = 10; // Example constant value to add
 
     /* Get source output */
     int source_out = multi_maxsum(source_vec, source_m);
 
-    /* Modify the subarray by adding the constant value */
-    for (int i = 0; i < source_vec.size(); i++) {
-        source_vec[i] += constant;
+    /* Construct follow-up input */
+    vector<int> follow_vec = source_vec;
+    
+    /* Multiply all elements by -1 */
+    for (int i = 0; i < follow_vec.size(); ++i) {
+        follow_vec[i] *= -1;
     }
 
     /* Get follow-up output */
-    int follow_out = multi_maxsum(source_vec, source_m);
+    int follow_out = multi_maxsum(follow_vec, source_m);
 
     /* Verification */
-    EXPECT_EQ(follow_out, source_out + source_vec.size() * constant);
+    EXPECT_EQ(follow_out, source_out);
 }
 
 /**
- * @brief Metamorphic Relation 10: Scaling the entire array by a factor, the output should scale accordingly.
+ * @brief Metamorphic Relation 10: Randomly shuffling the input array, the follow-up output should remain the same.
  *
  */
 TEST_P(MultiMAXSUMParamTest, MR10) {
     /* Get source input */
     MultiMAXSUMInput input = GetParam();
     vector<int> source_vec = input.vec;
-    int scalingFactor = 2; // Example scaling factor
     int source_m = input.m;
 
     /* Get source output */
     int source_out = multi_maxsum(source_vec, source_m);
 
-    /* Scale the entire array */
-    for (int &num : source_vec) {
-        num *= scalingFactor;
-    }
+    /* Construct follow-up input */
+    vector<int> follow_vec = source_vec;
+
+    /* Randomly shuffle the elements */
+    unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+    shuffle(follow_vec.begin(), follow_vec.end(), std::default_random_engine(seed));
 
     /* Get follow-up output */
-    int follow_out = multi_maxsum(source_vec, source_m);
+    int follow_out = multi_maxsum(follow_vec, source_m);
 
     /* Verification */
-    EXPECT_EQ(follow_out, source_out * scalingFactor);
+    EXPECT_EQ(follow_out, source_out);
 }
 
 /**
- * @brief Metamorphic Relation 11: Shifting all elements of the array to the right by a fixed offset, the output should remain the same as the source output.
+ * @brief Metamorphic Relation 11: Taking a subarray of the input array, the follow-up output should be less than or equal to the source output.
  *
  */
 TEST_P(MultiMAXSUMParamTest, MR11) {
     /* Get source input */
     MultiMAXSUMInput input = GetParam();
     vector<int> source_vec = input.vec;
-    int shiftOffset = 2; // Example shift offset
     int source_m = input.m;
+    int n = source_vec.size();
 
     /* Get source output */
     int source_out = multi_maxsum(source_vec, source_m);
 
-    /* Apply right shift to the entire array */
-    rotate(source_vec.rbegin(), source_vec.rbegin() + shiftOffset, source_vec.rend());
+    /* Construct follow-up input */
+    vector<int> follow_vec(source_vec.begin(), source_vec.begin() + n / 2); // Taking the first half as follow-up input
 
     /* Get follow-up output */
-    int follow_out = multi_maxsum(source_vec, source_m);
+    int follow_out = multi_maxsum(follow_vec, source_m);
 
     /* Verification */
-    EXPECT_EQ(follow_out, source_out);
+    EXPECT_LE(follow_out, source_out);
 }
-#include <cmath>
 
 /**
- * @brief Metamorphic Relation 12: Replacing all even elements in the array with their square roots, the output should remain the same as the source output.
+ * @brief Metamorphic Relation 12: Duplicating the input array, the follow-up output should be at least double the source output.
  *
  */
 TEST_P(MultiMAXSUMParamTest, MR12) {
@@ -270,25 +304,22 @@ TEST_P(MultiMAXSUMParamTest, MR12) {
     vector<int> source_vec = input.vec;
     int source_m = input.m;
 
-    /* Replace even elements with their square roots */
-    for (int &num : source_vec) {
-        if (num % 2 == 0) {
-            num = static_cast<int>(sqrt(num)); // Using integer square root for simplicity
-        }
-    }
-
     /* Get source output */
     int source_out = multi_maxsum(source_vec, source_m);
 
+    /* Construct follow-up input */
+    vector<int> follow_vec = source_vec;
+    follow_vec.insert(follow_vec.end(), source_vec.begin(), source_vec.end()); // Concatenating the input array with itself
+
     /* Get follow-up output */
-    int follow_out = multi_maxsum(source_vec, source_m);
+    int follow_out = multi_maxsum(follow_vec, source_m);
 
     /* Verification */
-    EXPECT_EQ(follow_out, source_out);
+    EXPECT_GE(follow_out, source_out * 2);
 }
 
 /**
- * @brief Metamorphic Relation 13: Reversing the sign of all elements in the array, the output should remain the same as the source output.
+ * @brief Metamorphic Relation 13: Replacing all elements of the input array with their absolute values, the follow-up output should be the same as the source output.
  *
  */
 TEST_P(MultiMAXSUMParamTest, MR13) {
@@ -297,25 +328,24 @@ TEST_P(MultiMAXSUMParamTest, MR13) {
     vector<int> source_vec = input.vec;
     int source_m = input.m;
 
-    /* Reverse the sign of all elements */
-    for (int &num : source_vec) {
-        num = -num;
-    }
-
     /* Get source output */
     int source_out = multi_maxsum(source_vec, source_m);
 
+    /* Construct follow-up input */
+    vector<int> follow_vec = source_vec;
+    for (int i = 0; i < follow_vec.size(); ++i) {
+        follow_vec[i] = abs(follow_vec[i]);
+    }
+
     /* Get follow-up output */
-    int follow_out = multi_maxsum(source_vec, source_m);
+    int follow_out = multi_maxsum(follow_vec, source_m);
 
     /* Verification */
     EXPECT_EQ(follow_out, source_out);
 }
-#include <numeric>
 
 /**
- * @brief Metamorphic Relation 14: Slicing the array into two subarrays, summing the elements of the subarrays, and then summing the subarray sums, the result
- * should remain the same as the original sum.
+ * @brief Metamorphic Relation 14: Replacing the input array with a sorted version (in non-decreasing order), the follow-up output should be the same as the source output.
  *
  */
 TEST_P(MultiMAXSUMParamTest, MR14) {
@@ -324,25 +354,22 @@ TEST_P(MultiMAXSUMParamTest, MR14) {
     vector<int> source_vec = input.vec;
     int source_m = input.m;
 
-    int half_size = source_vec.size() / 2;
+    /* Get source output */
+    int source_out = multi_maxsum(source_vec, source_m);
 
-    /* Sum of original array */
-    int original_sum = accumulate(source_vec.begin(), source_vec.end(), 0);
+    /* Construct follow-up input */
+    vector<int> follow_vec = source_vec;
+    sort(follow_vec.begin(), follow_vec.end());
 
-    /* Calculate the sum of the two subarrays */
-    int first_half_sum = accumulate(source_vec.begin(), source_vec.begin() + half_size, 0);
-    int second_half_sum = accumulate(source_vec.begin() + half_size, source_vec.end(), 0);
-
-    /* Calculate the sum of the subarray sums */
-    int subarray_sum_sum = first_half_sum + second_half_sum;
+    /* Get follow-up output */
+    int follow_out = multi_maxsum(follow_vec, source_m);
 
     /* Verification */
-    EXPECT_EQ(subarray_sum_sum, original_sum);
+    EXPECT_EQ(follow_out, source_out);
 }
 
 /**
- * @brief Metamorphic Relation 15: Computing the maximum subarray sum and then adding a value to each element, the new maximum subarray sum should increase by
- * the product of the value and the subarray length.
+ * @brief Metamorphic Relation 15: Applying a reverse sorting to the input array, the follow-up output should be the same as the source output.
  *
  */
 TEST_P(MultiMAXSUMParamTest, MR15) {
@@ -350,134 +377,132 @@ TEST_P(MultiMAXSUMParamTest, MR15) {
     MultiMAXSUMInput input = GetParam();
     vector<int> source_vec = input.vec;
     int source_m = input.m;
-    int additional_value = 5; // Example additional value
 
-    /* Source output */
+    /* Get source output */
     int source_out = multi_maxsum(source_vec, source_m);
 
-    /* Calculate the maximum subarray sum */
-    int max_sum = multi_maxsum(source_vec, source_m);
+    /* Construct follow-up input */
+    vector<int> follow_vec = source_vec;
+    sort(follow_vec.rbegin(), follow_vec.rend());
 
-    /* Add a value to each element */
-    for (int i = 0; i < source_vec.size(); i++) {
-        source_vec[i] += additional_value;
-    }
-
-    /* Calculate the new maximum subarray sum */
-    int new_max_sum = multi_maxsum(source_vec, source_m);
+    /* Get follow-up output */
+    int follow_out = multi_maxsum(follow_vec, source_m);
 
     /* Verification */
-    EXPECT_EQ(new_max_sum, max_sum + (additional_value * source_m));
+    EXPECT_EQ(follow_out, source_out);
 }
 
 /**
- * @brief Metamorphic Relation 16: Sorting the array in descending order, the output should remain the same as the source output.
+ * @brief Metamorphic Relation 16: Multiplying all elements of the input array by a negative number, the output remains the same.
  *
  */
 TEST_P(MultiMAXSUMParamTest, MR16) {
+    /* Get source input */
     MultiMAXSUMInput input = GetParam();
     vector<int> source_vec = input.vec;
     int source_m = input.m;
 
-    /* Sort the source vector in descending order */
-    sort(source_vec.rbegin(), source_vec.rend());
-
     /* Get source output */
     int source_out = multi_maxsum(source_vec, source_m);
 
+    /* Construct follow-up input */
+    vector<int> follow_vec = source_vec;
+    for (int i = 0; i < follow_vec.size(); ++i) {
+        follow_vec[i] *= -1;
+    }
+
     /* Get follow-up output */
-    int follow_out = multi_maxsum(source_vec, source_m);
+    int follow_out = multi_maxsum(follow_vec, source_m);
 
     /* Verification */
     EXPECT_EQ(follow_out, source_out);
 }
 
 /**
- * @brief Metamorphic Relation 17: Replacing all odd elements in the array with zeros, the follow-up output should be less than or equal to the source output.
+ * @brief Metamorphic Relation 17: Appending the reverse of the input array to itself, the follow-up output should be at least double the source output.
  *
  */
 TEST_P(MultiMAXSUMParamTest, MR17) {
+    /* Get source input */
     MultiMAXSUMInput input = GetParam();
     vector<int> source_vec = input.vec;
     int source_m = input.m;
 
-    /* Replace odd elements with zeros */
-    for (int &num : source_vec) {
-        if (num % 2 != 0) {
-            num = 0;
-        }
-    }
-
     /* Get source output */
     int source_out = multi_maxsum(source_vec, source_m);
 
+    /* Construct follow-up input */
+    vector<int> follow_vec = source_vec;
+    vector<int> temp = source_vec;
+    reverse(temp.begin(), temp.end());
+    follow_vec.insert(follow_vec.end(), temp.begin(), temp.end());
+
     /* Get follow-up output */
-    int follow_out = multi_maxsum(source_vec, source_m);
+    int follow_out = multi_maxsum(follow_vec, source_m);
 
     /* Verification */
-    EXPECT_LE(follow_out, source_out);
+    EXPECT_GE(follow_out, source_out * 2);
 }
 
 /**
- * @brief Metamorphic Relation 18: Dividing each element of the array by a positive scalar, the output should remain the same as the source output.
+ * @brief Metamorphic Relation 18: Repeating the input array multiple times, the follow-up output should be at least equal to the count of repetitions times the source output.
  *
  */
 TEST_P(MultiMAXSUMParamTest, MR18) {
+    /* Get source input */
     MultiMAXSUMInput input = GetParam();
     vector<int> source_vec = input.vec;
-    int scalar = 2; // Example scalar value
+    int source_m = input.m;
+    int repetition_count = 3;  // Number of times to repeat the array
+
+    /* Get source output */
+    int source_out = multi_maxsum(source_vec, source_m);
+
+    /* Construct follow-up input */
+    vector<int> follow_vec;
+    for (int i = 0; i < repetition_count; ++i) {
+        follow_vec.insert(follow_vec.end(), source_vec.begin(), source_vec.end());
+    }
+
+    /* Get follow-up output */
+    int follow_out = multi_maxsum(follow_vec, source_m);
+
+    /* Verification */
+    EXPECT_GE(follow_out, source_out * repetition_count);
+}
+
+/**
+ * @brief Metamorphic Relation 19: Multiplying each element of the input array by a different scaling factor, the follow-up output should be scaled accordingly.
+ *
+ */
+TEST_P(MultiMAXSUMParamTest, MR19) {
+    /* Get source input */
+    MultiMAXSUMInput input = GetParam();
+    vector<int> source_vec = input.vec;
     int source_m = input.m;
 
     /* Get source output */
     int source_out = multi_maxsum(source_vec, source_m);
 
-    /* Divide each element by the scalar */
-    for (int &num : source_vec) {
-        num /= scalar;
+    /* Construct follow-up input */
+    vector<int> follow_vec = source_vec;
+    vector<int> scaling_factors = {1, 2, 3, 4, 5}; // Example scaling factors
+    for (int i = 0; i < follow_vec.size(); ++i) {
+        follow_vec[i] *= scaling_factors[i % scaling_factors.size()]; // Applying different scaling factors
     }
 
     /* Get follow-up output */
-    int follow_out = multi_maxsum(source_vec, source_m);
-
-    /* Verification */
-    EXPECT_EQ(follow_out, source_out);
-}
-
-/**
- * @brief Metamorphic Relation 19: Applying a windowing function, such as a moving average, to the array, the output should change accordingly.
- *
- */
-TEST_P(MultiMAXSUMParamTest, MR19) {
-    MultiMAXSUMInput input = GetParam();
-    vector<int> source_vec = input.vec;
-    int window_size = 3; // Example window size
-    int source_m = input.m;
-
-    /* Fix by radon */
-    int source_out = multi_maxsum(source_vec, source_m);
-
-    /* Apply a moving average window function to the array */
-    for (int i = 0; i <= source_vec.size() - window_size; ++i) {
-        int sum = 0;
-        for (int j = i; j < i + window_size; ++j) {
-            sum += source_vec[j];
-        }
-        source_vec[i] = sum / window_size;
+    int expected_follow_out = source_out;
+    for (int i = 0; i < scaling_factors.size(); ++i) {
+        expected_follow_out *= scaling_factors[i];
     }
 
-    /* Get follow-up output */
-    int follow_out = multi_maxsum(source_vec, source_m);
-
     /* Verification */
-#if INVALID
-    EXPECT_NE(follow_out, input.out); // Ensure that the output has changed
-#else
-    EXPECT_NE(follow_out, source_out); // Ensure that the output has changed
-#endif
+    EXPECT_EQ(multi_maxsum(follow_vec, source_m), expected_follow_out);
 }
 
 /**
- * @brief Metamorphic Relation 20: Reversing the array and then reversing the subarray sums, the result should be the same as the original sum.
+ * @brief Metamorphic Relation 20: Replacing a subset of elements in the input array with 0, the follow-up output should be smaller than or equal to the source output.
  *
  */
 TEST_P(MultiMAXSUMParamTest, MR20) {
@@ -485,36 +510,26 @@ TEST_P(MultiMAXSUMParamTest, MR20) {
     MultiMAXSUMInput input = GetParam();
     vector<int> source_vec = input.vec;
     int source_m = input.m;
+    int n = source_vec.size();
 
-    /* Fix by Radon */
+    /* Get source output */
     int source_out = multi_maxsum(source_vec, source_m);
 
-    /* Reverse the source array */
-    reverse(source_vec.begin(), source_vec.end());
+    /* Construct follow-up input */
+    vector<int> follow_vec = source_vec;
+    int start_index = n / 4;
+    int end_index = n / 2;
+    fill(follow_vec.begin() + start_index, follow_vec.begin() + end_index, 0); // Replacing a subset of elements with 0
 
-    /* Calculate the sum of the subarrays */
-    vector<int> prefix_sum(source_vec.size() + 1, 0);
-    for (int i = 1; i <= source_vec.size(); i++) {
-        prefix_sum[i] = prefix_sum[i - 1] + source_vec[i - 1];
-    }
-
-    int original_sum = 0;
-    for (int i = 0; i <= source_vec.size() - source_m; i++) {
-        int sum = prefix_sum[i + source_m] - prefix_sum[i];
-        original_sum += sum;
-    }
+    /* Get follow-up output */
+    int follow_out = multi_maxsum(follow_vec, source_m);
 
     /* Verification */
-#if INVALID
-    EXPECT_EQ(original_sum, input.out);
-#else
-    EXPECT_EQ(original_sum, source_out);
-#endif
+    EXPECT_LE(follow_out, source_out);
 }
 
 /**
- * @brief Metamorphic Relation 21: Appending a copy of the array to itself and then finding the maximum subarray sum, the result should be at least double the
- * original maximum subarray sum.
+ * @brief Metamorphic Relation 21: Replacing all even elements of the input array with their negative values, the follow-up output should be the same as the source output.
  *
  */
 TEST_P(MultiMAXSUMParamTest, MR21) {
@@ -523,49 +538,54 @@ TEST_P(MultiMAXSUMParamTest, MR21) {
     vector<int> source_vec = input.vec;
     int source_m = input.m;
 
-    /* Append a copy of the source array to itself */
-    vector<int> extended_vec(source_vec);
-    extended_vec.insert(extended_vec.end(), source_vec.begin(), source_vec.end());
+    /* Get source output */
+    int source_out = multi_maxsum(source_vec, source_m);
 
-    /* Get the original maximum subarray sum */
-    int original_max_sum = multi_maxsum(source_vec, source_m);
+    /* Construct follow-up input */
+    vector<int> follow_vec = source_vec;
+    for (int i = 0; i < follow_vec.size(); ++i) {
+        if (follow_vec[i] % 2 == 0) {
+            follow_vec[i] *= -1;
+        }
+    }
 
-    /* Get the maximum subarray sum of the extended array */
-    int extended_max_sum = multi_maxsum(extended_vec, source_m);
+    /* Get follow-up output */
+    int follow_out = multi_maxsum(follow_vec, source_m);
 
     /* Verification */
-    EXPECT_GE(extended_max_sum, original_max_sum * 2);
+    EXPECT_EQ(follow_out, source_out);
 }
 
 /**
- * @brief Metamorphic Relation 22: Multiplying each element of the array by a positive scalar, the output should scale accordingly.
+ * @brief Metamorphic Relation 22: Replacing all negative elements of the input array with 0, the follow-up output should be the same as or larger than the source output.
  *
  */
 TEST_P(MultiMAXSUMParamTest, MR22) {
     /* Get source input */
     MultiMAXSUMInput input = GetParam();
     vector<int> source_vec = input.vec;
-    int scalar = 3; // Example scalar value
     int source_m = input.m;
 
     /* Get source output */
     int source_out = multi_maxsum(source_vec, source_m);
 
-    /* Multiply each element by the scalar */
-    for (int &num : source_vec) {
-        num *= scalar;
+    /* Construct follow-up input */
+    vector<int> follow_vec = source_vec;
+    for (int i = 0; i < follow_vec.size(); ++i) {
+        if (follow_vec[i] < 0) {
+            follow_vec[i] = 0;
+        }
     }
 
     /* Get follow-up output */
-    int follow_out = multi_maxsum(source_vec, source_m);
+    int follow_out = multi_maxsum(follow_vec, source_m);
 
     /* Verification */
-    EXPECT_EQ(follow_out, source_out * scalar);
+    EXPECT_GE(follow_out, source_out);
 }
 
 /**
- * @brief Metamorphic Relation 23: Reversing the array and then finding the maximum subarray sum, the result should be the same as the original maximum subarray
- * sum.
+ * @brief Metamorphic Relation 23: Rotating the input array by a certain number of positions, the follow-up output should remain the same.
  *
  */
 TEST_P(MultiMAXSUMParamTest, MR23) {
@@ -573,22 +593,27 @@ TEST_P(MultiMAXSUMParamTest, MR23) {
     MultiMAXSUMInput input = GetParam();
     vector<int> source_vec = input.vec;
     int source_m = input.m;
+    int n = source_vec.size();
 
-    /* Reverse the source array */
-    reverse(source_vec.begin(), source_vec.end());
+    /* Get source output */
+    int source_out = multi_maxsum(source_vec, source_m);
 
-    /* Get the original maximum subarray sum */
-    int original_max_sum = multi_maxsum(input.vec, source_m);
+    /* Construct follow-up input */
+    vector<int> follow_vec = source_vec;
+    int shift = 2;  // Example shift amount
+    
+    /* Perform rotation */
+    rotate(follow_vec.begin(), follow_vec.begin() + shift, follow_vec.end());
 
-    /* Get the maximum subarray sum of the reversed array */
-    int reversed_max_sum = multi_maxsum(source_vec, source_m);
+    /* Get follow-up output */
+    int follow_out = multi_maxsum(follow_vec, source_m);
 
     /* Verification */
-    EXPECT_EQ(reversed_max_sum, original_max_sum);
+    EXPECT_EQ(follow_out, source_out);
 }
 
 /**
- * @brief Metamorphic Relation 24: Swapping the positions of two elements in the array, the output should remain the same as the source output.
+ * @brief Metamorphic Relation 24: Reversing the elements of the input array, the follow-up output should remain the same.
  *
  */
 TEST_P(MultiMAXSUMParamTest, MR24) {
@@ -597,24 +622,22 @@ TEST_P(MultiMAXSUMParamTest, MR24) {
     vector<int> source_vec = input.vec;
     int source_m = input.m;
 
-    if (source_vec.size() >= 2) {
-        /* Swap the positions of the first two elements */
-        swap(source_vec[0], source_vec[1]);
+    /* Get source output */
+    int source_out = multi_maxsum(source_vec, source_m);
 
-        /* Get source output */
-        int source_out = multi_maxsum(input.vec, source_m);
+    /* Construct follow-up input by reversing the array */
+    vector<int> follow_vec = source_vec;
+    reverse(follow_vec.begin(), follow_vec.end());
 
-        /* Get follow-up output */
-        int follow_out = multi_maxsum(source_vec, source_m);
+    /* Get follow-up output */
+    int follow_out = multi_maxsum(follow_vec, source_m);
 
-        /* Verification */
-        EXPECT_EQ(follow_out, source_out);
-    }
+    /* Verification */
+    EXPECT_EQ(follow_out, source_out);
 }
 
 /**
- * @brief Metamorphic Relation 25: Applying a custom transformation function to the array, the maximum subarray sum should have a specific relationship with the
- * original maximum subarray sum.
+ * @brief Metamorphic Relation 25: Replacing all elements of the input array with the absolute difference between the element and a fixed value, the follow-up output should remain the same.
  *
  */
 TEST_P(MultiMAXSUMParamTest, MR25) {
@@ -622,26 +645,26 @@ TEST_P(MultiMAXSUMParamTest, MR25) {
     MultiMAXSUMInput input = GetParam();
     vector<int> source_vec = input.vec;
     int source_m = input.m;
+    int fixed_value = 5;   // Example fixed value
 
-    /* Define a transformation function (e.g., squaring each element) */
-    auto transformFunction = [](int x) -> int { return x * x; };
+    /* Get source output */
+    int source_out = multi_maxsum(source_vec, source_m);
 
-    /* Apply the transformation function to each element in the array */
-    transform(source_vec.begin(), source_vec.end(), source_vec.begin(), transformFunction);
+    /* Construct follow-up input */
+    vector<int> follow_vec;
+    for (int i = 0; i < source_vec.size(); ++i) {
+        follow_vec.push_back(abs(source_vec[i] - fixed_value));  // Absolute difference from the fixed value
+    }
 
-    /* Get the original maximum subarray sum */
-    int original_max_sum = multi_maxsum(input.vec, source_m);
-
-    /* Get the maximum subarray sum of the transformed array */
-    int transformed_max_sum = multi_maxsum(source_vec, source_m);
+    /* Get follow-up output */
+    int follow_out = multi_maxsum(follow_vec, source_m);
 
     /* Verification */
-    EXPECT_EQ(transformed_max_sum, original_max_sum); // Example: verify they are equal, or use a specific relationship as necessary
+    EXPECT_EQ(follow_out, source_out);
 }
 
 /**
- * @brief Metamorphic Relation 26: Multiplying each element of the array by a constant and then adding another constant, the output should maintain the same
- * relationship with the source output.
+ * @brief Metamorphic Relation 26: Multiplying the input array by a constant factor and then taking the absolute values, the follow-up output remains the same.
  *
  */
 TEST_P(MultiMAXSUMParamTest, MR26) {
@@ -649,26 +672,26 @@ TEST_P(MultiMAXSUMParamTest, MR26) {
     MultiMAXSUMInput input = GetParam();
     vector<int> source_vec = input.vec;
     int source_m = input.m;
-    int multiplier = 2; // Example constant for multiplication
-    int addition = 3;   // Example constant for addition
+    int constant = 2;   // Example constant factor
 
-    /* Apply the transformation to each element in the array */
-    for (int &num : source_vec) {
-        num = num * multiplier + addition;
+    /* Get source output */
+    int source_out = multi_maxsum(source_vec, source_m);
+
+    /* Construct follow-up input */
+    vector<int> follow_vec = source_vec;
+    for (int i = 0; i < follow_vec.size(); ++i) {
+        follow_vec[i] = abs(follow_vec[i] * constant);  // Applying constant factor and taking absolute value
     }
 
-    /* Get the original maximum subarray sum */
-    int original_max_sum = multi_maxsum(input.vec, source_m);
-
-    /* Get the maximum subarray sum of the transformed array */
-    int transformed_max_sum = multi_maxsum(source_vec, source_m);
+    /* Get follow-up output */
+    int follow_out = multi_maxsum(follow_vec, source_m);
 
     /* Verification */
-    EXPECT_EQ(transformed_max_sum, multiplier * original_max_sum + addition);
+    EXPECT_EQ(follow_out, source_out);
 }
 
 /**
- * @brief Metamorphic Relation 27: Replacing each element with its absolute value, the maximum subarray sum should remain the same.
+ * @brief Metamorphic Relation 27: If all elements of the input are positive, keep all even elements and set all odd elements to 1, the follow-up output should be less than or equal to the source output.
  *
  */
 TEST_P(MultiMAXSUMParamTest, MR27) {
@@ -677,24 +700,26 @@ TEST_P(MultiMAXSUMParamTest, MR27) {
     vector<int> source_vec = input.vec;
     int source_m = input.m;
 
-    /* Replace each element with its absolute value */
-    for (int &num : source_vec) {
-        num = abs(num);
+    /* Get source output */
+    int source_out = multi_maxsum(source_vec, source_m);
+
+    /* Construct follow-up input */
+    vector<int> follow_vec = source_vec;
+    for (int i = 0; i < follow_vec.size(); ++i) {
+        if (follow_vec[i] % 2 != 0) {
+            follow_vec[i] = 1;  // Set to 1 if odd
+        }
     }
 
-    /* Get the original maximum subarray sum */
-    int original_max_sum = multi_maxsum(input.vec, source_m);
-
-    /* Get the maximum subarray sum of the transformed array */
-    int transformed_max_sum = multi_maxsum(source_vec, source_m);
+    /* Get follow-up output */
+    int follow_out = multi_maxsum(follow_vec, source_m);
 
     /* Verification */
-    EXPECT_EQ(transformed_max_sum, original_max_sum);
+    EXPECT_LE(follow_out, source_out);
 }
 
 /**
- * @brief Metamorphic Relation 28: Subtracting a specific value from each element of the array, the maximum subarray sum should maintain a specific relationship
- * with the original maximum subarray sum.
+ * @brief Metamorphic Relation 28: Adding a constant to all elements of the input array, the follow-up output should be increased by the sum of the array multiplied by the constant.
  *
  */
 TEST_P(MultiMAXSUMParamTest, MR28) {
@@ -702,26 +727,29 @@ TEST_P(MultiMAXSUMParamTest, MR28) {
     MultiMAXSUMInput input = GetParam();
     vector<int> source_vec = input.vec;
     int source_m = input.m;
-    int subtrahend = 5; // Example value to subtract
+    int constant = 2;  // Example constant value
+    
+    /* Get source output */
+    int source_out = multi_maxsum(source_vec, source_m);
 
-    /* Subtract the value from each element in the array */
-    for (int &num : source_vec) {
-        num -= subtrahend;
+    /* Construct follow-up input */
+    vector<int> follow_vec;
+    for (int val : source_vec) {
+        follow_vec.push_back(val + constant);
     }
 
-    /* Get the original maximum subarray sum */
-    int original_max_sum = multi_maxsum(input.vec, source_m);
+    /* Get follow-up output */
+    int follow_up_out = multi_maxsum(follow_vec, source_m);
 
-    /* Get the maximum subarray sum of the transformed array */
-    int transformed_max_sum = multi_maxsum(source_vec, source_m);
+    /* Calculate the expected follow-up output */
+    int expected_follow_up_out = source_out + accumulate(source_vec.begin(), source_vec.end(), 0) * constant;
 
     /* Verification */
-    EXPECT_EQ(transformed_max_sum, original_max_sum - (subtrahend * source_m)); // Example relationship between the maximum subarray sums
+    EXPECT_EQ(follow_up_out, expected_follow_up_out);
 }
 
 /**
- * @brief Metamorphic Relation 29: Replacing the elements of the array with their square roots, the maximum subarray sum should have a specific relationship
- * with the original maximum subarray sum.
+ * @brief Metamorphic Relation 29: Taking the absolute difference between consecutive elements in the input array, the follow-up output should remain the same.
  *
  */
 TEST_P(MultiMAXSUMParamTest, MR29) {
@@ -730,24 +758,24 @@ TEST_P(MultiMAXSUMParamTest, MR29) {
     vector<int> source_vec = input.vec;
     int source_m = input.m;
 
-    /* Replace each element with its square root */
-    for (int &num : source_vec) {
-        num = sqrt(num);
+    /* Get source output */
+    int source_out = multi_maxsum(source_vec, source_m);
+
+    /* Construct follow-up input */
+    vector<int> follow_vec;
+    for (int i = 1; i < source_vec.size(); ++i) {
+        follow_vec.push_back(abs(source_vec[i] - source_vec[i-1]));  // Absolute difference between consecutive elements
     }
 
-    /* Get the original maximum subarray sum */
-    int original_max_sum = multi_maxsum(input.vec, source_m);
-
-    /* Get the maximum subarray sum of the transformed array */
-    int transformed_max_sum = multi_maxsum(source_vec, source_m);
+    /* Get follow-up output */
+    int follow_out = multi_maxsum(follow_vec, source_m);
 
     /* Verification */
-    EXPECT_GE(transformed_max_sum, original_max_sum); // Example relationship between the maximum subarray sums
+    EXPECT_EQ(follow_out, source_out);
 }
 
 /**
- * @brief Metamorphic Relation 30: Reversing the elements of the array and then finding the maximum subarray sum, the result should remain the same as the
- * original maximum subarray sum.
+ * @brief Metamorphic Relation 30: Replacing the elements of the input array with 1 if they are greater than a threshold value, the follow-up output should be less than or equal to the source output.
  *
  */
 TEST_P(MultiMAXSUMParamTest, MR30) {
@@ -755,50 +783,54 @@ TEST_P(MultiMAXSUMParamTest, MR30) {
     MultiMAXSUMInput input = GetParam();
     vector<int> source_vec = input.vec;
     int source_m = input.m;
+    int threshold = 10;  // Example threshold value
 
-    /* Reverse the source array */
-    reverse(source_vec.begin(), source_vec.end());
+    /* Get source output */
+    int source_out = multi_maxsum(source_vec, source_m);
 
-    /* Get the original maximum subarray sum */
-    int original_max_sum = multi_maxsum(input.vec, source_m);
+    /* Construct follow-up input */
+    vector<int> follow_vec = source_vec;
+    for (int i = 0; i < follow_vec.size(); ++i) {
+        if (follow_vec[i] > threshold) {
+            follow_vec[i] = 1;  // Replace with 1 if greater than the threshold
+        }
+    }
 
-    /* Get the maximum subarray sum of the reversed array */
-    int reversed_max_sum = multi_maxsum(source_vec, source_m);
+    /* Get follow-up output */
+    int follow_out = multi_maxsum(follow_vec, source_m);
 
     /* Verification */
-    EXPECT_EQ(reversed_max_sum, original_max_sum);
+    EXPECT_LE(follow_out, source_out);
 }
 
 /**
- * @brief Metamorphic Relation 31: Incrementing each element of the array by a constant value, the maximum subarray sum should increase by the product of the
- * constant value and the subarray length.
+ * @brief Metamorphic Relation 31: Replacing all elements of the input array with their squares, the follow-up output should be greater than or equal to the source output.
  *
  */
 TEST_P(MultiMAXSUMParamTest, MR31) {
     /* Get source input */
     MultiMAXSUMInput input = GetParam();
     vector<int> source_vec = input.vec;
-    int constant = 10; // Example constant value
     int source_m = input.m;
 
-    /* Get the original maximum subarray sum */
-    int original_max_sum = multi_maxsum(source_vec, source_m);
+    /* Get source output */
+    int source_out = multi_maxsum(source_vec, source_m);
 
-    /* Increment each element by the constant value */
-    for (int &num : source_vec) {
-        num += constant;
+    /* Construct follow-up input */
+    vector<int> follow_vec;
+    for (int i = 0; i < source_vec.size(); ++i) {
+        follow_vec.push_back(source_vec[i] * source_vec[i]);  // Replace with the square of each element
     }
 
-    /* Get the maximum subarray sum of the modified array */
-    int incremented_max_sum = multi_maxsum(source_vec, source_m);
+    /* Get follow-up output */
+    int follow_out = multi_maxsum(follow_vec, source_m);
 
     /* Verification */
-    EXPECT_EQ(incremented_max_sum, original_max_sum + (constant * source_m));
+    EXPECT_GE(follow_out, source_out);
 }
 
 /**
- * @brief Metamorphic Relation 32: Replacing all elements in the array with their squares and then finding the maximum subarray sum, the result should be
- * different from the original maximum subarray sum.
+ * @brief Metamorphic Relation 32: Replacing all elements of the input array with their cubes, the follow-up output should be greater than or equal to the square of the source output.
  *
  */
 TEST_P(MultiMAXSUMParamTest, MR32) {
@@ -807,54 +839,51 @@ TEST_P(MultiMAXSUMParamTest, MR32) {
     vector<int> source_vec = input.vec;
     int source_m = input.m;
 
-    /* Get the original maximum subarray sum */
-    int original_max_sum = multi_maxsum(source_vec, source_m);
+    /* Get source output */
+    int source_out = multi_maxsum(source_vec, source_m);
+    int source_out_squared = source_out * source_out;
 
-    /* Replace each element with its square */
-    for (int &num : source_vec) {
-        num = num * num;
+    /* Construct follow-up input */
+    vector<int> follow_vec;
+    for (int i = 0; i < source_vec.size(); ++i) {
+        follow_vec.push_back(source_vec[i] * source_vec[i] * source_vec[i]);  // Replace with the cube of each element
     }
 
-    /* Get the maximum subarray sum of the transformed array */
-    int transformed_max_sum = multi_maxsum(source_vec, source_m);
+    /* Get follow-up output */
+    int follow_out = multi_maxsum(follow_vec, source_m);
 
     /* Verification */
-    EXPECT_NE(transformed_max_sum, original_max_sum); // Ensure that the output has changed
+    EXPECT_GE(follow_out, source_out_squared);
 }
 
 /**
- * @brief Metamorphic Relation 33: Adding a constant value to the array and then reversing the array, the maximum subarray sum should remain the same as the
- * original maximum subarray sum.
+ * @brief Metamorphic Relation 33: Replacing all elements of the input array with their square roots, the follow-up output should be less than or equal to the source output.
  *
  */
 TEST_P(MultiMAXSUMParamTest, MR33) {
     /* Get source input */
     MultiMAXSUMInput input = GetParam();
     vector<int> source_vec = input.vec;
-    int constant = 5; // Example constant value
     int source_m = input.m;
 
-    /* Add the constant value to each element in the array */
-    for (int &num : source_vec) {
-        num += constant;
+    /* Get source output */
+    int source_out = multi_maxsum(source_vec, source_m);
+
+    /* Construct follow-up input */
+    vector<int> follow_vec;
+    for (int i = 0; i < source_vec.size(); ++i) {
+        follow_vec.push_back(sqrt(source_vec[i]));  // Replace with the square root of each element
     }
 
-    /* Get the original maximum subarray sum */
-    int original_max_sum = multi_maxsum(input.vec, source_m);
-
-    /* Reverse the source array */
-    reverse(source_vec.begin(), source_vec.end());
-
-    /* Get the maximum subarray sum of the modified array */
-    int reversed_max_sum = multi_maxsum(source_vec, source_m);
+    /* Get follow-up output */
+    int follow_out = multi_maxsum(follow_vec, source_m);
 
     /* Verification */
-    EXPECT_EQ(reversed_max_sum, original_max_sum);
+    EXPECT_LE(follow_out, source_out);
 }
 
 /**
- * @brief Metamorphic Relation 34: Reversing the array and then finding the sum of the first and second halves separately, the sum of the two halves should
- * remain the same as the original sum.
+ * @brief Metamorphic Relation 34: Replacing all elements of the input array with their logarithms, the follow-up output should be less than or equal to the source output.
  *
  */
 TEST_P(MultiMAXSUMParamTest, MR34) {
@@ -863,78 +892,77 @@ TEST_P(MultiMAXSUMParamTest, MR34) {
     vector<int> source_vec = input.vec;
     int source_m = input.m;
 
-    /* Get the original sum */
-    int original_sum = std::accumulate(source_vec.begin(), source_vec.end(), 0);
+    /* Get source output */
+    int source_out = multi_maxsum(source_vec, source_m);
 
-    /* Reverse the source array */
-    reverse(source_vec.begin(), source_vec.end());
+    /* Construct follow-up input */
+    vector<int> follow_vec;
+    for (int i = 0; i < source_vec.size(); ++i) {
+        follow_vec.push_back(log(source_vec[i]));  // Replace with the logarithm of each element
+    }
 
-    /* Calculate the sum of the first half */
-    int first_half_sum = std::accumulate(source_vec.begin(), source_vec.begin() + source_vec.size() / 2, 0);
-
-    /* Calculate the sum of the second half */
-    int second_half_sum = std::accumulate(source_vec.begin() + source_vec.size() / 2, source_vec.end(), 0);
+    /* Get follow-up output */
+    int follow_out = multi_maxsum(follow_vec, source_m);
 
     /* Verification */
-    EXPECT_EQ(first_half_sum + second_half_sum, original_sum);
+    EXPECT_LE(follow_out, source_out);
 }
 
 /**
- * @brief Metamorphic Relation 35: Multiplying each element of the array by a positive scalar and then finding the maximum subarray sum, the result should
- * maintain a specific relationship with the original maximum subarray sum.
+ * @brief Metamorphic Relation 35: Reversing the input array and then negating all elements, the follow-up output should be the same as the source output.
  *
  */
 TEST_P(MultiMAXSUMParamTest, MR35) {
     /* Get source input */
     MultiMAXSUMInput input = GetParam();
     vector<int> source_vec = input.vec;
-    int scalar = 2; // Example scalar value
     int source_m = input.m;
 
-    /* Get the original maximum subarray sum */
-    int original_max_sum = multi_maxsum(source_vec, source_m);
+    /* Get source output */
+    int source_out = multi_maxsum(source_vec, source_m);
 
-    /* Multiply each element by the scalar */
-    for (int &num : source_vec) {
-        num *= scalar;
-    }
+    /* Construct follow-up input */
+    vector<int> follow_vec = source_vec;
+    reverse(follow_vec.begin(), follow_vec.end());
+    transform(follow_vec.begin(), follow_vec.end(), follow_vec.begin(), 
+              [](int value) { return -value; });  // Reversing and negating all elements
 
-    /* Get the maximum subarray sum of the modified array */
-    int transformed_max_sum = multi_maxsum(source_vec, source_m);
+    /* Get follow-up output */
+    int follow_out = multi_maxsum(follow_vec, source_m);
 
     /* Verification */
-    EXPECT_EQ(transformed_max_sum, scalar * original_max_sum);
+    EXPECT_EQ(follow_out, source_out);
 }
 
 /**
- * @brief Metamorphic Relation 36: Replacing all elements in the array with their absolute differences from a fixed value, the maximum subarray sum should
- * remain the same as the original maximum subarray sum.
+ * @brief Metamorphic Relation 36: Adding a constant value to each element of the input array, the follow-up output should be incremented by a factor corresponding to the constant value.
  *
  */
 TEST_P(MultiMAXSUMParamTest, MR36) {
     /* Get source input */
     MultiMAXSUMInput input = GetParam();
     vector<int> source_vec = input.vec;
-    int fixed_value = 10; // Example fixed value
     int source_m = input.m;
+    int constant_value = 10;  // Example constant value
 
-    /* Get the original maximum subarray sum */
-    int original_max_sum = multi_maxsum(source_vec, source_m);
+    /* Get source output */
+    int source_out = multi_maxsum(source_vec, source_m);
 
-    /* Replace each element with its absolute difference from the fixed value */
-    for (int &num : source_vec) {
-        num = abs(num - fixed_value);
+    /* Construct follow-up input */
+    vector<int> follow_vec = source_vec;
+    for (int& value : follow_vec) {
+        value += constant_value;  // Adding a constant value to each element
     }
 
-    /* Get the maximum subarray sum of the modified array */
-    int modified_max_sum = multi_maxsum(source_vec, source_m);
+    /* Get follow-up output */
+    int follow_out = multi_maxsum(follow_vec, source_m);
 
     /* Verification */
-    EXPECT_EQ(modified_max_sum, original_max_sum);
+    EXPECT_EQ(follow_out, source_out + constant_value * source_vec.size());
 }
 
 /**
- * @brief Metamorphic Relation 37: Replacing all elements in the array with their cumulative sum, the maximum subarray sum should increase.
+ * @brief Metamorphic Relation 37: Dividing each element of the input array by a scaling factor, the follow-up output should be decreased by a factor corresponding to the scaling factor.
  *
  */
 TEST_P(MultiMAXSUMParamTest, MR37) {
@@ -942,23 +970,26 @@ TEST_P(MultiMAXSUMParamTest, MR37) {
     MultiMAXSUMInput input = GetParam();
     vector<int> source_vec = input.vec;
     int source_m = input.m;
+    int scaling_factor = 2;  // Example scaling factor
 
-    /* Calculate the cumulative sum of the source array */
-    partial_sum(source_vec.begin(), source_vec.end(), source_vec.begin());
+    /* Get source output */
+    int source_out = multi_maxsum(source_vec, source_m);
 
-    /* Get the original maximum subarray sum */
-    int original_max_sum = multi_maxsum(input.vec, source_m);
+    /* Construct follow-up input */
+    vector<int> follow_vec = source_vec;
+    for (int& value : follow_vec) {
+        value /= scaling_factor;  // Dividing each element by a scaling factor
+    }
 
-    /* Get the maximum subarray sum of the modified array */
-    int modified_max_sum = multi_maxsum(source_vec, source_m);
+    /* Get follow-up output */
+    int follow_out = multi_maxsum(follow_vec, source_m);
 
     /* Verification */
-    EXPECT_GT(modified_max_sum, original_max_sum);
+    EXPECT_EQ(follow_out, source_out / scaling_factor);
 }
 
 /**
- * @brief Metamorphic Relation 38: Replacing all elements in the array with their rounding to the nearest integer, the maximum subarray sum should remain the
- * same as the original maximum subarray sum.
+ * @brief Metamorphic Relation 38: Replacing all elements of the input array with their exponential values, the follow-up output should be the summation of the exponential values.
  *
  */
 TEST_P(MultiMAXSUMParamTest, MR38) {
@@ -967,24 +998,26 @@ TEST_P(MultiMAXSUMParamTest, MR38) {
     vector<int> source_vec = input.vec;
     int source_m = input.m;
 
-    /* Round each element to the nearest integer */
-    for (int &num : source_vec) {
-        num = round(num);
+    /* Construct follow-up input */
+    vector<int> follow_vec = source_vec;
+    vector<long long> exponential_elements;
+    for (int value : follow_vec) {
+        exponential_elements.push_back(exp(value)); // Calculating the exponential values
     }
 
-    /* Get the original maximum subarray sum */
-    int original_max_sum = multi_maxsum(input.vec, source_m);
-
-    /* Get the maximum subarray sum of the modified array */
-    int modified_max_sum = multi_maxsum(source_vec, source_m);
+    /* Get source and follow-up outputs */
+    int source_out = multi_maxsum(source_vec, source_m);
+    long long follow_up_out = 0;
+    for (long long value : exponential_elements) {
+        follow_up_out += value;  // Summing the exponential values
+    }
 
     /* Verification */
-    EXPECT_EQ(modified_max_sum, original_max_sum);
+    EXPECT_EQ(follow_up_out, source_out);
 }
 
 /**
- * @brief Metamorphic Relation 39: Multiplying each element of the array by its index and then finding the maximum subarray sum, the result should have a
- * specific relationship with the original maximum subarray sum.
+ * @brief Metamorphic Relation 39: Multiplying the input array by a constant factor and then adding a constant value to each element, the follow-up output should be scaled by the constant and offset by the value correspondingly.
  *
  */
 TEST_P(MultiMAXSUMParamTest, MR39) {
@@ -992,25 +1025,27 @@ TEST_P(MultiMAXSUMParamTest, MR39) {
     MultiMAXSUMInput input = GetParam();
     vector<int> source_vec = input.vec;
     int source_m = input.m;
+    int scaling_factor = 2;  // Example scaling factor
+    int constant_offset = 5;  // Example constant offset
 
-    /* Multiply each element by its index */
-    for (size_t i = 0; i < source_vec.size(); i++) {
-        source_vec[i] *= i;
+    /* Get source output */
+    int source_out = multi_maxsum(source_vec, source_m);
+
+    /* Construct follow-up input */
+    vector<int> follow_vec = source_vec;
+    for (int& value : follow_vec) {
+        value = value * scaling_factor + constant_offset;  // Applying scaling and offset
     }
 
-    /* Get the original maximum subarray sum */
-    int original_max_sum = multi_maxsum(input.vec, source_m);
-
-    /* Get the maximum subarray sum of the modified array */
-    int transformed_max_sum = multi_maxsum(source_vec, source_m);
+    /* Get follow-up output */
+    int follow_out = multi_maxsum(follow_vec, source_m);
 
     /* Verification */
-    EXPECT_EQ(transformed_max_sum, 2 * original_max_sum); // Example relationship between the maximum subarray sums
+    EXPECT_EQ(follow_out, source_out * scaling_factor + constant_offset * source_vec.size());
 }
 
 /**
- * @brief Metamorphic Relation 40: Replacing all elements in the array with their absolute differences from the mean value, the maximum subarray sum should
- * remain the same as the original maximum subarray sum.
+ * @brief Metamorphic Relation 40: Multiplying the squared elements of the input array by a constant factor, the follow-up output should be scaled by the factor squared.
  *
  */
 TEST_P(MultiMAXSUMParamTest, MR40) {
@@ -1018,47 +1053,22 @@ TEST_P(MultiMAXSUMParamTest, MR40) {
     MultiMAXSUMInput input = GetParam();
     vector<int> source_vec = input.vec;
     int source_m = input.m;
+    int scaling_factor = 3;  // Example scaling factor
 
-    /* Calculate the mean value of the source array */
-    double mean = accumulate(source_vec.begin(), source_vec.end(), 0.0) / source_vec.size();
+    /* Get source output */
+    int source_out = multi_maxsum(source_vec, source_m);
 
-    /* Get the original maximum subarray sum */
-    int original_max_sum = multi_maxsum(source_vec, source_m);
-
-    /* Replace each element with its absolute difference from the mean value */
-    for (int &num : source_vec) {
-        num = abs(num - mean);
+    /* Construct follow-up input */
+    vector<int> follow_vec = source_vec;
+    for (int& value : follow_vec) {
+        value = value * value * scaling_factor;  // Applying scaling to squared elements
     }
 
-    /* Get the maximum subarray sum of the modified array */
-    int modified_max_sum = multi_maxsum(source_vec, source_m);
+    /* Get follow-up output */
+    int follow_out = multi_maxsum(follow_vec, source_m);
 
     /* Verification */
-    EXPECT_EQ(modified_max_sum, original_max_sum);
-}
-
-/**
- * @brief Metamorphic Relation 41: Reversing the array and then finding the maximum subarray sum, the result should maintain a specific relationship with the
- * original maximum subarray sum.
- *
- */
-TEST_P(MultiMAXSUMParamTest, MR41) {
-    /* Get source input */
-    MultiMAXSUMInput input = GetParam();
-    vector<int> source_vec = input.vec;
-    int source_m = input.m;
-
-    /* Get the original maximum subarray sum */
-    int original_max_sum = multi_maxsum(input.vec, source_m);
-
-    /* Reverse the source array */
-    reverse(source_vec.begin(), source_vec.end());
-
-    /* Get the maximum subarray sum of the reversed array */
-    int reversed_max_sum = multi_maxsum(source_vec, source_m);
-
-    /* Verification */
-    EXPECT_EQ(reversed_max_sum, original_max_sum);
+    EXPECT_EQ(follow_out, source_out * scaling_factor * scaling_factor);
 }
 
 INSTANTIATE_TEST_CASE_P(TrueReturn, MultiMAXSUMParamTest, testing::ValuesIn(gen_tcs_randomly()));
