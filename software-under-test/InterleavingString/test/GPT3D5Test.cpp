@@ -612,9 +612,9 @@ TEST_P(InterleavingStringParamTest, MR25) {
     bool source_out = is_interleaved(A, B, C);
 
     /* Construct follow-up input */
+    string follow_A;
     for (char &c : A) {
-        //c = to_string((int)c)[0];
-        c = static_cast<char>(static_cast<int>(c));
+        follow_A += to_string((int)c);
     }
 
     /* Get follow-up output */
