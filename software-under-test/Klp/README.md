@@ -40,7 +40,7 @@ build/test/GPT3D5Test --gtest_filter=TrueReturn/KLPParamTest.MR20/* > testcases.
 Run all test cases of GPT3D5Test, each test case is repeated five times:
 
 ```sh
-for i in {3..42}; do ./run.sh GPT3D5Test MR$i 5; done | tee testcases.validate.md
+for i in {1..40}; do ./run.sh GPT3D5Test MR$i 5; done | tee testcases.validate.md
 ```
 
 Run all test cases of GPT4Test, each test case is repeated five times:
