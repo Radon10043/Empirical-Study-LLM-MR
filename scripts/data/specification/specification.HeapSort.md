@@ -1,37 +1,26 @@
 > ### `heap_sort` Function Specification
 >
 > #### Description
-> The `heap_sort` function is an implementation of the heap sort algorithm, which is a comparison-based sorting technique based on a binary heap data structure. This function sorts an array of integers in ascending order. The algorithm organizes the input array into a heap, then repeatedly extracts the minimum element from the heap and rebuilds the heap until the array is sorted.
->
-> #### Function Signatures
-> C++ Version:
-> ```c++
-> int* HeapSort(int data[], int length);
-> ```
->
-> Wrapper for `std::vector<int>`:
-> ```c++
-> vector<int> heap_sort(vector<int> vec);
-> ```
+> The `heap_sort` function provides an implementation of the heap sort algorithm for sorting a vector of integers in decreasing order. This function utilizes an auxiliary function `HeapSort`, which performs the sorting on a raw array of integers. After sorting the elements using the heap sort algorithm, it returns the sorted vector.
 >
 > #### Parameters
-> - `data[]`: A pointer to the first element of an array of integers to be sorted.
-> - `length`: The number of elements in the array.
-> - `vec`: A `std::vector<int>` containing the integers to be sorted.
+> - `vec` (`vector<int>`): A vector of integers to be sorted. This vector is passed by value, which means the function operates on a copy of the original vector, leaving the original vector unchanged.
 >
 > #### Returns
-> - The C++ version (`HeapSort`) returns a pointer to the first element of the sorted array.
-> - The `std::vector<int>` version (`heap_sort`) returns a sorted `std::vector<int>`.
+> - `vector<int>`: A new vector containing the sorted integers in non-decreasing order.
 >
-> #### Logic
-> 1. **Building a Min Heap**: The initial part of the algorithm builds a min heap from the input array. This is done by considering the array as a complete binary tree and then adjusting each subtree to follow the min heap property (parent node is smaller than its child nodes) starting from the last non-leaf node all the way up to the root node.
+> #### Behavior
+> - The function first converts the vector into a heap structure by calling the `HeapSort` function with the underlying array data of the vector and its size.
+> - It applies the heap sort algorithm, which involves building a heap from the input data and then repeatedly extracting the maximum element from the heap and restoring the heap property until all elements are sorted.
+> - The sorted elements are moved into their correct positions in the original array, effectively sorting the entire vector.
+> - Finally, the function returns the sorted vector.
 >
-> 2. **Heap Rebuilding and Element Swapping**: After the heap is built, the algorithm repeatedly swaps the first element of the array (which is the smallest element of the heap) with the last element of the current heap, reduces the heap size by one, and then rebuilds the heap to ensure the heap property is maintained. This process is repeated until the heap size is reduced to 0, resulting in a sorted array.
+> #### Usage Notes
+> - The input vector can contain any integers, including negative numbers and duplicates.
+> - If the input vector is empty or contains a single element, the function will return it as is without any modifications.
+> - The function does not modify the original input vector passed to it; instead, it operates on a copy of the vector and returns a new sorted vector.
 >
-> 3. **Sorting in Place**: The sorting is performed in place, meaning that no additional arrays are used for the sorting process. The input array is modified to contain the sorted elements.
->
-> #### Notes
-> - The provided `HeapSort` function operates directly on C-style arrays, while the `heap_sort` function provides a more modern C++ interface by accepting and returning a `std::vector<int>`.
-> - The algorithm's time complexity is O(n log n) in the worst case, making it efficient for sorting large datasets.
-> - The heap sort is not a stable sort; that is, the relative order of equal elements may not be preserved.
-> - The implementation assumes that the input is valid; specifically, it does not check for `NULL` pointers or negative array lengths in the `HeapSort` function, which could lead to undefined behavior if invalid input is provided.
+> #### Implementation Details
+> - Internally, the function uses the `HeapSort` C++ function which requires a raw pointer to the array and the length of the array as its parameters.
+> - Error handling for null pointers or invalid data is managed within the `HeapSort` function by returning the input pointer as is if it points to `NULL` or if the length is non-positive.
+> - The `heap_sort` function itself does not include additional error handling since it operates on C++ vectors, which manage their memory and size.
