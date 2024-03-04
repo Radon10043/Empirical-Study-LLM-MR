@@ -12,7 +12,57 @@ using namespace std;
 class FMPInputParamTest : public ::testing::TestWithParam<FMPInput> {};
 
 /**
- * @brief Metamorphic Relation 3: Reversing the input array, the output remains the same.
+ * @brief Metamorphic Relation 1: Adding one negative integer to the source array, the output should be the same.
+ *
+ */
+TEST_P(FMPInputParamTest, MR1) {
+    /* Get source input */
+    FMPInput input = GetParam();
+    vector<int> source_vec = input.vec;
+
+    /* Get source output */
+    int source_out = first_missing_positive(source_vec);
+
+    /* Construct follow-up input */
+    vector<int> follow_vec = source_vec;
+    follow_vec.push_back(-1); // Adding a negative integer to the array
+
+    /* Get follow-up output */
+    int follow_out = first_missing_positive(follow_vec);
+
+    /* Verification */
+    EXPECT_EQ(source_out, follow_out);
+}
+
+/**
+ * @brief Metamorphic Relation 2: Replacing all positive integers in the input array with their negation, the output will be the same.
+ *
+ */
+TEST_P(FMPInputParamTest, MR2) {
+    /* Get source input */
+    FMPInput input = GetParam();
+    vector<int> source_vec = input.vec;
+
+    /* Get source output */
+    int source_out = first_missing_positive(source_vec);
+
+    /* Construct follow-up input */
+    vector<int> follow_vec = source_vec;
+    for (int &num : follow_vec) {
+        if (num > 0) {
+            num = -num; // Replace positive integers with their negation
+        }
+    }
+
+    /* Get follow-up output */
+    int follow_out = first_missing_positive(follow_vec);
+
+    /* Verification */
+    EXPECT_EQ(source_out, follow_out);
+}
+
+/**
+ * @brief Metamorphic Relation 3: Multiplying all elements in the input array by a positive integer, the output should be the same.
  *
  */
 TEST_P(FMPInputParamTest, MR3) {
@@ -25,7 +75,10 @@ TEST_P(FMPInputParamTest, MR3) {
 
     /* Construct follow-up input */
     vector<int> follow_vec = source_vec;
-    std::reverse(follow_vec.begin(), follow_vec.end());
+    int multiplier = 2; // Multiplying all elements by a positive integer
+    for (int &num : follow_vec) {
+        num *= multiplier;
+    }
 
     /* Get follow-up output */
     int follow_out = first_missing_positive(follow_vec);
@@ -35,7 +88,7 @@ TEST_P(FMPInputParamTest, MR3) {
 }
 
 /**
- * @brief Metamorphic Relation 4: Multiplying all elements in the input array by a constant factor, the output remains the same.
+ * @brief Metamorphic Relation 4: Reversing the elements in the input array, the output should be the same.
  *
  */
 TEST_P(FMPInputParamTest, MR4) {
@@ -46,14 +99,9 @@ TEST_P(FMPInputParamTest, MR4) {
     /* Get source output */
     int source_out = first_missing_positive(source_vec);
 
-    /* Define the constant factor */
-    int factor = 2;
-
     /* Construct follow-up input */
-    vector<int> follow_vec;
-    for (int num : source_vec) {
-        follow_vec.push_back(num * factor);
-    }
+    vector<int> follow_vec = source_vec;
+    reverse(follow_vec.begin(), follow_vec.end()); // Reverse the elements
 
     /* Get follow-up output */
     int follow_out = first_missing_positive(follow_vec);
@@ -63,7 +111,7 @@ TEST_P(FMPInputParamTest, MR4) {
 }
 
 /**
- * @brief Metamorphic Relation 5: Adding a constant value to all elements in the input array, the output remains the same.
+ * @brief Metamorphic Relation 5: Adding a constant value to all elements in the input array, the output should be incremented by the same constant.
  *
  */
 TEST_P(FMPInputParamTest, MR5) {
@@ -74,24 +122,22 @@ TEST_P(FMPInputParamTest, MR5) {
     /* Get source output */
     int source_out = first_missing_positive(source_vec);
 
-    /* Define the constant value */
-    int constant = 5;
-
     /* Construct follow-up input */
-    vector<int> follow_vec;
-    for (int num : source_vec) {
-        follow_vec.push_back(num + constant);
+    vector<int> follow_vec = source_vec;
+    int constant = 5; // Add a constant value to all elements
+    for (int &num : follow_vec) {
+        num += constant;
     }
 
     /* Get follow-up output */
     int follow_out = first_missing_positive(follow_vec);
 
     /* Verification */
-    EXPECT_EQ(source_out, follow_out);
+    EXPECT_EQ(source_out + constant, follow_out);
 }
 
 /**
- * @brief Metamorphic Relation 6: Removing duplicates from the input array, the output remains the same.
+ * @brief Metamorphic Relation 6: Sorting the elements in the input array, the output should be the same.
  *
  */
 TEST_P(FMPInputParamTest, MR6) {
@@ -104,8 +150,7 @@ TEST_P(FMPInputParamTest, MR6) {
 
     /* Construct follow-up input */
     vector<int> follow_vec = source_vec;
-    std::sort(follow_vec.begin(), follow_vec.end());
-    follow_vec.erase(std::unique(follow_vec.begin(), follow_vec.end()), follow_vec.end());
+    sort(follow_vec.begin(), follow_vec.end()); // Sort the elements
 
     /* Get follow-up output */
     int follow_out = first_missing_positive(follow_vec);
@@ -115,7 +160,7 @@ TEST_P(FMPInputParamTest, MR6) {
 }
 
 /**
- * @brief Metamorphic Relation 7: Adding a sorted array to the original array, the output remains the same.
+ * @brief Metamorphic Relation 7: Multiplying all elements in the input array by -1, the output should be the same.
  *
  */
 TEST_P(FMPInputParamTest, MR7) {
@@ -128,39 +173,8 @@ TEST_P(FMPInputParamTest, MR7) {
 
     /* Construct follow-up input */
     vector<int> follow_vec = source_vec;
-    std::sort(follow_vec.begin(), follow_vec.end());
-    follow_vec.insert(follow_vec.begin(), follow_vec.begin(), follow_vec.end());
-
-    /* Get follow-up output */
-    int follow_out = first_missing_positive(follow_vec);
-
-    /* Verification */
-    EXPECT_EQ(source_out, follow_out);
-}
-
-/**
- * @brief Metamorphic Relation 8: Multiplying all even elements by a constant and dividing all odd elements by the same constant, the output remains the same.
- *
- */
-TEST_P(FMPInputParamTest, MR8) {
-    /* Get source input */
-    FMPInput input = GetParam();
-    vector<int> source_vec = input.vec;
-
-    /* Get source output */
-    int source_out = first_missing_positive(source_vec);
-
-    /* Define the constant factor */
-    int factor = 3;
-
-    /* Construct follow-up input */
-    vector<int> follow_vec;
-    for (int num : source_vec) {
-        if (num % 2 == 0) {
-            follow_vec.push_back(num * factor);
-        } else {
-            follow_vec.push_back(num / factor);
-        }
+    for (int &num : follow_vec) {
+        num *= -1; // Multiply all elements by -1
     }
 
     /* Get follow-up output */
@@ -171,7 +185,32 @@ TEST_P(FMPInputParamTest, MR8) {
 }
 
 /**
- * @brief Metamorphic Relation 9: Multiplying the entire input array by -1, the output remains the same.
+ * @brief Metamorphic Relation 8: Replacing all elements in the input array with their absolute values, the output should be the same.
+ *
+ */
+TEST_P(FMPInputParamTest, MR8) {
+    /* Get source input */
+    FMPInput input = GetParam();
+    vector<int> source_vec = input.vec;
+
+    /* Get source output */
+    int source_out = first_missing_positive(source_vec);
+
+    /* Construct follow-up input */
+    vector<int> follow_vec = source_vec;
+    for (int &num : follow_vec) {
+        num = abs(num); // Replace each element with its absolute value
+    }
+
+    /* Get follow-up output */
+    int follow_out = first_missing_positive(follow_vec);
+
+    /* Verification */
+    EXPECT_EQ(source_out, follow_out);
+}
+
+/**
+ * @brief Metamorphic Relation 9: Replacing all elements in the input array with their squares, the output should be the same.
  *
  */
 TEST_P(FMPInputParamTest, MR9) {
@@ -183,9 +222,9 @@ TEST_P(FMPInputParamTest, MR9) {
     int source_out = first_missing_positive(source_vec);
 
     /* Construct follow-up input */
-    vector<int> follow_vec;
-    for (int num : source_vec) {
-        follow_vec.push_back(num * -1);
+    vector<int> follow_vec = source_vec;
+    for (int &num : follow_vec) {
+        num = num * num; // Replace each element with its square
     }
 
     /* Get follow-up output */
@@ -196,7 +235,7 @@ TEST_P(FMPInputParamTest, MR9) {
 }
 
 /**
- * @brief Metamorphic Relation 10: Using a subset of the input array as the follow-up input, the output remains the same.
+ * @brief Metamorphic Relation 10: Adding one to all elements in the input array, the output should also increase by one.
  *
  */
 TEST_P(FMPInputParamTest, MR10) {
@@ -208,17 +247,20 @@ TEST_P(FMPInputParamTest, MR10) {
     int source_out = first_missing_positive(source_vec);
 
     /* Construct follow-up input */
-    vector<int> follow_vec(source_vec.begin(), source_vec.begin() + source_vec.size() / 2);
+    vector<int> follow_vec = source_vec;
+    for (int &num : follow_vec) {
+        num += 1; // Adding one to each element
+    }
 
     /* Get follow-up output */
     int follow_out = first_missing_positive(follow_vec);
 
     /* Verification */
-    EXPECT_EQ(source_out, follow_out);
+    EXPECT_EQ(source_out + 1, follow_out);
 }
 
 /**
- * @brief Metamorphic Relation 11: Replacing all negative numbers with their absolute values, the output remains the same.
+ * @brief Metamorphic Relation 11: Removing all duplicate elements in the input array, the output should be the same.
  *
  */
 TEST_P(FMPInputParamTest, MR11) {
@@ -230,10 +272,9 @@ TEST_P(FMPInputParamTest, MR11) {
     int source_out = first_missing_positive(source_vec);
 
     /* Construct follow-up input */
-    vector<int> follow_vec;
-    for (int num : source_vec) {
-        follow_vec.push_back(abs(num));
-    }
+    vector<int> follow_vec = source_vec;
+    sort(follow_vec.begin(), follow_vec.end());
+    follow_vec.erase(unique(follow_vec.begin(), follow_vec.end()), follow_vec.end()); // Remove duplicates
 
     /* Get follow-up output */
     int follow_out = first_missing_positive(follow_vec);
@@ -243,7 +284,7 @@ TEST_P(FMPInputParamTest, MR11) {
 }
 
 /**
- * @brief Metamorphic Relation 12: Repeating the input array multiple times, the output remains the same.
+ * @brief Metamorphic Relation 12: Adding a new positive integer greater than the size of the array to the input array, the output should be the same as before.
  *
  */
 TEST_P(FMPInputParamTest, MR12) {
@@ -254,14 +295,9 @@ TEST_P(FMPInputParamTest, MR12) {
     /* Get source output */
     int source_out = first_missing_positive(source_vec);
 
-    /* Define the number of repetitions */
-    int repetitions = 3;
-
     /* Construct follow-up input */
-    vector<int> follow_vec;
-    for (int i = 0; i < repetitions; i++) {
-        follow_vec.insert(follow_vec.end(), source_vec.begin(), source_vec.end());
-    }
+    vector<int> follow_vec = source_vec;
+    follow_vec.push_back(source_vec.size() + 1); // Add a new positive integer greater than the size of the array
 
     /* Get follow-up output */
     int follow_out = first_missing_positive(follow_vec);
@@ -271,7 +307,7 @@ TEST_P(FMPInputParamTest, MR12) {
 }
 
 /**
- * @brief Metamorphic Relation 13: Inserting one or more zeros into the input array, the output remains the same.
+ * @brief Metamorphic Relation 13: Removing a positive integer from the input array, the output should be the same.
  *
  */
 TEST_P(FMPInputParamTest, MR13) {
@@ -284,7 +320,7 @@ TEST_P(FMPInputParamTest, MR13) {
 
     /* Construct follow-up input */
     vector<int> follow_vec = source_vec;
-    follow_vec.insert(follow_vec.begin() + source_vec.size() / 2, 0); // Inserting one zero at the middle position
+    follow_vec.erase(remove_if(follow_vec.begin(), follow_vec.end(), [](int x) { return x > 0; }), follow_vec.end()); // Remove positive integers
 
     /* Get follow-up output */
     int follow_out = first_missing_positive(follow_vec);
@@ -294,7 +330,7 @@ TEST_P(FMPInputParamTest, MR13) {
 }
 
 /**
- * @brief Metamorphic Relation 14: Combining the input array with its reverse, the output remains the same.
+ * @brief Metamorphic Relation 14: Reversing the order of the positive elements in the input array, the output should be the same.
  *
  */
 TEST_P(FMPInputParamTest, MR14) {
@@ -307,9 +343,10 @@ TEST_P(FMPInputParamTest, MR14) {
 
     /* Construct follow-up input */
     vector<int> follow_vec = source_vec;
-    vector<int> reverse_vec = source_vec;
-    std::reverse(reverse_vec.begin(), reverse_vec.end());
-    follow_vec.insert(follow_vec.end(), reverse_vec.begin(), reverse_vec.end());
+    reverse(follow_vec.begin(), follow_vec.end());
+    // Only consider positive elements for reversal
+    auto pos_start = partition(follow_vec.begin(), follow_vec.end(), [](int x) { return x > 0; });
+    reverse(pos_start, follow_vec.end()); // Reverse the positive elements
 
     /* Get follow-up output */
     int follow_out = first_missing_positive(follow_vec);
@@ -319,7 +356,7 @@ TEST_P(FMPInputParamTest, MR14) {
 }
 
 /**
- * @brief Metamorphic Relation 15: Adding a constant value to each element and then sorting the input array, the output remains the same.
+ * @brief Metamorphic Relation 15: Removing all negative elements from the input array, the output should be the same.
  *
  */
 TEST_P(FMPInputParamTest, MR15) {
@@ -330,15 +367,9 @@ TEST_P(FMPInputParamTest, MR15) {
     /* Get source output */
     int source_out = first_missing_positive(source_vec);
 
-    /* Define the constant value */
-    int constant = 5;
-
     /* Construct follow-up input */
     vector<int> follow_vec = source_vec;
-    for (int& num : follow_vec) {
-        num += constant;
-    }
-    std::sort(follow_vec.begin(), follow_vec.end());
+    follow_vec.erase(remove_if(follow_vec.begin(), follow_vec.end(), [](int x) { return x <= 0; }), follow_vec.end()); // Remove non-positive elements
 
     /* Get follow-up output */
     int follow_out = first_missing_positive(follow_vec);
@@ -348,7 +379,7 @@ TEST_P(FMPInputParamTest, MR15) {
 }
 
 /**
- * @brief Metamorphic Relation 16: Replacing all elements in the input array with their squares, the output remains the same.
+ * @brief Metamorphic Relation 16: Doubling all positive elements and removing negative elements from the input array, the output should be the same.
  *
  */
 TEST_P(FMPInputParamTest, MR16) {
@@ -360,9 +391,10 @@ TEST_P(FMPInputParamTest, MR16) {
     int source_out = first_missing_positive(source_vec);
 
     /* Construct follow-up input */
-    vector<int> follow_vec;
-    for (int num : source_vec) {
-        follow_vec.push_back(num * num);
+    vector<int> follow_vec = source_vec;
+    follow_vec.erase(remove_if(follow_vec.begin(), follow_vec.end(), [](int x) { return x <= 0; }), follow_vec.end()); // Remove non-positive elements
+    for (int &num : follow_vec) {
+        num *= 2; // Double all positive elements
     }
 
     /* Get follow-up output */
@@ -373,7 +405,7 @@ TEST_P(FMPInputParamTest, MR16) {
 }
 
 /**
- * @brief Metamorphic Relation 17: Reversing the input array and then taking the absolute values of all elements, the output remains the same.
+ * @brief Metamorphic Relation 17: Multiplying all negative elements in the input array by -1, the output should be the same.
  *
  */
 TEST_P(FMPInputParamTest, MR17) {
@@ -386,9 +418,10 @@ TEST_P(FMPInputParamTest, MR17) {
 
     /* Construct follow-up input */
     vector<int> follow_vec = source_vec;
-    std::reverse(follow_vec.begin(), follow_vec.end());
-    for (int& num : follow_vec) {
-        num = abs(num);
+    for (int &num : follow_vec) {
+        if (num < 0) {
+            num *= -1; // Multiply negative elements by -1
+        }
     }
 
     /* Get follow-up output */
@@ -399,7 +432,7 @@ TEST_P(FMPInputParamTest, MR17) {
 }
 
 /**
- * @brief Metamorphic Relation 18: Appending a constant value to all elements in the input array, the output remains the same.
+ * @brief Metamorphic Relation 18: Replacing all odd elements in the input array with their squares, the output should be the same.
  *
  */
 TEST_P(FMPInputParamTest, MR18) {
@@ -410,13 +443,41 @@ TEST_P(FMPInputParamTest, MR18) {
     /* Get source output */
     int source_out = first_missing_positive(source_vec);
 
-    /* Define the constant value */
-    int constant = 100;
+    /* Construct follow-up input */
+    vector<int> follow_vec = source_vec;
+    for (int &num : follow_vec) {
+        if (num % 2 != 0) {
+            num = num * num; // Replace each odd element with its square
+        }
+    }
+
+    /* Get follow-up output */
+    int follow_out = first_missing_positive(follow_vec);
+
+    /* Verification */
+    EXPECT_EQ(source_out, follow_out);
+}
+
+// fixed max_element -> max_val
+/**
+ * @brief Metamorphic Relation 19: Adding the maximum element in the input array to all elements, the output should be the same as before.
+ *
+ */
+TEST_P(FMPInputParamTest, MR19) {
+    /* Get source input */
+    FMPInput input = GetParam();
+    vector<int> source_vec = input.vec;
+
+    /* Find the maximum element in the input array */
+    int max_val = *max_element(source_vec.begin(), source_vec.end());
+
+    /* Get source output */
+    int source_out = first_missing_positive(source_vec);
 
     /* Construct follow-up input */
-    vector<int> follow_vec;
-    for (int num : source_vec) {
-        follow_vec.push_back(num + constant);
+    vector<int> follow_vec = source_vec;
+    for (int &num : follow_vec) {
+        num += max_val; // Add the maximum element to all elements
     }
 
     /* Get follow-up output */
@@ -427,33 +488,7 @@ TEST_P(FMPInputParamTest, MR18) {
 }
 
 /**
- * @brief Metamorphic Relation 19: Applying a transformation function to each element of the array, the output remains the same.
- *
- */
-TEST_P(FMPInputParamTest, MR19) {
-    /* Get source input */
-    FMPInput input = GetParam();
-    vector<int> source_vec = input.vec;
-
-    /* Get source output */
-    int source_out = first_missing_positive(source_vec);
-
-    /* Define the transformation function */
-    auto transformFunc = [](int num) { return num * num - 3; };
-
-    /* Construct follow-up input */
-    vector<int> follow_vec;
-    std::transform(source_vec.begin(), source_vec.end(), std::back_inserter(follow_vec), transformFunc);
-
-    /* Get follow-up output */
-    int follow_out = first_missing_positive(follow_vec);
-
-    /* Verification */
-    EXPECT_EQ(source_out, follow_out);
-}
-
-/**
- * @brief Metamorphic Relation 20: Appending the reverse of the input array to the original array, the output remains the same.
+ * @brief Metamorphic Relation 20: Randomly shuffling the positive elements in the input array, the output should be the same.
  *
  */
 TEST_P(FMPInputParamTest, MR20) {
@@ -466,9 +501,18 @@ TEST_P(FMPInputParamTest, MR20) {
 
     /* Construct follow-up input */
     vector<int> follow_vec = source_vec;
-    vector<int> reverseVec = source_vec;
-    std::reverse(reverseVec.begin(), reverseVec.end());
-    follow_vec.insert(follow_vec.end(), reverseVec.begin(), reverseVec.end());
+    // Random shuffle for positive elements only
+    vector<int> positive_elements;
+    copy_if(source_vec.begin(), source_vec.end(), back_inserter(positive_elements), [](int x) { return x > 0; });
+    shuffle(positive_elements.begin(), positive_elements.end(), std::default_random_engine());
+
+    // Replace the positive elements with the shuffled ones
+    auto pos_it = positive_elements.begin();
+    for (int &num : follow_vec) {
+        if (num > 0) {
+            num = *pos_it++;
+        }
+    }
 
     /* Get follow-up output */
     int follow_out = first_missing_positive(follow_vec);
@@ -478,7 +522,7 @@ TEST_P(FMPInputParamTest, MR20) {
 }
 
 /**
- * @brief Metamorphic Relation 21: Multiplying the elements in the input array by a factor and then sorting the array, the output remains the same.
+ * @brief Metamorphic Relation 21: Replacing all even elements in the input array with their squares, the output should be the same.
  *
  */
 TEST_P(FMPInputParamTest, MR21) {
@@ -489,15 +533,13 @@ TEST_P(FMPInputParamTest, MR21) {
     /* Get source output */
     int source_out = first_missing_positive(source_vec);
 
-    /* Define the factor for multiplication */
-    int factor = 2;
-
     /* Construct follow-up input */
     vector<int> follow_vec = source_vec;
-    for (int& num : follow_vec) {
-        num *= factor;
+    for (int &num : follow_vec) {
+        if (num % 2 == 0) {
+            num = num * num; // Replace each even element with its square
+        }
     }
-    std::sort(follow_vec.begin(), follow_vec.end());
 
     /* Get follow-up output */
     int follow_out = first_missing_positive(follow_vec);
@@ -506,8 +548,9 @@ TEST_P(FMPInputParamTest, MR21) {
     EXPECT_EQ(source_out, follow_out);
 }
 
+// fixed min_element -> min_val
 /**
- * @brief Metamorphic Relation 22: Interchanging the positions of two elements in the array, the output remains the same.
+ * @brief Metamorphic Relation 22: Adding the minimum element in the input array to all elements, the output should be the same as before.
  *
  */
 TEST_P(FMPInputParamTest, MR22) {
@@ -515,12 +558,17 @@ TEST_P(FMPInputParamTest, MR22) {
     FMPInput input = GetParam();
     vector<int> source_vec = input.vec;
 
+    /* Find the minimum element in the input array */
+    int min_val = *min_element(source_vec.begin(), source_vec.end());
+
     /* Get source output */
     int source_out = first_missing_positive(source_vec);
 
     /* Construct follow-up input */
     vector<int> follow_vec = source_vec;
-    std::swap(follow_vec[0], follow_vec[1]); // Interchange the positions of the first two elements
+    for (int &num : follow_vec) {
+        num += min_val; // Add the minimum element to all elements
+    }
 
     /* Get follow-up output */
     int follow_out = first_missing_positive(follow_vec);
@@ -530,7 +578,7 @@ TEST_P(FMPInputParamTest, MR22) {
 }
 
 /**
- * @brief Metamorphic Relation 23: Appending the first element of the array to itself, the output remains the same.
+ * @brief Metamorphic Relation 23: Negating all elements in the input array, the output should be the same.
  *
  */
 TEST_P(FMPInputParamTest, MR23) {
@@ -543,34 +591,8 @@ TEST_P(FMPInputParamTest, MR23) {
 
     /* Construct follow-up input */
     vector<int> follow_vec = source_vec;
-    follow_vec.push_back(source_vec[0]);
-
-    /* Get follow-up output */
-    int follow_out = first_missing_positive(follow_vec);
-
-    /* Verification */
-    EXPECT_EQ(source_out, follow_out);
-}
-
-/**
- * @brief Metamorphic Relation 24: Adding the maximum value of the original array to all elements, the output remains the same.
- *
- */
-TEST_P(FMPInputParamTest, MR24) {
-    /* Get source input */
-    FMPInput input = GetParam();
-    vector<int> source_vec = input.vec;
-
-    /* Get source output */
-    int source_out = first_missing_positive(source_vec);
-
-    /* Find the maximum value in the original array */
-    int maxVal = *max_element(source_vec.begin(), source_vec.end());
-
-    /* Construct follow-up input */
-    vector<int> follow_vec;
-    for (int num : source_vec) {
-        follow_vec.push_back(num + maxVal);
+    for (int &num : follow_vec) {
+        num = -num; // Negate all elements
     }
 
     /* Get follow-up output */
@@ -581,7 +603,32 @@ TEST_P(FMPInputParamTest, MR24) {
 }
 
 /**
- * @brief Metamorphic Relation 25: Multiplying each element in the array by -1 and then sorting the array, the output remains the same.
+ * @brief Metamorphic Relation 24: Replacing all elements in the input array with their cubes, the output should be the same.
+ *
+ */
+TEST_P(FMPInputParamTest, MR24) {
+    /* Get source input */
+    FMPInput input = GetParam();
+    vector<int> source_vec = input.vec;
+
+    /* Get source output */
+    int source_out = first_missing_positive(source_vec);
+
+    /* Construct follow-up input */
+    vector<int> follow_vec = source_vec;
+    for (int &num : follow_vec) {
+        num = num * num * num; // Replace each element with its cube
+    }
+
+    /* Get follow-up output */
+    int follow_out = first_missing_positive(follow_vec);
+
+    /* Verification */
+    EXPECT_EQ(source_out, follow_out);
+}
+
+/**
+ * @brief Metamorphic Relation 25: Sorting the input array in descending order, the output should be the same as before.
  *
  */
 TEST_P(FMPInputParamTest, MR25) {
@@ -594,8 +641,7 @@ TEST_P(FMPInputParamTest, MR25) {
 
     /* Construct follow-up input */
     vector<int> follow_vec = source_vec;
-    std::transform(follow_vec.begin(), follow_vec.end(), follow_vec.begin(), [](int n) { return -n; });
-    std::sort(follow_vec.begin(), follow_vec.end());
+    sort(follow_vec.rbegin(), follow_vec.rend()); // Sort the array in descending order
 
     /* Get follow-up output */
     int follow_out = first_missing_positive(follow_vec);
@@ -605,7 +651,7 @@ TEST_P(FMPInputParamTest, MR25) {
 }
 
 /**
- * @brief Metamorphic Relation 26: Taking the square root of the absolute value of each element in the array, the output remains the same.
+ * @brief Metamorphic Relation 26: Replacing all elements in the input array with their absolute cubes, the output should be the same.
  *
  */
 TEST_P(FMPInputParamTest, MR26) {
@@ -617,9 +663,9 @@ TEST_P(FMPInputParamTest, MR26) {
     int source_out = first_missing_positive(source_vec);
 
     /* Construct follow-up input */
-    vector<int> follow_vec;
-    for (int num : source_vec) {
-        follow_vec.push_back(static_cast<int>(sqrt(abs(num))));     /* Fixed By Radon */
+    vector<int> follow_vec = source_vec;
+    for (int &num : follow_vec) {
+        num = abs(num * num * num); // Replace each element with its absolute cube
     }
 
     /* Get follow-up output */
@@ -630,7 +676,7 @@ TEST_P(FMPInputParamTest, MR26) {
 }
 
 /**
- * @brief Metamorphic Relation 27: Multiplying each element in the array by a constant and then reversing the array, the output remains the same.
+ * @brief Metamorphic Relation 27: Replacing all elements in the input array with their negative values, the output should be the same as before.
  *
  */
 TEST_P(FMPInputParamTest, MR27) {
@@ -641,15 +687,11 @@ TEST_P(FMPInputParamTest, MR27) {
     /* Get source output */
     int source_out = first_missing_positive(source_vec);
 
-    /* Define the constant for multiplication */
-    int constant = 3;
-
     /* Construct follow-up input */
     vector<int> follow_vec = source_vec;
-    for (int& num : follow_vec) {
-        num *= constant;
+    for (int &num : follow_vec) {
+        num = -abs(num); // Replace each element with its negative value
     }
-    std::reverse(follow_vec.begin(), follow_vec.end());
 
     /* Get follow-up output */
     int follow_out = first_missing_positive(follow_vec);
@@ -659,7 +701,7 @@ TEST_P(FMPInputParamTest, MR27) {
 }
 
 /**
- * @brief Metamorphic Relation 28: Removing all occurrences of a specific element in the array, the output remains the same.
+ * @brief Metamorphic Relation 28: Negating the elements and then sorting the input array, the output should be the same as before.
  *
  */
 TEST_P(FMPInputParamTest, MR28) {
@@ -669,13 +711,13 @@ TEST_P(FMPInputParamTest, MR28) {
 
     /* Get source output */
     int source_out = first_missing_positive(source_vec);
-    
-    /* Define the element to be removed */
-    int elementToRemove = 0;
 
     /* Construct follow-up input */
     vector<int> follow_vec = source_vec;
-    follow_vec.erase(std::remove(follow_vec.begin(), follow_vec.end(), elementToRemove), follow_vec.end());
+    for (int &num : follow_vec) {
+        num = -num; // Negate each element
+    }
+    sort(follow_vec.begin(), follow_vec.end()); // Sort the elements
 
     /* Get follow-up output */
     int follow_out = first_missing_positive(follow_vec);
@@ -685,7 +727,7 @@ TEST_P(FMPInputParamTest, MR28) {
 }
 
 /**
- * @brief Metamorphic Relation 29: Multiplying all odd elements by 2 and all even elements by -1, the output remains the same.
+ * @brief Metamorphic Relation 29: Replacing all elements in the input array with their reciprocals, the output should be the same as before.
  *
  */
 TEST_P(FMPInputParamTest, MR29) {
@@ -697,14 +739,11 @@ TEST_P(FMPInputParamTest, MR29) {
     int source_out = first_missing_positive(source_vec);
 
     /* Construct follow-up input */
-    vector<int> follow_vec;
-    for (int num : source_vec) {
-        if (num % 2 == 0) {
-            follow_vec.push_back(-1 * num);
-        } else {
-            follow_vec.push_back(2 * num);
-        }
-    }
+    vector<int> follow_vec(source_vec.size());
+    // Calculate the reciprocals of the elements
+    transform(source_vec.begin(), source_vec.end(), follow_vec.begin(), [](int x) {
+        return (x != 0) ? 1 / x : 0; // Handle division by zero
+    });
 
     /* Get follow-up output */
     int follow_out = first_missing_positive(follow_vec);
@@ -714,7 +753,7 @@ TEST_P(FMPInputParamTest, MR29) {
 }
 
 /**
- * @brief Metamorphic Relation 30: Repeating the input array with an additional duplicate of the array, the output remains the same.
+ * @brief Metamorphic Relation 30: Replacing all elements in the input array with their negated reciprocals, the output should be the same as before.
  *
  */
 TEST_P(FMPInputParamTest, MR30) {
@@ -726,8 +765,11 @@ TEST_P(FMPInputParamTest, MR30) {
     int source_out = first_missing_positive(source_vec);
 
     /* Construct follow-up input */
-    vector<int> follow_vec = source_vec;
-    follow_vec.insert(follow_vec.end(), source_vec.begin(), source_vec.end());
+    vector<int> follow_vec(source_vec.size());
+    // Calculate the negated reciprocals of the elements
+    transform(source_vec.begin(), source_vec.end(), follow_vec.begin(), [](int x) {
+        return (x != 0) ? -1 / x : 0; // Handle division by zero
+    });
 
     /* Get follow-up output */
     int follow_out = first_missing_positive(follow_vec);
@@ -737,7 +779,7 @@ TEST_P(FMPInputParamTest, MR30) {
 }
 
 /**
- * @brief Metamorphic Relation 31: Multiplying all elements in the array by 0, the output remains the same.
+ * @brief Metamorphic Relation 31: Applying a hash function to the elements in the input array, the output should be the same as before.
  *
  */
 TEST_P(FMPInputParamTest, MR31) {
@@ -748,10 +790,15 @@ TEST_P(FMPInputParamTest, MR31) {
     /* Get source output */
     int source_out = first_missing_positive(source_vec);
 
+    /* Define a simple hash function */
+    auto simpleHash = [](int x) {
+        return x % 10; // Modulus by 10 as a simple hash function
+    };
+
     /* Construct follow-up input */
-    vector<int> follow_vec;
-    for (int num : source_vec) {
-        follow_vec.push_back(0);
+    vector<int> follow_vec = source_vec;
+    for (int &num : follow_vec) {
+        num = simpleHash(num); // Apply the hash function to each element
     }
 
     /* Get follow-up output */
@@ -762,7 +809,7 @@ TEST_P(FMPInputParamTest, MR31) {
 }
 
 /**
- * @brief Metamorphic Relation 32: Incrementing all elements in the array by 1, the output is incremented by 1.
+ * @brief Metamorphic Relation 32: Randomly changing the sign of the elements in the input array, the output should be the same as before.
  *
  */
 TEST_P(FMPInputParamTest, MR32) {
@@ -774,57 +821,11 @@ TEST_P(FMPInputParamTest, MR32) {
     int source_out = first_missing_positive(source_vec);
 
     /* Construct follow-up input */
-    vector<int> follow_vec;
-    for (int num : source_vec) {
-        follow_vec.push_back(num + 1);
-    }
-
-    /* Get follow-up output */
-    int follow_out = first_missing_positive(follow_vec);
-
-    /* Verification */
-    EXPECT_EQ(source_out + 1, follow_out);
-}
-
-/**
- * @brief Metamorphic Relation 33: Replacing all elements in the array with 1, the output is 1.
- *
- */
-TEST_P(FMPInputParamTest, MR33) {
-    /* Get source input */
-    FMPInput input = GetParam();
-    vector<int> source_vec = input.vec;
-
-    /* Construct follow-up input */
-    vector<int> follow_vec(source_vec.size(), 1);
-
-    /* Get follow-up output */
-    int follow_out = first_missing_positive(follow_vec);
-
-    /* Verification */
-    EXPECT_EQ(1, follow_out);
-}
-
-/**
- * @brief Metamorphic Relation 34: Multiplying the elements in the array by a factor and then adding a constant value, the output relation is preserved.
- *
- */
-TEST_P(FMPInputParamTest, MR34) {
-    /* Get source input */
-    FMPInput input = GetParam();
-    vector<int> source_vec = input.vec;
-
-    /* Define factor and constant */
-    int factor = 2;
-    int constant = 5;
-
-    /* Get source output */
-    int source_out = first_missing_positive(source_vec);
-
-    /* Applying the transformation to follow-up input */
-    vector<int> follow_vec;
-    for (int num : source_vec) {
-        follow_vec.push_back(num * factor + constant);
+    vector<int> follow_vec = source_vec;
+    for (int &num : follow_vec) {
+        if (rand() % 2 == 0) {
+            num = -num; // Randomly change the sign of each element
+        }
     }
 
     /* Get follow-up output */
@@ -835,7 +836,61 @@ TEST_P(FMPInputParamTest, MR34) {
 }
 
 /**
- * @brief Metamorphic Relation 35: Reversing the input array twice, the output is the same as reversing the input array once.
+ * @brief Metamorphic Relation 33: Applying a linear transformation to the elements in the input array, the output should be the same as before.
+ *
+ */
+TEST_P(FMPInputParamTest, MR33) {
+    /* Get source input */
+    FMPInput input = GetParam();
+    vector<int> source_vec = input.vec;
+
+    /* Get source output */
+    int source_out = first_missing_positive(source_vec);
+
+    // Define the linear transformation for demonstration purposes
+    int a = 2; // Scaling factor
+    int b = 3; // Translation factor
+
+    /* Construct follow-up input */
+    vector<int> follow_vec = source_vec;
+    for (int &num : follow_vec) {
+        num = a * num + b; // Apply the linear transformation
+    }
+
+    /* Get follow-up output */
+    int follow_out = first_missing_positive(follow_vec);
+
+    /* Verification */
+    EXPECT_EQ(source_out, follow_out);
+}
+
+/**
+ * @brief Metamorphic Relation 34: Doubling each element and then adding its square, the output should be the same as before.
+ *
+ */
+TEST_P(FMPInputParamTest, MR34) {
+    /* Get source input */
+    FMPInput input = GetParam();
+    vector<int> source_vec = input.vec;
+
+    /* Get source output */
+    int source_out = first_missing_positive(source_vec);
+
+    /* Construct follow-up input */
+    vector<int> follow_vec = source_vec;
+    for (int &num : follow_vec) {
+        num = num * num + num; // Doubling each element and then adding its square
+    }
+
+    /* Get follow-up output */
+    int follow_out = first_missing_positive(follow_vec);
+
+    /* Verification */
+    EXPECT_EQ(source_out, follow_out);
+}
+
+/**
+ * @brief Metamorphic Relation 35: Adding the square of each element to itself, the output should be the same as before.
  *
  */
 TEST_P(FMPInputParamTest, MR35) {
@@ -846,10 +901,16 @@ TEST_P(FMPInputParamTest, MR35) {
     /* Get source output */
     int source_out = first_missing_positive(source_vec);
 
-    /* Applying the transformation to follow-up input */
+    // Define the morphing function for demonstration purposes
+    auto morphingFunction = [](int x) {
+        return x + (x * x); // Adding the square of the element to itself
+    };
+
+    /* Construct follow-up input */
     vector<int> follow_vec = source_vec;
-    std::reverse(follow_vec.begin(), follow_vec.end());
-    std::reverse(follow_vec.begin(), follow_vec.end()); // Reversing the array twice
+    for (int &num : follow_vec) {
+        num = morphingFunction(num); // Apply the morphing function
+    }
 
     /* Get follow-up output */
     int follow_out = first_missing_positive(follow_vec);
@@ -859,7 +920,7 @@ TEST_P(FMPInputParamTest, MR35) {
 }
 
 /**
- * @brief Metamorphic Relation 36: Sorting the input array, the output relation is preserved.
+ * @brief Metamorphic Relation 36: Applying a complex mathematical function to the elements in the input array, the output should be the same as before.
  *
  */
 TEST_P(FMPInputParamTest, MR36) {
@@ -870,9 +931,16 @@ TEST_P(FMPInputParamTest, MR36) {
     /* Get source output */
     int source_out = first_missing_positive(source_vec);
 
-    /* Applying the transformation to follow-up input */
+    // Define the complex function for demonstration purposes
+    auto complexFunction = [](int x) {
+        return (3 * x * x) + (5 * x) + 7; // A complex mathematical function
+    };
+
+    /* Construct follow-up input */
     vector<int> follow_vec = source_vec;
-    std::sort(follow_vec.begin(), follow_vec.end()); // Sorting the array
+    for (int &num : follow_vec) {
+        num = complexFunction(num); // Apply the complex function
+    }
 
     /* Get follow-up output */
     int follow_out = first_missing_positive(follow_vec);
@@ -882,7 +950,7 @@ TEST_P(FMPInputParamTest, MR36) {
 }
 
 /**
- * @brief Metamorphic Relation 37: Applying a square root transformation to the elements in the input array, the output relation is preserved.
+ * @brief Metamorphic Relation 37: Squaring each element and then adding the original value, the output should be the same as before.
  *
  */
 TEST_P(FMPInputParamTest, MR37) {
@@ -893,10 +961,10 @@ TEST_P(FMPInputParamTest, MR37) {
     /* Get source output */
     int source_out = first_missing_positive(source_vec);
 
-    /* Applying the transformation to follow-up input */
-    vector<int> follow_vec;
-    for (int num : source_vec) {
-        follow_vec.push_back(sqrt(num));
+    /* Construct follow-up input */
+    vector<int> follow_vec = source_vec;
+    for (int &num : follow_vec) {
+        num = num * num + num; // Square each element and then adding the original value
     }
 
     /* Get follow-up output */
@@ -907,7 +975,7 @@ TEST_P(FMPInputParamTest, MR37) {
 }
 
 /**
- * @brief Metamorphic Relation 38: Removing all negative elements from the input array, the output relation is preserved.
+ * @brief Metamorphic Relation 38: Substracting 1 from each element in the input array, the output should be decremented by the same number.
  *
  */
 TEST_P(FMPInputParamTest, MR38) {
@@ -918,19 +986,21 @@ TEST_P(FMPInputParamTest, MR38) {
     /* Get source output */
     int source_out = first_missing_positive(source_vec);
 
-    /* Applying the transformation to follow-up input */
+    /* Construct follow-up input */
     vector<int> follow_vec = source_vec;
-    follow_vec.erase(std::remove_if(follow_vec.begin(), follow_vec.end(), [](int i) { return i < 0; }), follow_vec.end());
+    for (int &num : follow_vec) {
+        num -= 1; // Substract 1 from each element
+    }
 
     /* Get follow-up output */
     int follow_out = first_missing_positive(follow_vec);
 
     /* Verification */
-    EXPECT_EQ(source_out, follow_out);
+    EXPECT_EQ(source_out - 1, follow_out);
 }
 
 /**
- * @brief Metamorphic Relation 39: Replacing all duplicate elements in the input array with their square values, the output relation is preserved.
+ * @brief Metamorphic Relation 39: Adding 1 to each element in the input array, the output should be incremented by the same number.
  *
  */
 TEST_P(FMPInputParamTest, MR39) {
@@ -941,25 +1011,21 @@ TEST_P(FMPInputParamTest, MR39) {
     /* Get source output */
     int source_out = first_missing_positive(source_vec);
 
-    /* Applying the transformation to follow-up input */
+    /* Construct follow-up input */
     vector<int> follow_vec = source_vec;
-    std::unordered_set<int> unique_nums;
-    for (auto it = follow_vec.begin(); it != follow_vec.end();) {
-        if (!unique_nums.insert(*it).second) {
-            *it = (*it) * (*it);
-        }
-        ++it;
+    for (int &num : follow_vec) {
+        num += 1; // Add 1 to each element
     }
 
     /* Get follow-up output */
     int follow_out = first_missing_positive(follow_vec);
 
     /* Verification */
-    EXPECT_EQ(source_out, follow_out);
+    EXPECT_EQ(source_out + 1, follow_out);
 }
 
 /**
- * @brief Metamorphic Relation 40: Adding a constant value to one subset of the input array and subtracting the same constant value from another disjoint subset, the output relation is preserved.
+ * @brief Metamorphic Relation 40: Replacing each element in the input array with a random number, the output should be the same as before.
  *
  */
 TEST_P(FMPInputParamTest, MR40) {
@@ -967,70 +1033,14 @@ TEST_P(FMPInputParamTest, MR40) {
     FMPInput input = GetParam();
     vector<int> source_vec = input.vec;
 
-    /* Define the constant value */
-    int constant = 10;
-
     /* Get source output */
     int source_out = first_missing_positive(source_vec);
 
-    /* Applying the transformation to follow-up input */
-    vector<int> follow_vec = source_vec;
-    int halfSize = source_vec.size() / 2;
-    for (int i = 0; i < halfSize; ++i) {
-        follow_vec[i] += constant;
+    /* Construct follow-up input */
+    vector<int> follow_vec;
+    for (int &num : source_vec) {
+        num = rand(); // Replace each element with a random number
     }
-    for (int i = halfSize; i < source_vec.size(); ++i) {
-        follow_vec[i] -= constant;
-    }
-
-    /* Get follow-up output */
-    int follow_out = first_missing_positive(follow_vec);
-
-    /* Verification */
-    EXPECT_EQ(source_out, follow_out);
-}
-
-/**
- * @brief Metamorphic Relation 41: Reversing the input array and then adding the reversed array as a suffix, the output relation is preserved.
- *
- */
-TEST_P(FMPInputParamTest, MR41) {
-    /* Get source input */
-    FMPInput input = GetParam();
-    vector<int> source_vec = input.vec;
-
-    /* Get source output */
-    int source_out = first_missing_positive(source_vec);
-
-    /* Applying the transformation to follow-up input */
-    vector<int> follow_vec = source_vec;
-    vector<int> reversed_vec = source_vec;
-    std::reverse(reversed_vec.begin(), reversed_vec.end());
-    follow_vec.insert(follow_vec.end(), reversed_vec.begin(), reversed_vec.end());
-
-    /* Get follow-up output */
-    int follow_out = first_missing_positive(follow_vec);
-
-    /* Verification */
-    EXPECT_EQ(source_out, follow_out);
-}
-
-/**
- * @brief Metamorphic Relation 42: Multiplying all elements in the array by 0 and then replacing the first element with 1, the output relation is preserved.
- *
- */
-TEST_P(FMPInputParamTest, MR42) {
-    /* Get source input */
-    FMPInput input = GetParam();
-    vector<int> source_vec = input.vec;
-
-    /* Get source output */
-    int source_out = first_missing_positive(source_vec);
-
-    /* Applying the transformation to follow-up input */
-    vector<int> follow_vec = source_vec;
-    std::transform(follow_vec.begin(), follow_vec.end(), follow_vec.begin(), [](int n) { return 0; });
-    follow_vec[0] = 1;
 
     /* Get follow-up output */
     int follow_out = first_missing_positive(follow_vec);
