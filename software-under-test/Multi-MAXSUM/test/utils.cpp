@@ -10,14 +10,15 @@ using namespace std;
 vector<MultiMAXSUMInput> gen_tcs_randomly() {
     vector<MultiMAXSUMInput> tcs;
     mt19937 rng(random_device{}());
-    uniform_int_distribution<int> dist(2, 1000);
+    uniform_int_distribution<int> dist_size(2, 1000),
+                                  dist_val(-1000, 1000);
 
     /* 构造测试用例 */
     for (int i = 0; i < TESTCASE_NUM; i++) {
-        int size = dist(rng);
+        int size = dist_size(rng);
         vector<int> vec(size);
         for (int j = 0; j < size; j++)
-            vec[j] = dist(rng);
+            vec[j] = dist_val(rng);
 
         uniform_int_distribution<int> dist_m(1, size - 1);
         int m = dist_m(rng);
