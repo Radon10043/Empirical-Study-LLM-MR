@@ -3,13 +3,13 @@ from utils import *
 
 class TestingClass(unittest.TestCase):
     @parameterized.expand(load_test_cases)
-    def test17(self, graph: list, src: int, dst: int, method: str):
-        """Metamorphic Relation 17: Given the same graph, the same source and destination vertices,
-        but with the graph representing an undirected graph, the output should be the same."""
+    def test1(self, graph: list, src: int, dst: int, method: str):
+        """Metamorphic Relation 1: Given the same graph, the same source and destination vertices,
+        but with reversed direction (directed/undirected), the output should be the same."""
         # Get source output
         source_out = shortest_path(graph, method=method, directed=True)[src][dst]
 
-        # Construct follow-up input: representing an undirected graph
+        # Construct follow-up input
         follow_out = shortest_path(graph, method=method, directed=False)[src][dst]
 
         # Verification

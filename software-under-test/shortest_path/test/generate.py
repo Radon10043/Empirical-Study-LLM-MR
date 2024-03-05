@@ -60,7 +60,7 @@ def gen_tcs_randomly() -> list:
 
     for _ in range(TESTCASE_NUM):
         # 节点数量
-        num_v = randint(1, MAX_VERTICES)
+        num_v = randint(5, MAX_VERTICES)
         graph = [[0 for _ in range(num_v)] for _ in range(num_v)]
 
         # 随机生成图

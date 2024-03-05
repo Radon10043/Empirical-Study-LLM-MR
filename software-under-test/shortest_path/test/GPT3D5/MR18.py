@@ -1,33 +1,19 @@
-import unittest
-import os, sys
-
-from parameterized import parameterized
-from scipy.sparse.csgraph import shortest_path
-from copy import deepcopy
-
-sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
-
-from utils import gen_tcs_randomly
+from utils import *
 
 
 class TestingClass(unittest.TestCase):
-    @parameterized.expand(gen_tcs_randomly)
+    @parameterized.expand(load_test_cases)
     def test18(self, graph: list, src: int, dst: int, method: str):
         """Metamorphic Relation 18: Given the same graph, the same source and destination vertices,
-        if we add a cycle with negative weight, the shortest path length should remain the same."""
-        # Get the shortest path for the original graph
-        original_shortest_path = shortest_path(graph, method=method)[src][dst]
+        but with the graph having a limit for Dijkstra's algorithm, the output should be the same."""
+        # Get source output
+        source_out = shortest_path(graph, method=method, limit=None)[src][dst]
 
-        # Add a cycle with negative weight to the graph
-        graph_with_cycle = deepcopy(graph)
-        for i in range(len(graph_with_cycle)):
-            graph_with_cycle[i][i] = -1  # Add negative weight for self-loop for all vertices
-
-        # Get the shortest path for the modified graph
-        modified_shortest_path = shortest_path(graph_with_cycle, method=method)[src][dst]
+        # Construct follow-up input: applying a limit for Dijkstra's algorithm
+        follow_out = shortest_path(graph, method=method, limit=5)[src][dst]
 
         # Verification
-        self.assertEqual(original_shortest_path, modified_shortest_path)
+        self.assertEqual(source_out, follow_out)
 
 
 if __name__ == "__main__":

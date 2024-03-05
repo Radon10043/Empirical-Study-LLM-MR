@@ -1,36 +1,25 @@
-import numpy as np
-
-import unittest
-import os, sys
-
-from parameterized import parameterized
-from scipy.sparse.csgraph import shortest_path
-from copy import deepcopy
-
-sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
-
-from utils import gen_tcs_randomly
+from utils import *
 
 
 class TestingClass(unittest.TestCase):
-    @parameterized.expand(gen_tcs_randomly)
-    def test13(self, graph: list, src: int, dst: int, method: str):
+    @parameterized.expand(load_test_cases)
+    def test13(self, graph: list, src: int, dst: int, method: str):  # Fixed
         """Metamorphic Relation 13: Given the same graph, the same source and destination vertices,
-        if we add a new vertex with a direct edge to the source and destination, the shortest path length should decrease or remain the same."""
-        # Get the shortest path for the original graph
-        original_shortest_path = shortest_path(graph, method=method)[src][dst]
+        but with the weights multiplied by a positive constant, the shortest path remains the same."""
+        # Get source output
+        _, predecessors = shortest_path(graph, method=method, return_predecessors=True)
+        if predecessors[src][dst] == -9999:
+            unittest.skip("No path from source to destination")
+        source_out = self.get_shortest_path(predecessors, src, dst)
 
-        # Add a new vertex with direct edges to the source and destination
-        extended_graph = deepcopy(graph)
-        extended_graph.append([np.inf] * (len(graph) + 1))  # Add a new vertex with no connections
-        extended_graph[src][len(graph)] = 1  # Connect the new vertex to the source
-        extended_graph[len(graph)][dst] = 1  # Connect the new vertex to the destination
+        follow_graph = [[weight * 2 for weight in row] for row in graph]
 
-        # Get the shortest path for the extended graph
-        extended_shortest_path = shortest_path(extended_graph, method=method)[src][dst]
+        # Get folllow-up output
+        _, predecessors = shortest_path(follow_graph, method=method, return_predecessors=True)
+        follow_out = self.get_shortest_path(predecessors, src, dst)
 
         # Verification
-        self.assertLessEqual(extended_shortest_path, original_shortest_path)
+        self.assertEqual(source_out, follow_out)
 
 
 if __name__ == "__main__":

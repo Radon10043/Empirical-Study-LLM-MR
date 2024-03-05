@@ -1,31 +1,18 @@
-import unittest
-import os, sys
-
-from parameterized import parameterized
-from scipy.sparse.csgraph import shortest_path
-from scipy.sparse import csr_matrix
-
-sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
-
-from utils import gen_tcs_randomly
+from utils import *
 
 
 class TestingClass(unittest.TestCase):
-    @parameterized.expand(gen_tcs_randomly)
+    @parameterized.expand(load_test_cases)
     def test23(self, graph: list, src: int, dst: int, method: str):
-        """Metamorphic Relation 23: Given the same graph, the same source and destination vertices,
-        if we decrease all edge weights by a constant, the shortest path length should remain the same or increase."""
-        # Get the shortest path for the original graph
-        original_shortest_path = shortest_path(graph, method=method)[src][dst]
+        """Metamorphic Relation 23: Given the same graph and vertices, the output should be the same irrespective of whether the input is unweighted or weighted."""
+        # Get source output with weighted input graph
+        source_weighted = shortest_path(graph, method=method, unweighted=False)[src][dst]
 
-        # Decrease all edge weights by a constant for follow-up input
-        decreased_weight_graph = [[max(weight - 1, 0) for weight in row] for row in graph]
-
-        # Get the shortest path for the modified graph
-        decreased_shortest_path = shortest_path(decreased_weight_graph, method=method)[src][dst]
+        # Get source output with unweighted input graph
+        source_unweighted = shortest_path(graph, method=method, unweighted=True)[src][dst]
 
         # Verification
-        self.assertGreaterEqual(decreased_shortest_path, original_shortest_path)
+        self.assertEqual(source_weighted, source_unweighted)
 
 
 if __name__ == "__main__":

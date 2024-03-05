@@ -1,31 +1,23 @@
-import unittest
-import os, sys
-
-from parameterized import parameterized
-from scipy.sparse.csgraph import shortest_path
-from scipy.sparse import csr_matrix
-
-sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
-
 from utils import *
 
 
 class TestingClass(unittest.TestCase):
-    @parameterized.expand(gen_tcs_randomly)
+    @parameterized.expand(load_test_cases)
     def test38(self, graph: list, src: int, dst: int, method: str):
         """Metamorphic Relation 38: Given the same graph, the same source and destination vertices,
-        if we create a graph with the reverse edge weights, the shortest path length should remain unchanged."""
-        # Get the shortest path for the original graph
-        original_shortest_path = shortest_path(graph, method=method)[src][dst]
+        but with the graph represented as a completely disconnected graph, 
+        the shortest path length should be infinity."""
+        # Get the original shortest path length
+        original_distance = shortest_path(graph, method=method)[src][dst]
 
-        # Create a graph with reverse edge weights for follow-up input
-        modified_graph = [[weight for weight in reversed(row)] for row in graph]
+        # Create a disconnected graph
+        follow_graph = [[float('inf') if weight!=0 else 0 for weight in row] for row in graph]
 
-        # Get the shortest path for the modified graph
-        modified_shortest_path = shortest_path(modified_graph, method=method)[src][dst]
+        # Get the new shortest path length
+        new_distance = shortest_path(follow_graph, method=method)[src][dst]
 
         # Verification
-        self.assertEqual(original_shortest_path, modified_shortest_path)
+        self.assertEqual(new_distance, float('inf'))
 
 
 if __name__ == "__main__":

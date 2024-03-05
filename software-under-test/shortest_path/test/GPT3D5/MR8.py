@@ -1,35 +1,24 @@
-import unittest
-import os, sys
-
-from copy import deepcopy
-from parameterized import parameterized
-from scipy.sparse.csgraph import shortest_path
-
-sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
-
-from utils import gen_tcs_randomly
+import scipy
+from utils import *
 
 
 class TestingClass(unittest.TestCase):
-    @parameterized.expand(gen_tcs_randomly)
+    # fixed
+    @parameterized.expand(load_test_cases)
     def test8(self, graph: list, src: int, dst: int, method: str):
-        """Metamorphic Relation 8: Given the same graph, the same source and destination vertices, and a shortest path,
-        if we add a new vertex and connect it to the existing vertices in the graph, the shortest path length from
-        source to destination should not decrease."""
-        # Get the shortest path for the original graph
-        original_shortest_path = shortest_path(graph, method=method)[src][dst]
+        """Metamorphic Relation 8: Given the same graph, the same source and destination vertices,
+        but with different starting methods leading to the same method, the output should be the same."""
+        # Get source output
+        source_out = shortest_path(graph, method=method)[src][dst]
 
-        # Add a new vertex and connect it to the existing vertices in the graph for follow-up input
-        extended_graph = deepcopy(graph)
-        for row in extended_graph:
-            row.append(5)  # Add a new edge weight to the existing vertices
-        extended_graph.append([5] * (len(graph) + 1))  # Connect the new vertex to the existing vertices
-
-        # Get the shortest path for the extended graph
-        extended_shortest_path = shortest_path(extended_graph, method=method)[src][dst]
+        # Construct follow-up input
+        follow_method = "auto" if method == "FW" else "FW"
+        # Convert the list to a sparse matrix
+        sparse_graph = scipy.sparse.csr_matrix(graph)
+        follow_out = shortest_path(sparse_graph, method=follow_method)[src][dst]
 
         # Verification
-        self.assertGreaterEqual(extended_shortest_path, original_shortest_path)
+        self.assertEqual(source_out, follow_out)
 
 if __name__ == "__main__":
     unittest.main()

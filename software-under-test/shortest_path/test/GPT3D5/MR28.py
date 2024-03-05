@@ -1,32 +1,24 @@
-import unittest
-import os, sys
-
-from parameterized import parameterized
-from scipy.sparse.csgraph import shortest_path
-from scipy.sparse import csr_matrix
-
-sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
-
 from utils import *
 
 
 class TestingClass(unittest.TestCase):
-    @parameterized.expand(gen_tcs_randomly)
+    @parameterized.expand(load_test_cases)
     def test28(self, graph: list, src: int, dst: int, method: str):
-        """Metamorphic Relation 28: Given the same graph, the same source and destination vertices,
-        if we remove all edges except for the direct edge from source to destination, the shortest path length should not increase."""
-        # Get the shortest path for the original graph
-        original_shortest_path = shortest_path(graph, method=method)[src][dst]
+        """Metamorphic Relation 28: Given the same graph and vertices, the output of the shortest path should remain the same if
+        the graph is represented using a different storage type (e.g., list of lists vs. NumPy array)."""
+        import numpy as np
 
-        # Remove all edges except for the direct edge from source to destination for the follow-up input
-        modified_graph = [[np.inf] * len(graph) for _ in range(len(graph))]
-        modified_graph[src][dst] = graph[src][dst]
+        # Get source output using list of lists
+        source_out_list = shortest_path(graph, method=method)[src][dst]
 
-        # Get the shortest path for the modified graph
-        modified_shortest_path = shortest_path(modified_graph, method=method)[src][dst]
+        # Convert the graph to a NumPy array
+        np_graph = np.array(graph)
+
+        # Get follow-up output using NumPy array
+        follow_out_np = shortest_path(np_graph, method=method)[src][dst]
 
         # Verification
-        self.assertLessEqual(modified_shortest_path, original_shortest_path)
+        self.assertEqual(source_out_list, follow_out_np)
 
 
 if __name__ == "__main__":

@@ -1,36 +1,22 @@
-import unittest
-import os, sys
-
-from parameterized import parameterized
-from scipy.sparse.csgraph import shortest_path
-from scipy.sparse import csr_matrix
-
-sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
-
 from utils import *
 
 
 class TestingClass(unittest.TestCase):
-    @parameterized.expand(gen_tcs_randomly)
+    @parameterized.expand(load_test_cases)
     def test33(self, graph: list, src: int, dst: int, method: str):
-        """Metamorphic Relation 33: Given the same graph, the same source and destination vertices,
-        if we remove all paths from the source to the destination except for the shortest path, 
-        the only existing path should be the shortest path."""
-        # Get the shortest path for the original graph
-        original_shortest_path = shortest_path(graph, method=method)[src][dst]
+        """Metamorphic Relation 33: Given the same graph, the same source and destination vertices, and the same algorithm,
+        but with all weights decreased by a constant value, the resulting shortest path should remain the same."""
+        # Get source output
+        source_out = shortest_path(graph, method=method)[src][dst]
 
-        # Modify the graph to remove alternative paths from src to dst
-        modified_graph = deepcopy(graph)
-        for i in range(len(graph)):
-            for j in range(len(graph[i])):
-                if i != src and j != dst:
-                    modified_graph[i][j] = np.inf
+        # Decrease all weights in the graph by a constant value
+        follow_graph = [[weight - 3 for weight in row] for row in graph]
 
-        # Get the shortest path for the modified graph
-        modified_shortest_path = shortest_path(modified_graph, method=method)[src][dst]
+        # Get follow-up output
+        follow_out = shortest_path(follow_graph, method=method)[src][dst]
 
         # Verification
-        self.assertEqual(original_shortest_path, modified_shortest_path)
+        self.assertEqual(source_out, follow_out)
 
 
 if __name__ == "__main__":

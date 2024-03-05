@@ -1,31 +1,28 @@
-import unittest
-import os, sys
-
-from parameterized import parameterized
-from scipy.sparse.csgraph import shortest_path
-from scipy.sparse import csr_matrix
-
-sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
-
 from utils import *
 
 
 class TestingClass(unittest.TestCase):
-    @parameterized.expand(gen_tcs_randomly)
+    @parameterized.expand(load_test_cases)
     def test26(self, graph: list, src: int, dst: int, method: str):
-        """Metamorphic Relation 26: Given the same graph, the same source and destination vertices,
-        if we change all edge weights to 1, the shortest path length should not increase"""
-        # Get the shortest path for the original graph
-        original_shortest_path = shortest_path(graph, method=method)[src][dst]
+        """Metamorphic Relation 26: Given the same graph and vertices, the output of the shortest path should remain the same if
+        the same graph is represented using different sparse matrix formats."""
+        from scipy.sparse import csr_matrix, csc_matrix
+        import numpy as np
 
-        # Change all edge weights to 1 for follow-up input
-        modified_graph = [[1 if weight != np.inf else np.inf for weight in row] for row in graph]
+        # Create a csr_matrix from the original graph
+        csr_graph = csr_matrix(np.array(graph))
 
-        # Get the shortest path for the modified graph
-        modified_shortest_path = shortest_path(modified_graph, method=method)[src][dst]
+        # Get source output using csr_matrix
+        source_out_csr = shortest_path(csr_graph, method=method)[src][dst]
+
+        # Create a csc_matrix from the original graph
+        csc_graph = csc_matrix(np.array(graph))
+
+        # Get follow-up output using csc_matrix
+        follow_out_csc = shortest_path(csc_graph, method=method)[src][dst]
 
         # Verification
-        self.assertLessEqual(modified_shortest_path, original_shortest_path)
+        self.assertEqual(source_out_csr, follow_out_csc)
 
 
 if __name__ == "__main__":

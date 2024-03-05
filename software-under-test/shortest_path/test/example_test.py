@@ -7,7 +7,7 @@ from parameterized import parameterized
 from scipy.sparse.csgraph import shortest_path
 from scipy.sparse import csr_matrix
 
-from utils import gen_tcs_randomly
+from generate import gen_tcs_randomly
 
 
 def load_test_cases() -> list:

@@ -1,35 +1,22 @@
-import unittest
-import os, sys
-
-from parameterized import parameterized
-from scipy.sparse.csgraph import shortest_path
-from copy import deepcopy
-
-sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
-
-from utils import gen_tcs_randomly
+from utils import *
 
 
 class TestingClass(unittest.TestCase):
-    @parameterized.expand(gen_tcs_randomly)
+    @parameterized.expand(load_test_cases)
     def test24(self, graph: list, src: int, dst: int, method: str):
-        """Metamorphic Relation 24: Given the same graph, the same source and destination vertices,
-        if we add a new vertex with zero-weight edges to all existing vertices, the shortest path length should remain unchanged."""
-        # Get the shortest path for the original graph
-        original_shortest_path = shortest_path(graph, method=method)[src][dst]
+        """Metamorphic Relation 24: Given the same graph and vertices, but with the edge weights scaled by a constant factor, the output should also be scaled by the same factor."""
+        scale_factor = 2
+        # Get source output
+        source_out = shortest_path(graph, method=method)[src][dst]
 
-        # Add a new vertex with zero-weight edges to all existing vertices for follow-up input
-        extended_graph = deepcopy(graph)
-        extended_graph.append([0] * len(graph))  # Add a new vertex with zero-weight edges
+        # Construct follow-up input with scaled edge weights
+        follow_graph = [[weight * scale_factor for weight in row] for row in graph]
 
-        for i in range(len(extended_graph)):
-            extended_graph[i].append(0)  # Connect the new vertex to all existing vertices with zero-weight edges
-
-        # Get the shortest path for the extended graph
-        extended_shortest_path = shortest_path(extended_graph, method=method)[src][dst]
+        # Get follow-up output
+        follow_out = shortest_path(follow_graph, method=method)[src][dst]
 
         # Verification
-        self.assertEqual(original_shortest_path, extended_shortest_path)
+        self.assertAlmostEqual(source_out * scale_factor, follow_out)
 
 
 if __name__ == "__main__":
