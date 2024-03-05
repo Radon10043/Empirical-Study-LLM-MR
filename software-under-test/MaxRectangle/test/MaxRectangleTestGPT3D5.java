@@ -1,1266 +1,1097 @@
 package test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static src.MaxRectangle.maximalRectangle;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
-import java.util.stream.Collectors;
+import java.util.List;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import src.MaxRectangle;
-
 public class MaxRectangleTestGPT3D5 {
+    /**
+     * Metamorphic Relation 1: Scaling all elements in the matrix by a positive constant factor should not change the output.
+     */
+    @ParameterizedTest
+    @MethodSource("testcaseProvider")
+    public void test1(ArrayList<ArrayList<Integer>> matrix) {
+        /* Get source output */
+        int source_out = maximalRectangle(matrix);
+
+        /* Scale the matrix by a constant factor */
+        int scaleFactor = 2;
+        ArrayList<ArrayList<Integer>> scaled_matrix = new ArrayList<ArrayList<Integer>>();
+        for (var row : matrix) {
+            ArrayList<Integer> scaled_row = new ArrayList<Integer>();
+            for (int elem : row) {
+                scaled_row.add(elem * scaleFactor);
+            }
+            scaled_matrix.add(scaled_row);
+        }
+
+        /* Get follow-up output */
+        int follow_out = maximalRectangle(scaled_matrix);
+
+        /* Verification */
+        assertEquals(source_out, follow_out);
+    }
 
     /**
-     * Metamorphic Relation 3: Reversing the rows should not change the output.
+     * Mrtamorphic Relation 2: Reversing the order of rows in the matrix should not change the output.
+     */
+    @ParameterizedTest
+    @MethodSource("testcaseProvider")
+    public void test2(ArrayList<ArrayList<Integer>> matrix) {
+        /* Get source output */
+        int source_out = maximalRectangle(matrix);
+
+        /* Reverse the order of rows in the matrix */
+        Collections.reverse(matrix);
+
+        /* Get follow-up output */
+        int follow_out = maximalRectangle(matrix);
+
+        /* Verification */
+        assertEquals(source_out, follow_out);
+    }
+
+    /**
+     * Metamorphic Relation 3: Transposing the matrix should not change the output.
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
     public void test3(ArrayList<ArrayList<Integer>> matrix) {
         /* Get source output */
-        int source_out = MaxRectangle.maximalRectangle(matrix);
+        int source_out = maximalRectangle(matrix);
 
-        /* Construct follow-up input */
-        ArrayList<ArrayList<Integer>> follow_matrix = new ArrayList<>(matrix);
-        Collections.reverse(follow_matrix);
+        /* Transpose the matrix */
+        ArrayList<ArrayList<Integer>> transposed_matrix = new ArrayList<>();
+        for (int i = 0; i < matrix.get(0).size(); i++) {
+            ArrayList<Integer> transposed_row = new ArrayList<>();
+            for (ArrayList<Integer> row : matrix) {
+                transposed_row.add(row.get(i));
+            }
+            transposed_matrix.add(transposed_row);
+        }
 
         /* Get follow-up output */
-        int follow_out = MaxRectangle.maximalRectangle(follow_matrix);
+        int follow_out = maximalRectangle(transposed_matrix);
 
         /* Verification */
         assertEquals(source_out, follow_out);
     }
 
     /**
-     * Metamorphic Relation 4: Reversing the columns should not change the output.
+     * Metamorphic Relation 4: Replacing all occurrences of 0 with 1 and 1 with 0 in the matrix should not change the output.
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
     public void test4(ArrayList<ArrayList<Integer>> matrix) {
         /* Get source output */
-        int source_out = MaxRectangle.maximalRectangle(matrix);
+        int source_out = maximalRectangle(matrix);
 
-        /* Construct follow-up input */
-        ArrayList<ArrayList<Integer>> follow_matrix = new ArrayList<>();
-        int rowSize = matrix.size();
-        int colSize = matrix.get(0).size();
-
-        for (int i = 0; i < rowSize; i++) {
-            ArrayList<Integer> newRow = new ArrayList<>(colSize);
-            for (int j = colSize - 1; j >= 0; j--) {
-                newRow.add(matrix.get(i).get(j));
+        /* Negate the matrix */
+        ArrayList<ArrayList<Integer>> negated_matrix = new ArrayList<>();
+        for (var row : matrix) {
+            ArrayList<Integer> negated_row = new ArrayList<>();
+            for (int elem : row) {
+                negated_row.add(1 - elem);
             }
-            follow_matrix.add(newRow);
+            negated_matrix.add(negated_row);
         }
 
         /* Get follow-up output */
-        int follow_out = MaxRectangle.maximalRectangle(follow_matrix);
+        int follow_out = maximalRectangle(negated_matrix);
 
         /* Verification */
         assertEquals(source_out, follow_out);
     }
 
     /**
-     * Metamorphic Relation 5: Scaling all elements in the matrix by a constant
-     * factor should not change the output.
+     * Metamorphic Relation 5: Adding a constant value to all elements in the matrix should not change the output.
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
     public void test5(ArrayList<ArrayList<Integer>> matrix) {
         /* Get source output */
-        int source_out = MaxRectangle.maximalRectangle(matrix);
+        int source_out = maximalRectangle(matrix);
 
-        /* Construct follow-up input */
-        double scaleFactor = 2.0;
-        ArrayList<ArrayList<Integer>> follow_matrix = new ArrayList<>();
+        /* Add a constant to all elements in the matrix */
+        int constant = 2;
+        ArrayList<ArrayList<Integer>> altered_matrix = new ArrayList<>();
         for (var row : matrix) {
-            ArrayList<Integer> newRow = new ArrayList<>();
-            for (int val : row) {
-                newRow.add((int) (val * scaleFactor));
+            ArrayList<Integer> altered_row = new ArrayList<>();
+            for (int elem : row) {
+                altered_row.add(elem + constant);
             }
-            follow_matrix.add(newRow);
+            altered_matrix.add(altered_row);
         }
 
         /* Get follow-up output */
-        int follow_out = MaxRectangle.maximalRectangle(follow_matrix);
+        int follow_out = maximalRectangle(altered_matrix);
 
         /* Verification */
         assertEquals(source_out, follow_out);
     }
 
     /**
-     * Metamorphic Relation 6: Shifting all elements in the matrix by a constant
-     * value should not change the output.
+     * Metamorphic Relation 6: Adding the same constant value to all columns in the matrix should not change the output.
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
     public void test6(ArrayList<ArrayList<Integer>> matrix) {
         /* Get source output */
-        int source_out = MaxRectangle.maximalRectangle(matrix);
+        int source_out = maximalRectangle(matrix);
 
-        /* Construct follow-up input */
-        int shiftValue = 1;
-        ArrayList<ArrayList<Integer>> follow_matrix = new ArrayList<>();
-        for (var row : matrix) {
-            ArrayList<Integer> newRow = new ArrayList<>();
-            for (int val : row) {
-                newRow.add(val + shiftValue);
+        /* Add a constant to all columns in the matrix */
+        int constant = 2;
+        ArrayList<ArrayList<Integer>> altered_matrix = new ArrayList<>();
+        for (int j = 0; j < matrix.get(0).size(); j++) {
+            ArrayList<Integer> altered_col = new ArrayList<>();
+            for (var row : matrix) {
+                altered_col.add(row.get(j) + constant);
             }
-            follow_matrix.add(newRow);
+            altered_matrix.add(altered_col);
         }
 
         /* Get follow-up output */
-        int follow_out = MaxRectangle.maximalRectangle(follow_matrix);
+        int follow_out = maximalRectangle(altered_matrix);
 
         /* Verification */
         assertEquals(source_out, follow_out);
     }
 
     /**
-     * Metamorphic Relation 7: Replacing 0 with 1 and 1 with 0 in the matrix should
-     * not change the output.
+     * Metamorphic Relation 7: Swapping any two rows in the matrix should not change the output.
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
     public void test7(ArrayList<ArrayList<Integer>> matrix) {
         /* Get source output */
-        int source_out = MaxRectangle.maximalRectangle(matrix);
+        int source_out = maximalRectangle(matrix);
 
-        /* Construct follow-up input */
-        ArrayList<ArrayList<Integer>> follow_matrix = new ArrayList<>();
-        for (var row : matrix) {
-            ArrayList<Integer> newRow = new ArrayList<>();
-            for (int val : row) {
-                newRow.add(1 - val); // Replace 0 with 1 and 1 with 0
-            }
-            follow_matrix.add(newRow);
-        }
+        /* Swap two rows in the matrix */
+        int row1 = 0;  // Choose the indices of the rows to swap
+        int row2 = 1;
+        Collections.swap(matrix, row1, row2);
 
         /* Get follow-up output */
-        int follow_out = MaxRectangle.maximalRectangle(follow_matrix);
+        int follow_out = maximalRectangle(matrix);
 
         /* Verification */
         assertEquals(source_out, follow_out);
     }
 
     /**
-     * Metamorphic Relation 8: Reordering the rows should not change the output.
+     * Metamorphic Relation 8: Shuffling the columns in the matrix should not change the output.
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
     public void test8(ArrayList<ArrayList<Integer>> matrix) {
         /* Get source output */
-        int source_out = MaxRectangle.maximalRectangle(matrix);
+        int source_out = maximalRectangle(matrix);
 
-        /* Construct follow-up input */
-        ArrayList<ArrayList<Integer>> follow_matrix = new ArrayList<>(matrix);
-        Collections.shuffle(follow_matrix);
+        /* Shuffle the columns in the matrix */
+        ArrayList<ArrayList<Integer>> shuffled_matrix = new ArrayList<>();
+        for (var row : matrix) {
+            List<Integer> rowCopy = new ArrayList<>(row);
+            Collections.shuffle(rowCopy);
+            shuffled_matrix.add(new ArrayList<>(rowCopy));
+        }
 
         /* Get follow-up output */
-        int follow_out = MaxRectangle.maximalRectangle(follow_matrix);
+        int follow_out = maximalRectangle(shuffled_matrix);
 
         /* Verification */
         assertEquals(source_out, follow_out);
     }
 
     /**
-     * Metamorphic Relation 9: Removing a row from the matrix should not increase
-     * the output area.
+     * Metamorphic Relation 9: Adding a diagonal mirror image of the matrix should not change the output.
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
     public void test9(ArrayList<ArrayList<Integer>> matrix) {
         /* Get source output */
-        int source_out = MaxRectangle.maximalRectangle(matrix);
+        int source_out = maximalRectangle(matrix);
 
-        /* Construct follow-up input */
-        if (matrix.size() > 1) {
-            ArrayList<ArrayList<Integer>> follow_matrix = new ArrayList<>(matrix);
-            follow_matrix.remove(0); // Remove the first row
-
-            /* Get follow-up output */
-            int follow_out = MaxRectangle.maximalRectangle(follow_matrix);
-
-            /* Verification */
-            assertTrue(follow_out <= source_out);
+        /* Add a diagonal mirror image of the matrix */
+        int rows = matrix.size();
+        int cols = matrix.get(0).size();
+        ArrayList<ArrayList<Integer>> mirrorMatrix = new ArrayList<>();
+        for (int i = 0; i < rows; i++) {
+            ArrayList<Integer> newRow = new ArrayList<>(Collections.nCopies(i, 0));
+            for (int j = 0; j < cols; j++) {
+                newRow.add(matrix.get(i).get(j));
+            }
+            for (int j = cols - 1; j >= 0; j--) {
+                newRow.add(matrix.get(i).get(j));
+            }
+            for (int j = 0; j < cols - i - 1; j++) {
+                newRow.add(0);
+            }
+            mirrorMatrix.add(newRow);
         }
+
+        /* Get follow-up output */
+        int follow_out = maximalRectangle(mirrorMatrix);
+
+        /* Verification */
+        assertEquals(source_out, follow_out);
     }
 
     /**
-     * Metamorphic Relation 10: Removing a column from the matrix should not
-     * increase the output area.
+     * Metamorphic Relation 10: Reversing the order of columns in the matrix should not change the output.
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
     public void test10(ArrayList<ArrayList<Integer>> matrix) {
         /* Get source output */
-        int source_out = MaxRectangle.maximalRectangle(matrix);
+        int source_out = maximalRectangle(matrix);
 
-        /* Construct follow-up input */
-        if (matrix.get(0).size() > 1) {
-            ArrayList<ArrayList<Integer>> follow_matrix = new ArrayList<>();
-            for (var row : matrix) {
-                ArrayList<Integer> newRow = new ArrayList<>(row);
-                newRow.remove(0); // Remove the first column element
-                follow_matrix.add(newRow);
-            }
-
-            /* Get follow-up output */
-            int follow_out = MaxRectangle.maximalRectangle(follow_matrix);
-
-            /* Verification */
-            assertTrue(follow_out <= source_out);
+        /* Reverse the order of columns in the matrix */
+        ArrayList<ArrayList<Integer>> reversedColumnsMatrix = new ArrayList<>();
+        for (var row : matrix) {
+            ArrayList<Integer> reversedRow = new ArrayList<>(row);
+            Collections.reverse(reversedRow);
+            reversedColumnsMatrix.add(reversedRow);
         }
+
+        /* Get follow-up output */
+        int follow_out = maximalRectangle(reversedColumnsMatrix);
+
+        /* Verification */
+        assertEquals(source_out, follow_out);
     }
 
     /**
-     * Metamorphic Relation 11: Swapping two rows in the matrix should not change
-     * the output.
+     * Metamorphic Relation 11: Multiplying all elements in the matrix by -1 should not change the output.
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
     public void test11(ArrayList<ArrayList<Integer>> matrix) {
         /* Get source output */
-        int source_out = MaxRectangle.maximalRectangle(matrix);
+        int source_out = maximalRectangle(matrix);
 
-        /* Construct follow-up input by swapping the first and last rows */
-        if (matrix.size() >= 2) {
-            ArrayList<ArrayList<Integer>> follow_matrix = new ArrayList<>(matrix);
-            Collections.swap(follow_matrix, 0, matrix.size() - 1);
-
-            /* Get follow-up output */
-            int follow_out = MaxRectangle.maximalRectangle(follow_matrix);
-
-            /* Verification */
-            assertEquals(source_out, follow_out);
+        /* Multiply all elements in the matrix by -1 */
+        ArrayList<ArrayList<Integer>> negatedMatrix = new ArrayList<>();
+        for (var row : matrix) {
+            ArrayList<Integer> negatedRow = new ArrayList<>();
+            for (int elem : row) {
+                negatedRow.add(elem * -1);
+            }
+            negatedMatrix.add(negatedRow);
         }
+
+        /* Get follow-up output */
+        int follow_out = maximalRectangle(negatedMatrix);
+
+        /* Verification */
+        assertEquals(source_out, follow_out);
     }
 
     /**
-     * Metamorphic Relation 12: Replacing all elements with their absolute values
-     * should not change the output.
+     * Metamorphic Relation 12: Adding a row of all 0s to the matrix should not change the output.
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
     public void test12(ArrayList<ArrayList<Integer>> matrix) {
         /* Get source output */
-        int source_out = MaxRectangle.maximalRectangle(matrix);
+        int source_out = maximalRectangle(matrix);
 
-        /* Construct follow-up input by taking absolute values of all elements */
-        ArrayList<ArrayList<Integer>> follow_matrix = new ArrayList<>();
-        for (var row : matrix) {
-            ArrayList<Integer> newRow = new ArrayList<>();
-            for (int val : row) {
-                newRow.add(Math.abs(val));
-            }
-            follow_matrix.add(newRow);
-        }
+        /* Add a row of all 0s to the matrix */
+        int cols = matrix.get(0).size();
+        ArrayList<Integer> zerosRow = new ArrayList<>(Collections.nCopies(cols, 0));
+        ArrayList<ArrayList<Integer>> zerosMatrix = new ArrayList<>(matrix);
+        zerosMatrix.add(zerosRow);
 
         /* Get follow-up output */
-        int follow_out = MaxRectangle.maximalRectangle(follow_matrix);
+        int follow_out = maximalRectangle(zerosMatrix);
 
         /* Verification */
         assertEquals(source_out, follow_out);
     }
 
     /**
-     * Metamorphic Relation 13: Reversing the order of columns in the matrix should
-     * not change the output.
+     * Metamorphic Relation 13: Multiplying all elements in the matrix by a positive constant factor should not change the output.
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
     public void test13(ArrayList<ArrayList<Integer>> matrix) {
         /* Get source output */
-        int source_out = MaxRectangle.maximalRectangle(matrix);
+        int source_out = maximalRectangle(matrix);
 
-        /* Construct follow-up input by reversing the order of columns */
-        ArrayList<ArrayList<Integer>> follow_matrix = new ArrayList<>();
-        for (var row : matrix) {
-            ArrayList<Integer> newRow = new ArrayList<>(row);
-            Collections.reverse(newRow);
-            follow_matrix.add(newRow);
+        /* Scale the matrix by a constant factor */
+        int scaleFactor = 2;
+        ArrayList<ArrayList<Integer>> scaledMatrix = new ArrayList<>(matrix);
+        for (int i = 0; i < scaledMatrix.size(); i++) {
+            ArrayList<Integer> row = scaledMatrix.get(i);
+            for (int j = 0; j < row.size(); j++) {
+                row.set(j, row.get(j) * scaleFactor);
+            }
+            scaledMatrix.set(i, row);
         }
 
         /* Get follow-up output */
-        int follow_out = MaxRectangle.maximalRectangle(follow_matrix);
+        int follow_out = maximalRectangle(scaledMatrix);
 
         /* Verification */
         assertEquals(source_out, follow_out);
     }
 
     /**
-     * Metamorphic Relation 14: Adding the transpose of the matrix to the original
-     * matrix should not change the output.
+     * Metamorphic Relation 14: Adding the transpose of the matrix to itself should not change the output.
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
     public void test14(ArrayList<ArrayList<Integer>> matrix) {
         /* Get source output */
-        int source_out = MaxRectangle.maximalRectangle(matrix);
+        int source_out = maximalRectangle(matrix);
 
-        /*
-         * Construct follow-up input by adding the transpose of the matrix to the
-         * original matrix
-         */
-        ArrayList<ArrayList<Integer>> follow_matrix = new ArrayList<>();
-        int rowSize = matrix.size();
-        int colSize = matrix.get(0).size();
-
-        for (int i = 0; i < rowSize; i++) {
-            ArrayList<Integer> newRow = new ArrayList<>(colSize);
-            for (int j = 0; j < colSize; j++) {
-                newRow.add(matrix.get(i).get(j) + matrix.get(j).get(i)); // Add the transpose
+        /* Add the transpose of the matrix to itself */
+        int rows = matrix.size();
+        int cols = matrix.get(0).size();
+        ArrayList<ArrayList<Integer>> addedMatrix = new ArrayList<>(matrix);
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                addedMatrix.get(i).set(j, matrix.get(i).get(j) + matrix.get(j).get(i));
             }
-            follow_matrix.add(newRow);
         }
 
         /* Get follow-up output */
-        int follow_out = MaxRectangle.maximalRectangle(follow_matrix);
+        int follow_out = maximalRectangle(addedMatrix);
 
         /* Verification */
         assertEquals(source_out, follow_out);
     }
 
     /**
-     * Metamorphic Relation 15: Adding a constant value to all elements in the
-     * matrix should not change the output.
+     * Metamorphic Relation 15: Multiplying a constant to all elements in the matrix and then adding another constant should not change the output.
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
     public void test15(ArrayList<ArrayList<Integer>> matrix) {
-        // Get source output
-        int source_out = MaxRectangle.maximalRectangle(matrix);
+        /* Get source output */
+        int source_out = maximalRectangle(matrix);
 
-        // Construct follow-up input by adding a constant value to all elements
-        int constantToAdd = 5;
-        ArrayList<ArrayList<Integer>> follow_matrix = new ArrayList<>();
-        for (var row : matrix) {
-            ArrayList<Integer> newRow = new ArrayList<>();
-            for (int val : row) {
-                newRow.add(val + constantToAdd);
+        /* Multiply a constant to all elements in the matrix and then add another constant */
+        int constant1 = 2;
+        int constant2 = 3;
+        ArrayList<ArrayList<Integer>> alteredMatrix = new ArrayList<>(matrix);
+        for (int i = 0; i < alteredMatrix.size(); i++) {
+            ArrayList<Integer> row = alteredMatrix.get(i);
+            for (int j = 0; j < row.size(); j++) {
+                row.set(j, row.get(j) * constant1 + constant2);
             }
-            follow_matrix.add(newRow);
+            alteredMatrix.set(i, row);
         }
 
-        // Get follow-up output
-        int follow_out = MaxRectangle.maximalRectangle(follow_matrix);
+        /* Get follow-up output */
+        int follow_out = maximalRectangle(alteredMatrix);
 
-        // Verification
+        /* Verification */
         assertEquals(source_out, follow_out);
     }
 
     /**
-     * Metamorphic Relation 16: Absolute value of the result should be the same when
-     * all elements are negated.
+     * Metamorphic Relation 16: Flipping the elements of each row in the matrix should not change the output.
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
     public void test16(ArrayList<ArrayList<Integer>> matrix) {
-        // Get source output
-        int source_out = Math.abs(MaxRectangle.maximalRectangle(matrix));
+        /* Get source output */
+        int source_out = maximalRectangle(matrix);
 
-        // Construct follow-up input by negating all elements
-        ArrayList<ArrayList<Integer>> follow_matrix = new ArrayList<>();
+        /* Flip the elements of each row in the matrix */
+        ArrayList<ArrayList<Integer>> flippedMatrix = new ArrayList<>();
         for (var row : matrix) {
-            ArrayList<Integer> newRow = new ArrayList<>();
-            for (int val : row) {
-                newRow.add(-val);
-            }
-            follow_matrix.add(newRow);
+            ArrayList<Integer> flippedRow = new ArrayList<>(row);
+            Collections.reverse(flippedRow);
+            flippedMatrix.add(flippedRow);
         }
 
-        // Get follow-up output
-        int follow_out = Math.abs(MaxRectangle.maximalRectangle(follow_matrix));
+        /* Get follow-up output */
+        int follow_out = maximalRectangle(flippedMatrix);
 
-        // Verification
+        /* Verification */
         assertEquals(source_out, follow_out);
     }
 
     /**
-     * Metamorphic Relation 17: Multiplying all elements in the matrix by a constant
-     * factor should result in the output being multiplied by the same factor.
+     * Metamorphic Relation 17: Reversing the order of elements in each row of the matrix should not change the output.
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
     public void test17(ArrayList<ArrayList<Integer>> matrix) {
-        // Get source output
-        int source_out = MaxRectangle.maximalRectangle(matrix);
+        /* Get source output */
+        int source_out = maximalRectangle(matrix);
 
-        // Construct follow-up input by multiplying all elements in the matrix by a
-        // constant factor
-        int scaleFactor = 3;
-        ArrayList<ArrayList<Integer>> follow_matrix = new ArrayList<>();
+        /* Reverse the order of elements in each row of the matrix */
+        ArrayList<ArrayList<Integer>> reversedElementsMatrix = new ArrayList<>();
         for (var row : matrix) {
-            ArrayList<Integer> newRow = new ArrayList<>();
-            for (int val : row) {
-                newRow.add(val * scaleFactor);
-            }
-            follow_matrix.add(newRow);
+            ArrayList<Integer> reversedElementsRow = new ArrayList<>(row);
+            Collections.reverse(reversedElementsRow);
+            reversedElementsMatrix.add(reversedElementsRow);
         }
 
-        // Get follow-up output
-        int follow_out = MaxRectangle.maximalRectangle(follow_matrix);
+        /* Get follow-up output */
+        int follow_out = maximalRectangle(reversedElementsMatrix);
 
-        // Verification
-        assertEquals(source_out * scaleFactor, follow_out);
+        /* Verification */
+        assertEquals(source_out, follow_out);
     }
 
     /**
-     * Metamorphic Relation 18: The result should be the same when the rows of the
-     * matrix are sorted in ascending order based on the sum of their elements.
+     * Metamorphic Relation 18: Multiplying a constant to all elements in the matrix and then subtracting another constant should not change the output.
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
     public void test18(ArrayList<ArrayList<Integer>> matrix) {
-        // Get source output
-        int source_out = MaxRectangle.maximalRectangle(matrix);
+        /* Get source output */
+        int source_out = maximalRectangle(matrix);
 
-        // Construct follow-up input by sorting the rows based on the sum of their
-        // elements
-        ArrayList<ArrayList<Integer>> follow_matrix = matrix.stream()
-                .sorted(Comparator.comparing(row -> row.stream().mapToInt(Integer::intValue).sum()))
-                .collect(Collectors.toCollection(ArrayList::new));
+        /* Multiply a constant to all elements in the matrix and then subtract another constant */
+        int constant1 = 3;
+        int constant2 = 2;
+        ArrayList<ArrayList<Integer>> alteredMatrix = new ArrayList<>(matrix);
+        for (int i = 0; i < alteredMatrix.size(); i++) {
+            ArrayList<Integer> row = alteredMatrix.get(i);
+            for (int j = 0; j < row.size(); j++) {
+                row.set(j, row.get(j) * constant1 - constant2);
+            }
+            alteredMatrix.set(i, row);
+        }
 
-        // Get follow-up output
-        int follow_out = MaxRectangle.maximalRectangle(follow_matrix);
+        /* Get follow-up output */
+        int follow_out = maximalRectangle(alteredMatrix);
 
-        // Verification
+        /* Verification */
         assertEquals(source_out, follow_out);
     }
 
     /**
-     * Metamorphic Relation 19: Adding a constant value to each row in the matrix
-     * should not change the output.
+     * Metamorphic Relation 19: Adding a constant value to all columns and rows in the matrix should not change the output.
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
     public void test19(ArrayList<ArrayList<Integer>> matrix) {
-        // Get source output
-        int source_out = MaxRectangle.maximalRectangle(matrix);
+        /* Get source output */
+        int source_out = maximalRectangle(matrix);
 
-        // Construct follow-up input by adding a constant value to each row
-        int constantToAdd = 5;
-        ArrayList<ArrayList<Integer>> follow_matrix = new ArrayList<>();
+        /* Add a constant to all columns and rows in the matrix */
+        int constant = 2;
+        ArrayList<ArrayList<Integer>> alteredMatrix = new ArrayList<>();
         for (var row : matrix) {
-            ArrayList<Integer> newRow = new ArrayList<>();
-            for (int val : row) {
-                newRow.add(val + constantToAdd);
+            ArrayList<Integer> alteredRow = new ArrayList<>();
+            for (int elem : row) {
+                alteredRow.add(elem + constant);
             }
-            follow_matrix.add(newRow);
+            alteredMatrix.add(alteredRow);
         }
 
-        // Get follow-up output
-        int follow_out = MaxRectangle.maximalRectangle(follow_matrix);
+        for (var row : alteredMatrix) {
+            for (int i = 0; i < row.size(); i++) {
+                row.set(i, row.get(i) + constant);
+            }
+        }
 
-        // Verification
+        /* Get follow-up output */
+        int follow_out = maximalRectangle(alteredMatrix);
+
+        /* Verification */
         assertEquals(source_out, follow_out);
     }
 
     /**
-     * Metamorphic Relation 20: The output should remain the same when removing
-     * duplicates from each row in the matrix.
+     * Metamorphic Relation 20: Adding a row filled with the same constant should not change the output.
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
     public void test20(ArrayList<ArrayList<Integer>> matrix) {
-        // Get source output
-        int source_out = MaxRectangle.maximalRectangle(matrix);
+        /* Get source output */
+        int source_out = maximalRectangle(matrix);
 
-        // Construct follow-up input by removing duplicates from each row
-        ArrayList<ArrayList<Integer>> follow_matrix = new ArrayList<>();
-        for (var row : matrix) {
-            ArrayList<Integer> newRow = row.stream()
-                    .distinct()
-                    .collect(Collectors.toCollection(ArrayList::new));
-            follow_matrix.add(newRow);
-        }
+        /* Add a row filled with a constant to the matrix */
+        int rows = matrix.size();
+        int cols = matrix.get(0).size();
+        int constant = 1;
+        ArrayList<ArrayList<Integer>> alteredMatrix = new ArrayList<>(matrix);
+        ArrayList<Integer> newRow = new ArrayList<>(Collections.nCopies(cols, constant));
+        alteredMatrix.add(newRow);
 
-        // Get follow-up output
-        int follow_out = MaxRectangle.maximalRectangle(follow_matrix);
+        /* Get follow-up output */
+        int follow_out = maximalRectangle(alteredMatrix);
 
-        // Verification
+        /* Verification */
         assertEquals(source_out, follow_out);
     }
 
     /**
-     * Metamorphic Relation 21: If we shuffle the columns of the matrix, the output
-     * should remain the same.
+     * Metamorphic Relation 21: Adding a column filled with the same constant should not change the output.
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
     public void test21(ArrayList<ArrayList<Integer>> matrix) {
-        // Get source output
-        int source_out = MaxRectangle.maximalRectangle(matrix);
+        /* Get source output */
+        int source_out = maximalRectangle(matrix);
 
-        // Construct follow-up input by shuffling the columns of the matrix
-        ArrayList<ArrayList<Integer>> follow_matrix = new ArrayList<>();
-        int rows = matrix.size();
-        int cols = matrix.get(0).size();
-        ArrayList<Integer> columnIndexes = new ArrayList<>();
-        for (int i = 0; i < cols; i++) {
-            columnIndexes.add(i);
-        }
-        Collections.shuffle(columnIndexes);
-        for (int i = 0; i < rows; i++) {
-            ArrayList<Integer> newRow = new ArrayList<>();
-            for (int j = 0; j < cols; j++) {
-                newRow.add(matrix.get(i).get(columnIndexes.get(j)));
-            }
-            follow_matrix.add(newRow);
+        /* Add a column filled with a constant to the matrix */
+        int constant = 1;
+        ArrayList<ArrayList<Integer>> alteredMatrix = new ArrayList<>();
+        for (var row : matrix) {
+            ArrayList<Integer> alteredRow = new ArrayList<>(row);
+            alteredRow.add(constant);
+            alteredMatrix.add(alteredRow);
         }
 
-        // Get follow-up output
-        int follow_out = MaxRectangle.maximalRectangle(follow_matrix);
+        /* Get follow-up output */
+        int follow_out = maximalRectangle(alteredMatrix);
 
-        // Verification
+        /* Verification */
         assertEquals(source_out, follow_out);
     }
 
     /**
-     * Metamorphic Relation 22: Adding a constant value to all elements of the
-     * matrix and then multiplying all elements by another constant should not
-     * change the output.
+     * Metamorphic Relation 22: Multiplying the elements of each row by a constant should not change the output.
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
     public void test22(ArrayList<ArrayList<Integer>> matrix) {
-        // Get source output
-        int source_out = MaxRectangle.maximalRectangle(matrix);
+        /* Get source output */
+        int source_out = maximalRectangle(matrix);
 
-        // Construct follow-up input by adding a constant and then multiplying by
-        // another constant
-        int constantToAdd = 3;
-        int multiplyBy = 2;
-        ArrayList<ArrayList<Integer>> follow_matrix = new ArrayList<>();
+        /* Multiply the elements of each row by a constant */
+        int constant = 2;
+        ArrayList<ArrayList<Integer>> alteredMatrix = new ArrayList<>();
         for (var row : matrix) {
-            ArrayList<Integer> newRow = new ArrayList<>();
-            for (int val : row) {
-                newRow.add((val + constantToAdd) * multiplyBy);
+            ArrayList<Integer> alteredRow = new ArrayList<>();
+            for (int elem : row) {
+                alteredRow.add(elem * constant);
             }
-            follow_matrix.add(newRow);
+            alteredMatrix.add(alteredRow);
         }
 
-        // Get follow-up output
-        int follow_out = MaxRectangle.maximalRectangle(follow_matrix);
+        /* Get follow-up output */
+        int follow_out = maximalRectangle(alteredMatrix);
 
-        // Verification
+        /* Verification */
         assertEquals(source_out, follow_out);
     }
 
     /**
-     * Metamorphic Relation 23: If we reverse the order of the elements in each row,
-     * the output should remain the same.
+     * Metamorphic Relation 23: Multiplying the elements of each column by a constant should not change the output.
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
     public void test23(ArrayList<ArrayList<Integer>> matrix) {
-        // Get source output
-        int source_out = MaxRectangle.maximalRectangle(matrix);
+        /* Get source output */
+        int source_out = maximalRectangle(matrix);
 
-        // Construct follow-up input by reversing the elements in each row
-        ArrayList<ArrayList<Integer>> follow_matrix = new ArrayList<>();
+        /* Multiply the elements of each column by a constant */
+        int constant = 2;
+        ArrayList<ArrayList<Integer>> alteredMatrix = new ArrayList<>();
         for (var row : matrix) {
-            ArrayList<Integer> newRow = new ArrayList<>(row);
-            Collections.reverse(newRow);
-            follow_matrix.add(newRow);
+            ArrayList<Integer> alteredRow = new ArrayList<>();
+            for (int elem : row) {
+                alteredRow.add(elem);
+            }
+            alteredMatrix.add(alteredRow);
+        }
+        for (int j = 0; j < alteredMatrix.get(0).size(); j++) {
+            for (int i = 0; i < alteredMatrix.size(); i++) {
+                alteredMatrix.get(i).set(j, alteredMatrix.get(i).get(j) * constant);
+            }
         }
 
-        // Get follow-up output
-        int follow_out = MaxRectangle.maximalRectangle(follow_matrix);
+        /* Get follow-up output */
+        int follow_out = maximalRectangle(alteredMatrix);
 
-        // Verification
+        /* Verification */
         assertEquals(source_out, follow_out);
     }
 
     /**
-     * Metamorphic Relation 24: If we apply a bitwise complement to every element in
-     * the matrix, the output should remain the same.
+     * Metamorphic Relation 24: Doubling the size of the matrix by repeating the rows and columns should not change the output.
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
     public void test24(ArrayList<ArrayList<Integer>> matrix) {
-        // Get source output
-        int source_out = MaxRectangle.maximalRectangle(matrix);
+        /* Get source output */
+        int source_out = maximalRectangle(matrix);
 
-        // Construct follow-up input by applying bitwise complement to every element
-        ArrayList<ArrayList<Integer>> follow_matrix = new ArrayList<>();
-        for (var row : matrix) {
-            ArrayList<Integer> newRow = new ArrayList<>();
-            for (int val : row) {
-                newRow.add(~val);
+        /* Double the size of the matrix by repeating the rows and columns */
+        int n = matrix.size();
+        int m = matrix.get(0).size();
+        ArrayList<ArrayList<Integer>> doubledMatrix = new ArrayList<>();
+        for (int i = 0; i < n; i++) {
+            ArrayList<Integer> row = new ArrayList<>();
+            for (int j = 0; j < m; j++) {
+                row.add(matrix.get(i % n).get(j % m));
             }
-            follow_matrix.add(newRow);
+            doubledMatrix.add(row);
         }
 
-        // Get follow-up output
-        int follow_out = MaxRectangle.maximalRectangle(follow_matrix);
+        /* Get follow-up output */
+        int follow_out = maximalRectangle(doubledMatrix);
 
-        // Verification
+        /* Verification */
         assertEquals(source_out, follow_out);
     }
 
     /**
-     * Metamorphic Relation 25: Mirroring the matrix horizontally or vertically
-     * should not change the output.
+     * Metamorphic Relation 25: Rotating the matrix by 90 degrees in the clockwise direction should not change the output.
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
     public void test25(ArrayList<ArrayList<Integer>> matrix) {
-        // Get source output
-        int source_out = MaxRectangle.maximalRectangle(matrix);
+        /* Get source output */
+        int source_out = maximalRectangle(matrix);
 
-        // Construct follow-up input by mirroring the matrix horizontally
-        ArrayList<ArrayList<Integer>> mirrorHorizontal = new ArrayList<>();
-        for (int i = matrix.size() - 1; i >= 0; i--) {
-            mirrorHorizontal.add(matrix.get(i));
+        /* Rotate the matrix by 90 degrees in the clockwise direction */
+        int n = matrix.size();
+        int m = matrix.get(0).size();
+        ArrayList<ArrayList<Integer>> rotatedMatrix = new ArrayList<>();
+        for (int j = 0; j < m; j++) {
+            ArrayList<Integer> row = new ArrayList<>();
+            for (int i = n - 1; i >= 0; i--) {
+                row.add(matrix.get(i).get(j));
+            }
+            rotatedMatrix.add(row);
         }
 
-        // Get follow-up output
-        int follow_out1 = MaxRectangle.maximalRectangle(mirrorHorizontal);
+        /* Get follow-up output */
+        int follow_out = maximalRectangle(rotatedMatrix);
 
-        // Verification
-        assertEquals(source_out, follow_out1);
-
-        // Construct follow-up input by mirroring the matrix vertically
-        ArrayList<ArrayList<Integer>> mirrorVertical = new ArrayList<>();
-        for (var row : matrix) {
-            ArrayList<Integer> newRow = new ArrayList<>(row);
-            Collections.reverse(newRow);
-            mirrorVertical.add(newRow);
-        }
-
-        // Get follow-up output
-        int follow_out2 = MaxRectangle.maximalRectangle(mirrorVertical);
-
-        // Verification
-        assertEquals(source_out, follow_out2);
+        /* Verification */
+        assertEquals(source_out, follow_out);
     }
 
     /**
-     * Metamorphic Relation 26: Dividing each element in the matrix by a constant
-     * factor should not change the output.
+     * Metamorphic Relation 26: Replacing all occurrences of 0 with 1 and 1 with 0 in the matrix should not change the output.
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
     public void test26(ArrayList<ArrayList<Integer>> matrix) {
-        // Get source output
-        int source_out = MaxRectangle.maximalRectangle(matrix);
+        /* Get source output */
+        int source_out = maximalRectangle(matrix);
 
-        // Construct follow-up input by dividing each element by a constant factor
-        int divisor = 2;
-        ArrayList<ArrayList<Integer>> follow_matrix = new ArrayList<>();
+        /* Replace all occurrences of 0 with 1 and 1 with 0 in the matrix */
+        ArrayList<ArrayList<Integer>> alteredMatrix = new ArrayList<>();
         for (var row : matrix) {
             ArrayList<Integer> newRow = new ArrayList<>();
-            for (int val : row) {
-                newRow.add(val / divisor);
+            for (int elem : row) {
+                if (elem == 0) {
+                    newRow.add(1);
+                } else {
+                    newRow.add(0);
+                }
             }
-            follow_matrix.add(newRow);
+            alteredMatrix.add(newRow);
         }
 
-        // Get follow-up output
-        int follow_out = MaxRectangle.maximalRectangle(follow_matrix);
+        /* Get follow-up output */
+        int follow_out = maximalRectangle(alteredMatrix);
 
-        // Verification
+        /* Verification */
         assertEquals(source_out, follow_out);
     }
 
     /**
-     * Metamorphic Relation 27: Multiplying a row by a constant factor should result
-     * in the same scaled output.
+     * Metamorphic Relation 27: Transforming the matrix by replacing each element with its square should not change the output.
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
     public void test27(ArrayList<ArrayList<Integer>> matrix) {
-        // Get source output
-        int source_out = MaxRectangle.maximalRectangle(matrix);
+        /* Get source output */
+        int source_out = maximalRectangle(matrix);
 
-        // Construct follow-up input by multiplying a row by a constant factor
-        int rowIndex = 0; // Choose the first row for demonstration
-        int scaleFactor = 3;
-        ArrayList<ArrayList<Integer>> follow_matrix = new ArrayList<>();
-        for (int i = 0; i < matrix.size(); i++) {
-            ArrayList<Integer> newRow = new ArrayList<>(matrix.get(i));
-            if (i == rowIndex) {
-                for (int j = 0; j < newRow.size(); j++) {
-                    newRow.set(j, newRow.get(j) * scaleFactor);
-                }
+        /* Transform the matrix by replacing each element with its square */
+        ArrayList<ArrayList<Integer>> transformedMatrix = new ArrayList<>();
+        for (var row : matrix) {
+            ArrayList<Integer> newRow = new ArrayList<>();
+            for (int elem : row) {
+                newRow.add(elem * elem);
             }
-            follow_matrix.add(newRow);
+            transformedMatrix.add(newRow);
         }
 
-        // Get follow-up output
-        int follow_out = MaxRectangle.maximalRectangle(follow_matrix);
+        /* Get follow-up output */
+        int follow_out = maximalRectangle(transformedMatrix);
 
-        // Verification
-        assertEquals(source_out * scaleFactor, follow_out);
+        /* Verification */
+        assertEquals(source_out, follow_out);
     }
 
     /**
-     * Metamorphic Relation 28: Rotating the matrix 90 degrees should not change the
-     * output.
+     * Metamorphic Relation 28: Adding an inverted diagonal mirror image of the matrix should not change the output.
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
     public void test28(ArrayList<ArrayList<Integer>> matrix) {
-        // Get source output
-        int source_out = MaxRectangle.maximalRectangle(matrix);
+        /* Get source output */
+        int source_out = maximalRectangle(matrix);
 
-        // Construct follow-up input by rotating the matrix 90 degrees
-        ArrayList<ArrayList<Integer>> follow_matrix = new ArrayList<>();
-        int rowSize = matrix.size();
-        int colSize = matrix.get(0).size();
-
-        for (int j = 0; j < colSize; j++) {
+        /* Add an inverted diagonal mirror image of the matrix */
+        int rows = matrix.size();
+        int cols = matrix.get(0).size();
+        ArrayList<ArrayList<Integer>> invertedMirrorMatrix = new ArrayList<>();
+        for (int i = 0; i < rows; i++) {
             ArrayList<Integer> newRow = new ArrayList<>();
-            for (int i = rowSize - 1; i >= 0; i--) {
-                newRow.add(matrix.get(i).get(j));
+            for (int j = 0; j < cols; j++) {
+                if (i + j < rows) {
+                    newRow.add(matrix.get(i + j).get(j));
+                } else {
+                    newRow.add(0);
+                }
             }
-            follow_matrix.add(newRow);
+            invertedMirrorMatrix.add(newRow);
         }
 
-        // Get follow-up output
-        int follow_out = MaxRectangle.maximalRectangle(follow_matrix);
+        /* Get follow-up output */
+        int follow_out = maximalRectangle(invertedMirrorMatrix);
 
-        // Verification
+        /* Verification */
         assertEquals(source_out, follow_out);
     }
 
     /**
-     * Metamorphic Relation 29: Multiplying each column by a constant factor should
-     * result in the same scaled output.
+     * Metamorphic Relation 29: Adding a scalar product of the matrix with itself should not change the output.
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
     public void test29(ArrayList<ArrayList<Integer>> matrix) {
-        // Get source output
-        int source_out = MaxRectangle.maximalRectangle(matrix);
+        /* Get source output */
+        int source_out = maximalRectangle(matrix);
 
-        // Construct follow-up input by multiplying each column by a constant factor
-        int scaleFactor = 2;
-        ArrayList<ArrayList<Integer>> follow_matrix = new ArrayList<>();
-        for (int j = 0; j < matrix.get(0).size(); j++) {
-            ArrayList<Integer> newColumn = new ArrayList<>();
-            for (int i = 0; i < matrix.size(); i++) {
-                newColumn.add(matrix.get(i).get(j) * scaleFactor);
+        /* Add a scalar product of the matrix with itself */
+        ArrayList<ArrayList<Integer>> scalarProductMatrix = new ArrayList<>();
+        for (int i = 0; i < matrix.size(); i++) {
+            ArrayList<Integer> newRow = new ArrayList<>();
+            for (int j = 0; j < matrix.get(i).size(); j++) {
+                newRow.add(matrix.get(i).get(j) * matrix.get(i).get(j));
             }
-            follow_matrix.add(newColumn);
+            scalarProductMatrix.add(newRow);
         }
 
-        // Get follow-up output
-        int follow_out = MaxRectangle.maximalRectangle(follow_matrix);
+        /* Get follow-up output */
+        int follow_out = maximalRectangle(scalarProductMatrix);
 
-        // Verification
-        assertEquals(source_out * scaleFactor, follow_out);
+        /* Verification */
+        assertEquals(source_out, follow_out);
     }
 
     /**
-     * Metamorphic Relation 30: Sorting the matrix in ascending order should not
-     * change the output.
+     * Metamorphic Relation 30: Adding a row-wise running sum of the matrix should not change the output.
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
     public void test30(ArrayList<ArrayList<Integer>> matrix) {
-        // Get source output
-        int source_out = MaxRectangle.maximalRectangle(matrix);
+        /* Get source output */
+        int source_out = maximalRectangle(matrix);
 
-        // Construct follow-up input by sorting the matrix in ascending order
-        ArrayList<ArrayList<Integer>> follow_matrix = new ArrayList<>(matrix);
-        follow_matrix.sort(Comparator.comparing(Object::toString));
+        /* Add a row-wise running sum of the matrix */
+        ArrayList<ArrayList<Integer>> runningSumMatrix = new ArrayList<>();
+        for (int i = 0; i < matrix.size(); i++) {
+            ArrayList<Integer> newRow = new ArrayList<>();
+            int sum = 0;
+            for (int j = 0; j < matrix.get(i).size(); j++) {
+                sum += matrix.get(i).get(j);
+                newRow.add(sum);
+            }
+            runningSumMatrix.add(newRow);
+        }
 
-        // Get follow-up output
-        int follow_out = MaxRectangle.maximalRectangle(follow_matrix);
+        /* Get follow-up output */
+        int follow_out = maximalRectangle(runningSumMatrix);
 
-        // Verification
+        /* Verification */
         assertEquals(source_out, follow_out);
     }
 
     /**
-     * Metamorphic Relation 31: Transposing the matrix should not change the output.
+     * Metamorphic Relation 31: Sorting the elements of each row in the matrix should not change the output.
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
     public void test31(ArrayList<ArrayList<Integer>> matrix) {
-        // Get source output
-        int source_out = MaxRectangle.maximalRectangle(matrix);
+        /* Get source output */
+        int source_out = maximalRectangle(matrix);
 
-        // Construct follow-up input by transposing the matrix
-        ArrayList<ArrayList<Integer>> follow_matrix = new ArrayList<>();
-        int rowSize = matrix.size();
-        int colSize = matrix.get(0).size();
-
-        for (int j = 0; j < colSize; j++) {
-            ArrayList<Integer> newRow = new ArrayList<>();
-            for (int i = 0; i < rowSize; i++) {
-                newRow.add(matrix.get(i).get(j));
-            }
-            follow_matrix.add(newRow);
+        /* Sort the elements of each row in the matrix */
+        ArrayList<ArrayList<Integer>> sortedMatrix = new ArrayList<>();
+        for (ArrayList<Integer> row : matrix) {
+            ArrayList<Integer> sortedRow = new ArrayList<>(row);
+            Collections.sort(sortedRow);
+            sortedMatrix.add(sortedRow);
         }
 
-        // Get follow-up output
-        int follow_out = MaxRectangle.maximalRectangle(follow_matrix);
+        /* Get follow-up output */
+        int follow_out = maximalRectangle(sortedMatrix);
 
-        // Verification
+        /* Verification */
         assertEquals(source_out, follow_out);
     }
 
     /**
-     * Metamorphic Relation 32: The output should remain unchanged when the matrix
-     * is multiplied by its own transpose.
+     * Metamorphic Relation 32: Shifting all elements in the matrix row-wise should not change the output.
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
     public void test32(ArrayList<ArrayList<Integer>> matrix) {
-        // Get source output
-        int source_out = MaxRectangle.maximalRectangle(matrix);
+        /* Get source output */
+        int source_out = maximalRectangle(matrix);
 
-        // Construct follow-up input by multiplying the matrix by its own transpose
-        ArrayList<ArrayList<Integer>> transpose = new ArrayList<>();
-        int rowSize = matrix.size();
-        int colSize = matrix.get(0).size();
-
-        for (int j = 0; j < colSize; j++) {
-            ArrayList<Integer> newRow = new ArrayList<>();
-            for (int i = 0; i < rowSize; i++) {
-                newRow.add(matrix.get(i).get(j));
+        /* Shift all elements in the matrix row-wise */
+        ArrayList<ArrayList<Integer>> shiftedMatrix = new ArrayList<>();
+        for (ArrayList<Integer> row : matrix) {
+            int n = row.size();
+            ArrayList<Integer> shiftedRow = new ArrayList<>(n);
+            for (int i = 0; i < n; i++) {
+                shiftedRow.add(row.get((i + 1) % n));
             }
-            transpose.add(newRow);
+            shiftedMatrix.add(shiftedRow);
         }
 
-        // Get follow-up output
-        int follow_out = MaxRectangle.maximalRectangle(multiplyMatrices(matrix, transpose));
+        /* Get follow-up output */
+        int follow_out = maximalRectangle(shiftedMatrix);
 
-        // Verification
+        /* Verification */
         assertEquals(source_out, follow_out);
     }
 
-    // Helper function for matrix multiplication
-    private ArrayList<ArrayList<Integer>> multiplyMatrices(ArrayList<ArrayList<Integer>> A,
-            ArrayList<ArrayList<Integer>> B) {
-        int m1 = A.size();
-        int n1 = A.get(0).size();
-        int m2 = B.size();
-        int n2 = B.get(0).size();
-        assert n1 == m2;
-
-        ArrayList<ArrayList<Integer>> result = new ArrayList<>();
-        for (int i = 0; i < m1; i++) {
-            ArrayList<Integer> newRow = new ArrayList<>();
-            for (int j = 0; j < n2; j++) {
-                int sum = 0;
-                for (int k = 0; k < n1; k++) {
-                    sum += A.get(i).get(k) * B.get(k).get(j);
-                }
-                newRow.add(sum);
-            }
-            result.add(newRow);
-        }
-        return result;
-    }
-
     /**
-     * Metamorphic Relation 33: Applying a constant value to the entire matrix
-     * should not change the output.
+     * Metamorphic Relation 33: Adding a symmetrical reflection of the matrix should not change the output.
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
     public void test33(ArrayList<ArrayList<Integer>> matrix) {
-        // Get source output
-        int source_out = MaxRectangle.maximalRectangle(matrix);
+        /* Get source output */
+        int source_out = maximalRectangle(matrix);
 
-        // Construct follow-up input by adding a constant to the entire matrix
-        int constantToAdd = 5;
-        ArrayList<ArrayList<Integer>> follow_matrix = new ArrayList<>();
-        for (var row : matrix) {
+        /* Add a symmetrical reflection of the matrix */
+        int rows = matrix.size();
+        int cols = matrix.get(0).size();
+        ArrayList<ArrayList<Integer>> reflectedMatrix = new ArrayList<>();
+        for (int i = 0; i < rows; i++) {
             ArrayList<Integer> newRow = new ArrayList<>();
-            for (int val : row) {
-                newRow.add(val + constantToAdd);
+            for (int j = 0; j < cols; j++) {
+                newRow.add(matrix.get(i).get(j));
             }
-            follow_matrix.add(newRow);
+            reflectedMatrix.add(newRow);
+        }
+        for (int i = rows-1; i >= 0; i--) {
+            ArrayList<Integer> newRow = new ArrayList<>();
+            for (int j = cols-1; j >= 0; j--) {
+                newRow.add(matrix.get(i).get(j));
+            }
+            reflectedMatrix.add(newRow);
         }
 
-        // Get follow-up output
-        int follow_out = MaxRectangle.maximalRectangle(follow_matrix);
+        /* Get follow-up output */
+        int follow_out = maximalRectangle(reflectedMatrix);
 
-        // Verification
+        /* Verification */
         assertEquals(source_out, follow_out);
     }
 
     /**
-     * Metamorphic Relation 34: Concatenating the matrix with itself should not
-     * change the output.
+     * Metamorphic Relation 34: Adding a horizontal flip of the matrix should not change the output.
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
     public void test34(ArrayList<ArrayList<Integer>> matrix) {
-        // Get source output
-        int source_out = MaxRectangle.maximalRectangle(matrix);
+        /* Get source output */
+        int source_out = maximalRectangle(matrix);
 
-        // Construct follow-up input by concatenating the matrix with itself
-        ArrayList<ArrayList<Integer>> follow_matrix = new ArrayList<>();
-        follow_matrix.addAll(matrix);
-        follow_matrix.addAll(matrix);
+        /* Add a horizontal flip of the matrix */
+        int rows = matrix.size();
+        int cols = matrix.get(0).size();
+        ArrayList<ArrayList<Integer>> flippedMatrix = new ArrayList<>();
+        for (int i = 0; i < rows; i++) {
+            ArrayList<Integer> newRow = new ArrayList<>();
+            for (int j = cols-1; j >= 0; j--) {
+                newRow.add(matrix.get(i).get(j));
+            }
+            flippedMatrix.add(newRow);
+        }
 
-        // Get follow-up output
-        int follow_out = MaxRectangle.maximalRectangle(follow_matrix);
+        /* Get follow-up output */
+        int follow_out = maximalRectangle(flippedMatrix);
 
-        // Verification
+        /* Verification */
         assertEquals(source_out, follow_out);
     }
 
     /**
-     * Metamorphic Relation 35: Replacing all elements with a constant value should
-     * not change the output.
+     * Metamorphic Relation 35: Adding a vertical flip of the matrix should not change the output.
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
     public void test35(ArrayList<ArrayList<Integer>> matrix) {
-        // Get source output
-        int source_out = MaxRectangle.maximalRectangle(matrix);
+        /* Get source output */
+        int source_out = maximalRectangle(matrix);
 
-        // Construct follow-up input by replacing all elements with a constant value
-        int constantValue = 2;
-        ArrayList<ArrayList<Integer>> follow_matrix = new ArrayList<>();
-        for (int i = 0; i < matrix.size(); i++) {
+        /* Add a vertical flip of the matrix */
+        int rows = matrix.size();
+        int cols = matrix.get(0).size();
+        ArrayList<ArrayList<Integer>> flippedMatrix = new ArrayList<>();
+        for (int i = rows-1; i >= 0; i--) {
             ArrayList<Integer> newRow = new ArrayList<>();
-            for (int j = 0; j < matrix.get(0).size(); j++) {
-                newRow.add(constantValue);
+            for (int j = 0; j < cols; j++) {
+                newRow.add(matrix.get(i).get(j));
             }
-            follow_matrix.add(newRow);
+            flippedMatrix.add(newRow);
         }
 
-        // Get follow-up output
-        int follow_out = MaxRectangle.maximalRectangle(follow_matrix);
+        /* Get follow-up output */
+        int follow_out = maximalRectangle(flippedMatrix);
 
-        // Verification
+        /* Verification */
         assertEquals(source_out, follow_out);
     }
 
     /**
-     * Metamorphic Relation 36: The result should remain the same when every element
-     * is raised to a power.
+     * Metamorphic Relation 36: Adding a negative diagonal mirror image of the matrix should not change the output.
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
     public void test36(ArrayList<ArrayList<Integer>> matrix) {
-        // Get source output
-        int source_out = MaxRectangle.maximalRectangle(matrix);
+        /* Get source output */
+        int source_out = maximalRectangle(matrix);
 
-        // Construct follow-up input by raising every element to the power of 2
-        ArrayList<ArrayList<Integer>> follow_matrix = new ArrayList<>();
-        for (var row : matrix) {
+        /* Add a negative diagonal mirror image of the matrix */
+        int rows = matrix.size();
+        int cols = matrix.get(0).size();
+        ArrayList<ArrayList<Integer>> negativeMirrorMatrix = new ArrayList<>();
+        for (int i = 0; i < rows; i++) {
             ArrayList<Integer> newRow = new ArrayList<>();
-            for (int val : row) {
-                newRow.add((int) Math.pow(val, 2));
+            for (int j = 0; j < cols; j++) {
+                if (i == j) {
+                    newRow.add(matrix.get(i).get(j));
+                } else {
+                    newRow.add(-matrix.get(i).get(j));
+                }
             }
-            follow_matrix.add(newRow);
+            negativeMirrorMatrix.add(newRow);
         }
 
-        // Get follow-up output
-        int follow_out = MaxRectangle.maximalRectangle(follow_matrix);
+        /* Get follow-up output */
+        int follow_out = maximalRectangle(negativeMirrorMatrix);
 
-        // Verification
+        /* Verification */
         assertEquals(source_out, follow_out);
     }
 
     /**
-     * Metamorphic Relation 37: Applying a scalar multiplication to a row should
-     * affect the output in the same way.
+     * Metamorphic Relation 37: Multiplying each element in the matrix by the row number and column number should not change the output.
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
     public void test37(ArrayList<ArrayList<Integer>> matrix) {
-        // Get source output
-        int source_out = MaxRectangle.maximalRectangle(matrix);
+        /* Get source output */
+        int source_out = maximalRectangle(matrix);
 
-        // Construct follow-up input by multiplying a specific row by a scalar
-        int rowIndex = 0; // Choose the first row for demonstration
-        int scalarMultiplier = 4;
-        ArrayList<ArrayList<Integer>> follow_matrix = new ArrayList<>(matrix);
-        ArrayList<Integer> newRow = new ArrayList<>();
-        for (int val : matrix.get(rowIndex)) {
-            newRow.add(val * scalarMultiplier);
+        /* Multiply each element in the matrix by the row number and column number */
+        int rows = matrix.size();
+        int cols = matrix.get(0).size();
+        ArrayList<ArrayList<Integer>> transformedMatrix = new ArrayList<>();
+        for (int i = 0; i < rows; i++) {
+            ArrayList<Integer> newRow = new ArrayList<>();
+            for (int j = 0; j < cols; j++) {
+                newRow.add(matrix.get(i).get(j) * i * j);
+            }
+            transformedMatrix.add(newRow);
         }
-        follow_matrix.set(rowIndex, newRow);
 
-        // Get follow-up output
-        int follow_out = MaxRectangle.maximalRectangle(follow_matrix);
+        /* Get follow-up output */
+        int follow_out = maximalRectangle(transformedMatrix);
 
-        // Verification
-        assertEquals(source_out * scalarMultiplier, follow_out);
+        /* Verification */
+        assertEquals(source_out, follow_out);
     }
 
     /**
-     * Metamorphic Relation 38: Replacing all elements with their squares should not
-     * change the output.
+     * Metamorphic Relation 38: Replacing all elements in the matrix with their absolute values should not change the output.
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
     public void test38(ArrayList<ArrayList<Integer>> matrix) {
-        // Get source output
-        int source_out = MaxRectangle.maximalRectangle(matrix);
+        /* Get source output */
+        int source_out = maximalRectangle(matrix);
 
-        // Construct follow-up input by replacing all elements with their squares
-        ArrayList<ArrayList<Integer>> follow_matrix = new ArrayList<>();
-        for (var row : matrix) {
-            ArrayList<Integer> newRow = new ArrayList<>();
+        /* Replace all elements in the matrix with their absolute values */
+        ArrayList<ArrayList<Integer>> absMatrix = new ArrayList<>();
+        for (ArrayList<Integer> row : matrix) {
+            ArrayList<Integer> absRow = new ArrayList<>();
             for (int val : row) {
-                newRow.add(val * val);
+                absRow.add(Math.abs(val));
             }
-            follow_matrix.add(newRow);
+            absMatrix.add(absRow);
         }
 
-        // Get follow-up output
-        int follow_out = MaxRectangle.maximalRectangle(follow_matrix);
+        /* Get follow-up output */
+        int follow_out = maximalRectangle(absMatrix);
 
-        // Verification
+        /* Verification */
         assertEquals(source_out, follow_out);
     }
 
     /**
-     * Metamorphic Relation 39: Flipping the signs of the elements in the matrix
-     * should not change the output.
+     * Metamorphic Relation 39: Adding a right diagonal mirror image of the matrix should not change the output.
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
     public void test39(ArrayList<ArrayList<Integer>> matrix) {
-        // Get source output
-        int source_out = MaxRectangle.maximalRectangle(matrix);
+        /* Get source output */
+        int source_out = maximalRectangle(matrix);
 
-        // Construct follow-up input by flipping the signs of the elements in the matrix
-        ArrayList<ArrayList<Integer>> follow_matrix = new ArrayList<>();
-        for (var row : matrix) {
-            ArrayList<Integer> newRow = new ArrayList<>();
-            for (int val : row) {
-                newRow.add(-val);
+        /* Add a right diagonal mirror image of the matrix */
+        int rows = matrix.size();
+        int cols = matrix.get(0).size();
+        ArrayList<ArrayList<Integer>> rightMirrorMatrix = new ArrayList<>(Collections.nCopies(cols, new ArrayList<>(Collections.nCopies(rows, 0))));
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                rightMirrorMatrix.get(j).set(i, matrix.get(i).get(j));
             }
-            follow_matrix.add(newRow);
         }
 
-        // Get follow-up output
-        int follow_out = MaxRectangle.maximalRectangle(follow_matrix);
+        /* Get follow-up output */
+        int follow_out = maximalRectangle(rightMirrorMatrix);
 
-        // Verification
+        /* Verification */
         assertEquals(source_out, follow_out);
     }
 
     /**
-     * Metamorphic Relation 40: Taking the square root of each element in the matrix
-     * and then squaring the results should not change the output.
+     * Metamorphic Relation 40: Adding a counter-diagonal mirror image of the matrix should not change the output.
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
     public void test40(ArrayList<ArrayList<Integer>> matrix) {
-        // Get source output
-        int source_out = MaxRectangle.maximalRectangle(matrix);
+        /* Get source output */
+        int source_out = maximalRectangle(matrix);
 
-        // Construct follow-up input by taking the square root of each element and then
-        // squaring the results
-        ArrayList<ArrayList<Integer>> follow_matrix = new ArrayList<>();
-        for (var row : matrix) {
+        /* Add a counter-diagonal mirror image of the matrix */
+        int rows = matrix.size();
+        int cols = matrix.get(0).size();
+        ArrayList<ArrayList<Integer>> counterDiagonalMirrorMatrix = new ArrayList<>();
+        for (int i = 0; i < rows; i++) {
             ArrayList<Integer> newRow = new ArrayList<>();
-            for (int val : row) {
-                newRow.add((int) Math.pow(Math.sqrt(val), 2));
+            for (int j = 0; j < cols; j++) {
+                newRow.add(matrix.get(rows - i - 1).get(cols - j - 1));
             }
-            follow_matrix.add(newRow);
+            counterDiagonalMirrorMatrix.add(newRow);
         }
 
-        // Get follow-up output
-        int follow_out = MaxRectangle.maximalRectangle(follow_matrix);
+        /* Get follow-up output */
+        int follow_out = maximalRectangle(counterDiagonalMirrorMatrix);
 
-        // Verification
+        /* Verification */
         assertEquals(source_out, follow_out);
-    }
-
-    /**
-     * Metamorphic Relation 41: If we add a constant value to each element and then
-     * subtract the same constant value, the output should remain unchanged.
-     */
-    @ParameterizedTest
-    @MethodSource("testcaseProvider")
-    public void test41(ArrayList<ArrayList<Integer>> matrix) {
-        // Get source output
-        int source_out = MaxRectangle.maximalRectangle(matrix);
-
-        // Construct follow-up input
-        int constant = 5;
-        ArrayList<ArrayList<Integer>> follow_matrix = new ArrayList<>();
-        for (var row : matrix) {
-            ArrayList<Integer> newRow = new ArrayList<>();
-            for (int val : row) {
-                newRow.add(val + constant - constant);
-            }
-            follow_matrix.add(newRow);
-        }
-
-        // Get follow-up output
-        int follow_out = MaxRectangle.maximalRectangle(follow_matrix);
-
-        // Verification
-        assertEquals(source_out, follow_out);
-    }
-
-    /**
-     * Metamorphic Relation 42: Repeating the matrix multiple times (e.g.,
-     * concatenating it with itself) should not change the output.
-     */
-    @ParameterizedTest
-    @MethodSource("testcaseProvider")
-    public void test42(ArrayList<ArrayList<Integer>> matrix) {
-        // Get source output
-        int source_out = MaxRectangle.maximalRectangle(matrix);
-
-        // Construct follow-up input by repeating the matrix (concatenating it with
-        // itself)
-        int times = 3;
-        ArrayList<ArrayList<Integer>> follow_matrix = new ArrayList<>();
-        for (int i = 0; i < times; i++) {
-            follow_matrix.addAll(matrix);
-        }
-
-        // Get follow-up output
-        int follow_out = MaxRectangle.maximalRectangle(follow_matrix);
-
-        // Verification
-        assertEquals(source_out, follow_out);
-    }
-
-    /**
-     * Metamorphic Relation 43: If we add a matrix to its transposition, the output
-     * should be the same as adding the transposed result.
-     */
-    @ParameterizedTest
-    @MethodSource("testcaseProvider")
-    public void test43(ArrayList<ArrayList<Integer>> matrix) {
-        // Get source output
-        int source_out = MaxRectangle.maximalRectangle(matrix);
-
-        // Construct follow-up input
-        ArrayList<ArrayList<Integer>> transposedMatrix = transposeMatrix(matrix);
-        ArrayList<ArrayList<Integer>> follow_matrix = addMatrices(matrix, transposedMatrix);
-
-        // Get follow-up output
-        int follow_out = MaxRectangle.maximalRectangle(follow_matrix);
-
-        // Verification
-        assertEquals(source_out, follow_out);
-    }
-
-    /**
-     * Metamorphic Relation 44: Adding a constant value to each element of the
-     * matrix and then multiplying the result by the same constant should not change
-     * the output.
-     */
-    @ParameterizedTest
-    @MethodSource("testcaseProvider")
-    public void test44(ArrayList<ArrayList<Integer>> matrix) {
-        // Get source output
-        int source_out = MaxRectangle.maximalRectangle(matrix);
-
-        // Construct follow-up input
-        int constant = 3;
-        ArrayList<ArrayList<Integer>> follow_matrix = new ArrayList<>();
-        for (var row : matrix) {
-            ArrayList<Integer> newRow = new ArrayList<>();
-            for (int val : row) {
-                newRow.add((val + constant) * constant);
-            }
-            follow_matrix.add(newRow);
-        }
-
-        // Get follow-up output
-        int follow_out = MaxRectangle.maximalRectangle(follow_matrix);
-
-        // Verification
-        assertEquals(source_out, follow_out);
-    }
-
-    // Helper function for matrix transposition
-    private ArrayList<ArrayList<Integer>> transposeMatrix(ArrayList<ArrayList<Integer>> matrix) {
-        ArrayList<ArrayList<Integer>> transposedMatrix = new ArrayList<>();
-        for (int i = 0; i < matrix.get(0).size(); i++) {
-            ArrayList<Integer> newRow = new ArrayList<>();
-            for (ArrayList<Integer> integers : matrix) {
-                newRow.add(integers.get(i));
-            }
-            transposedMatrix.add(newRow);
-        }
-        return transposedMatrix;
-    }
-
-    // Helper function for matrix addition
-    private ArrayList<ArrayList<Integer>> addMatrices(ArrayList<ArrayList<Integer>> matrixA,
-            ArrayList<ArrayList<Integer>> matrixB) {
-        ArrayList<ArrayList<Integer>> result = new ArrayList<>();
-        for (int i = 0; i < matrixA.size(); i++) {
-            ArrayList<Integer> newRow = new ArrayList<>();
-            for (int j = 0; j < matrixA.get(0).size(); j++) {
-                newRow.add(matrixA.get(i).get(j) + matrixB.get(i).get(j));
-            }
-            result.add(newRow);
-        }
-        return result;
-    }
-
-    /**
-     * Metamorphic Relation 45: If we apply a linear transformation on the matrix,
-     * the output should be the same as applying the transformation on the output.
-     */
-    @ParameterizedTest
-    @MethodSource("testcaseProvider")
-    public void test45(ArrayList<ArrayList<Integer>> matrix) {
-        // Get source output
-        int source_out = MaxRectangle.maximalRectangle(matrix);
-
-        // Apply a linear transformation to the matrix
-        int a = 2;
-        int b = 3;
-        ArrayList<ArrayList<Integer>> transformedMatrix = new ArrayList<>();
-        for (var row : matrix) {
-            ArrayList<Integer> newRow = new ArrayList<>();
-            for (int val : row) {
-                newRow.add(a * val + b);
-            }
-            transformedMatrix.add(newRow);
-        }
-
-        // Get output after transformation
-        int transformed_out = MaxRectangle.maximalRectangle(transformedMatrix);
-
-        // Verification
-        assertEquals(source_out, a * transformed_out + b);
-    }
-
-    /**
-     * Metamorphic Relation 46: Replacing all elements with their cube should not
-     * change the output.
-     */
-    @ParameterizedTest
-    @MethodSource("testcaseProvider")
-    public void test46(ArrayList<ArrayList<Integer>> matrix) {
-        // Get source output
-        int source_out = MaxRectangle.maximalRectangle(matrix);
-
-        // Replace all elements with their cube
-        ArrayList<ArrayList<Integer>> transformedMatrix = new ArrayList<>();
-        for (var row : matrix) {
-            ArrayList<Integer> newRow = new ArrayList<>();
-            for (int val : row) {
-                newRow.add(val * val * val);
-            }
-            transformedMatrix.add(newRow);
-        }
-
-        // Get output after transformation
-        int transformed_out = MaxRectangle.maximalRectangle(transformedMatrix);
-
-        // Verification
-        assertEquals(source_out, transformed_out);
     }
 
     /**
@@ -1272,4 +1103,6 @@ public class MaxRectangleTestGPT3D5 {
     public static Stream<Arguments> testcaseProvider() throws Exception {
         return testcaseGenerator.generate(1000);
     }
+
 }
+
