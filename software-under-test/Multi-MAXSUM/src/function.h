@@ -9,7 +9,7 @@ int max(int a,int c)
 {
 	return a>c ? a:c;
 }
-int solve(int dp[],int num[],int n,int m)
+int solve(int dp[],int num[],int n,int m)	// FIXME
 {
 	for(int i=1;i<=m;i++)
 	{
