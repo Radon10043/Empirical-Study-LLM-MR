@@ -3,7 +3,7 @@ from utils import *
 
 class TestingClass(unittest.TestCase):
     @parameterized.expand(load_test_cases)
-    def test2(self, img: np.array, angle: float):
+    def test2(self, img: np.array, angle: float):   # Fixed
         """Metamorphic Relation 2: Rotating the image by angle and -angle will result in the same output except for a change in axes."""
         # Get source output
         source_out = ndimage.rotate(img, angle)
@@ -15,7 +15,7 @@ class TestingClass(unittest.TestCase):
         follow_out = ndimage.rotate(img, follow_angle)
 
         # Verification
-        self.assertTrue(np.all(np.flip(source_out, axis=(0, 1)) - follow_out) == 0)
+        self.assertTrue(np.any(source_out - follow_out) == 0)
 
 
 if __name__ == "__main__":

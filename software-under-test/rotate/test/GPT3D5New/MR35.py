@@ -16,7 +16,7 @@ class TestingClass(unittest.TestCase):
         follow_out = ndimage.rotate(source_out, -follow_angle)  # Rotate the negative angle by the same positive angle
 
         # Verification
-        self.assertTrue(np.all(follow_out - img) == 0)
+        self.assertTrue(np.any(follow_out - img) == 0)  # Fixed
 
 
 if __name__ == "__main__":

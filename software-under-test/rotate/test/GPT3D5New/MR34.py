@@ -12,7 +12,7 @@ class TestingClass(unittest.TestCase):
         follow_out = ndimage.rotate(source_out, 180)  # Rotate the result by 180 degrees
 
         # Verification
-        self.assertTrue(np.all(follow_out - img) == 0)
+        self.assertTrue(np.any(follow_out - img) == 0)  # Fixed
 
 
 

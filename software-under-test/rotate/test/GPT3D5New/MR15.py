@@ -16,7 +16,7 @@ class TestingClass(unittest.TestCase):
 
         # Verification
         expected_out = np.flipud(img)  # Vertical flip of the original input
-        self.assertTrue(np.all(follow_out - expected_out) == 0)
+        self.assertTrue(np.any(follow_out - expected_out) == 0) # Fixed
 
 
 if __name__ == "__main__":

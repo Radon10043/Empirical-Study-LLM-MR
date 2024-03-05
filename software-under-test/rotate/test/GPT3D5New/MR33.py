@@ -12,7 +12,7 @@ class TestingClass(unittest.TestCase):
         follow_out = ndimage.rotate(img, angle, order=0)  # Use a different order parameter
 
         # Verification
-        self.assertTrue(np.all(follow_out - source_out) == 0)
+        self.assertTrue(np.any(follow_out - source_out) == 0)   # Fixed
 
 
 if __name__ == "__main__":

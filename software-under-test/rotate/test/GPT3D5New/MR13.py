@@ -18,7 +18,7 @@ class TestingClass(unittest.TestCase):
 
         # Verification
         expected_out = ndimage.rotate(img, abs(follow_angle1 - follow_angle2))  # Rotate the original image by the absolute difference between the two angles
-        self.assertTrue(np.all(follow_out - expected_out) == 0)
+        self.assertTrue(np.any(follow_out - expected_out) == 0) # Fixed
 
 
 if __name__ == "__main__":

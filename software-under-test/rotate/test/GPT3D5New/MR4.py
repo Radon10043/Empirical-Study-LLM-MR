@@ -2,9 +2,8 @@ from utils import *
 
 
 class TestingClass(unittest.TestCase):
-    # fixed
     @parameterized.expand(load_test_cases)
-    def test4(self, img: np.array, angle: float):
+    def test4(self, img: np.array, angle: float):   # Fixed
         """Metamorphic Relation 4: Rotating the image by 90-degree multiples will result in the same output up to a permutation of axes."""
         # Get source output
         source_out = ndimage.rotate(img, angle)
@@ -15,11 +14,8 @@ class TestingClass(unittest.TestCase):
         # Get follow-up output
         follow_out = ndimage.rotate(img, follow_angle)
 
-        # Transpose follow_out to match the shape of source_out
-        permuted_follow_out = np.transpose(follow_out, axes=(2, 0, 1))
-
         # Verification
-        self.assertTrue(np.all(np.transpose(permuted_follow_out) - source_out) == 0)
+        self.assertTrue(np.any(np.transpose(follow_out) - source_out) == 0)
 
 
 if __name__ == "__main__":

@@ -15,7 +15,7 @@ class TestingClass(unittest.TestCase):
         follow_out = ndimage.rotate(np.swapaxes(img, 0, 1), follow_angle)  # Swap the axes and then rotate by 90 degrees
 
         # Verification
-        self.assertTrue(np.all(follow_out - source_out) == 0)
+        self.assertTrue(np.any(follow_out - source_out) == 0)   # Fixed
 
 
 if __name__ == "__main__":

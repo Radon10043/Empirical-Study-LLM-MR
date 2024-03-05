@@ -15,7 +15,7 @@ class TestingClass(unittest.TestCase):
         follow_out = ndimage.rotate(source_out, follow_angle)
 
         # Verification
-        self.assertTrue(np.all(follow_out - img) == 0)
+        self.assertTrue(np.any(follow_out - img) == 0)
 
 
 if __name__ == "__main__":
