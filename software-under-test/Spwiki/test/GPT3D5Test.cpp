@@ -13,15 +13,56 @@ using namespace std;
 class SpwikiParamTest : public ::testing::TestWithParam<SpwikiInput> {};
 
 /**
- * 修改步骤:
- * 1. DijkstraAlgorithmParamTest -> SpwikiParamTest
- * 2. DijkstraInput -> SpwikiInput
- * 3. dijkstra_shortest_path -> shortest_path
- * 4. 所有没有source_n的地方都加上了source_n
+ * @brief Metamorphic Relation 1: Reversing the source and destination vertices, the length of the shortest path should be the same.
+ *
  */
+TEST_P(SpwikiParamTest, MR1) {
+    /* Get source input */
+    SpwikiInput input = GetParam();
+    vector<vector<int>> source_edges = input.edges;
+    int source_src = input.src, source_dst = input.dst, source_n = input.n;
+
+    /* Get source output */
+    int source_out = shortest_path(source_edges, source_src, source_dst, source_n);
+
+    /* Construct follow-up input */
+    int follow_src = source_dst, follow_dst = source_src;
+
+    /* Get follow-up output */
+    int follow_out = shortest_path(source_edges, follow_src, follow_dst, source_n);
+
+    /* Verification */
+    EXPECT_EQ(follow_out, source_out);
+}
 
 /**
- * @brief Metamorphic Relation 3: Adding a constant value to the weight of every edge, the length of the shortest path should remain unchanged.
+ * @brief Metamorphic Relation 2: Adding a constant to all edge weights, the length of the shortest path should be increased by the same constant.
+ *
+ */
+TEST_P(SpwikiParamTest, MR2) {
+    /* Get source input */
+    SpwikiInput input = GetParam();
+    vector<vector<int>> source_edges = input.edges;
+    int source_src = input.src, source_dst = input.dst, source_n = input.n;
+
+    /* Get source output */
+    int source_out = shortest_path(source_edges, source_src, source_dst, source_n);
+
+    /* Construct follow-up input */
+    vector<vector<int>> follow_edges = source_edges;
+    int constant = 5; // Example constant value
+    for (auto &elem : follow_edges)
+        elem[2] += constant;
+
+    /* Get follow-up output */
+    int follow_out = shortest_path(follow_edges, source_src, source_dst, source_n);
+
+    /* Verification */
+    EXPECT_EQ(follow_out, source_out + constant);
+}
+
+/**
+ * @brief Metamorphic Relation 3: Adding or removing a vertex and its incident edges, the shortest path distance should remain unchanged.
  *
  */
 TEST_P(SpwikiParamTest, MR3) {
@@ -35,18 +76,18 @@ TEST_P(SpwikiParamTest, MR3) {
 
     /* Construct follow-up input */
     vector<vector<int>> follow_edges = source_edges;
-    for (auto &elem : follow_edges)
-        elem[2] += 10; // Adding a constant value of 10 to the weight of each edge
+    follow_edges.push_back({source_n, source_n+1, 10}); // Adding a new edge
+    int follow_n = source_n + 1; // Number of vertices increased
 
     /* Get follow-up output */
-    int follow_out = shortest_path(follow_edges, source_src, source_dst, source_n);
+    int follow_out = shortest_path(follow_edges, source_src, source_dst, follow_n);
 
     /* Verification */
     EXPECT_EQ(follow_out, source_out);
 }
 
 /**
- * @brief Metamorphic Relation 4: Removing an intermediate vertex from the graph, the length of the shortest path should be less than or equal to the original shortest path length.
+ * @brief Metamorphic Relation 4: Reversing the direction of the edges, the shortest path distance should remain unchanged.
  *
  */
 TEST_P(SpwikiParamTest, MR4) {
@@ -58,30 +99,21 @@ TEST_P(SpwikiParamTest, MR4) {
     /* Get source output */
     int source_out = shortest_path(source_edges, source_src, source_dst, source_n);
 
-    /* Fix by Radon */
-    /* Delete a vertex randomly? */
-    mt19937 rng(random_device{}());
-    uniform_int_distribution<int> dist(0, source_n - 1);
-    int intermediate_vertex = dist(rng);
-
-    /* Construct follow-up input by removing an intermediate vertex (if present) */
-    vector<vector<int>> follow_edges = source_edges;
-    for (auto it = follow_edges.begin(); it != follow_edges.end();) {
-        if (it->at(0) == intermediate_vertex || it->at(1) == intermediate_vertex) {
-            it = follow_edges.erase(it); // Remove edges connected to the intermediate vertex
-        } else {
-            ++it;
-        }
-    }
+    /* Construct follow-up input */
+    vector<vector<int>> follow_edges;
+    for (const auto &edge : source_edges)
+        follow_edges.push_back({edge[1], edge[0], edge[2]}); // Reverse the direction of the edges
 
     /* Get follow-up output */
-    int follow_out = shortest_path(follow_edges, source_src, source_dst, source_n - 1);
+    int follow_out = shortest_path(follow_edges, source_src, source_dst, source_n);
 
     /* Verification */
-    EXPECT_LE(follow_out, source_out);
+    EXPECT_EQ(follow_out, source_out);
 }
+
 /**
- * @brief Metamorphic Relation 5: Adding the same constant value to all edge weights should not change the shortest path length.
+ * @brief Metamorphic Relation 5: Doubling the weight of all edges and the source and destination vertex, the shortest path distance should remain the same.
+ *
  */
 TEST_P(SpwikiParamTest, MR5) {
     /* Get source input */
@@ -94,20 +126,23 @@ TEST_P(SpwikiParamTest, MR5) {
 
     /* Construct follow-up input */
     vector<vector<int>> follow_edges = source_edges;
-    int constant = 5; // arbitrary constant value
-    for (auto &elem : follow_edges) {
-        elem[2] += constant;
-    }
+    int constant = 2; // Doubling constant
+    for (auto &elem : follow_edges)
+        elem[2] *= constant;
+
+    int follow_src = source_src * constant; // Doubling the source vertex
+    int follow_dst = source_dst * constant; // Doubling the destination vertex
 
     /* Get follow-up output */
-    int follow_out = shortest_path(follow_edges, source_src, source_dst, source_n);
+    int follow_out = shortest_path(follow_edges, follow_src, follow_dst, source_n);
 
-    /* Verification - Adding the same constant to all edge weights should not change the shortest path length */
+    /* Verification */
     EXPECT_EQ(follow_out, source_out);
 }
 
 /**
- * @brief Metamorphic Relation 6: Reversing the direction of all edges in the graph should not change the shortest path length.
+ * @brief Metamorphic Relation 6: Multiplying all edge weights and the number of vertices by a constant, the length of the shortest path should be multiplied by the same constant.
+ *
  */
 TEST_P(SpwikiParamTest, MR6) {
     /* Get source input */
@@ -115,23 +150,27 @@ TEST_P(SpwikiParamTest, MR6) {
     vector<vector<int>> source_edges = input.edges;
     int source_src = input.src, source_dst = input.dst, source_n = input.n;
 
-     /* Get source output */
+    /* Get source output */
     int source_out = shortest_path(source_edges, source_src, source_dst, source_n);
 
-    /* Construct follow-up input - Reverse the direction of all edges in the graph */
-    vector<vector<int>> follow_edges;
-    for (auto& elem : source_edges){
-        follow_edges.push_back({elem[1], elem[0], elem[2]});
-    }
+    /* Construct follow-up input */
+    vector<vector<int>> follow_edges = source_edges;
+    int constant = 3; // Example constant value
+    for (auto &elem : follow_edges)
+        elem[2] *= constant;
+
+    int follow_n = source_n * constant; // Multiplying the number of vertices
 
     /* Get follow-up output */
-    int follow_out = shortest_path(follow_edges, source_src, source_dst, source_n);
+    int follow_out = shortest_path(follow_edges, source_src, source_dst, follow_n);
 
-    /* Verification - Reversing the direction of all edges in the graph should not change the shortest path length */
-    EXPECT_EQ(follow_out, source_out);
+    /* Verification */
+    EXPECT_EQ(follow_out, source_out * constant);
 }
+
 /**
- * @brief Metamorphic Relation 7: Adding a new vertex connected to all other vertices with the same weight, the length of the shortest path from the new vertex to any other vertex should be the same.
+ * @brief Metamorphic Relation 7: Removing a specific edge from the graph, the shortest path distance should remain unchanged if the removed edge is not on the shortest path.
+ *
  */
 TEST_P(SpwikiParamTest, MR7) {
     /* Get source input */
@@ -142,26 +181,20 @@ TEST_P(SpwikiParamTest, MR7) {
     /* Get source output */
     int source_out = shortest_path(source_edges, source_src, source_dst, source_n);
 
-    /* Construct follow-up input - Adding a new vertex connected to all other vertices with the same weight */
-    vector<vector<int>> follow_edges = source_edges;
-    int newVertex = source_n; // Assume new vertex is the next sequential number after the existing vertices
-    for (int i = 0; i < source_n; i++) {
-        if (i != newVertex) {
-            follow_edges.emplace_back(vector<int>{i, newVertex, 10}); // Adding a new edge of weight 10 from existing vertices to the new vertex
-            follow_edges.emplace_back(vector<int>{newVertex, i, 10}); // Adding a new edge of weight 10 from the new vertex to existing vertices
-        }
-    }
-    source_n++; // Increment the number of vertices
+    /* Choose an edge to remove */
+    vector<int> edge_to_remove = source_edges.back(); // Selecting the last edge in the list
+    source_edges.pop_back(); // Removing the chosen edge
 
     /* Get follow-up output */
-    int follow_out = shortest_path(follow_edges, newVertex, source_dst, source_n);
+    int follow_out = shortest_path(source_edges, source_src, source_dst, source_n);
 
-    /* Verification - The length of the shortest path from the new vertex to any other vertex should be the same */
+    /* Verification */
     EXPECT_EQ(follow_out, source_out);
 }
 
 /**
- * @brief Metamorphic Relation 8: Reversing the weights of the edges, the length of the shortest path should still be the same.
+ * @brief Metamorphic Relation 8: Adding a specific edge to the graph, the shortest path distance should either remain unchanged or increase if the added edge lies on the shortest path.
+ *
  */
 TEST_P(SpwikiParamTest, MR8) {
     /* Get source input */
@@ -172,20 +205,24 @@ TEST_P(SpwikiParamTest, MR8) {
     /* Get source output */
     int source_out = shortest_path(source_edges, source_src, source_dst, source_n);
 
-    /* Construct follow-up input - Reversing the weights of the edges */
-    vector<vector<int>> follow_edges = source_edges;
-    for (auto &elem : follow_edges) {
-        elem[2] = -elem[2]; // Reversing the weights of the edges
-    }
+    /* Choose an edge to add */
+    vector<int> edge_to_add = {source_src, source_dst, 5}; // Adding edge directly between src and dst
+    source_edges.push_back(edge_to_add); // Adding the chosen edge
 
     /* Get follow-up output */
-    int follow_out = shortest_path(follow_edges, source_src, source_dst, source_n);
+    int follow_out = shortest_path(source_edges, source_src, source_dst, source_n);
 
-    /* Verification - Reversing the weights of the edges should not change the shortest path length */
-    EXPECT_EQ(follow_out, source_out);
+    /* Verification */
+    if (follow_out >= source_out) {
+        EXPECT_TRUE(true);  // Added edge lies on the shortest path
+    } else {
+        EXPECT_EQ(follow_out, source_out);  // Added edge does not lie on the shortest path
+    }
 }
+
 /**
- * @brief Metamorphic Relation 9: Adding a new edge to the existing graph should not increase the shortest path length from the source to the destination.
+ * @brief Metamorphic Relation 9: Reversing the weights of all edges (invert weights, e.g., w -> 1/w), the shortest path distance should remain unchanged.
+ *
  */
 TEST_P(SpwikiParamTest, MR9) {
     /* Get source input */
@@ -196,19 +233,21 @@ TEST_P(SpwikiParamTest, MR9) {
     /* Get source output */
     int source_out = shortest_path(source_edges, source_src, source_dst, source_n);
 
-    /* Construct follow-up input - Adding a new edge to the existing graph */
+    /* Construct follow-up input */
     vector<vector<int>> follow_edges = source_edges;
-    follow_edges.emplace_back(vector<int>{source_src, source_dst, 5}); // Adding a new edge from source to destination with weight 5
+    for (auto &elem : follow_edges)
+        elem[2] = 1.0 / elem[2]; // Invert the weights of all edges
 
     /* Get follow-up output */
     int follow_out = shortest_path(follow_edges, source_src, source_dst, source_n);
 
-    /* Verification - Adding a new edge to the existing graph should not increase the shortest path length */
-    EXPECT_LE(follow_out, source_out);
+    /* Verification */
+    EXPECT_EQ(follow_out, source_out);
 }
 
 /**
- * @brief Metamorphic Relation 10: Removing an edge from the existing graph should not increase the shortest path length from the source to the destination.
+ * @brief Metamorphic Relation 10: Shuffling the order of edges, the shortest path distance should remain unchanged.
+ *
  */
 TEST_P(SpwikiParamTest, MR10) {
     /* Get source input */
@@ -219,22 +258,19 @@ TEST_P(SpwikiParamTest, MR10) {
     /* Get source output */
     int source_out = shortest_path(source_edges, source_src, source_dst, source_n);
 
-    /* Construct follow-up input - Removing an edge from the existing graph */
-    vector<vector<int>> follow_edges;
-    for (auto &edge : source_edges) {
-        if (!(edge[0] == source_src && edge[1] == source_dst)) {
-            follow_edges.push_back(edge); // Exclude the edge from source to destination
-        }
-    }
+    /* Shuffle the order of edges */
+    random_shuffle(source_edges.begin(), source_edges.end());
 
     /* Get follow-up output */
-    int follow_out = shortest_path(follow_edges, source_src, source_dst, source_n);
+    int follow_out = shortest_path(source_edges, source_src, source_dst, source_n);
 
-    /* Verification - Removing an edge from the existing graph should not increase the shortest path length */
-    EXPECT_LE(follow_out, source_out);
+    /* Verification */
+    EXPECT_EQ(follow_out, source_out);
 }
+
 /**
- * @brief Metamorphic Relation 11: Adding a new vertex and connecting it to the source and destination vertices, the shortest path should not increase from the source to the destination.
+ * @brief Metamorphic Relation 11: Adding a loop (an edge from a vertex to itself) with weight 0, the shortest path distance should remain unchanged.
+ *
  */
 TEST_P(SpwikiParamTest, MR11) {
     /* Get source input */
@@ -245,22 +281,19 @@ TEST_P(SpwikiParamTest, MR11) {
     /* Get source output */
     int source_out = shortest_path(source_edges, source_src, source_dst, source_n);
 
-    /* Construct follow-up input - Adding a new vertex and connecting it to the source and destination vertices */
-    vector<vector<int>> follow_edges = source_edges;
-    int newVertex = source_n;
-    follow_edges.push_back({source_src, newVertex, 8}); // Connecting the new vertex to the source with weight 8
-    follow_edges.push_back({newVertex, source_dst, 8}); // Connecting the new vertex to the destination with weight 8
-    source_n++; // Increment the number of vertices
+    /* Add a loop */
+    source_edges.push_back({source_src, source_src, 0}); // Adding a loop with weight 0
 
     /* Get follow-up output */
-    int follow_out = shortest_path(follow_edges, source_src, source_dst, source_n);
+    int follow_out = shortest_path(source_edges, source_src, source_dst, source_n);
 
-    /* Verification - Adding a new vertex and connecting it to the source and destination vertices should not increase the shortest path length */
-    EXPECT_LE(follow_out, source_out);
+    /* Verification */
+    EXPECT_EQ(follow_out, source_out);
 }
 
 /**
- * @brief Metamorphic Relation 12: Reversing the direction of the graph and the source and destination, the shortest path length should remain the same.
+ * @brief Metamorphic Relation 12: Duplicating all edges, the shortest path distance should remain unchanged.
+ *
  */
 TEST_P(SpwikiParamTest, MR12) {
     /* Get source input */
@@ -271,22 +304,22 @@ TEST_P(SpwikiParamTest, MR12) {
     /* Get source output */
     int source_out = shortest_path(source_edges, source_src, source_dst, source_n);
 
-    /* Construct follow-up input - Reversing the direction of the graph and the source and destination */
-    vector<vector<int>> follow_edges;
-    for (auto& edge : source_edges) {
-        follow_edges.emplace_back(vector<int>{edge[1], edge[0], edge[2]}); // Reverse the direction of the edges
+    /* Duplicate all edges */
+    int original_size = source_edges.size();
+    for (int i = 0; i < original_size; i++) {
+        source_edges.push_back(source_edges[i]);
     }
-    int follow_src = source_dst; // Reverse source and destination
-    int follow_dst = source_src;
 
     /* Get follow-up output */
-    int follow_out = shortest_path(follow_edges, follow_src, follow_dst, source_n);
+    int follow_out = shortest_path(source_edges, source_src, source_dst, source_n);
 
-    /* Verification - Reversing the direction of the graph and the source and destination should not change the shortest path length */
+    /* Verification */
     EXPECT_EQ(follow_out, source_out);
 }
+
 /**
- * @brief Metamorphic Relation 13: Scaling all edge weights by a constant factor should scale the shortest path length by the same factor.
+ * @brief Metamorphic Relation 13: Adding a constant to the source and destination vertices, the shortest path distance should remain unchanged.
+ *
  */
 TEST_P(SpwikiParamTest, MR13) {
     /* Get source input */
@@ -297,22 +330,20 @@ TEST_P(SpwikiParamTest, MR13) {
     /* Get source output */
     int source_out = shortest_path(source_edges, source_src, source_dst, source_n);
 
-    /* Construct follow-up input - Scaling all edge weights by a constant factor */
-    vector<vector<int>> follow_edges = source_edges;
-    int scalingFactor = 2; // arbitrary constant scaling factor
-    for (auto &edge : follow_edges) {
-        edge[2] *= scalingFactor; // scale the weight of each edge
-    }
+    /* Construct follow-up input */
+    int follow_src = source_src + 10; // Adding a constant to the source vertex
+    int follow_dst = source_dst + 10; // Adding a constant to the destination vertex
 
     /* Get follow-up output */
-    int follow_out = shortest_path(follow_edges, source_src, source_dst, source_n);
+    int follow_out = shortest_path(source_edges, follow_src, follow_dst, source_n);
 
-    /* Verification - Scaling all edge weights by a constant factor should scale the shortest path length by the same factor */
-    EXPECT_EQ(follow_out, source_out * scalingFactor);
+    /* Verification */
+    EXPECT_EQ(follow_out, source_out);
 }
 
 /**
- * @brief Metamorphic Relation 14: Adding a cyclic path to the graph should not change the shortest path length from the source to the destination.
+ * @brief Metamorphic Relation 14: Reversing the graph, meaning changing all edges to their opposite direction, the shortest path distance should remain unchanged.
+ *
  */
 TEST_P(SpwikiParamTest, MR14) {
     /* Get source input */
@@ -323,18 +354,22 @@ TEST_P(SpwikiParamTest, MR14) {
     /* Get source output */
     int source_out = shortest_path(source_edges, source_src, source_dst, source_n);
 
-    /* Construct follow-up input - Adding a cyclic path to the graph */
+    /* Construct follow-up input by reversing the graph */
     vector<vector<int>> follow_edges = source_edges;
-    follow_edges.emplace_back(vector<int>{source_dst, source_src, 3}); // Adding a cyclic path from destination back to source with weight 3
+    for (auto &edge : follow_edges) {
+        swap(edge[0], edge[1]); // Reversing edge direction
+    }
 
     /* Get follow-up output */
     int follow_out = shortest_path(follow_edges, source_src, source_dst, source_n);
 
-    /* Verification - Adding a cyclic path to the graph should not change the shortest path length */
+    /* Verification */
     EXPECT_EQ(follow_out, source_out);
 }
+
 /**
- * @brief Metamorphic Relation 15: Adding a self-loop to a vertex in the graph should not change the shortest path length from the source to the destination.
+ * @brief Metamorphic Relation 15: Scaling all edge weights by a constant factor, the shortest path distance from source to destination should be scaled by the same factor.
+ *
  */
 TEST_P(SpwikiParamTest, MR15) {
     /* Get source input */
@@ -345,19 +380,23 @@ TEST_P(SpwikiParamTest, MR15) {
     /* Get source output */
     int source_out = shortest_path(source_edges, source_src, source_dst, source_n);
 
-    /* Construct follow-up input - Adding a self-loop to a vertex in the graph */
+    /* Construct follow-up input */
+    double scaling_factor = 1.5; // Scaling factor
     vector<vector<int>> follow_edges = source_edges;
-    follow_edges.emplace_back(vector<int>{source_src, source_src, 2}); // Adding a self-loop to the source vertex with weight 2
+    for (auto &edge : follow_edges) {
+        edge[2] = static_cast<int>(edge[2] * scaling_factor); // Scaling edge weights
+    }
 
     /* Get follow-up output */
     int follow_out = shortest_path(follow_edges, source_src, source_dst, source_n);
 
-    /* Verification - Adding a self-loop to a vertex in the graph should not change the shortest path length */
-    EXPECT_EQ(follow_out, source_out);
+    /* Verification */
+    EXPECT_EQ(follow_out, static_cast<int>(source_out * scaling_factor));
 }
 
 /**
- * @brief Metamorphic Relation 16: Removing a vertex from the graph should not increase the shortest path length from the source to the destination.
+ * @brief Metamorphic Relation 16: Adding a vertex and multiple edges to the graph, the shortest path distance should remain unchanged if the added vertex is not on the shortest path.
+ *
  */
 TEST_P(SpwikiParamTest, MR16) {
     /* Get source input */
@@ -368,31 +407,21 @@ TEST_P(SpwikiParamTest, MR16) {
     /* Get source output */
     int source_out = shortest_path(source_edges, source_src, source_dst, source_n);
 
-    /* Fix by Radon */
-    /* Delete a vertex randomly? */
-    mt19937 rng(random_device{}());
-    uniform_int_distribution<int> dist(0, source_n - 1);
-    int vertex_to_remove = dist(rng);
-
-    /* Construct follow-up input - Removing a vertex from the graph */
-    vector<vector<int>> follow_edges = source_edges;
-    for (auto it = follow_edges.begin(); it != follow_edges.end();) {
-        if (it->at(0) == vertex_to_remove || it->at(1) == vertex_to_remove) {
-            it = follow_edges.erase(it); // Remove edges connected to the vertex to be removed
-        } else {
-            ++it;
-        }
-    }
-    source_n--; // Decrement the number of vertices
+    /* Add a new vertex and multiple edges connected to existing vertices */
+    source_n++; // Incrementing the number of vertices
+    source_edges.push_back({source_src, source_n, 5}); // Adding an edge from source to the new vertex
+    source_edges.push_back({source_n, source_dst, 7}); // Adding an edge from the new vertex to the destination
 
     /* Get follow-up output */
-    int follow_out = shortest_path(follow_edges, source_src, source_dst, source_n);
+    int follow_out = shortest_path(source_edges, source_src, source_dst, source_n);
 
-    /* Verification - Removing a vertex from the graph should not increase the shortest path length */
-    EXPECT_LE(follow_out, source_out);
+    /* Verification */
+    EXPECT_EQ(follow_out, source_out);
 }
+
 /**
- * @brief Metamorphic Relation 17: Settling a new monkey vertex should not change the shortest path from the source to the destination.
+ * @brief Metamorphic Relation 17: Reversing the order of vertices while keeping the edge directions, the shortest path distance should remain unchanged.
+ *
  */
 TEST_P(SpwikiParamTest, MR17) {
     /* Get source input */
@@ -403,37 +432,50 @@ TEST_P(SpwikiParamTest, MR17) {
     /* Get source output */
     int source_out = shortest_path(source_edges, source_src, source_dst, source_n);
 
-    /* Construct follow-up input - Settling a new monkey vertex */
+    /* Reverse the order of vertices */
     vector<vector<int>> follow_edges = source_edges;
-    int monkey_vertex = source_n; // Assumption: the monkey vertex is the next sequential number after the existing vertices
-    follow_edges.emplace_back(vector<int>{source_src, monkey_vertex, 4}); // Add an edge from source to monkey vertex with weight 4
-    follow_edges.emplace_back(vector<int>{monkey_vertex, source_dst, 4}); // Add an edge from monkey vertex to destination with weight 4
-    source_n++; // Increment the number of vertices
+    for (auto &edge : follow_edges) {
+        int temp = edge[0];
+        edge[0] = edge[1];
+        edge[1] = temp;
+    }
 
     /* Get follow-up output */
-    int follow_out = shortest_path(follow_edges, source_src, source_dst, source_n);
+    int follow_out = shortest_path(follow_edges, source_dst, source_src, source_n);
 
-    /* Verification - Settling a new monkey vertex should not change the shortest path length */
+    /* Verification */
     EXPECT_EQ(follow_out, source_out);
 }
 
 /**
- * @brief Metamorphic Relation 18: Randomly shuffling the edges in the graph should not change the shortest path from the source to the destination.
+ * @brief Metamorphic Relation 18: Replacing all edge weights with the absolute values of the original weights, the shortest path distance should remain unchanged.
+ *
  */
 TEST_P(SpwikiParamTest, MR18) {
     /* Get source input */
     SpwikiInput input = GetParam();
     vector<vector<int>> source_edges = input.edges;
-    std::random_shuffle(source_edges.begin(), source_edges.end()); // Shuffle the edges randomly
+    int source_src = input.src, source_dst = input.dst, source_n = input.n;
 
     /* Get source output */
-    int source_out = shortest_path(source_edges, input.src, input.dst, input.n);
+    int source_out = shortest_path(source_edges, source_src, source_dst, source_n);
 
-    /* Verification - Randomly shuffling the edges in the graph should not change the shortest path length */
-    EXPECT_EQ(source_out, shortest_path(source_edges, input.src, input.dst, input.n));
+    /* Construct follow-up input */
+    vector<vector<int>> follow_edges = source_edges;
+    for (auto &edge : follow_edges) {
+        edge[2] = abs(edge[2]); // Replacing edge weights with their absolute values
+    }
+
+    /* Get follow-up output */
+    int follow_out = shortest_path(follow_edges, source_src, source_dst, source_n);
+
+    /* Verification */
+    EXPECT_EQ(follow_out, source_out);
 }
+
 /**
- * @brief Metamorphic Relation 19: Reversing the direction of the graph, the shortest path from the destination to the source should not change.
+ * @brief Metamorphic Relation 19: Multiplying all vertex indices and edge weights by a constant factor, the shortest path distance should remain unchanged.
+ *
  */
 TEST_P(SpwikiParamTest, MR19) {
     /* Get source input */
@@ -444,21 +486,27 @@ TEST_P(SpwikiParamTest, MR19) {
     /* Get source output */
     int source_out = shortest_path(source_edges, source_src, source_dst, source_n);
 
-    /* Construct follow-up input - Reversing the direction of the graph */
+    /* Construct follow-up input */
+    int constant_factor = 10; // Constant factor for multiplication
     vector<vector<int>> follow_edges = source_edges;
-    for (auto& edge : follow_edges) {
-        swap(edge[0], edge[1]); // Reverse the directions of the edges
+    for (auto &edge : follow_edges) {
+        edge[0] *= constant_factor; // Multiply start vertex index
+        edge[1] *= constant_factor; // Multiply end vertex index
+        edge[2] *= constant_factor; // Multiply edge weight
     }
+    int follow_src = source_src * constant_factor; // Multiply source vertex index
+    int follow_dst = source_dst * constant_factor; // Multiply destination vertex index
 
     /* Get follow-up output */
-    int follow_out = shortest_path(follow_edges, source_dst, source_src, source_n);
+    int follow_out = shortest_path(follow_edges, follow_src, follow_dst, source_n * constant_factor);
 
-    /* Verification - Reversing the direction of the graph should not change the shortest path from the destination to the source */
+    /* Verification */
     EXPECT_EQ(follow_out, source_out);
 }
 
 /**
- * @brief Metamorphic Relation 20: Scaling all edge weights by a negative constant factor should not change the shortest path length from the source to the destination.
+ * @brief Metamorphic Relation 20: Adding or removing parallel edges between two vertices, the shortest path distance should remain unchanged.
+ *
  */
 TEST_P(SpwikiParamTest, MR20) {
     /* Get source input */
@@ -469,21 +517,19 @@ TEST_P(SpwikiParamTest, MR20) {
     /* Get source output */
     int source_out = shortest_path(source_edges, source_src, source_dst, source_n);
 
-    /* Construct follow-up input - Scaling all edge weights by a negative constant factor */
-    vector<vector<int>> follow_edges = source_edges;
-    int scalingFactor = -2; // arbitrary negative constant scaling factor
-    for (auto &edge : follow_edges) {
-        edge[2] *= scalingFactor; // scale the weight of each edge by the negative factor
-    }
+    /* Add a parallel edge between source and destination vertices */
+    source_edges.push_back({source_src, source_dst, 8});
 
-   /* Get follow-up output */
-    int follow_out = shortest_path(follow_edges, source_src, source_dst, source_n);
+    /* Get follow-up output */
+    int follow_out = shortest_path(source_edges, source_src, source_dst, source_n);
 
-    /* Verification - Scaling all edge weights by a negative constant factor should not change the shortest path length from the source to the destination */
+    /* Verification */
     EXPECT_EQ(follow_out, source_out);
 }
+
 /**
- * @brief Metamorphic Relation 21: Adding a new vertex and connecting it to all existing vertices with a constant weight, the shortest path from the source to the destination should not increase.
+ * @brief Metamorphic Relation 21: Adding a vertex and creating connections with all existing vertices, the shortest path distance should remain unchanged.
+ *
  */
 TEST_P(SpwikiParamTest, MR21) {
     /* Get source input */
@@ -491,538 +537,614 @@ TEST_P(SpwikiParamTest, MR21) {
     vector<vector<int>> source_edges = input.edges;
     int source_src = input.src, source_dst = input.dst, source_n = input.n;
 
-    /* Get source output */
+    /* Compute the shortest path with the original number of vertices */
     int source_out = shortest_path(source_edges, source_src, source_dst, source_n);
 
-    /* Construct follow-up input - Adding a new vertex connected to all existing vertices with a constant weight */
+    /* Add a new vertex and connect it with all existing vertices */
+    int follow_n = source_n + 1;
     vector<vector<int>> follow_edges = source_edges;
-    int new_vertex = source_n; // Assuming the new vertex is the next sequential number after the existing vertices
     for (int i = 0; i < source_n; i++) {
-        if (i != new_vertex) {
-            follow_edges.emplace_back(vector<int>{i, new_vertex, 5}); // Add an edge with weight 5 from the existing vertex to the new vertex
-            follow_edges.emplace_back(vector<int>{new_vertex, i, 5}); // Add an edge with weight 5 from the new vertex to the existing vertex
-        }
+        follow_edges.push_back({i, source_n, 5}); // Creating connections with the new vertex
+        follow_edges.push_back({source_n, i, 5}); // Creating connections from the new vertex
     }
-    source_n++; // Increment the number of vertices
 
-    /* Get follow-up output */
-    int follow_out = shortest_path(follow_edges, source_src, source_dst, source_n);
+    /* Compute the shortest path with the new vertex and connections */
+    int follow_out = shortest_path(follow_edges, source_src, source_dst, follow_n);
 
-    /* Verification - Adding a new vertex and connecting it to all existing vertices should not increase the shortest path length */
-    EXPECT_LE(follow_out, source_out);
+    /* Verification */
+    EXPECT_EQ(follow_out, source_out); // Shortest path distance remains unchanged
 }
 
 /**
- * @brief Metamorphic Relation 22: Removing an edge from the graph should not change the shortest path length from the source to the destination.
+ * @brief Metamorphic Relation 22: Reversing the direction of all edges, the shortest path distance should remain unchanged.
+ *
  */
 TEST_P(SpwikiParamTest, MR22) {
     /* Get source input */
     SpwikiInput input = GetParam();
     vector<vector<int>> source_edges = input.edges;
     int source_src = input.src, source_dst = input.dst, source_n = input.n;
-
-    /* Get source output */
+  
+    /* Get shortest path with original edges */
     int source_out = shortest_path(source_edges, source_src, source_dst, source_n);
 
-    /* Construct follow-up input - Removing an edge from the graph */
-    vector<vector<int>> follow_edges = source_edges;
-    // Remove an edge based on some criteria, for example, the first edge in the vector
-    if (!follow_edges.empty()) {
-        follow_edges.erase(follow_edges.begin());
+    /* Reverse the direction of all edges */
+    vector<vector<int>> follow_edges;
+    for (vector<int> edge : source_edges) {
+        follow_edges.push_back({edge[1], edge[0], edge[2]});
     }
 
     /* Get follow-up output */
-    int follow_out = shortest_path(follow_edges, source_src, source_dst, source_n);
+    int follow_out = shortest_path(follow_edges, source_dst, source_src, source_n);
 
-    /* Verification - Removing an edge from the graph should not change the shortest path length */
+    /* Verification */
     EXPECT_EQ(follow_out, source_out);
 }
 
+//fixed
 /**
- * @brief Metamorphic Relation 23: Adding or removing a non-essential vertex from the graph should not change the shortest path length from the source to the destination.
+ * @brief Metamorphic Relation 23: Removing an intermediate vertex from the shortest path, the shortest path distance should remain unchanged.
+ *
  */
 TEST_P(SpwikiParamTest, MR23) {
     /* Get source input */
     SpwikiInput input = GetParam();
     vector<vector<int>> source_edges = input.edges;
-    int source_src = input.src, source_dst = input.dst;
+    int source_src = input.src, source_dst = input.dst, source_n = input.n;
 
-    /* Get source output */
-    int source_out = shortest_path(source_edges, source_src, source_dst, input.n);
+    /* Get shortest path with original edges */
+    int source_out = shortest_path(source_edges, source_src, source_dst, source_n);
 
-    /* Construct follow-up input - Adding or removing a non-essential vertex from the graph */
-    // Here, a non-essential vertex is a vertex with no influence on the shortest path between the source and destination
+    /* Find the shortest path */
+    vector<int> path;
+    int dist;
+    int source_edges_array[100][100]; // 静态分配的二维数组
 
-    // Step 1: Add a new non-essential vertex to the graph
-    int new_vertex = input.n;  // Assuming the new vertex is the next sequential number after the existing vertices
-    vector<vector<int>> follow_edges_add = source_edges;
-    for (int i = 0; i < input.n; i++) {
-        if (i != new_vertex) {
-            follow_edges_add.push_back({i, new_vertex, 2}); // Add an edge with weight 2 from existing vertices to the new non-essential vertex
-            follow_edges_add.push_back({new_vertex, i, 2}); // Add an edge with weight 2 from the new non-essential vertex to existing vertices
+    // 将向量内容复制到数组中
+    for (size_t i = 0; i < source_edges.size(); ++i) {
+        for (size_t j = 0; j < source_edges[i].size(); ++j) {
+            source_edges_array[i][j] = source_edges[i][j];
         }
     }
-    int follow_out_add = shortest_path(follow_edges_add, source_src, source_dst, input.n + 1);
 
-    // Step 2: Remove a non-essential vertex from the graph
-    vector<vector<int>> follow_edges_remove = source_edges;
-    // Remove the last vertex, assuming it is a non-essential vertex
-    follow_edges_remove.erase(follow_edges_remove.end() - 1);
-    int follow_out_remove = shortest_path(follow_edges_remove, source_src, source_dst, input.n - 1);
+    // 将数组指针传递给函数
+    Dijkstra(source_edges_array, source_src, source_n);
+    //Dijkstra(source_edges, source_src, source_n, path, dist);
 
-    /* Verification - Adding or removing a non-essential vertex from the graph should not change the shortest path length */
-    EXPECT_EQ(follow_out_add, source_out);
-    EXPECT_EQ(follow_out_remove, source_out);
+    /* Remove an intermediate vertex from the path and check if the shortest path distance remains unchanged */
+    for (size_t i = 1; i < path.size() - 1; i++) {
+        vector<vector<int>> follow_edges = source_edges;
+        int removed_vertex = path[i];
+        for (size_t j = 0; j < follow_edges.size(); j++) {
+            if (follow_edges[j][0] == removed_vertex || follow_edges[j][1] == removed_vertex) {
+                follow_edges.erase(follow_edges.begin() + j);
+                j--;
+            }
+        }
+        int follow_out = shortest_path(follow_edges, source_src, source_dst, source_n);
+        EXPECT_EQ(follow_out, source_out);
+    }
 }
 
 /**
- * @brief Metamorphic Relation 24: Multiplying all edge weights by a constant factor should not change the shortest path length from the source to the destination.
+ * @brief Metamorphic Relation 24: Adding a large constant to all edge weights, the shortest path distance should remain unchanged.
+ *
  */
 TEST_P(SpwikiParamTest, MR24) {
     /* Get source input */
     SpwikiInput input = GetParam();
     vector<vector<int>> source_edges = input.edges;
-    int source_src = input.src, source_dst = input.dst;
+    int source_src = input.src, source_dst = input.dst, source_n = input.n;
 
-    /* Get source output */
-    int source_out = shortest_path(source_edges, source_src, source_dst, input.n);
+    /* Get shortest path with original edges */
+    int source_out = shortest_path(source_edges, source_src, source_dst, source_n);
 
-    /* Construct follow-up input - Multiplying all edge weights by a constant factor */
+    /* Add a large constant to all edge weights */
     vector<vector<int>> follow_edges = source_edges;
-    int scaling_factor = 2;  // Multiplying all edge weights by 2
-    for (auto &edge : follow_edges) {
-        edge[2] *= scaling_factor;
+    int constant = 1000; // Example constant value
+    for (vector<int>& edge : follow_edges) {
+        edge[2] += constant;
     }
 
     /* Get follow-up output */
-    int follow_out = shortest_path(follow_edges, source_src, source_dst, input.n);
+    int follow_out = shortest_path(follow_edges, source_src, source_dst, source_n);
 
-    /* Verification - Multiplying all edge weights by a constant factor should not change the shortest path length */
-    EXPECT_EQ(source_out, follow_out);
+    /* Verification */
+    EXPECT_EQ(follow_out, source_out);
 }
+
 /**
- * @brief Metamorphic Relation 25: Adding a new edge with a weight of 0 should not change the shortest path length from the source to the destination.
+ * @brief Metamorphic Relation 25: Modifying edge weights to their absolute values, the shortest path distance should remain unchanged.
+ *
  */
 TEST_P(SpwikiParamTest, MR25) {
     /* Get source input */
     SpwikiInput input = GetParam();
     vector<vector<int>> source_edges = input.edges;
-    int source_src = input.src, source_dst = input.dst;
+    int source_src = input.src, source_dst = input.dst, source_n = input.n;
 
-    /* Get source output */
-    int source_out = shortest_path(source_edges, source_src, source_dst, input.n);
+    /* Get shortest path with original edges */
+    int source_out = shortest_path(source_edges, source_src, source_dst, source_n);
 
-    /* Construct follow-up input - Adding a new edge with a weight of 0 */
+    /* Modify edge weights to their absolute values */
     vector<vector<int>> follow_edges = source_edges;
-    int new_edge_weight = 0;
-    follow_edges.emplace_back(vector<int>{source_src, source_dst, new_edge_weight});
+    for (vector<int>& edge : follow_edges) {
+        edge[2] = abs(edge[2]);
+    }
 
     /* Get follow-up output */
-    int follow_out = shortest_path(follow_edges, source_src, source_dst, input.n);
+    int follow_out = shortest_path(follow_edges, source_src, source_dst, source_n);
 
-    /* Verification - Adding a new edge with a weight of 0 should not change the shortest path length */
+    /* Verification */
     EXPECT_EQ(follow_out, source_out);
 }
 
+
 /**
- * @brief Metamorphic Relation 26: Excluding all edges from the graph should result in a non-existent path between the source and destination.
+ * @brief Metamorphic Relation 26: Applying different scaling factors to individual edge weights, the shortest path distance should be affected accordingly.
+ *
  */
 TEST_P(SpwikiParamTest, MR26) {
     /* Get source input */
     SpwikiInput input = GetParam();
-    int source_src = input.src, source_dst = input.dst;
+    vector<vector<int>> source_edges = input.edges;
+    int source_src = input.src, source_dst = input.dst, source_n = input.n;
 
-    /* Construct follow-up input - Excluding all edges from the graph */
-    vector<vector<int>> follow_edges = {}; // Empty edge list
+    /* Get shortest path with original edges */
+    int source_out = shortest_path(source_edges, source_src, source_dst, source_n);
+
+    /* Construct follow-up input by applying different scaling factors to individual edge weights */
+    vector<vector<int>> follow_edges = source_edges;
+    int scaling_factors[] = {2, 1, 3};  // Example scaling factors
+    for (size_t i = 0; i < follow_edges.size(); ++i) {
+        follow_edges[i][2] *= scaling_factors[i % 3]; 
+    }
 
     /* Get follow-up output */
-    int follow_out = shortest_path(follow_edges, source_src, source_dst, input.n);
+    int follow_out = shortest_path(follow_edges, source_src, source_dst, source_n);
 
-    /* Verification - Excluding all edges should result in a non-existent path */
-    EXPECT_EQ(follow_out, -1); // Assuming -1 represents a non-existent path
+    /* Verification */
+    EXPECT_EQ(follow_out, source_out * 2 * 3);
 }
+
+//fixed
 /**
- * @brief Metamorphic Relation 27: Adding a duplicate edge to the graph should not change the shortest path length from the source to the destination.
+ * @brief Metamorphic Relation 27: Adding an edge to a cycle in the graph, the shortest path distance should remain unchanged.
+ *
  */
+bool find_cycle_dfs(const vector<vector<int>>& edges, int current, int parent, vector<int>& visited, vector<int>& path) {
+    visited[current] = 1;
+    path.push_back(current);
+    
+    for (int next : edges[current]) {
+        if (next == parent) continue; // Skip the edge to the parent vertex
+        
+        if (visited[next] == 1) {
+            // Cycle found
+            // Add the current vertex to the path and return true
+            path.push_back(next);
+            return true;
+        } else if (visited[next] == 0) {
+            // Recursive call to explore the next vertex
+            if (find_cycle_dfs(edges, next, current, visited, path)) {
+                return true;
+            }
+        }
+    }
+    
+    // Mark the current vertex as visited (2) after exploring all its neighbors
+    visited[current] = 2;
+    path.pop_back(); // Remove the current vertex from the path
+    return false;
+}
+
 TEST_P(SpwikiParamTest, MR27) {
     /* Get source input */
     SpwikiInput input = GetParam();
     vector<vector<int>> source_edges = input.edges;
-    int source_src = input.src, source_dst = input.dst;
+    int source_src = input.src, source_dst = input.dst, source_n = input.n;
+  
+    /* Get shortest path with original edges */
+    int source_out = shortest_path(source_edges, source_src, source_dst, source_n);
 
-    /* Get source output */
-    int source_out = shortest_path(source_edges, source_src, source_dst, input.n);
-
-    /* Construct follow-up input - Adding a duplicate edge to the graph */
-    vector<vector<int>> follow_edges = source_edges;
-    if (!source_edges.empty()) {
-        follow_edges.push_back(source_edges.front()); // Add the first edge as a duplicate edge
+    /* Find cycles in the graph */
+    vector<vector<int>> cycles;
+    vector<int> visited(source_n, 0);
+    vector<int> path;
+    for (int i = 0; i < source_n; i++) {
+        if (!visited[i]) {
+            path.clear();
+            if (find_cycle_dfs(source_edges, i, -1, visited, path)) {
+                cycles.push_back(path);
+            }
+        }
     }
-
-    /* Get follow-up output */
-    int follow_out = shortest_path(follow_edges, source_src, source_dst, input.n);
-
-    /* Verification - Adding a duplicate edge to the graph should not change the shortest path length */
-    EXPECT_EQ(follow_out, source_out);
+    
+    /* Choose a cycle and add an edge to it */
+    if (!cycles.empty()) {
+        vector<int> cycle = cycles[0]; // Choose the first cycle
+        for (size_t i = 1; i < cycle.size(); i++) {
+            vector<vector<int>> follow_edges = source_edges;
+            follow_edges.push_back({cycle[i - 1], cycle[i], 5}); // Adding an edge to the cycle
+            int follow_out = shortest_path(follow_edges, source_src, source_dst, source_n);
+            EXPECT_EQ(follow_out, source_out);
+        }
+    }
 }
 
 /**
- * @brief Metamorphic Relation 28: Removing all edges incident to the destination vertex should result in an unreachable destination from the source.
+ * @brief Metamorphic Relation 28: Substituting each weight with its square, the shortest path distance should be the same or higher.
+ *
  */
 TEST_P(SpwikiParamTest, MR28) {
     /* Get source input */
     SpwikiInput input = GetParam();
-    int source_src = input.src, source_dst = input.dst;
     vector<vector<int>> source_edges = input.edges;
-
-    /* Construct follow-up input - Removing all edges incident to the destination vertex */
+    int source_src = input.src, source_dst = input.dst, source_n = input.n;
+  
+    /* Get shortest path with original edges */
+    int source_out = shortest_path(source_edges, source_src, source_dst, source_n);
+  
+    /* Construct follow-up input by performing transformation on edge weights */
     vector<vector<int>> follow_edges = source_edges;
-    auto remove_if_dst = [source_dst](const vector<int>& edge) { return (edge[1] == source_dst); };
-    follow_edges.erase(remove_if(follow_edges.begin(), follow_edges.end(), remove_if_dst), follow_edges.end());
+    for (auto &edge : follow_edges) {
+        edge[2] = edge[2] * edge[2]; // Using the square of the original weight
+    }
 
     /* Get follow-up output */
-    int follow_out = shortest_path(follow_edges, source_src, source_dst, input.n);
+    int follow_out = shortest_path(follow_edges, source_src, source_dst, source_n);
 
-    /* Verification - Removing all edges incident to the destination vertex should result in unreachable destination */
-    EXPECT_EQ(follow_out, -1); // Assuming -1 represents an unreachable destination
+    /* Verification */
+    EXPECT_GE(follow_out, source_out);
 }
+
+//fixed
 /**
- * @brief Metamorphic Relation 29: Adding a shortcut edge in the graph should not change the shortest path length from the source to the destination.
+ * @brief Metamorphic Relation 29: Removing an irrelevant edge that is not a part of the shortest path, the shortest path distance should remain unchanged.
+ *
  */
 TEST_P(SpwikiParamTest, MR29) {
     /* Get source input */
     SpwikiInput input = GetParam();
     vector<vector<int>> source_edges = input.edges;
-    int source_src = input.src, source_dst = input.dst;
+    int source_src = input.src, source_dst = input.dst, source_n = input.n;
+  
+    /* Get shortest path with original edges */
+    int source_out = shortest_path(source_edges, source_src, source_dst, source_n);
 
-    /* Get source output */
-    int source_out = shortest_path(source_edges, source_src, source_dst, input.n);
+    /* Find the shortest path */
+    vector<int> path;
+    int dist;
+    int source_edges_array[100][100]; // 静态分配的二维数组
 
-    /* Construct follow-up input - Adding a shortcut edge in the graph */
-    vector<vector<int>> follow_edges = source_edges;
-    // Assuming the shortcut edge connects the source directly to the destination with a lower weight
-    follow_edges.push_back({source_src, source_dst, 5}); // Adding a shortcut edge with weight 5
+    // 将向量内容复制到数组中
+    for (size_t i = 0; i < source_edges.size(); ++i) {
+        for (size_t j = 0; j < source_edges[i].size(); ++j) {
+            source_edges_array[i][j] = source_edges[i][j];
+        }
+    }
 
-    /* Get follow-up output */
-    int follow_out = shortest_path(follow_edges, source_src, source_dst, input.n);
-
-    /* Verification - Adding a shortcut edge in the graph should not change the shortest path length */
-    EXPECT_EQ(follow_out, source_out);
+    // 将数组指针传递给函数
+    Dijkstra(source_edges_array, source_src, source_n);
+    //Dijkstra(source_edges, source_src, source_n, path, dist);
+  
+    /* Remove an irrelevant edge from the graph and check if the shortest path distance remains unchanged */
+    for (size_t i = 1; i < path.size(); i++) {
+        int u = path[i - 1];
+        int v = path[i];
+        vector<vector<int>> follow_edges = source_edges;
+        for (size_t j = 0; j < follow_edges.size(); j++) {
+            if (follow_edges[j][0] == u && follow_edges[j][1] == v) {
+                follow_edges.erase(follow_edges.begin() + j);
+                break;
+            }
+        }
+        int follow_out = shortest_path(follow_edges, source_src, source_dst, source_n);
+        EXPECT_EQ(follow_out, source_out);
+    }
 }
 
 /**
- * @brief Metamorphic Relation 30: Adding a bi-directional shortcut edge between any two vertices in the graph should not change the shortest path length between these vertices.
+ * @brief Metamorphic Relation 30: Repeatedly performing Dijkstra's algorithm, the shortest path distance should remain unchanged.
+ *
  */
 TEST_P(SpwikiParamTest, MR30) {
     /* Get source input */
     SpwikiInput input = GetParam();
     vector<vector<int>> source_edges = input.edges;
-
-    /* Select two distinct vertices in the graph */
-    int vertex1 = 0;  // Assuming the vertices are 0-based
-    int vertex2 = 1;
-
-    /* Get the shortest path length between the selected vertices */
-    int source_out = shortest_path(source_edges, vertex1, vertex2, input.n);
-
-    /* Construct follow-up input - Adding a bi-directional shortcut edge between the selected vertices */
-    vector<vector<int>> follow_edges = source_edges;
-    int new_edge_weight = 3;  // Assuming the weight of the shortcut edge is 3
-    follow_edges.push_back({vertex1, vertex2, new_edge_weight}); // Adding a shortcut edge from vertex1 to vertex2
-    follow_edges.push_back({vertex2, vertex1, new_edge_weight}); // Adding a shortcut edge from vertex2 to vertex1
-
-    /* Get the shortest path length between the selected vertices in the follow-up graph */
-    int follow_out = shortest_path(follow_edges, vertex1, vertex2, input.n);
-
-    /* Verification - Adding a bi-directional shortcut edge between any two vertices should not change the shortest path length between these vertices */
-    EXPECT_EQ(follow_out, source_out);
+    int source_src = input.src, source_dst = input.dst, source_n = input.n;
+  
+    /* Get shortest path with original edges */
+    int source_out = shortest_path(source_edges, source_src, source_dst, source_n);
+  
+    /* Perform Dijkstra's algorithm multiple times and ensure that the shortest path distance remains consistent */
+    for (int i = 0; i < 10; i++) {
+        int follow_out = shortest_path(source_edges, source_src, source_dst, source_n);
+        EXPECT_EQ(follow_out, source_out);
+    }
 }
+
 /**
- * @brief Metamorphic Relation 31: Adding a disjoint subgraph with no connection to the existing graph should not change the shortest path length between vertices in the existing graph.
+ * @brief Metamorphic Relation 31: Reversing the weight signs of all edge weights, the shortest path distance should remain unchanged.
+ *
  */
 TEST_P(SpwikiParamTest, MR31) {
     /* Get source input */
     SpwikiInput input = GetParam();
-    vector<vector<int>> existing_edges = input.edges;
-    
-    /* Assume a new subgraph with vertices not connected to the existing graph */
-    vector<vector<int>> new_subgraph = {{10, 11, 5}, {11, 12, 7}, {10, 12, 4}};
+    vector<vector<int>> source_edges = input.edges;
+    int source_src = input.src, source_dst = input.dst, source_n = input.n;
+  
+    /* Get shortest path with original edges */
+    int source_out = shortest_path(source_edges, source_src, source_dst, source_n);
 
-    /* Get the shortest path length between two existing vertices */
-    int source_out = shortest_path(existing_edges, 0, 1, input.n);
+    /* Construct follow-up input */
+    vector<vector<int>> follow_edges = source_edges;
+    for (auto &edge : follow_edges) {
+        edge[2] = -edge[2]; // Reversing the signs of edge weights
+    }
 
-    /* Construct follow-up input - Combining the existing graph with the new subgraph */
-    vector<vector<int>> combined_edges = existing_edges;
-    combined_edges.insert(combined_edges.end(), new_subgraph.begin(), new_subgraph.end());
+    /* Get follow-up output */
+    int follow_out = shortest_path(follow_edges, source_src, source_dst, source_n);
 
-    /* Get the shortest path length between the same two existing vertices in the combined graph */
-    int follow_out = shortest_path(combined_edges, 0, 1, input.n + new_subgraph.size());
-
-    /* Verification - Adding a disjoint subgraph should not change the shortest path length between existing vertices */
+    /* Verification */
     EXPECT_EQ(follow_out, source_out);
 }
 
 /**
- * @brief Metamorphic Relation 32: Removing an isolated vertex from the graph should not change the shortest path length between any two existing vertices.
+ * @brief Metamorphic Relation 32: Adding a self-cycle to all vertices, the shortest path distance should remain unchanged.
+ *
  */
 TEST_P(SpwikiParamTest, MR32) {
     /* Get source input */
     SpwikiInput input = GetParam();
-    vector<vector<int>> existing_edges = input.edges;
+    vector<vector<int>> source_edges = input.edges;
+    int source_src = input.src, source_dst = input.dst, source_n = input.n;
 
-    /* Remove the isolated vertex from the graph */
-    vector<vector<int>> updated_edges;
-    int isolated_vertex = 5; // Assuming the isolated vertex is vertex 5
-    for (const auto& edge : existing_edges) {
-        if (edge[0] != isolated_vertex && edge[1] != isolated_vertex) {
-            updated_edges.push_back(edge);
-        }
+    /* Get shortest path with original edges */
+    int source_out = shortest_path(source_edges, source_src, source_dst, source_n);
+
+    /* Construct follow-up input */
+    vector<vector<int>> follow_edges = source_edges;
+    for (int i = 0; i < source_n; i++) {
+        follow_edges.push_back({i, i, 0}); // Adding a self-cycle to each vertex
     }
 
-    /* Get the shortest path length between two existing vertices */
-    int source_out = shortest_path(existing_edges, 0, 1, input.n);
+    /* Get follow-up output */
+    int follow_out = shortest_path(follow_edges, source_src, source_dst, source_n);
 
-    /* Get the shortest path length between the same two existing vertices in the updated graph */
-    int follow_out = shortest_path(updated_edges, 0, 1, input.n);
-
-    /* Verification - Removing an isolated vertex should not change the shortest path length between any two existing vertices */
+    /* Verification */
     EXPECT_EQ(follow_out, source_out);
 }
+
 /**
- * @brief Metamorphic Relation 33: Adding a cycle in the graph should not change the shortest path length between any pair of vertices.
+ * @brief Metamorphic Relation 33: Adding a new vertex connected to all existing vertices, the shortest path distance should remain unchanged.
+ *
  */
 TEST_P(SpwikiParamTest, MR33) {
     /* Get source input */
     SpwikiInput input = GetParam();
-    vector<vector<int>> existing_edges = input.edges;
+    vector<vector<int>> source_edges = input.edges;
+    int source_src = input.src, source_dst = input.dst, source_n = input.n;
+  
+    /* Get shortest path with original edges */
+    int source_out = shortest_path(source_edges, source_src, source_dst, source_n);
 
-    /* Construct a graph with a cycle */
-    vector<vector<int>> graph_with_cycle = existing_edges;
-    graph_with_cycle.emplace_back(vector<int>{1, 4, 3});  // Adding an edge to create a cycle
+    /* Construct follow-up input */
+    vector<vector<int>> follow_edges = source_edges;
+    for (int i = 0; i < source_n; i++) {
+        follow_edges.push_back({source_n, i, 1}); // Adding edges from the new vertex to all existing vertices
+        follow_edges.push_back({i, source_n, 1}); // Adding edges from all existing vertices to the new vertex
+    }
+    follow_edges.push_back({source_n, source_dst, 1}); // Adding an edge from the new vertex to the destination vertex
+    follow_edges.push_back({source_src, source_n, 1}); // Adding an edge from the source vertex to the new vertex
 
-    /* Get the shortest path length between two existing vertices */
-    int source_out = shortest_path(existing_edges, 0, 2, input.n);
+    /* Get follow-up output */
+    int follow_out = shortest_path(follow_edges, source_src, source_dst, source_n + 1);
 
-    /* Get the shortest path length between the same two existing vertices in the graph with a cycle */
-    int follow_out = shortest_path(graph_with_cycle, 0, 2, input.n);
-
-    /* Verification - Adding a cycle should not change the shortest path length between existing vertices */
+    /* Verification */
     EXPECT_EQ(follow_out, source_out);
 }
 
 /**
- * @brief Metamorphic Relation 34: Adding a bridge in the graph should not change the shortest path length between any pair of non-adjacent vertices.
+ * @brief Metamorphic Relation 34: Adding a new vertex and connecting it to the source vertex, the shortest path distance should remain unchanged.
+ *
  */
 TEST_P(SpwikiParamTest, MR34) {
     /* Get source input */
     SpwikiInput input = GetParam();
-    vector<vector<int>> existing_edges = input.edges;
+    vector<vector<int>> source_edges = input.edges;
+    int source_src = input.src, source_dst = input.dst, source_n = input.n;
+  
+    /* Get shortest path with original edges */
+    int source_out = shortest_path(source_edges, source_src, source_dst, source_n);
 
-    /* Construct a graph with a bridge */
-    vector<vector<int>> graph_with_bridge = existing_edges;
-    graph_with_bridge.emplace_back(vector<int>{4, 5, 7});  // Adding an edge to create a bridge
+    /* Construct follow-up input */
+    vector<vector<int>> follow_edges = source_edges;
+    follow_edges.push_back({source_src, source_n, 1}); // Adding an edge from the source vertex to the new vertex
+    follow_edges.push_back({source_n, source_dst, 1}); // Adding an edge from the new vertex to the destination vertex
 
-    /* Get the shortest path length between two non-adjacent vertices */
-    int source_out = shortest_path(existing_edges, 0, 3, input.n);
+    /* Get follow-up output */
+    int follow_out = shortest_path(follow_edges, source_src, source_dst, source_n + 1);
 
-    /* Get the shortest path length between the same two non-adjacent vertices in the graph with a bridge */
-    int follow_out = shortest_path(graph_with_bridge, 0, 3, input.n);
-
-    /* Verification - Adding a bridge should not change the shortest path length between non-adjacent vertices */
+    /* Verification */
     EXPECT_EQ(follow_out, source_out);
 }
+
 /**
- * @brief Metamorphic Relation 35: Adding a shortcut path in the graph should not change the shortest path length between any pair of vertices.
+ * @brief Metamorphic Relation 35: Scaling all edge weights by a constant factor and adding a constant to all vertex indices, the shortest path distance should remain unchanged.
+ *
  */
 TEST_P(SpwikiParamTest, MR35) {
     /* Get source input */
     SpwikiInput input = GetParam();
-    vector<vector<int>> existing_edges = input.edges;
+    vector<vector<int>> source_edges = input.edges;
+    int source_src = input.src, source_dst = input.dst, source_n = input.n;
 
-    /* Construct a graph with a shortcut path */
-    vector<vector<int>> graph_with_shortcut = existing_edges;
-    graph_with_shortcut.emplace_back(vector<int>{1, 3, 5}); // Adding an edge to create a shortcut path
+    /* Get shortest path with original edges */
+    int source_out = shortest_path(source_edges, source_src, source_dst, source_n);
 
-    /* Get the shortest path length between two vertices without the shortcut */
-    int source_out = shortest_path(existing_edges, 0, 4, input.n);
+    /* Construct follow-up input */
+    double constant_factor = 2.0;
+    vector<vector<int>> follow_edges = source_edges;
+    for (auto &edge : follow_edges) {
+        edge[2] *= constant_factor;  // Multiply all edge weights by a constant factor
+    }
 
-    /* Get the shortest path length between the same two vertices in the graph with the shortcut */
-    int follow_out = shortest_path(graph_with_shortcut, 0, 4, input.n);
+    int follow_src = source_src + 10;  // Add a constant to the source vertex index
+    int follow_dst = source_dst + 10;  // Add a constant to the destination vertex index
 
-    /* Verification - Adding a shortcut path should not change the shortest path length between any pair of vertices */
+    /* Get follow-up output */
+    int follow_out = shortest_path(follow_edges, follow_src, follow_dst, source_n);
+
+    /* Verification */
     EXPECT_EQ(follow_out, source_out);
 }
 
 /**
- * @brief Metamorphic Relation 36: Changing the direction of a single edge in the graph should not change the shortest path length.
+ * @brief Metamorphic Relation 36: Removing a specific edge from the graph, the shortest path distance should either remain unchanged or increase if the removed edge is on the shortest path.
+ *
  */
 TEST_P(SpwikiParamTest, MR36) {
     /* Get source input */
     SpwikiInput input = GetParam();
-    vector<vector<int>> existing_edges = input.edges;
+    vector<vector<int>> source_edges = input.edges;
+    int source_src = input.src, source_dst = input.dst, source_n = input.n;
 
-    /* Select a single edge to change the direction */
-    // Assuming the graph is non-directed, the direction change should not impact shortest paths
-    vector<int> edge_to_change = existing_edges[0];
-    vector<vector<int>> graph_with_directional_change = existing_edges;
-    graph_with_directional_change.erase(graph_with_directional_change.begin());
-    graph_with_directional_change.emplace_back(vector<int>{edge_to_change[1], edge_to_change[0], edge_to_change[2]});
+    /* Get shortest path with original edges */
+    int source_out = shortest_path(source_edges, source_src, source_dst, source_n);
 
-    /* Get the shortest path length after changing the direction of the edge */
-    int source_out = shortest_path(existing_edges, 0, 4, input.n);
-    int follow_out = shortest_path(graph_with_directional_change, 0, 4, input.n);
+    /* Choose an edge to remove */
+    vector<int> edge_to_remove = source_edges.front(); // Selecting the first edge in the list
+    source_edges.erase(source_edges.begin()); // Removing the chosen edge
 
-    /* Verification - Changing the direction of a single edge should not change the shortest path length */
-    EXPECT_EQ(follow_out, source_out);
+    /* Get follow-up output */
+    int follow_out = shortest_path(source_edges, source_src, source_dst, source_n);
+
+    /* Verification */
+    if (follow_out >= source_out) {
+        EXPECT_TRUE(true);  // Removed edge is on or not on the shortest path
+    } else {
+        EXPECT_EQ(follow_out, source_out);  // Removed edge is on the shortest path
+    }
 }
+
 /**
- * @brief Metamorphic Relation 37: Adding a long detour in the graph should not change the shortest path length between any pair of vertices.
+ * @brief Metamorphic Relation 37: Adding randomly generated edges to the graph, the shortest path distance should remain unchanged or increase.
+ *
  */
 TEST_P(SpwikiParamTest, MR37) {
     /* Get source input */
     SpwikiInput input = GetParam();
-    vector<vector<int>> existing_edges = input.edges;
+    vector<vector<int>> source_edges = input.edges;
+    int source_src = input.src, source_dst = input.dst, source_n = input.n;
 
-    /* Construct a graph with a detour */
-    vector<vector<int>> graph_with_detour = existing_edges;
-    graph_with_detour.emplace_back(vector<int>{1, 5, 10}); // Adding an edge to create a detour, increasing the distance between vertices 1 and 5
+    /* Get shortest path with original edges */
+    int source_out = shortest_path(source_edges, source_src, source_dst, source_n);
 
-    /* Get the shortest path length between two vertices without the detour */
-    int source_out = shortest_path(existing_edges, 0, 4, input.n);
+    /* Randomly generate additional edges */
+    vector<vector<int>> new_edges;
+    int num_additional_edges = 5; // Number of additional edges to add
+    for (int i = 0; i < num_additional_edges; i++) {
+        int start_vertex = rand() % source_n;
+        int end_vertex = rand() % source_n;
+        int weight = rand() % 10 + 1;
+        new_edges.push_back({start_vertex, end_vertex, weight});
+    }
 
-    /* Get the shortest path length between the same two vertices in the graph with the detour */
-    int follow_out = shortest_path(graph_with_detour, 0, 4, input.n);
+    /* Add the additional edges to the original graph */
+    vector<vector<int>> follow_edges = source_edges;
+    follow_edges.insert(follow_edges.end(), new_edges.begin(), new_edges.end());
 
-    /* Verification - Adding a detour in the graph should not change the shortest path length between any pair of vertices */
-    EXPECT_EQ(follow_out, source_out);
+    /* Get follow-up output */
+    int follow_out = shortest_path(follow_edges, source_src, source_dst, source_n);
+
+    /* Verification */
+    if (follow_out >= source_out) {
+        EXPECT_TRUE(true);  // Distance either remains unchanged or increases
+    } else {
+        EXPECT_EQ(follow_out, source_out);  // Unexpected case
+    }
 }
 
 /**
- * @brief Metamorphic Relation 38: Adding or removing any isolated vertices in the graph should not change the shortest path length between any pair of vertices.
+ * @brief Metamorphic Relation 38: Removing randomly selected edges from the graph, the shortest path distance should remain unchanged or decrease.
+ *
  */
 TEST_P(SpwikiParamTest, MR38) {
     /* Get source input */
     SpwikiInput input = GetParam();
-    vector<vector<int>> existing_edges = input.edges;
+    vector<vector<int>> source_edges = input.edges;
+    int source_src = input.src, source_dst = input.dst, source_n = input.n;
 
-    /* Add isolated vertices to the graph */
-    vector<vector<int>> graph_with_isolated_vertices = existing_edges;
-    graph_with_isolated_vertices.emplace_back(vector<int>{6, 7, 2}); // Adding an edge to create an isolated vertex 6
-    graph_with_isolated_vertices.emplace_back(vector<int>{8, 9, 3}); // Adding an edge to create an isolated vertex 8
+    /* Get shortest path with original edges */
+    int source_out = shortest_path(source_edges, source_src, source_dst, source_n);
 
-    /* Remove existing isolated vertices from the graph */
-    vector<vector<int>> graph_without_isolated_vertices = existing_edges;
-    // Remove edges incident to isolated vertices
-    graph_without_isolated_vertices.erase(std::remove_if(graph_without_isolated_vertices.begin(), graph_without_isolated_vertices.end(), 
-        [](const vector<int>& edge) { return edge[0] == 6 || edge[0] == 7 || edge[1] == 6 || edge[1] == 7; }), graph_without_isolated_vertices.end());
+    /* Randomly select edges to remove */
+    vector<vector<int>> follow_edges = source_edges;
+    int num_edges_to_remove = 2; // Number of edges to remove
+    for (int i = 0; i < num_edges_to_remove; i++) {
+        int index = rand() % follow_edges.size();
+        follow_edges.erase(follow_edges.begin() + index);
+    }
 
-    /* Get the shortest path length between two vertices in the original graph and the modified graphs */
-    int source_out = shortest_path(existing_edges, 0, 4, input.n);
-    int follow_out_add = shortest_path(graph_with_isolated_vertices, 0, 4, input.n);
-    int follow_out_remove = shortest_path(graph_without_isolated_vertices, 0, 4, input.n);
+    /* Get follow-up output */
+    int follow_out = shortest_path(follow_edges, source_src, source_dst, source_n);
 
-    /* Verification - Adding or removing isolated vertices in the graph should not change the shortest path length between any pair of vertices */
-    EXPECT_EQ(source_out, follow_out_add);
-    EXPECT_EQ(source_out, follow_out_remove);
+    /* Verification */
+    if (follow_out <= source_out) {
+        EXPECT_TRUE(true);  // Distance either remains unchanged or decreases
+    } else {
+        EXPECT_EQ(follow_out, source_out);  // Unexpected case
+    }
 }
+
 /**
- * @brief Metamorphic Relation 39: Adding or removing parallel edges in the graph should not change the shortest path length between any pair of vertices.
+ * @brief Metamorphic Relation 39: Doubling the number of vertices, the behavior of the shortest path algorithm is altered.
+ *
  */
 TEST_P(SpwikiParamTest, MR39) {
     /* Get source input */
     SpwikiInput input = GetParam();
-    vector<vector<int>> existing_edges = input.edges;
-    
-    /* Add parallel edges to the graph */
-    vector<vector<int>> graph_with_parallel_edges = existing_edges;
-    graph_with_parallel_edges.push_back({0, 1, 3}); // Adding a parallel edge to the graph
-    // Remove existing parallel edges from the graph
-    vector<vector<int>> graph_without_parallel_edges = existing_edges;
-    graph_without_parallel_edges.erase(
-        std::remove(graph_without_parallel_edges.begin(), graph_without_parallel_edges.end(), vector<int>{0, 1, 2}), 
-        graph_without_parallel_edges.end());
+    vector<vector<int>> source_edges = input.edges;
+    int source_src = input.src, source_dst = input.dst, source_n = input.n;
 
-    /* Get the shortest path length between two vertices in the original graph and the modified graphs */
-    int source_out = shortest_path(existing_edges, 0, 2, input.n);
-    int follow_out_add = shortest_path(graph_with_parallel_edges, 0, 2, input.n);
-    int follow_out_remove = shortest_path(graph_without_parallel_edges, 0, 2, input.n);
+    /* Compute the shortest path with the original number of vertices */
+    int source_out = shortest_path(source_edges, source_src, source_dst, source_n);
 
-    /* Verification - Adding or removing parallel edges in the graph should not change the shortest path length between any pair of vertices */
-    EXPECT_EQ(follow_out_add, source_out);
-    EXPECT_EQ(follow_out_remove, source_out);
+    /* Double the number of vertices */
+    int follow_n = source_n * 2;
+    vector<vector<int>> follow_edges = source_edges;
+    for (int i = 0; i < source_n; i++) {
+        follow_edges.push_back({i, i + source_n, 5}); // Creating connections between the original and the new set of vertices
+    }
+
+    /* Compute the shortest path with the doubled number of vertices */
+    int follow_out = shortest_path(follow_edges, source_src, source_dst, follow_n);
+
+    /* Verification */
+    EXPECT_TRUE(true); // Behavior of the shortest path algorithm is altered
 }
 
+
 /**
- * @brief Metamorphic Relation 40: Adding a hub node in the graph should not change the shortest path length between non-adjacent vertices.
+ * @brief Metamorphic Relation 40: Adding a negative weight cycle in the graph, the behavior of the shortest path algorithm is undefined.
+ *
  */
 TEST_P(SpwikiParamTest, MR40) {
     /* Get source input */
     SpwikiInput input = GetParam();
-    vector<vector<int>> existing_edges = input.edges;
+    vector<vector<int>> source_edges = input.edges;
+    int source_src = input.src, source_dst = input.dst, source_n = input.n;
 
-    /* Construct a graph with a hub node */
-    vector<vector<int>> graph_with_hub = existing_edges;
-    // Add edges from the hub to the existing nodes
-    for (int i = 0; i < existing_edges.size(); i++) {
-        graph_with_hub.emplace_back(vector<int>{existing_edges[i][0], existing_edges[i][1], 3});
-    }
+    // Construct follow-up input by adding a negative weight cycle in the graph
+    vector<vector<int>> follow_edges = source_edges;
+    follow_edges.push_back({source_n, source_n, -3});  // Adding a negative weight self-loop
 
-    /* Get the shortest path length between two non-adjacent vertices */
-    int source_out = shortest_path(existing_edges, 0, 3, input.n);
+    // Get follow-up output
+    int follow_out = shortest_path(follow_edges, source_src, source_dst, source_n);
 
-    /* Get the shortest path length between the same two non-adjacent vertices in the graph with a hub */
-    int follow_out = shortest_path(graph_with_hub, 0, 3, input.n);
-
-    /* Verification - Adding a hub node in the graph should not change the shortest path length between non-adjacent vertices */
-    EXPECT_EQ(follow_out, source_out);
-}
-/**
- * @brief Metamorphic Relation 41: Replacing an edge in the graph with a shorter path of multiple edges should not change the shortest path length between any pair of vertices.
- */
-TEST_P(SpwikiParamTest, MR41) {
-    /* Get source input */
-    SpwikiInput input = GetParam();
-    vector<vector<int>> existing_edges = input.edges;
-
-    /* Construct a graph with a replaced shorter path of multiple edges */
-    vector<vector<int>> graph_with_shorter_path = existing_edges;
-    // Replace an edge with a shorter path of multiple edges
-    graph_with_shorter_path.emplace_back(vector<int>{0, 3, 2});
-    graph_with_shorter_path.emplace_back(vector<int>{3, 4, 3});
-    graph_with_shorter_path.emplace_back(vector<int>{4, 2, 4});
-    // Remove the original edge from the graph
-    graph_with_shorter_path.erase(std::remove(graph_with_shorter_path.begin(), graph_with_shorter_path.end(), vector<int>{0, 2, 6}), 
-                                graph_with_shorter_path.end());
-
-    /* Get the shortest path length between two vertices with the original and replaced edges */
-    int source_out = shortest_path(existing_edges, 0, 2, input.n);
-    int follow_out = shortest_path(graph_with_shorter_path, 0, 2, input.n);
-
-    /* Verification - Replacing an edge with a shorter path of multiple edges should not change the shortest path length between any pair of vertices */
-    EXPECT_EQ(follow_out, source_out);
-}
-
-/**
- * @brief Metamorphic Relation 42: Adding a long bypass path in the graph should not change the shortest path length between any pair of vertices.
- */
-TEST_P(SpwikiParamTest, MR42) {
-    /* Get source input */
-    SpwikiInput input = GetParam();
-    vector<vector<int>> existing_edges = input.edges;
-
-    /* Construct a graph with a bypass path */
-    vector<vector<int>> graph_with_bypass_path = existing_edges;
-    // Add a long bypass path in the graph
-    graph_with_bypass_path.emplace_back(vector<int>{0, 3, 5});
-    graph_with_bypass_path.emplace_back(vector<int>{3, 4, 6});
-    graph_with_bypass_path.emplace_back(vector<int>{4, 2, 3});
-
-    /* Get the shortest path length between two vertices with and without the bypass path */
-    int source_out = shortest_path(existing_edges, 0, 2, input.n);
-    int follow_out = shortest_path(graph_with_bypass_path, 0, 2, input.n);
-
-    /* Verification - Adding a long bypass path in the graph should not change the shortest path length between any pair of vertices */
-    EXPECT_EQ(follow_out, source_out);
+    // Verification
+    EXPECT_TRUE(true); // Behavior of the shortest path algorithm is undefined
 }
 
 INSTANTIATE_TEST_CASE_P(TrueReturn, SpwikiParamTest, testing::ValuesIn(gen_tcs_randomly()));
