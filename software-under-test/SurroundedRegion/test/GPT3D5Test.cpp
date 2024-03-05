@@ -184,7 +184,7 @@ TEST_P(SurroundedRegionParamTest, MR7) {
  * @brief Metamorphic Relation 8: Transposing the input matrix (interchanging rows and columns), then the output should also be transposed.
  *
  */
-TEST_P(SurroundedRegionParamTest, MR8) {
+TEST_P(SurroundedRegionParamTest, MR8) {    // fixed
     /* Get source input */
     SurroundedRegionInput input = GetParam();
     vector<string> source_vec = input.vec;
@@ -199,12 +199,18 @@ TEST_P(SurroundedRegionParamTest, MR8) {
             follow_vec[j][i] = source_vec[i][j];
         }
     }
-    
+
     /* Get follow-up output */
     vector<string> follow_out = surrounded_region(follow_vec);
     
     /* Verification: Result of transposing input should match transposed output */
-    EXPECT_EQ(follow_out, source_out);
+    vector<string> expected(source_out[0].size(), string(source_out.size(), ' '));
+    for (size_t i = 0; i < source_out.size(); i++) {
+        for (size_t j = 0; j < source_out[i].size(); j++) {
+            expected[j][i] = source_out[i][j];
+        }
+    }
+    EXPECT_EQ(follow_out, expected);
 }
 
 /**
@@ -240,7 +246,7 @@ TEST_P(SurroundedRegionParamTest, MR9) {
  * @brief Metamorphic Relation 10: Rotating the input matrix 90 degrees clockwise, then the output should also be rotated 90 degrees clockwise.
  *
  */
-TEST_P(SurroundedRegionParamTest, MR10) {
+TEST_P(SurroundedRegionParamTest, MR10) {   // fixed
     /* Get source input */
     SurroundedRegionInput input = GetParam();
     vector<string> source_vec = input.vec;
@@ -260,7 +266,13 @@ TEST_P(SurroundedRegionParamTest, MR10) {
     vector<string> follow_out = surrounded_region(follow_vec);
     
     /* Verification: Result of rotating input should match rotated output */
-    EXPECT_EQ(follow_out, source_out);
+    vector<string> expected(source_out[0].size(), string(source_out.size(), ' '));
+    for (size_t i = 0; i < source_out.size(); i++) {
+        for (size_t j = 0; j < source_out[i].size(); j++) {
+            expected[j][source_out.size() - 1 - i] = source_out[i][j];
+        }
+    }
+    EXPECT_EQ(follow_out, expected);
 }
 
 /**
@@ -564,7 +576,7 @@ TEST_P(SurroundedRegionParamTest, MR22) {
  * @brief Metamorphic Relation 23: Rotating the input matrix 180 degrees, then the output should also be rotated 180 degrees.
  *
  */
-TEST_P(SurroundedRegionParamTest, MR23) {
+TEST_P(SurroundedRegionParamTest, MR23) {   // fixed
     /* Get source input */
     SurroundedRegionInput input = GetParam();
     vector<string> source_vec = input.vec;
@@ -582,7 +594,10 @@ TEST_P(SurroundedRegionParamTest, MR23) {
     vector<string> follow_out = surrounded_region(follow_vec);
 
     /* Verification: Result of rotating input 180 degrees should match rotated output */
-    EXPECT_EQ(follow_out, source_out);
+    vector<string> expected(source_out.rbegin(), source_out.rend());
+    for (auto& row : expected)
+        reverse(row.begin(), row.end());
+    EXPECT_EQ(follow_out, expected);
 }
 
 //fixed
@@ -741,7 +756,8 @@ TEST_P(SurroundedRegionParamTest, MR29) {
     vector<string> follow_out = surrounded_region(follow_vec);
 
     /* Verification: Result of reversing rows in input should match reversed output */
-    EXPECT_EQ(follow_out, source_out);
+    vector<string> expected(source_out.rbegin(), source_out.rend());
+    EXPECT_EQ(follow_out, expected);
 }
 
 /**
