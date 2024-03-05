@@ -12,418 +12,532 @@ using namespace std;
 class SurroundedRegionParamTest : public ::testing::TestWithParam<SurroundedRegionInput> {};
 
 /**
- * @brief Metamorphic Relation 4: If the input board contains only a single 'O', the output should remain the same as the input.
+ * @brief Metamorphic Relation 1: Reversing the order of rows in the input matrix should not change the output.
+ *
+ */
+TEST_P(SurroundedRegionParamTest, MR1) {
+    /* Get source input */
+    SurroundedRegionInput input = GetParam();
+    vector<string> source_vec = input.vec;
+    
+    /* Get source output */
+    vector<string> source_out = surrounded_region(source_vec);
+    
+    /* Construct follow-up input */
+    vector<string> follow_vec(source_vec.rbegin(), source_vec.rend());
+    
+    /* Get follow-up output */
+    vector<string> follow_out = surrounded_region(follow_vec);
+    
+    /* Verification: Output of original input should be same as reverse input */
+    EXPECT_EQ(follow_out, source_out);
+}
+
+/**
+ * @brief Metamorphic Relation 2: Shifting every character in the input matrix down by one position, then the result should also be shifted down by one position.
+ *
+ */
+TEST_P(SurroundedRegionParamTest, MR2) {
+    /* Get source input */
+    SurroundedRegionInput input = GetParam();
+    vector<string> source_vec = input.vec;
+    
+    /* Get source output */
+    vector<string> source_out = surrounded_region(source_vec);
+    
+    /* Construct follow-up input */
+    vector<string> follow_vec = source_vec;
+    for (int i = follow_vec.size() - 1; i > 0; i--) {
+        follow_vec[i] = source_vec[i - 1];
+    }
+    follow_vec[0] = string(follow_vec[0].length(), 'O');
+    
+    /* Get follow-up output */
+    vector<string> follow_out = surrounded_region(follow_vec);
+    
+    /* Verification: Result of shifting down the input should match shifted down result */
+    EXPECT_EQ(follow_out, source_out);
+}
+
+/**
+ * @brief Metamorphic Relation 3: Replacing all 'O's with 'X' in the input matrix, then the output should also have all 'O's replaced with 'X'.
+ *
+ */
+TEST_P(SurroundedRegionParamTest, MR3) {
+    /* Get source input */
+    SurroundedRegionInput input = GetParam();
+    vector<string> source_vec = input.vec;
+    
+    /* Replace 'O's with 'X' in source input */
+    for (auto& row : source_vec) {
+        replace(row.begin(), row.end(), 'O', 'X');
+    }
+    
+    /* Get source output */
+    vector<string> source_out = surrounded_region(source_vec);
+    
+    /* Verification: Output of source input with 'O's replaced by 'X' should match output of original input */
+    for (auto& row : source_out) {
+        replace(row.begin(), row.end(), 'O', 'X');
+    }
+    EXPECT_EQ(source_out, source_out);
+}
+
+/**
+ * @brief Metamorphic Relation 4: Adding a row of 'X's to the input matrix, then the output should remain the same.
  *
  */
 TEST_P(SurroundedRegionParamTest, MR4) {
     /* Get source input */
     SurroundedRegionInput input = GetParam();
     vector<string> source_vec = input.vec;
-
+    
     /* Get source output */
     vector<string> source_out = surrounded_region(source_vec);
-
+    
     /* Construct follow-up input */
-    vector<string> follow_vec = source_vec; // Follow-up input is the same as the source input
-    follow_vec[0][0] = 'O'; // Change the original 'X' to 'O' in the follow-up input
+    int cols = source_vec[0].length();
+    vector<string> follow_vec = source_vec;
+    follow_vec.push_back(string(cols, 'X'));
     
     /* Get follow-up output */
     vector<string> follow_out = surrounded_region(follow_vec);
-
-    /* Verification */
+    
+    /* Verification: Result of original input should be same as input with extra row of 'X's */
     EXPECT_EQ(follow_out, source_out);
 }
 
 /**
- * @brief Metamorphic Relation 5: If all 'O's are surrounded by 'X's in the original board, then the output should remain unchanged.
+ * @brief Metamorphic Relation 5: Removing the first row of the input matrix, then the output should be the same as the output of the modified matrix.
  *
  */
 TEST_P(SurroundedRegionParamTest, MR5) {
     /* Get source input */
     SurroundedRegionInput input = GetParam();
     vector<string> source_vec = input.vec;
-
+    
     /* Get source output */
     vector<string> source_out = surrounded_region(source_vec);
-
-    /* Verification */
-    EXPECT_EQ(surrounded_region(source_out), source_out);
+    
+    /* Remove the first row in the input matrix */
+    vector<string> follow_vec(source_vec.begin() + 1, source_vec.end());
+    
+    /* Get follow-up output */
+    vector<string> follow_out = surrounded_region(follow_vec);
+    
+    /* Verification: Result of modified input (removed first row) should match original output */
+    EXPECT_EQ(follow_out, source_out);
 }
 
 /**
- * @brief Metamorphic Relation 6: If the original input board and the follow-up input board are identical, then the original output and follow-up output should also be identical.
+ * @brief Metamorphic Relation 6: Repeating the input matrix twice (concatenating with itself), then the output should remain the same as the original input.
  *
  */
 TEST_P(SurroundedRegionParamTest, MR6) {
     /* Get source input */
     SurroundedRegionInput input = GetParam();
     vector<string> source_vec = input.vec;
-
+    
     /* Get source output */
     vector<string> source_out = surrounded_region(source_vec);
-
+    
+    /* Construct follow-up input by concatenating original input with itself */
+    vector<string> follow_vec = source_vec;
+    follow_vec.insert(follow_vec.end(), source_vec.begin(), source_vec.end());
+    
     /* Get follow-up output */
-    vector<string> follow_out = surrounded_region(source_vec); // Follow-up output is obtained from the same input as the original output
-
-    /* Verification */
+    vector<string> follow_out = surrounded_region(follow_vec);
+    
+    /* Verification: Repeating input matrix should not change the output */
     EXPECT_EQ(follow_out, source_out);
 }
+
 /**
- * @brief Metamorphic Relation 7: If all 'O's are already on the border of the board, then the output should remain the same as the input.
+ * @brief Metamorphic Relation 7: Flipping the characters in each row of the input matrix (reversing each row), then the output should also have the characters in each row flipped.
  *
  */
 TEST_P(SurroundedRegionParamTest, MR7) {
     /* Get source input */
     SurroundedRegionInput input = GetParam();
     vector<string> source_vec = input.vec;
-
+    
     /* Get source output */
     vector<string> source_out = surrounded_region(source_vec);
-
-    /* Construct follow-up input */
-    vector<string> follow_vec = source_vec; // Follow-up input is the same as the source input
+    
+    /* Construct follow-up input by reversing characters in each row */
+    vector<string> follow_vec = source_vec;
     for (auto& row : follow_vec) {
-        if (row[0] == 'O') row[0] = 'X'; // Flip the 'O's on the borders to 'X's in the follow-up input
-        if (row.back() == 'O') row.back() = 'X'; // Flip the 'O's on the borders to 'X's in the follow-up input
+        reverse(row.begin(), row.end());
     }
     
     /* Get follow-up output */
     vector<string> follow_out = surrounded_region(follow_vec);
-
-    /* Verification */
+    
+    /* Verification: Result of reversing each row characters in input should match reversed output */
+    for (auto& row : source_out) {
+        reverse(row.begin(), row.end());
+    }
     EXPECT_EQ(follow_out, source_out);
 }
 
 /**
- * @brief Metamorphic Relation 8: If the input board is empty (contains no 'O's), the output should also be an empty board.
+ * @brief Metamorphic Relation 8: Transposing the input matrix (interchanging rows and columns), then the output should also be transposed.
  *
  */
 TEST_P(SurroundedRegionParamTest, MR8) {
     /* Get source input */
     SurroundedRegionInput input = GetParam();
-    vector<string> source_vec; // Empty input board
+    vector<string> source_vec = input.vec;
     
     /* Get source output */
     vector<string> source_out = surrounded_region(source_vec);
-
-    /* Verification */
-    EXPECT_TRUE(source_out.empty());
+    
+    /* Construct follow-up input as transpose of source input */
+    vector<string> follow_vec(source_vec[0].size(), string(source_vec.size(), ' '));
+    for (size_t i = 0; i < source_vec.size(); i++) {
+        for (size_t j = 0; j < source_vec[i].size(); j++) {
+            follow_vec[j][i] = source_vec[i][j];
+        }
+    }
+    
+    /* Get follow-up output */
+    vector<string> follow_out = surrounded_region(follow_vec);
+    
+    /* Verification: Result of transposing input should match transposed output */
+    EXPECT_EQ(follow_out, source_out);
 }
 
 /**
- * @brief Metamorphic Relation 9: If all cells on the board contain 'X', then the output should also contain 'X's only.
+ * @brief Metamorphic Relation 9: Adding a border of 'X's around the input matrix, then the output should remain the same as the original input.
  *
  */
 TEST_P(SurroundedRegionParamTest, MR9) {
     /* Get source input */
     SurroundedRegionInput input = GetParam();
     vector<string> source_vec = input.vec;
-    // Convert all 'O's to 'X's in the source input
-    for (auto& row : source_vec) {
-        for (char& cell : row) {
-            if (cell == 'O') cell = 'X';
-        }
-    }
-
+    
     /* Get source output */
     vector<string> source_out = surrounded_region(source_vec);
-
-    /* Verification */
-    EXPECT_EQ(source_out, source_vec);
+    
+    /* Construct follow-up input by adding a border of 'X's around original input */
+    int rows = source_vec.size();
+    int cols = source_vec[0].size();
+    vector<string> follow_vec;
+    follow_vec.push_back(string(cols + 2, 'X'));
+    for (const auto& row : source_vec) {
+        follow_vec.push_back("X" + row + "X");
+    }
+    follow_vec.push_back(string(cols + 2, 'X'));
+    
+    /* Get follow-up output */
+    vector<string> follow_out = surrounded_region(follow_vec);
+    
+    /* Verification: Adding border of 'X's around input should not change the output */
+    EXPECT_EQ(follow_out, source_out);
 }
+
 /**
- * @brief Metamorphic Relation 10: If the input board consists of a single row or a single column, the output should remain the same as the input.
+ * @brief Metamorphic Relation 10: Rotating the input matrix 90 degrees clockwise, then the output should also be rotated 90 degrees clockwise.
  *
  */
 TEST_P(SurroundedRegionParamTest, MR10) {
     /* Get source input */
     SurroundedRegionInput input = GetParam();
     vector<string> source_vec = input.vec;
-
+    
     /* Get source output */
     vector<string> source_out = surrounded_region(source_vec);
-
-    /* Construct follow-up input */
-    vector<string> follow_vec = source_vec; // Follow-up input is the same as the source input
-    if (follow_vec.size() == 1 || follow_vec[0].size() == 1) { // If the input board consists of a single row or a single column
-        // Add or remove 'O's in the follow-up input to test consistency of output
-        follow_vec[0][0] = (follow_vec[0][0] == 'O') ? 'X' : 'O';
+    
+    /* Construct follow-up input by rotating original input 90 degrees clockwise */
+    vector<string> follow_vec(source_vec[0].size(), string(source_vec.size(), ' '));
+    for (size_t i = 0; i < source_vec.size(); i++) {
+        for (size_t j = 0; j < source_vec[i].size(); j++) {
+            follow_vec[j][source_vec.size() - 1 - i] = source_vec[i][j];
+        }
     }
     
     /* Get follow-up output */
     vector<string> follow_out = surrounded_region(follow_vec);
-
-    /* Verification */
+    
+    /* Verification: Result of rotating input should match rotated output */
     EXPECT_EQ(follow_out, source_out);
 }
 
 /**
- * @brief Metamorphic Relation 11: If the input board contains a single enclosed region with 'O's, and the size of the region changes, then the output should reflect the change in size of the enclosed region.
+ * @brief Metamorphic Relation 11: Scaling the input matrix by doubling the width and height, then the output should remain the same as the original input.
  *
  */
 TEST_P(SurroundedRegionParamTest, MR11) {
     /* Get source input */
     SurroundedRegionInput input = GetParam();
     vector<string> source_vec = input.vec;
-
+    
     /* Get source output */
     vector<string> source_out = surrounded_region(source_vec);
-
-    /* Construct follow-up input */
-    vector<string> follow_vec = source_vec;
-    // Modify the enclosed region by adding or removing 'O's
-    follow_vec[1][1] = (follow_vec[1][1] == 'O') ? 'X' : 'O'; // Change the status of a cell within the enclosed region
+    
+    /* Construct follow-up input by doubling the width and height of original input with additional 'O's */
+    vector<string> follow_vec;
+    for (auto row : source_vec) {
+        follow_vec.push_back(row + row);
+    }
+    for (auto row : source_vec) {
+        follow_vec.push_back(row + row);
+    }
     
     /* Get follow-up output */
     vector<string> follow_out = surrounded_region(follow_vec);
-
-    /* Verification */
-    EXPECT_NE(follow_out, source_out);
+    
+    /* Verification: Doubling the input size should not change the output */
+    EXPECT_EQ(follow_out, source_out);
 }
 
 /**
- * @brief Metamorphic Relation 12: If the input board consists of multiple enclosed regions with 'O's, and the regions are repositioned within the board, then the output should reflect the repositioning of the enclosed regions.
+ * @brief Metamorphic Relation 12: Replacing all characters of the input matrix with a single character 'O', then the output should also have all characters replaced with 'O'.
  *
  */
 TEST_P(SurroundedRegionParamTest, MR12) {
     /* Get source input */
     SurroundedRegionInput input = GetParam();
     vector<string> source_vec = input.vec;
-
+    
     /* Get source output */
     vector<string> source_out = surrounded_region(source_vec);
-
-    /* Construct follow-up input */
-    vector<string> follow_vec = source_vec;
-    // Mix the enclosed regions by swapping the positions of 'O's
-    swap(follow_vec[1][1], follow_vec[2][2]);
-
+    
+    /* Construct follow-up input by replacing all characters with 'O' */
+    vector<string> follow_vec;
+    for (auto row : source_vec) {
+        follow_vec.push_back(string(row.size(), 'O'));
+    }
+    
     /* Get follow-up output */
     vector<string> follow_out = surrounded_region(follow_vec);
-
-    /* Verification */
-    EXPECT_NE(follow_out, source_out);
+    
+    /* Verification: Result of replacing all characters with 'O' in input should match output */
+    EXPECT_EQ(follow_out, source_out);
 }
+
 /**
- * @brief Metamorphic Relation 13: If the input board is a symmetric board, the output should also be symmetric with respect to the same axis of symmetry.
+ * @brief Metamorphic Relation 13: Swapping rows in the input matrix, then the output should also have the rows swapped accordingly.
  *
  */
 TEST_P(SurroundedRegionParamTest, MR13) {
     /* Get source input */
     SurroundedRegionInput input = GetParam();
     vector<string> source_vec = input.vec;
-
+    
     /* Get source output */
     vector<string> source_out = surrounded_region(source_vec);
-
-    /* Construct follow-up input */
+    
+    /* Construct follow-up input by swapping the first and last rows of original input */
     vector<string> follow_vec = source_vec;
-    // Make the follow-up input symmetric along the horizontal axis
-    reverse(follow_vec.begin(), follow_vec.end());
-
+    swap(follow_vec.front(), follow_vec.back());
+    
     /* Get follow-up output */
     vector<string> follow_out = surrounded_region(follow_vec);
-
-    /* Verification */
-    reverse(follow_out.begin(), follow_out.end());
+    
+    /* Verification: Result of swapping rows in input should match swapped output */
     EXPECT_EQ(follow_out, source_out);
 }
 
-/* Fix by Radon */
-vector<string> rotate_output_90_degrees_counterclockwise(vector<string> output) {
-    vector<string> rotated_output(output[0].size(), string(output.size(), ' '));
-    for (size_t i = 0; i < output.size(); ++i) {
-        for (size_t j = 0; j < output[i].size(); ++j) {
-            rotated_output[output[i].size() - 1 - j][i] = output[i][j];
-        }
-    }
-    return rotated_output;
-}
-
 /**
- * @brief Metamorphic Relation 14: If the input board is a rotation of another input board, the output should also be a rotation of the output corresponding to the original input.
+ * @brief Metamorphic Relation 14: Reversing the order of columns in the input matrix, then the output should also have the columns reversed accordingly.
  *
  */
 TEST_P(SurroundedRegionParamTest, MR14) {
     /* Get source input */
     SurroundedRegionInput input = GetParam();
     vector<string> source_vec = input.vec;
-
+    
     /* Get source output */
     vector<string> source_out = surrounded_region(source_vec);
-
-    /* Construct follow-up input */
-    vector<string> follow_vec = source_vec;
-    // Rotate the follow-up input 90 degrees counterclockwise
-    vector<string> rotated_vec(source_vec[0].size(), string(source_vec.size(), ' '));
-    for (size_t i = 0; i < source_vec.size(); ++i) {
-        for (size_t j = 0; j < source_vec[i].size(); ++j) {
-            rotated_vec[source_vec[i].size() - 1 - j][i] = source_vec[i][j];
-        }
+    
+    /* Construct follow-up input by reversing the order of columns in original input */
+    vector<string> follow_vec;
+    for (const auto& row : source_vec) {
+        follow_vec.push_back(string(row.rbegin(), row.rend()));
     }
-
+    
     /* Get follow-up output */
-    vector<string> follow_out = surrounded_region(rotated_vec);
-
-    /* Verification */
-    EXPECT_EQ(rotate_output_90_degrees_counterclockwise(source_out), follow_out);
+    vector<string> follow_out = surrounded_region(follow_vec);
+    
+    /* Verification: Result of reversing columns in input should match reversed output */
+    EXPECT_EQ(follow_out, source_out);
 }
 
 /**
- * @brief Metamorphic Relation 15: If the input board contains a mixture of 'O's and 'X's, and the positions of 'O's are permuted within the board, the output should remain unchanged.
+ * @brief Metamorphic Relation 15: Removing every second row from the input matrix, then the output should also be the modified accordingly.
  *
  */
 TEST_P(SurroundedRegionParamTest, MR15) {
     /* Get source input */
     SurroundedRegionInput input = GetParam();
     vector<string> source_vec = input.vec;
-
+    
     /* Get source output */
     vector<string> source_out = surrounded_region(source_vec);
-
-    /* Construct follow-up input */
-    vector<string> follow_vec = source_vec;
-    // Permute the positions of 'O's within the input board
-    for (auto& row : follow_vec) {
-        random_shuffle(row.begin(), row.end());
+    
+    /* Remove every second row from the input matrix */
+    vector<string> follow_vec;
+    for (size_t i = 0; i < source_vec.size(); i += 2) {
+        follow_vec.push_back(source_vec[i]);
     }
-
+    
     /* Get follow-up output */
     vector<string> follow_out = surrounded_region(follow_vec);
-
-    /* Verification */
+    
+    /* Verification: Result of removing every second row from input should match modified output */
     EXPECT_EQ(follow_out, source_out);
 }
+
 /**
- * @brief Metamorphic Relation 16: If a row or column in the input board contains consecutive 'O's, and the number of consecutive 'O's changes, then the output should reflect the change in the number of consecutive 'O's.
+ * @brief Metamorphic Relation 16: Permuting the rows of the input matrix, then the output should also be the permuted accordingly.
  *
  */
 TEST_P(SurroundedRegionParamTest, MR16) {
     /* Get source input */
     SurroundedRegionInput input = GetParam();
     vector<string> source_vec = input.vec;
-
+    
     /* Get source output */
     vector<string> source_out = surrounded_region(source_vec);
-
-    /* Construct follow-up input */
+    
+    /* Permute the rows of the input matrix */
     vector<string> follow_vec = source_vec;
-    // Modify the number of consecutive 'O's in a row
-    follow_vec[1][1] = (follow_vec[1][1] == 'O') ? 'X' : 'O'; // Change the status of a cell within a row with consecutive 'O's
-
+    random_shuffle(follow_vec.begin(), follow_vec.end());
+    
     /* Get follow-up output */
     vector<string> follow_out = surrounded_region(follow_vec);
-
-    /* Verification */
-    EXPECT_NE(follow_out, source_out);
+    
+    /* Verification: Result of permuting rows in input should match permuted output */
+    EXPECT_EQ(follow_out, source_out);
 }
 
 /**
- * @brief Metamorphic Relation 17: If the input board contains isolated 'O's, adding or removing isolated 'O's should not change the output.
+ * @brief Metamorphic Relation 17: Reversing the order of columns in the input matrix, then the output should also have the columns reversed accordingly.
  *
  */
 TEST_P(SurroundedRegionParamTest, MR17) {
     /* Get source input */
     SurroundedRegionInput input = GetParam();
     vector<string> source_vec = input.vec;
-
+    
     /* Get source output */
     vector<string> source_out = surrounded_region(source_vec);
-
-    /* Construct follow-up input */
-    vector<string> follow_vec = source_vec;
-    // Add an isolated 'O' in the follow-up input
-    follow_vec[1][1] = 'O';
-
+    
+    /* Construct follow-up input by reversing the order of columns in the original input */
+    vector<string> follow_vec;
+    for (const auto& row : source_vec) {
+        follow_vec.push_back(string(row.rbegin(), row.rend()));
+    }
+    
     /* Get follow-up output */
     vector<string> follow_out = surrounded_region(follow_vec);
-
-    /* Verification */
+    
+    /* Verification: Result of reversing columns in the input should match reversed output */
     EXPECT_EQ(follow_out, source_out);
 }
 
 /**
- * @brief Metamorphic Relation 18: If the input board contains a mixture of 'X's and 'O's, and the positions of 'X's are permuted within the board, the output should remain unchanged.
+ * @brief Metamorphic Relation 18: Adding a column of 'O's to the input matrix, then the output should remain unchanged.
  *
  */
 TEST_P(SurroundedRegionParamTest, MR18) {
     /* Get source input */
     SurroundedRegionInput input = GetParam();
     vector<string> source_vec = input.vec;
-
+    
     /* Get source output */
     vector<string> source_out = surrounded_region(source_vec);
-
-    /* Construct follow-up input */
-    vector<string> follow_vec = source_vec;
-    // Permute the positions of 'X's within the input board
-    for (auto& row : follow_vec) {
-        random_shuffle(row.begin(), row.end());
+    
+    /* Construct follow-up input by adding a column of 'O's to the original input */
+    vector<string> follow_vec;
+    for (const auto& row : source_vec) {
+        follow_vec.push_back(row + "O");
     }
-
+    
     /* Get follow-up output */
     vector<string> follow_out = surrounded_region(follow_vec);
-
-    /* Verification */
+    
+    /* Verification: Result of adding a column of 'O's to the input should remain unchanged */
     EXPECT_EQ(follow_out, source_out);
 }
+
 /**
- * @brief Metamorphic Relation 19: If the input board contains a single enclosed region with 'O's, and the region is expanded or contracted, then the output should reflect the change in the size and shape of the enclosed region.
+ * @brief Metamorphic Relation 19: Replacing all 'O's with 'X' in the input matrix, then the output should also have all 'O's replaced with 'X'.
  *
  */
 TEST_P(SurroundedRegionParamTest, MR19) {
     /* Get source input */
     SurroundedRegionInput input = GetParam();
     vector<string> source_vec = input.vec;
-
+    
+    /* Replace 'O's with 'X' in source input */
+    for (auto& row : source_vec) {
+        replace(row.begin(), row.end(), 'O', 'X');
+    }
+    
     /* Get source output */
     vector<string> source_out = surrounded_region(source_vec);
-
-    /* Construct follow-up input */
-    vector<string> follow_vec = source_vec;
-    // Expand or contract the enclosed region by adding or removing 'O's
-    follow_vec[1][2] = (follow_vec[1][2] == 'O') ? 'X' : 'O'; // Change the status of a cell within the enclosed region
     
-    /* Get follow-up output */
-    vector<string> follow_out = surrounded_region(follow_vec);
-
-    /* Verification */
-    EXPECT_NE(follow_out, source_out);
+    /* Verification: Output of source input with 'O's replaced by 'X' should match output of original input */
+    for (auto& row : source_out) {
+        replace(row.begin(), row.end(), 'O', 'X');
+    }
+    EXPECT_EQ(source_out, source_out);
 }
 
 /**
- * @brief Metamorphic Relation 20: If the input board contains only a single cell, the output should remain unchanged because there are no enclosed regions.
+ * @brief Metamorphic Relation 20: Adding a row of 'X's to the input matrix, then the output should remain the same as the original input.
  *
  */
 TEST_P(SurroundedRegionParamTest, MR20) {
     /* Get source input */
     SurroundedRegionInput input = GetParam();
-    vector<string> source_vec = { "O" }; // Single cell input
+    vector<string> source_vec = input.vec;
     
     /* Get source output */
     vector<string> source_out = surrounded_region(source_vec);
-
-    /* Verification */
-    EXPECT_EQ(surrounded_region(source_out), source_out);
+    
+    /* Construct follow-up input by adding a row of 'X's to the original input */
+    int cols = source_vec[0].length();
+    vector<string> follow_vec = source_vec;
+    follow_vec.push_back(string(cols, 'X'));
+    
+    /* Get follow-up output */
+    vector<string> follow_out = surrounded_region(follow_vec);
+    
+    /* Verification: Result of original input should be same as input with extra row of 'X's */
+    EXPECT_EQ(follow_out, source_out);
 }
+
 /**
- * @brief Metamorphic Relation 21: If the input board contains regions where all 'O's are surrounded by 'X's but are not directly connected to each other, the output should remain unchanged.
+ * @brief Metamorphic Relation 21: Permuting the rows and columns of the input matrix, then the output should also be permuted accordingly.
  *
  */
 TEST_P(SurroundedRegionParamTest, MR21) {
     /* Get source input */
     SurroundedRegionInput input = GetParam();
     vector<string> source_vec = input.vec;
-
+    
     /* Get source output */
     vector<string> source_out = surrounded_region(source_vec);
 
-    /* Verification */
-    EXPECT_EQ(surrounded_region(source_out), source_out);
+    /* Permute the rows of the input matrix */
+    vector<string> follow_vec = source_vec;
+    random_shuffle(follow_vec.begin(), follow_vec.end());
+    for (auto &row : follow_vec) {
+        random_shuffle(row.begin(), row.end());
+    }
+
+    /* Get follow-up output */
+    vector<string> follow_out = surrounded_region(follow_vec);
+
+    /* Verification: Result of permuting rows and columns in input should match permuted output */
+    EXPECT_EQ(follow_out, source_out);
 }
 
 /**
- * @brief Metamorphic Relation 22: If the input board contains regions where two or more enclosed regions are directly connected, the output should still contain separate enclosed regions after the transformation.
+ * @brief Metamorphic Relation 22: Replacing all 'X's with 'O' in the input matrix, then the output should also have all 'X's replaced with 'O'.
  *
  */
 TEST_P(SurroundedRegionParamTest, MR22) {
@@ -431,25 +545,23 @@ TEST_P(SurroundedRegionParamTest, MR22) {
     SurroundedRegionInput input = GetParam();
     vector<string> source_vec = input.vec;
 
+    /* Replace 'X's with 'O' in source input */
+    for (auto& row : source_vec) {
+        replace(row.begin(), row.end(), 'X', 'O');
+    }
+
     /* Get source output */
     vector<string> source_out = surrounded_region(source_vec);
 
-    /* Construct follow-up input */
-    vector<string> follow_vec = source_vec;
-    // Combine two enclosed regions to make them directly connected
-    follow_vec[1][1] = 'O';
-    follow_vec[1][2] = 'O';
-    follow_vec[2][1] = 'O';
-    follow_vec[2][2] = 'O';
-
-    /* Get follow-up output */
-    vector<string> follow_out = surrounded_region(follow_vec);
-
-    /* Verification */
-    EXPECT_NE(follow_out, source_out);
+    /* Verification: Output of source input with 'X's replaced by 'O' should match output of original input */
+    for (auto& row : source_out) {
+        replace(row.begin(), row.end(), 'X', 'O');
+    }
+    EXPECT_EQ(source_out, source_out);
 }
+
 /**
- * @brief Metamorphic Relation 23: If the input board contains an enclosed region with a hole inside, the output should still contain the same enclosed region with the hole inside after the transformation.
+ * @brief Metamorphic Relation 23: Rotating the input matrix 180 degrees, then the output should also be rotated 180 degrees.
  *
  */
 TEST_P(SurroundedRegionParamTest, MR23) {
@@ -460,24 +572,22 @@ TEST_P(SurroundedRegionParamTest, MR23) {
     /* Get source output */
     vector<string> source_out = surrounded_region(source_vec);
 
-    /* Construct follow-up input */
-    vector<string> follow_vec = source_vec;
-    // Create a hole inside the enclosed region
-    follow_vec[1][1] = 'X';
-    follow_vec[1][2] = 'X';
-    follow_vec[2][1] = 'X';
-    follow_vec[2][2] = 'X';
-    follow_vec[2][3] = 'O';
+    /* Construct follow-up input by rotating original input 180 degrees */
+    vector<string> follow_vec(source_vec.rbegin(), source_vec.rend());
+    for (auto &row : follow_vec) {
+        reverse(row.begin(), row.end());
+    }
 
     /* Get follow-up output */
     vector<string> follow_out = surrounded_region(follow_vec);
 
-    /* Verification */
-    EXPECT_NE(follow_out, source_out);
+    /* Verification: Result of rotating input 180 degrees should match rotated output */
+    EXPECT_EQ(follow_out, source_out);
 }
 
+//fixed
 /**
- * @brief Metamorphic Relation 24: If the input board contains regions where 'O's form shapes other than rectangular or square, such as L-shapes, T-shapes, or irregular shapes, the output should still contain the same shapes after the transformation.
+ * @brief Metamorphic Relation 24: Replacing all 'O's in the input matrix with 'X' and vice versa, then the output should remain unchanged.
  *
  */
 TEST_P(SurroundedRegionParamTest, MR24) {
@@ -488,21 +598,29 @@ TEST_P(SurroundedRegionParamTest, MR24) {
     /* Get source output */
     vector<string> source_out = surrounded_region(source_vec);
 
-    /* Construct follow-up input */
-    vector<string> follow_vec = source_vec;
-    // Create non-rectangular or non-square shapes
-    follow_vec[1][1] = 'O';
-    follow_vec[1][2] = 'O';
-    follow_vec[2][2] = 'O';
+    /* Replace 'O's with 'X' and 'X's with 'O' in source input */
+    for (auto &row : source_vec) {
+        for (char &ch : row) {
+            if (ch == 'O') {
+                ch = 'X';
+            } else if (ch == 'X') {
+                ch = 'O';
+            }
+        }
+    }
 
-    /* Get follow-up output */
-    vector<string> follow_out = surrounded_region(follow_vec);
+    /* Get source output */
+    //vector<string> source_out = surrounded_region(source_vec);
 
-    /* Verification */
+    /* Get follow output */
+    vector<string> follow_out = surrounded_region(source_vec);
+
+    /* Verification: Output of source input with 'O's and 'X's swapped should match output of original input */
     EXPECT_EQ(follow_out, source_out);
 }
+
 /**
- * @brief Metamorphic Relation 25: If the input board contains only a single row or single column with 'O's, the output should remain unchanged after the transformation.
+ * @brief Metamorphic Relation 25: Adding an empty row to the input matrix, then the output should remain the same as the original input.
  *
  */
 TEST_P(SurroundedRegionParamTest, MR25) {
@@ -513,26 +631,20 @@ TEST_P(SurroundedRegionParamTest, MR25) {
     /* Get source output */
     vector<string> source_out = surrounded_region(source_vec);
 
-    /* Construct follow-up input */
+    /* Construct follow-up input by adding an empty row to the original input */
+    int cols = source_vec[0].length();
     vector<string> follow_vec = source_vec;
-    // Create a single row or single column with 'O's
-    if (follow_vec.size() == 1) {
-        follow_vec.push_back(follow_vec[0]);
-    } else {
-        for (auto& row : follow_vec) {
-            row += row;
-        }
-    }
+    follow_vec.push_back(string(cols, ' '));
 
     /* Get follow-up output */
     vector<string> follow_out = surrounded_region(follow_vec);
 
-    /* Verification */
+    /* Verification: Result of original input should be same as input with extra empty row */
     EXPECT_EQ(follow_out, source_out);
 }
 
 /**
- * @brief Metamorphic Relation 26: If the input board consists of a chessboard-like pattern of 'O's and 'X's, the output should also consist of the same chessboard-like pattern after the transformation.
+ * @brief Metamorphic Relation 26: Removing the last column from the input matrix, then the output should remain the same as the original input.
  *
  */
 TEST_P(SurroundedRegionParamTest, MR26) {
@@ -543,25 +655,21 @@ TEST_P(SurroundedRegionParamTest, MR26) {
     /* Get source output */
     vector<string> source_out = surrounded_region(source_vec);
 
-    /* Construct follow-up input */
-    vector<string> follow_vec = source_vec;
-    // Create a chessboard-like pattern
-    for (int i = 0; i < follow_vec.size(); i++) {
-        for (int j = 0; j < follow_vec[i].size(); j++) {
-            if ((i + j) % 2 == 0) {
-                follow_vec[i][j] = 'O';
-            }
-        }
+    /* Remove the last column from the input matrix */
+    vector<string> follow_vec;
+    for (auto &row : source_vec) {
+        follow_vec.push_back(row.substr(0, row.size() - 1));
     }
 
     /* Get follow-up output */
     vector<string> follow_out = surrounded_region(follow_vec);
 
-    /* Verification */
+    /* Verification: Result of modified input (removed last column) should match original output */
     EXPECT_EQ(follow_out, source_out);
 }
+
 /**
- * @brief Metamorphic Relation 27: If the input board contains a single enclosed region with 'O's, and the region is filled completely with 'X's, the output should consist of 'X's only.
+ * @brief Metamorphic Relation 27: Replacing all characters in the input matrix with a single character 'X', then the output should also have all characters replaced with 'X'.
  *
  */
 TEST_P(SurroundedRegionParamTest, MR27) {
@@ -569,29 +677,28 @@ TEST_P(SurroundedRegionParamTest, MR27) {
     SurroundedRegionInput input = GetParam();
     vector<string> source_vec = input.vec;
 
-    /* Construct follow-up input */
-    vector<string> follow_vec = source_vec;
-    // Fill the enclosed region completely with 'X's
-    for (size_t i = 1; i < follow_vec.size() - 1; ++i) {
-        for (size_t j = 1; j < follow_vec[i].size() - 1; ++j) {
-            follow_vec[i][j] = 'X';
+    /* Get source output */
+    vector<string> source_out = surrounded_region(source_vec);
+
+    /* Construct follow-up input by replacing all characters with 'X' */
+    vector<string> follow_vec;
+    for (size_t i = 0; i < source_vec.size(); i++) {
+        string row = "";
+        for (size_t j = 0; j < source_vec[i].size(); j++) {
+            row += "X";
         }
+        follow_vec.push_back(row);
     }
 
     /* Get follow-up output */
     vector<string> follow_out = surrounded_region(follow_vec);
 
-    /* Verification */
-    for (auto& row : follow_vec) {
-        for (char& cell : row) {
-            EXPECT_EQ(cell, 'X');
-        }
-    }
-    EXPECT_EQ(follow_out, follow_vec);
+    /* Verification: Result of replacing all characters with 'X' in input should match output */
+    EXPECT_EQ(follow_out, source_out);
 }
 
 /**
- * @brief Metamorphic Relation 28: If the input board contains a single enclosed region with 'O's, and the region is completely surrounded by 'X's, the output should remain unchanged.
+ * @brief Metamorphic Relation 28: Removing the first column from the input matrix, then the output should remain the same as the original input.
  *
  */
 TEST_P(SurroundedRegionParamTest, MR28) {
@@ -602,26 +709,21 @@ TEST_P(SurroundedRegionParamTest, MR28) {
     /* Get source output */
     vector<string> source_out = surrounded_region(source_vec);
 
-    /* Construct follow-up input */
-    vector<string> follow_vec = source_vec;
-    // Completely surround the enclosed region with 'X's
-    for (size_t j = 0; j < follow_vec[0].size(); ++j) {
-        follow_vec[0][j] = 'X';
-        follow_vec[follow_vec.size()-1][j] = 'X';
-    }
-    for (size_t i = 0; i < follow_vec.size(); ++i) {
-        follow_vec[i][0] = 'X';
-        follow_vec[i][follow_vec[i].size()-1] = 'X';
+    /* Remove the first column from the input matrix */
+    vector<string> follow_vec;
+    for (auto &row : source_vec) {
+        follow_vec.push_back(row.substr(1, row.size() - 1));
     }
 
     /* Get follow-up output */
     vector<string> follow_out = surrounded_region(follow_vec);
 
-    /* Verification */
+    /* Verification: Result of modified input (removed first column) should match original output */
     EXPECT_EQ(follow_out, source_out);
 }
+
 /**
- * @brief Metamorphic Relation 29: If the input board is mirrored along the vertical axis, the output should also be mirrored along the vertical axis.
+ * @brief Metamorphic Relation 29: Reversing the rows of the input matrix, then the output should also have the rows reversed accordingly.
  *
  */
 TEST_P(SurroundedRegionParamTest, MR29) {
@@ -632,21 +734,18 @@ TEST_P(SurroundedRegionParamTest, MR29) {
     /* Get source output */
     vector<string> source_out = surrounded_region(source_vec);
 
-    // Vertically mirror the source input
-    vector<string> vertical_mirrored_vec = source_vec;
-    for (auto& row : vertical_mirrored_vec) {
-        reverse(row.begin(), row.end());
-    }
+    /* Construct follow-up input by reversing the order of rows in the original input */
+    vector<string> follow_vec(source_vec.rbegin(), source_vec.rend());
 
-    /* Get vertical mirrored output */
-    vector<string> vertical_mirrored_out = surrounded_region(vertical_mirrored_vec);
+    /* Get follow-up output */
+    vector<string> follow_out = surrounded_region(follow_vec);
 
-    /* Verification */
-    EXPECT_EQ(vertical_mirrored_out, source_out);
+    /* Verification: Result of reversing rows in input should match reversed output */
+    EXPECT_EQ(follow_out, source_out);
 }
 
 /**
- * @brief Metamorphic Relation 30: If the input board is mirrored along the horizontal axis, the output should also be mirrored along the horizontal axis.
+ * @brief Metamorphic Relation 30: Removing every second column from the input matrix, then the output should remain the same as the original input.
  *
  */
 TEST_P(SurroundedRegionParamTest, MR30) {
@@ -657,18 +756,25 @@ TEST_P(SurroundedRegionParamTest, MR30) {
     /* Get source output */
     vector<string> source_out = surrounded_region(source_vec);
 
-    // Horizontally mirror the source input
-    vector<string> horizontal_mirrored_vec = source_vec;
-    reverse(horizontal_mirrored_vec.begin(), horizontal_mirrored_vec.end());
+    /* Remove every second column from the input matrix */
+    vector<string> follow_vec;
+    for (size_t i = 0; i < source_vec.size(); i++) {
+        string row;
+        for (size_t j = 0; j < source_vec[i].size(); j += 2) {
+            row += source_vec[i][j];
+        }
+        follow_vec.push_back(row);
+    }
 
-    /* Get horizontal mirrored output */
-    vector<string> horizontal_mirrored_out = surrounded_region(horizontal_mirrored_vec);
+    /* Get follow-up output */
+    vector<string> follow_out = surrounded_region(follow_vec);
 
-    /* Verification */
-    EXPECT_EQ(horizontal_mirrored_out, source_out);
+    /* Verification: Result of removing every second column from input should match original output */
+    EXPECT_EQ(follow_out, source_out);
 }
+
 /**
- * @brief Metamorphic Relation 31: If the input board contains a single enclosed region with 'O's along the region borders, the output should remain unchanged.
+ * @brief Metamorphic Relation 31: Replacing all 'O's in the input matrix with 'X' and vice versa, then the output should also have 'O's and 'X's swapped accordingly.
  *
  */
 TEST_P(SurroundedRegionParamTest, MR31) {
@@ -679,27 +785,26 @@ TEST_P(SurroundedRegionParamTest, MR31) {
     /* Get source output */
     vector<string> source_out = surrounded_region(source_vec);
 
-    /* Construct follow-up input */
-    vector<string> follow_vec = source_vec;
-    // Move the 'O's to the borders of the enclosed region
-    for (size_t i = 1; i < follow_vec.size() - 1; ++i) {
-        follow_vec[i][1] = 'O';
-        follow_vec[i][follow_vec[i].size() - 2] = 'O';
-    }
-    for (size_t j = 1; j < follow_vec[0].size() - 1; ++j) {
-        follow_vec[1][j] = 'O';
-        follow_vec[follow_vec.size() - 2][j] = 'O';
+    /* Construct follow-up input by swapping 'O's and 'X's */
+    for (auto &row : source_vec) {
+        for (char &ch : row) {
+            if (ch == 'O') {
+                ch = 'X';
+            } else if (ch == 'X') {
+                ch = 'O';
+            }
+        }
     }
 
     /* Get follow-up output */
-    vector<string> follow_out = surrounded_region(follow_vec);
+    vector<string> follow_out = surrounded_region(source_vec);
 
-    /* Verification */
+    /* Verification: Result of swapping 'O's and 'X's in input should match modified output */
     EXPECT_EQ(follow_out, source_out);
 }
 
 /**
- * @brief Metamorphic Relation 32: If the input board contains a single enclosed region with 'O's in the shape of a cross, the output should consist of 'X's only, and no change should be made.
+ * @brief Metamorphic Relation 32: Adding a column of 'O's to the input matrix, then the output should remain the same as the original input.
  *
  */
 TEST_P(SurroundedRegionParamTest, MR32) {
@@ -710,31 +815,21 @@ TEST_P(SurroundedRegionParamTest, MR32) {
     /* Get source output */
     vector<string> source_out = surrounded_region(source_vec);
 
-    /* Construct follow-up input */
-    vector<string> follow_vec = source_vec;
-    // Create a cross shape with 'O's
-    size_t center_row = source_vec.size() / 2;
-    size_t center_col = source_vec[0].size() / 2;
-    for (size_t i = 0; i < source_vec.size(); ++i) {
-        follow_vec[i][center_col] = 'O';
-    }
-    for (size_t j = 0; j < source_vec[0].size(); ++j) {
-        follow_vec[center_row][j] = 'O';
+    /* Construct follow-up input by adding a column of 'O's to the original input */
+    vector<string> follow_vec;
+    for (auto &row : source_vec) {
+        follow_vec.push_back(row + "O");
     }
 
     /* Get follow-up output */
     vector<string> follow_out = surrounded_region(follow_vec);
 
-    /* Verification */
-    for (auto& row : follow_out) {
-        for (char cell : row) {
-            EXPECT_EQ(cell, 'X');
-        }
-    }
+    /* Verification: Result of original input should remain the same as input with extra column of 'O's */
     EXPECT_EQ(follow_out, source_out);
 }
+
 /**
- * @brief Metamorphic Relation 33: If the input board contains a single enclosed region with 'O's in the shape of a square, the output should consist of 'X's only, and no change should be made.
+ * @brief Metamorphic Relation 33: Doubling the input matrix by repeating each row, then the output should remain the same as the original input.
  *
  */
 TEST_P(SurroundedRegionParamTest, MR33) {
@@ -745,36 +840,21 @@ TEST_P(SurroundedRegionParamTest, MR33) {
     /* Get source output */
     vector<string> source_out = surrounded_region(source_vec);
 
-    /* Construct follow-up input */
-    vector<string> follow_vec = source_vec;
-    // Create a square shape with 'O's
-    size_t start_row = source_vec.size() / 4;
-    size_t start_col = source_vec[0].size() / 4;
-    size_t end_row = start_row * 3;
-    size_t end_col = start_col * 3;
-    for (size_t i = start_row; i <= end_row; ++i) {
-        follow_vec[i][start_col] = 'O';
-        follow_vec[i][end_col] = 'O';
-    }
-    for (size_t j = start_col; j <= end_col; ++j) {
-        follow_vec[start_row][j] = 'O';
-        follow_vec[end_row][j] = 'O';
+    /* Construct follow-up input by repeating each row of the original input */
+    vector<string> follow_vec;
+    for (auto &row : source_vec) {
+        follow_vec.push_back(row + row);
     }
 
     /* Get follow-up output */
     vector<string> follow_out = surrounded_region(follow_vec);
 
-    /* Verification */
-    for (auto& row : follow_out) {
-        for (char cell : row) {
-            EXPECT_EQ(cell, 'X');
-        }
-    }
+    /* Verification: Result of repeating each row in input should remain unchanged */
     EXPECT_EQ(follow_out, source_out);
 }
 
 /**
- * @brief Metamorphic Relation 34: If the input board contains a single enclosed region with 'O's forming a straight line, the output should consist of 'X's only, and no change should be made.
+ * @brief Metamorphic Relation 34: Removing every second row and column from the input matrix, then the output should remain the same as the original input.
  *
  */
 TEST_P(SurroundedRegionParamTest, MR34) {
@@ -785,260 +865,187 @@ TEST_P(SurroundedRegionParamTest, MR34) {
     /* Get source output */
     vector<string> source_out = surrounded_region(source_vec);
 
-    /* Construct follow-up input */
-    vector<string> follow_vec = source_vec;
-    // Create a straight line shape with 'O's
-    size_t center_row = source_vec.size() / 2;
-    for (size_t j = 0; j < source_vec[0].size(); ++j) {
-        follow_vec[center_row][j] = 'O';
+    /* Remove every second row and column from the input matrix */
+    vector<string> follow_vec;
+    for (size_t i = 0; i < source_vec.size(); i += 2) {
+        string row;
+        for (size_t j = 0; j < source_vec[i].size(); j += 2) {
+            row += source_vec[i][j];
+        }
+        follow_vec.push_back(row);
     }
 
     /* Get follow-up output */
     vector<string> follow_out = surrounded_region(follow_vec);
 
-    /* Verification */
-    for (auto& row : follow_out) {
-        for (char cell : row) {
-            EXPECT_EQ(cell, 'X');
-        }
-    }
+    /* Verification: Result of removing every second row and column from input should match original output */
     EXPECT_EQ(follow_out, source_out);
 }
+
 /**
- * @brief Metamorphic Relation 35: If the input board contains a single enclosed region with 'O's forming a diagonal line, the output should consist of 'X's only, and no change should be made.
+ * @brief Metamorphic Relation 35: Converting all characters in the input matrix to uppercase, then the output should remain the same as the original input.
  *
  */
 TEST_P(SurroundedRegionParamTest, MR35) {
     /* Get source input */
     SurroundedRegionInput input = GetParam();
     vector<string> source_vec = input.vec;
-
+    
     /* Get source output */
     vector<string> source_out = surrounded_region(source_vec);
-
-    /* Construct follow-up input */
+    
+    /* Construct follow-up input by converting all characters to uppercase */
     vector<string> follow_vec = source_vec;
-    // Create a diagonal line shape with 'O's
-    for (size_t i = 0; i < follow_vec.size(); ++i) {
-        follow_vec[i][i] = 'O';
+    for (auto& row : follow_vec) {
+        transform(row.begin(), row.end(), row.begin(), ::toupper);
     }
-
+    
     /* Get follow-up output */
     vector<string> follow_out = surrounded_region(follow_vec);
-
-    /* Verification */
-    for (auto& row : follow_out) {
-        for (char cell : row) {
-            EXPECT_EQ(cell, 'X');
-        }
-    }
+    
+    /* Verification: Result of converting characters to uppercase should match original output */
     EXPECT_EQ(follow_out, source_out);
 }
 
 /**
- * @brief Metamorphic Relation 36: If the input board contains a single enclosed region with 'O's forming an irregular shape, the output should consist of 'X's only, and no change should be made.
+ * @brief Metamorphic Relation 36: Converting all characters in the input matrix to lowercase, then the output should remain the same as the original input.
  *
  */
 TEST_P(SurroundedRegionParamTest, MR36) {
     /* Get source input */
     SurroundedRegionInput input = GetParam();
     vector<string> source_vec = input.vec;
-
+    
     /* Get source output */
     vector<string> source_out = surrounded_region(source_vec);
-
-    /* Construct follow-up input */
+    
+    /* Construct follow-up input by converting all characters to lowercase */
     vector<string> follow_vec = source_vec;
-    // Create an irregular shape with 'O's
-    follow_vec[1][1] = 'O';
-    follow_vec[1][2] = 'O';
-    follow_vec[2][3] = 'O';
-    follow_vec[3][2] = 'O';
-
+    for (auto& row : follow_vec) {
+        transform(row.begin(), row.end(), row.begin(), ::tolower);
+    }
+    
     /* Get follow-up output */
     vector<string> follow_out = surrounded_region(follow_vec);
-
-    /* Verification */
-    for (auto& row : follow_out) {
-        for (char cell : row) {
-            EXPECT_EQ(cell, 'X');
-        }
-    }
+    
+    /* Verification: Result of converting characters to lowercase should match original output */
     EXPECT_EQ(follow_out, source_out);
 }
+
+//fixed
 /**
- * @brief Metamorphic Relation 37: If the input board has multiple enclosed regions with 'O's, and the regions are merged, the output should reflect the merged enclosed region.
+ * @brief Metamorphic Relation 37: Multiplying all characters in the input matrix by a number, then the output should remain the same as the original input.
  *
  */
 TEST_P(SurroundedRegionParamTest, MR37) {
     /* Get source input */
     SurroundedRegionInput input = GetParam();
     vector<string> source_vec = input.vec;
-
+    
     /* Get source output */
     vector<string> source_out = surrounded_region(source_vec);
-
-    /* Construct follow-up input */
-    vector<string> follow_vec = source_vec;
-    // Merge multiple enclosed regions
-    follow_vec[1][1] = 'O';
-    follow_vec[1][2] = 'O';
-    follow_vec[2][1] = 'O';
-    follow_vec[2][2] = 'O';
-    follow_vec[3][3] = 'O';
+    
+    /* Construct follow-up input by multiplying all characters by a number */
+    //vector<string> follow_vec = source_vec;  // No change in characters
+    vector<string> follow_vec;  
+    int multiplier = 2;
+    for (const auto& str : source_vec) {
+        string multiplied_str;
+        for (char ch : str) {
+            multiplied_str += string(ch * multiplier, ch);
+        }
+        follow_vec.push_back(multiplied_str);
+    }
 
     /* Get follow-up output */
     vector<string> follow_out = surrounded_region(follow_vec);
-
-    /* Verification */
-    EXPECT_NE(follow_out, source_out);
+    
+    /* Verification: Result of multiplying characters by a number should match original output */
+    EXPECT_EQ(follow_out, source_out);
 }
 
+//fixed
 /**
- * @brief Metamorphic Relation 38: If the input board has multiple isolated 'O's that are not part of an enclosed region, adding or removing isolated 'O's should not change the output.
+ * @brief Metamorphic Relation 38: Replacing all characters in the input matrix with a specific set of characters, then the output should remain the same as the original input.
  *
  */
 TEST_P(SurroundedRegionParamTest, MR38) {
     /* Get source input */
     SurroundedRegionInput input = GetParam();
     vector<string> source_vec = input.vec;
-
+    
     /* Get source output */
     vector<string> source_out = surrounded_region(source_vec);
-
-    /* Construct follow-up input */
-    vector<string> follow_vec = source_vec;
-    // Add an isolated 'O' in the follow-up input
-    follow_vec[1][1] = 'O';
-
+    
+    /* Construct follow-up input by replacing all characters with a specific set of characters */
+    //vector<string> follow_vec = source_vec;  // No change in characters
+    vector<string> follow_vec;  
+    for (const auto& str : source_vec) {
+        string replaced_str;
+        for (char ch : str) {
+            replaced_str += 'X';
+        }
+        follow_vec.push_back(replaced_str);
+    }
+    
     /* Get follow-up output */
     vector<string> follow_out = surrounded_region(follow_vec);
-
-    /* Verification */
+    
+    /* Verification: Result of replacing characters with a specific set should match original output */
     EXPECT_EQ(follow_out, source_out);
 }
+
 /**
- * @brief Metamorphic Relation 39: If the input board contains a single enclosed region with 'O's and additional 'O's are added inside the region, the output should reflect the addition of the 'O's inside the region.
+ * @brief Metamorphic Relation 39: Adding a column of 'X's to the end of the input matrix, then the output should remain the same as the original input.
  *
  */
 TEST_P(SurroundedRegionParamTest, MR39) {
     /* Get source input */
     SurroundedRegionInput input = GetParam();
     vector<string> source_vec = input.vec;
-
+    
     /* Get source output */
     vector<string> source_out = surrounded_region(source_vec);
-
-    /* Construct follow-up input */
-    vector<string> follow_vec = source_vec;
-    // Add additional 'O's inside the enclosed region
-    follow_vec[1][1] = 'O';
-    follow_vec[1][2] = 'O';
-
+    
+    /* Construct follow-up input by adding a column of 'X's to the original input */
+    vector<string> follow_vec;
+    for (auto &row : source_vec) {
+        row.push_back('X');
+        follow_vec.push_back(row);
+    }
+    
     /* Get follow-up output */
     vector<string> follow_out = surrounded_region(follow_vec);
-
-    /* Verification */
-    EXPECT_NE(follow_out, source_out);
+    
+    /* Verification: Result of original input should remain the same as input with extra column of 'X's */
+    EXPECT_EQ(follow_out, source_out);
 }
 
 /**
- * @brief Metamorphic Relation 40: If the input board contains a single enclosed region with 'O's, and some 'O's are removed from inside the region, the output should reflect the removal of the 'O's inside the region.
+ * @brief Metamorphic Relation 40: Interchanging the rows and columns of the input matrix, then the output should remain the same as the original input.
  *
  */
 TEST_P(SurroundedRegionParamTest, MR40) {
     /* Get source input */
     SurroundedRegionInput input = GetParam();
     vector<string> source_vec = input.vec;
-
+    
     /* Get source output */
     vector<string> source_out = surrounded_region(source_vec);
-
-    /* Construct follow-up input */
-    vector<string> follow_vec = source_vec;
-    // Remove some 'O's from inside the enclosed region
-    follow_vec[1][1] = 'X';
-
+    
+    /* Construct follow-up input as the transpose of the source input */
+    vector<string> follow_vec(source_vec[0].size(), string(source_vec.size(), ' '));
+    for (size_t i = 0; i < source_vec.size(); i++) {
+        for (size_t j = 0; j < source_vec[i].size(); j++) {
+            follow_vec[j][i] = source_vec[i][j];
+        }
+    }
+    
     /* Get follow-up output */
     vector<string> follow_out = surrounded_region(follow_vec);
-
-    /* Verification */
-    EXPECT_NE(follow_out, source_out);
-}
-/**
- * @brief Metamorphic Relation 41: If the input board contains two enclosed regions with 'O's, if the two regions are merged into a single enclosed region, the output should reflect the merged enclosed region.
- *
- */
-TEST_P(SurroundedRegionParamTest, MR41) {
-    /* Get source input */
-    SurroundedRegionInput input = GetParam();
-    vector<string> source_vec = input.vec;
-
-    /* Get source output */
-    vector<string> source_out = surrounded_region(source_vec);
-
-    /* Construct follow-up input */
-    vector<string> follow_vec = source_vec;
-    // Merge two enclosed regions into a single enclosed region
-    follow_vec[1][1] = 'O';
-    follow_vec[1][2] = 'O';
-
-    /* Get follow-up output */
-    vector<string> follow_out = surrounded_region(follow_vec);
-
-    /* Verification */
-    EXPECT_NE(follow_out, source_out);
-}
-
-/**
- * @brief Metamorphic Relation 42: If the input board contains two enclosed regions with 'O's, if the two regions are split into separate enclosed regions, the output should reflect the separate enclosed regions.
- *
- */
-TEST_P(SurroundedRegionParamTest, MR42) {
-    /* Get source input */
-    SurroundedRegionInput input = GetParam();
-    vector<string> source_vec = input.vec;
-
-    /* Get source output */
-    vector<string> source_out = surrounded_region(source_vec);
-
-    /* Construct follow-up input */
-    vector<string> follow_vec = source_vec;
-    // Split a single enclosed region into two separate enclosed regions
-    follow_vec[1][1] = 'O';
-    follow_vec[follow_vec.size()-2][1] = 'O';
-
-    /* Get follow-up output */
-    vector<string> follow_out = surrounded_region(follow_vec);
-
-    /* Verification */
-    EXPECT_NE(follow_out, source_out);
-}
-/**
- * @brief Metamorphic Relation 43: If the input board contains a single enclosed region with 'O's, if the shape of the region is altered, the output should reflect the altered shape of the enclosed region.
- *
- */
-TEST_P(SurroundedRegionParamTest, MR43) {
-    /* Get source input */
-    SurroundedRegionInput input = GetParam();
-    vector<string> source_vec = input.vec;
-
-    /* Get source output */
-    vector<string> source_out = surrounded_region(source_vec);
-
-    /* Construct follow-up input */
-    vector<string> follow_vec = source_vec;
-
-    // Alter the shape of the enclosed region
-    follow_vec[1][1] = 'O';
-    follow_vec[1][2] = 'O';
-    follow_vec[2][1] = 'O';
-
-    /* Get follow-up output */
-    vector<string> follow_out = surrounded_region(follow_vec);
-
-    /* Verification */
-    EXPECT_NE(follow_out, source_out);
+    
+    /* Verification: Result of interchanging rows and columns of the input should match original output */
+    EXPECT_EQ(follow_out, source_out);
 }
 
 INSTANTIATE_TEST_CASE_P(TrueReturn, SurroundedRegionParamTest, testing::ValuesIn(gen_tcs_randomly()));
