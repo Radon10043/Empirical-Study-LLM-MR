@@ -67,8 +67,7 @@ public void test3(int a, int b, int c) {
 @ParameterizedTest
 @MethodSource("testcaseProvider")
 public void test4(int a, int b, int c) {
-    if (a % 2 == 1 || b % 2 == 1 || c % 2 == 1)
-        return;
+    assumeTrue(a % 2 == 0 && b % 2 == 0 && c % 2 == 0);
 
     /* Get source output */
     Pair<Integer, Double> source_out = TriSquareJ.triangle_square(a, b, c);
@@ -80,7 +79,7 @@ public void test4(int a, int b, int c) {
     Pair<Integer, Double> follow_out = TriSquareJ.triangle_square(follow_a, follow_b, follow_c);
 
     /* Verification */
-    int source_type = source_out.getKey().intValue(), follow_type = source_out.getKey().intValue();
+    int source_type = source_out.getKey().intValue(), follow_type = follow_out.getKey().intValue();
     double source_area = source_out.getValue().doubleValue(), follow_area = follow_out.getValue().doubleValue();
     assertEquals(source_type, follow_type);
     assertTrue(Math.abs(source_area - follow_area * 4) < 1e-6);
