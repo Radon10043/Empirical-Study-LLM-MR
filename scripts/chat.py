@@ -2,7 +2,7 @@
 Author: Radon
 Date: 2023-12-06 15:26:45
 LastEditors: Radon
-LastEditTime: 2024-02-05 11:14:20
+LastEditTime: 2024-03-08 14:31:19
 Description: Hi, say something
 """
 
@@ -12,6 +12,7 @@ import random, time
 import argparse, os, re
 
 from marko.md_renderer import MarkdownRenderer
+from typing import Any
 
 # openai.log = "debug"
 with open("api_key.txt") as f:
@@ -165,7 +166,7 @@ def is_all_blank(document: marko.block.Document) -> bool:
     return b_all_blank
 
 
-def read_prompt(template_path: str, spec_path: str, demo_path: str) -> list:
+def read_prompt(template_path: str, spec_path: str, demo_path: str, **kwargs: Any) -> list:
     """读取模板文件, 规格说明文件, 已编码的初始MR文件, 并返回prompt的列表
 
     Parameters
@@ -176,6 +177,8 @@ def read_prompt(template_path: str, spec_path: str, demo_path: str) -> list:
         规格说明文件路径 (markdown)
     demo_path : str
         存储已编码MR的文件路径 (markdown)
+    kwargs: Any
+        其他参数
 
     Returns
     -------
@@ -196,6 +199,9 @@ def read_prompt(template_path: str, spec_path: str, demo_path: str) -> list:
     with open(demo_path, encoding="utf-8") as f:
         demo_text = f.read()
     md_text = template_text.replace("[specification]", spec_text).replace("[demo]", demo_text)
+
+    # 如果模板里有[sut_name], 将其替换为sut_name, 消融实验nospec里会用到
+    md_text = md_text.replace("[sut_name]", kwargs["sut_name"])
 
     # 解析markdown文件
     md_ast = md_instance.parse(md_text)
@@ -256,5 +262,5 @@ if __name__ == "__main__":
     if output_dir == "":
         output_dir = os.path.dirname(__file__)
 
-    list_prompt = read_prompt(template_path, spec_path, demo_path)
+    list_prompt = read_prompt(template_path, spec_path, demo_path, sut_name=sut_name)
     chat_with_gpt(list_prompt, model_name, output_dir, max_chat_count, sut_name)
