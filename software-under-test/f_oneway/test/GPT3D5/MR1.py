@@ -13,14 +13,14 @@ from utils import gen_tcs_randomly
 
 class TestingClass(unittest.TestCase):
     @parameterized.expand(gen_tcs_randomly(1000))
-    def test41(self, *groups):
-        """MR41: Replacing a group with a constant value should not change the result."""
+    def test1(self, *groups):   # Fixed
+        """MR1: Reordering the groups, the result should not change."""
         # Get source output
         source_out = f_oneway(*groups).pvalue
 
-        # Replacing the second group with a constant value
+        # Construct follow-up input
         follow_groups = list(groups)
-        follow_groups[1] = np.full_like(groups[1], 5)
+        np.random.shuffle(follow_groups)
 
         # Get follow-up output
         follow_out = f_oneway(*follow_groups).pvalue
