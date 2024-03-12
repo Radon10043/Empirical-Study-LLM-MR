@@ -1,8 +1,11 @@
+import os, sys
+
+sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 from utils import *
 
 
 class TestingClass(unittest.TestCase):
-    @parameterized.expand(load_test_cases)
+    @parameterized.expand(gen_tcs_randomly(1000))
     def test16(self, graph: list, src: int, dst: int, method: str):
         """Metamorphic Relation 16: Given the same input graph, the same source and destination vertices,
         but with the weights multiplied by -1 and the direction reversed, the distances should not change."""

@@ -1,8 +1,11 @@
+import os, sys
+
+sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 from utils import *
 
 
 class TestingClass(unittest.TestCase):
-    @parameterized.expand(load_test_cases)
+    @parameterized.expand(gen_tcs_randomly(1000))
     def test26(self, graph: list, src: int, dst: int, method: str):
         """Metamorphic Relation 26: Given the same graph and vertices, the output of the shortest path should remain the same if
         the same graph is represented using different sparse matrix formats."""

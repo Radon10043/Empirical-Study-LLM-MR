@@ -1,32 +1,8 @@
-import unittest
-import os, json
-
-import numpy as np
-
-from parameterized import parameterized
-from scipy.sparse.csgraph import shortest_path
-from scipy.sparse import csr_matrix
-
-from generate import gen_tcs_randomly
-
-
-def load_test_cases() -> list:
-    """加载测试用例
-
-    Returns
-    -------
-    list
-        存储测试用例的列表
-
-    Notes
-    -----
-    _description_
-    """
-    return gen_tcs_randomly()
+from utils import *
 
 
 class TestingClass(unittest.TestCase):
-    @parameterized.expand(load_test_cases)
+    @parameterized.expand(gen_tcs_randomly(1000))
     def test1(self, graph: list, src: int, dst: int, method: str):
         """Metamorphic Relation 1: Given the same graph, the same source and destination vertices,
         but with different algorithms, the output should be the same."""
@@ -44,7 +20,7 @@ class TestingClass(unittest.TestCase):
         # Verification
         self.assertEqual(source_out, follow_out)
 
-    @parameterized.expand(load_test_cases)
+    @parameterized.expand(gen_tcs_randomly(1000))
     def test2(self, graph: list, src: int, dst: int, method: str):
         """Metamorphic Relation 2: Given the same graph, the same source and destination vertices,
         but weights scaled 2 times, the output should also be scaled 2 times."""
