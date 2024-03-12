@@ -1,8 +1,11 @@
+import os, sys
+
+sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 from utils import *
 
 
 class TestingClass(unittest.TestCase):
-    @parameterized.expand(load_test_cases)
+    @parameterized.expand(gen_tcs_randomly(1000))
     def test35(self, graph: list, src: int, dst: int, method: str): # Fixed
         """Metamorphic Relation 35: Given the same graph, the same source and destination vertices, but with a single edge removed, 
         the shortest path length should either remain the same or be greater."""

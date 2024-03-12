@@ -1,8 +1,11 @@
+import os, sys
+
+sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 from utils import *
 
 
 class TestingClass(unittest.TestCase):
-    @parameterized.expand(load_test_cases)
+    @parameterized.expand(gen_tcs_randomly(1000))
     def test30(self, graph: list, src: int, dst: int, method: str):
         """Metamorphic Relation 30: Given the same graph and vertices, removing all edges incident on a particular vertex should not affect the shortest path for other vertices."""
         import copy

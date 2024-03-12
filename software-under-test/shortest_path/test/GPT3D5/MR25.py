@@ -1,8 +1,11 @@
+import os, sys
+
+sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 from utils import *
 
 
 class TestingClass(unittest.TestCase):
-    @parameterized.expand(load_test_cases)
+    @parameterized.expand(gen_tcs_randomly(1000))
     def test25(self, graph: list, src: int, dst: int, method: str): # Fixed
         """Metamorphic Relation 25: Given the same graph, the same source and destination vertices, and the same algorithm, 
         but with all weights increased by a constant value, the resulting shortest path should remain the same."""

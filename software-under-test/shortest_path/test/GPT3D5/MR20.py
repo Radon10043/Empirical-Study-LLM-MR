@@ -1,8 +1,11 @@
+import os, sys
+
+sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 from utils import *
 
 
 class TestingClass(unittest.TestCase):
-    @parameterized.expand(load_test_cases)
+    @parameterized.expand(gen_tcs_randomly(1000))
     def test20(self, graph: list, src: int, dst: int, method: str):
         """Metamorphic Relation 20: Given the same graph, the source and destination vertices swapped,
         the output should be the same."""

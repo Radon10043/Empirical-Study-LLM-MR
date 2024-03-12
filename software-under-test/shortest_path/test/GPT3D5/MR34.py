@@ -1,9 +1,12 @@
+import os, sys
+
+sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 from utils import *
 
 
 class TestingClass(unittest.TestCase):
     # fixed
-    @parameterized.expand(load_test_cases)
+    @parameterized.expand(gen_tcs_randomly(1000))
     def test34(self, graph: list, src: int, dst: int, method: str):
         """Metamorphic Relation 34: Given the same graph and vertices, the output of the shortest path should remain the same if
         the same graph is represented using a different mutable data structure with the exact same elements."""

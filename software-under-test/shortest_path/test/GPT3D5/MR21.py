@@ -1,8 +1,11 @@
+import os, sys
+
+sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 from utils import *
 
 
 class TestingClass(unittest.TestCase):
-    @parameterized.expand(load_test_cases)
+    @parameterized.expand(gen_tcs_randomly(1000))
     def test21(self, graph: list, src: int, dst: int, method: str):
         """Metamorphic Relation 21: Given the same graph and vertices, the output should be the same irrespective of the path reconstruction option."""
         # Fixed
