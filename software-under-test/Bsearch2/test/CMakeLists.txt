@@ -10,6 +10,10 @@ add_executable(GPT3D5Test_nosystem tmain.cpp GPT3D5Test_nosystem.cpp utils.cpp u
 target_link_libraries(GPT3D5Test_nosystem PRIVATE gtest)
 target_link_libraries(GPT3D5Test_nosystem PRIVATE pthread)
 
+add_executable(GPT3D5Test_nospec tmain.cpp GPT3D5Test_nospec.cpp utils.cpp utils.h ../src/function.h)
+target_link_libraries(GPT3D5Test_nospec PRIVATE gtest)
+target_link_libraries(GPT3D5Test_nospec PRIVATE pthread)
+
 add_executable(GPT4Test tmain.cpp GPT4Test.cpp utils.cpp utils.h ../src/function.h)
 target_link_libraries(GPT4Test PRIVATE gtest)
 target_link_libraries(GPT4Test PRIVATE pthread)
@@ -17,4 +21,5 @@ target_link_libraries(GPT4Test PRIVATE pthread)
 add_test(NAME exampleTest COMMAND exampleTest)
 add_test(NAME GPT3D5Test COMMAND GPT3D5Test)
 add_test(NAME GPT3D5Test_nosystem COMMAND GPT3D5Test_nosystem)
+add_test(NAME GPT3D5Test_nospec COMMAND GPT3D5Test_nospec)
 add_test(NAME GPT4Test COMMAND GPT4Test)
