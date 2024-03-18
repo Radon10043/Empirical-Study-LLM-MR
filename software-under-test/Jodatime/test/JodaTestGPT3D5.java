@@ -212,11 +212,10 @@ public class JodaTestGPT3D5 {
         Duration multipliedDuration = duration.multipliedBy(scalar);
 
         // Divide the follow-up output duration by the same scalar factor
-        Duration dividedDuration = duration.dividedBy(scalar);
+        Duration dividedDuration = multipliedDuration.dividedBy(scalar);
 
         // Verification
         assertEquals(duration, dividedDuration);
-        assertEquals(duration, multipliedDuration);
     }
 
     /**
