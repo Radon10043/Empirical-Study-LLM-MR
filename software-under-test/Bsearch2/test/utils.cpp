@@ -16,7 +16,7 @@ vector<BSearch2Input> get_tcs_randomly() {
 
     /* clang-format off */
     /* 各个数值的取值范围 */
-    uniform_int_distribution<int> dist_size(1, 100),        /* Vector's size, [1, 1000] */
+    uniform_int_distribution<int> dist_size(1, 1000),        /* Vector's size, [1, 1000] */
                                   dist_value(-1000, 1000),      /* Value's size, [1, 1000]  */
                                   dist_target(-1000, 1000);     /* Target's size, [1, 1000] */
     /* clang-format on */
