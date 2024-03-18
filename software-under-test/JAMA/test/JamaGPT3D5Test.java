@@ -290,7 +290,7 @@ public class JamaGPT3D5Test {
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider1")
-    public void test12(Matrix m) {
+    public void test12(Matrix m) {  // Fixed
         assumeTrue(Math.abs(m.det()) > 1e-6);
 
         /* Get source output */
@@ -303,7 +303,10 @@ public class JamaGPT3D5Test {
         Matrix result = adjointA.times(m);
 
         /* Verification */
-        assertTrue(expected.equals(result));
+        int n = m.getRowDimension();
+        for (int i = 0; i < n; i++)
+            for (int j = 0; j < n; j++)
+                assertEquals(expected.get(i, j), result.get(i, j), 1e-6);
     }
 
     /**
@@ -881,7 +884,7 @@ public class JamaGPT3D5Test {
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider1")
-    public void test40(Matrix m) {
+    public void test40(Matrix m) {  // Fixed
         int power = 3;
 
         /* Get source output */
@@ -889,8 +892,8 @@ public class JamaGPT3D5Test {
 
         /* Construct follow-up input */
         Matrix follow_m = m.copy();
-        for (int i = 0; i < power; i++)
-            follow_m = follow_m.times(power);
+        for (int i = 0; i < power - 1; i++)
+            follow_m = follow_m.times(m);
 
         /* Get follow-up output */
         double follow_out = follow_m.det();
