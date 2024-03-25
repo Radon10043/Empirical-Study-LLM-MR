@@ -2,7 +2,7 @@
 Author: Radon
 Date: 2024-01-02 21:07:30
 LastEditors: Radon
-LastEditTime: 2024-01-04 21:18:39
+LastEditTime: 2024-03-12 20:44:16
 Description: Hi, say something
 """
 import openai
@@ -74,7 +74,7 @@ def resume_chat(json_path: str, resume_cnt: int, gpt_name: str):
             msgs.append({"role": "assistant", "content": answer})
 
             # 如果输出内容中有Metamorphic Relation 55, 跳出循环
-            search_result = re.search("(Metamorphic Relation 55|MR55)", answer, flags=re.IGNORECASE)
+            search_result = re.search("(Metamorphic Relation 45|MR45)", answer, flags=re.IGNORECASE)
             if not search_result is None:
                 break
 
@@ -111,9 +111,9 @@ def resume_chat(json_path: str, resume_cnt: int, gpt_name: str):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="自动向大模型发送提示并输出内容至markdown文件")
-    parser.add_argument("-j", "--json", nargs="*", required=True, help="聊天记录json文件路径")
-    parser.add_argument("-c", "--count", type=int, default=10, help="继续聊天次数")
-    parser.add_argument("-m", "--model", choices=["gpt-3.5-turbo", "gpt-4-1106-preview"], required=True, help="要使用的大模型")
+    parser.add_argument("-j", "--json", required=True, help="聊天记录json文件路径")
+    parser.add_argument("-c", "--count", type=int, default=50, help="继续聊天次数")
+    parser.add_argument("-m", "--model", choices=["gpt-3.5-turbo-1106", "gpt-4-1106-preview"], required=True, help="要使用的大模型")
     args = parser.parse_args()
 
     json_path = args.json
