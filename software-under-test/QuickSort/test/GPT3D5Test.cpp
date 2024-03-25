@@ -308,7 +308,7 @@ TEST_P(QuickSortParamTest, MR11) {
  * @brief Metamorphic Relation 12: Adding a constantly increasing sequence to the input array, the output array will have the same relative order as the source
  * output, with the increasing sequence appended at the end.
  */
-TEST_P(QuickSortParamTest, MR12) {
+TEST_P(QuickSortParamTest, MR12) {  // Fixed
     /* Get source input */
     QuickSortInput input = GetParam();
     vector<int> source_vec = input.vec;
@@ -327,6 +327,9 @@ TEST_P(QuickSortParamTest, MR12) {
     vector<int> follow_out = quick_sort(follow_vec);
 
     /* Verification */
+    for (int i = max_elem; i < max_elem + source_vec.size(); ++i) {
+        source_out.push_back(i);
+    }
     EXPECT_EQ(follow_out, source_out);
 }
 
