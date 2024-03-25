@@ -233,13 +233,12 @@ public class SuperstringTestGPT3D5 {
         assertTrue(stringContainsAllSubstrings(follow_out, arr));
     }
 
-    //fixed
     /**
      * Metamorphic Relation 11: Reversing each string in the input array should result in a superstring that contains the original array of strings.
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
-    public void test11(ArrayList<String> arr) {
+    public void test11(ArrayList<String> arr) { // fixed
         /* Get source output */
         String source_out = Superstring.shortest_superstring(arr);
 
