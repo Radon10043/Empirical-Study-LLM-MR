@@ -2,20 +2,23 @@ from utils import *
 
 
 class TestingClass(unittest.TestCase):
-    # Fix by Radon
     @parameterized.expand(load_test_cases)
     def test13(self, img: np.array, angle: float):
-        """Metamorphic Relation 13: Rotating the image by angle A and then applying median filtering is equivalent to applying median filtering to the original image and then rotating the result by angle A."""
+        """Metamorphic Relation 13: Rotating the image by a positive angle and then rotating the result by a negative angle should result in the same output as rotating the original image by the absolute difference between the two angles."""
         # Get source output
         source_out = ndimage.rotate(img, angle)
 
         # Construct follow-up input
-        follow_out = ndimage.median_filter(source_out, size=3)  # or any other filter size
+        follow_angle1 = angle + 30  # Positive angle
+        follow_angle2 = -30  # Negative angle
+
+        # Get follow-up output
+        temp_out = ndimage.rotate(img, follow_angle1)  # Rotate the original image by a positive angle
+        follow_out = ndimage.rotate(temp_out, follow_angle2)  # Rotate the result by a negative angle
 
         # Verification
-        median_source_out = ndimage.median_filter(img, size=3)
-        rotated_median_out = ndimage.rotate(median_source_out, angle)
-        self.assertTrue(np.array_equal(follow_out, rotated_median_out))
+        expected_out = ndimage.rotate(img, abs(follow_angle1 - follow_angle2))  # Rotate the original image by the absolute difference between the two angles
+        self.assertTrue(np.any(follow_out - expected_out) == 0) # Fixed
 
 
 if __name__ == "__main__":

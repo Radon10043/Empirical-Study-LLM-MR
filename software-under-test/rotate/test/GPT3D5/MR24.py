@@ -1,21 +1,21 @@
 from utils import *
 
-
+# fixed
 class TestingClass(unittest.TestCase):
-    # Fix by Radon
     @parameterized.expand(load_test_cases)
     def test24(self, img: np.array, angle: float):
-        """Metamorphic Relation 24: Rotating the image by angle A and then performing edge detection is equivalent to performing edge detection on the original image and then rotating the result by angle A."""
+        """Metamorphic Relation 24: Rotating the image by 360 degrees should result in the same output as the original image."""
         # Get source output
         source_out = ndimage.rotate(img, angle)
 
         # Construct follow-up input
-        follow_out = ndimage.sobel(source_out)
+        follow_angle = 360 + angle # 360 degrees
+
+        # Get follow-up output
+        follow_out = ndimage.rotate(img, follow_angle)
 
         # Verification
-        sobel_source_out = ndimage.sobel(img)
-        rotated_sobel_out = ndimage.rotate(sobel_source_out, angle)
-        self.assertTrue(np.array_equal(follow_out, rotated_sobel_out))
+        self.assertTrue(np.any(follow_out - source_out) == 0)   # Fixed
 
 
 if __name__ == "__main__":

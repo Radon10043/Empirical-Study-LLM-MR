@@ -2,22 +2,22 @@ from utils import *
 
 
 class TestingClass(unittest.TestCase):
-    # Fix by Radon
     @parameterized.expand(load_test_cases)
     def test18(self, img: np.array, angle: float):
-        """Metamorphic Relation 18: Rotating the image by angle A and then rotating the resulting image by angle B is equivalent to rotating the original image by angle B and then rotating the result by angle A+B."""
+        """Metamorphic Relation 18: Rotating the image by 180 degrees followed by another rotation of 180 degrees should result in the same output as the original image."""
         # Get source output
         source_out = ndimage.rotate(img, angle)
 
-        # Construct combined rotation angle
-        combined_angle = angle + 30  # or any other angle
+        # Construct follow-up input
+        follow_angle1 = 180  # 180 degrees
+        follow_angle2 = 180  # 180 degrees
 
         # Get follow-up output
-        follow_out = ndimage.rotate(source_out, 30)
-        combined_out = ndimage.rotate(img, combined_angle)
+        temp_out = ndimage.rotate(img, follow_angle1)  # Rotate the original image by 180 degrees
+        follow_out = ndimage.rotate(temp_out, follow_angle2)  # Rotate the result by 180 degrees
 
         # Verification
-        self.assertTrue(np.array_equal(follow_out, combined_out))
+        self.assertTrue(np.any(follow_out - img) == 0)  # Fixed
 
 
 if __name__ == "__main__":

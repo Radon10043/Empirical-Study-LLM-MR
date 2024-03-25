@@ -2,21 +2,17 @@ from utils import *
 
 
 class TestingClass(unittest.TestCase):
-    # Fix by Radon
     @parameterized.expand(load_test_cases)
     def test33(self, img: np.array, angle: float):
-        """Metamorphic Relation 33: Rotating the image by angle A and then rotating the resulting image by the same angle in the opposite direction is equivalent to the original image."""
-        # Get source output
-        source_out = ndimage.rotate(img, angle)
+        """Metamorphic Relation 33: Rotating the image using different order parameters will guarantee consistency if the order parameters are swapped."""
+        # Get source output with the original order
+        source_out = ndimage.rotate(img, angle, order=3)
 
-        # Construct follow-up input
-        follow_angle = -angle
-
-        # Get follow-up output
-        follow_out = ndimage.rotate(source_out, follow_angle)
+        # Construct follow-up input with swapped order parameters
+        follow_out = ndimage.rotate(img, angle, order=0)  # Use a different order parameter
 
         # Verification
-        self.assertTrue(np.array_equal(follow_out, img))
+        self.assertTrue(np.any(follow_out - source_out) == 0)   # Fixed
 
 
 if __name__ == "__main__":

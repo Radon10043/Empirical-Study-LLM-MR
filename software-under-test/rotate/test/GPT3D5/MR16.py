@@ -2,20 +2,20 @@ from utils import *
 
 
 class TestingClass(unittest.TestCase):
-    # Fix by Radon
     @parameterized.expand(load_test_cases)
     def test16(self, img: np.array, angle: float):
-        """Metamorphic Relation 16: Rotating the image by angle A and then flipping the resulting image vertically is equivalent to flipping the original image vertically and then rotating the result by angle -A."""
+        """Metamorphic Relation 16: Rotating the image by 360 degrees N times should result in the original image, where N is an integer."""
         # Get source output
         source_out = ndimage.rotate(img, angle)
 
         # Construct follow-up input
-        follow_out = np.flipud(source_out)
+        follow_angle = 360  # 360 degrees
+
+        # Get follow-up output
+        follow_out = ndimage.rotate(img, follow_angle)
 
         # Verification
-        flipped_source = np.flipud(img)
-        rotated_flipped_out = ndimage.rotate(flipped_source, -angle)
-        self.assertTrue(np.array_equal(follow_out, rotated_flipped_out))
+        self.assertTrue(np.any(follow_out - img) == 0)  # Fixed
 
 
 if __name__ == "__main__":

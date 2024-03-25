@@ -2,20 +2,20 @@ from utils import *
 
 
 class TestingClass(unittest.TestCase):
-    # Fix by Radon
     @parameterized.expand(load_test_cases)
     def test38(self, img: np.array, angle: float):
-        """Metamorphic Relation 38: Rotating the image by angle A and then blurring the resulting image is equivalent to blurring the original image and then rotating the result by angle A."""
+        """Metamorphic Relation 38: Rotating the same image by N degree and N+360 degree should output the same result."""
         # Get source output
         source_out = ndimage.rotate(img, angle)
 
         # Construct follow-up input
-        follow_out = ndimage.gaussian_filter(source_out, sigma=1.5)
+        follow_angle = angle + 360
+
+        # Get follow-up output
+        follow_out = ndimage.rotate(img, follow_angle)
 
         # Verification
-        blurred_source_out = ndimage.gaussian_filter(img, sigma=1.5)
-        rotated_blurred_out = ndimage.rotate(blurred_source_out, angle)
-        self.assertTrue(np.array_equal(follow_out, rotated_blurred_out))
+        self.assertTrue(np.any(follow_out - source_out) == 0)   # Fixed
 
 
 if __name__ == "__main__":

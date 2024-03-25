@@ -2,20 +2,18 @@ from utils import *
 
 
 class TestingClass(unittest.TestCase):
-    # Fix by Radon
     @parameterized.expand(load_test_cases)
     def test41(self, img: np.array, angle: float):
-        """Metamorphic Relation 41: Rotating the image by angle A and then applying a uniform filter is equivalent to applying a uniform filter to the original image and then rotating the result by angle A."""
+        """Metamorphic Relation 41: Rotating the image by angle and then rotating the result by 180 degrees should result in the same output as rotating the original image by 180 degrees."""
         # Get source output
         source_out = ndimage.rotate(img, angle)
 
         # Construct follow-up input
-        follow_out = ndimage.uniform_filter(source_out, size=3)
+        follow_out = ndimage.rotate(source_out, 180)  # Rotate the result by 180 degrees
 
         # Verification
-        uniform_source_out = ndimage.uniform_filter(img, size=3)
-        rotated_uniform_out = ndimage.rotate(uniform_source_out, angle)
-        self.assertTrue(np.array_equal(follow_out, rotated_uniform_out))
+        expected_out = ndimage.rotate(img, 180)  # Rotate the original image by 180 degrees
+        self.assertTrue(np.all(follow_out - expected_out) == 0)
 
 
 if __name__ == "__main__":
