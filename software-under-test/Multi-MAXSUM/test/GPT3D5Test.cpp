@@ -274,7 +274,7 @@ TEST_P(MultiMAXSUMParamTest, MR10) {
  * @brief Metamorphic Relation 11: Taking a subarray of the input array, the follow-up output should be less than or equal to the source output.
  *
  */
-TEST_P(MultiMAXSUMParamTest, MR11) {
+TEST_P(MultiMAXSUMParamTest, MR11) {    // Fixed
     /* Get source input */
     MultiMAXSUMInput input = GetParam();
     vector<int> source_vec = input.vec;
@@ -286,6 +286,8 @@ TEST_P(MultiMAXSUMParamTest, MR11) {
 
     /* Construct follow-up input */
     vector<int> follow_vec(source_vec.begin(), source_vec.begin() + n / 2); // Taking the first half as follow-up input
+    if (source_m > follow_vec.size())
+        GTEST_SKIP();
 
     /* Get follow-up output */
     int follow_out = multi_maxsum(follow_vec, source_m);
@@ -694,11 +696,17 @@ TEST_P(MultiMAXSUMParamTest, MR26) {
  * @brief Metamorphic Relation 27: If all elements of the input are positive, keep all even elements and set all odd elements to 1, the follow-up output should be less than or equal to the source output.
  *
  */
-TEST_P(MultiMAXSUMParamTest, MR27) {
+TEST_P(MultiMAXSUMParamTest, MR27) {    // Fixed
     /* Get source input */
     MultiMAXSUMInput input = GetParam();
     vector<int> source_vec = input.vec;
     int source_m = input.m;
+
+    /* Make sure all elements are positive */
+    for (auto& val : source_vec) {
+        if (val <= 0)
+            val = 1;
+    }
 
     /* Get source output */
     int source_out = multi_maxsum(source_vec, source_m);
@@ -860,11 +868,17 @@ TEST_P(MultiMAXSUMParamTest, MR32) {
  * @brief Metamorphic Relation 33: Replacing all elements of the input array with their square roots, the follow-up output should be less than or equal to the source output.
  *
  */
-TEST_P(MultiMAXSUMParamTest, MR33) {
+TEST_P(MultiMAXSUMParamTest, MR33) {    // Fixed
     /* Get source input */
     MultiMAXSUMInput input = GetParam();
     vector<int> source_vec = input.vec;
     int source_m = input.m;
+
+    /* Make sure all elements are positive */
+    for (auto& val : source_vec) {
+        if (val <= 0)
+            val = 1;
+    }
 
     /* Get source output */
     int source_out = multi_maxsum(source_vec, source_m);
@@ -891,6 +905,12 @@ TEST_P(MultiMAXSUMParamTest, MR34) {
     MultiMAXSUMInput input = GetParam();
     vector<int> source_vec = input.vec;
     int source_m = input.m;
+
+    /* Make sure all elements are positive */
+    for (auto& val : source_vec) {
+        if (val <= 0)
+            val = 1;
+    }
 
     /* Get source output */
     int source_out = multi_maxsum(source_vec, source_m);
