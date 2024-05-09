@@ -465,7 +465,7 @@ public class BoyerTestGPT4 {
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
-    public void test20(String text, String pattern) {   // Fixed
+    public void test20(String text, String pattern) { // Fixed
         int originalIndex = Boyer.indexOf(text, pattern);
         if (originalIndex == -1) {
             return;
@@ -642,7 +642,7 @@ public class BoyerTestGPT4 {
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
-    public void test27(String text, String pattern) {
+    public void test27(String text, String pattern) { // Fixed
         int originalIndex = Boyer.indexOf(text, pattern);
         if (originalIndex == -1 || originalIndex == 0 || text.length() == pattern.length()) {
             return;
@@ -658,11 +658,7 @@ public class BoyerTestGPT4 {
          * The new index should be -1 (if the pattern was at the start of the original text), or the
          * original index should be decremented by 1 (due to left rotation).
          */
-        if (originalIndex == 1) {
-            assertEquals(rotatedText.length() - 1, newIndex);
-        } else {
-            assertTrue(newIndex == -1 || newIndex == originalIndex - 1);
-        }
+        assertTrue(newIndex == -1 || newIndex == originalIndex - 1);
     }
 
     /**
@@ -740,7 +736,12 @@ public class BoyerTestGPT4 {
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
-    public void test31(String text, String pattern) {
+    public void test31(String text, String pattern) { // Fixed
+        /* If pattern in the text, make text ends with pattern */
+        if (text.indexOf(pattern) != -1) {
+            text = text + pattern;
+        }
+
         if (!text.endsWith(pattern)) {
             return;
         }
@@ -776,7 +777,11 @@ public class BoyerTestGPT4 {
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
-    public void test33(String text, String pattern) {
+    public void test33(String text, String pattern) { // Fixed
+        if (text.indexOf(pattern) != -1) {
+            text = pattern + text;
+        }
+
         String prefix = "common_prefix_";
         String newText = prefix + text;
         String newPattern = prefix + pattern;
@@ -919,7 +924,7 @@ public class BoyerTestGPT4 {
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
-    public void test39(String text, String pattern) {
+    public void test39(String text, String pattern) {   // Fixed
         int originalIndex = Boyer.indexOf(text, pattern);
         if (originalIndex == -1) {
             return;
@@ -927,7 +932,11 @@ public class BoyerTestGPT4 {
 
         // Inserting characters between each character in the text
         String interveningChar = "#";
-        String newText = insertBetweenEveryChar(text, interveningChar);
+
+        /* Do not affect the pattern */
+        String prefixText = text.substring(0, originalIndex + 1);
+        String newPrefixText = insertBetweenEveryChar(prefixText, interveningChar);
+        String newText = newPrefixText + text.substring(originalIndex + 1);
 
         int newIndex = Boyer.indexOf(newText, pattern);
 
