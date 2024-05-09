@@ -465,13 +465,19 @@ public class BoyerTestGPT4 {
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
-    public void test20(String text, String pattern) {
+    public void test20(String text, String pattern) {   // Fixed
         int originalIndex = Boyer.indexOf(text, pattern);
         if (originalIndex == -1) {
             return;
         }
 
         String insertion = "insert";
+
+        /* Make sure inserting string not containing the pattern */
+        while (insertion.indexOf(pattern) != -1) {
+            insertion = RandomStringUtils.randomAlphabetic(6);
+        }
+
         String newText =
                 text.substring(0, originalIndex) + insertion + text.substring(originalIndex);
 
