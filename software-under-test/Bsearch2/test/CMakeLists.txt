@@ -18,6 +18,8 @@ add_executable(GPT4Test tmain.cpp GPT4Test.cpp utils.cpp utils.h ../src/function
 target_link_libraries(GPT4Test PRIVATE gtest)
 target_link_libraries(GPT4Test PRIVATE pthread)
 
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
+
 add_test(NAME exampleTest COMMAND exampleTest)
 add_test(NAME GPT3D5Test COMMAND GPT3D5Test)
 add_test(NAME GPT3D5Test_nosystem COMMAND GPT3D5Test_nosystem)

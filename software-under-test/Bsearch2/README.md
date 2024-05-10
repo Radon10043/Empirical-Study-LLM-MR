@@ -46,5 +46,5 @@ for i in {1..40}; do ./run.sh GPT3D5Test MR$i 5; done | tee testcases.validate.m
 Run all test cases of GPT4Test, each test case is repeated five times:
 
 ```sh
-for i in {1..40}; do ./run.sh GPT4Test MR$i 5; done | tee testcases.validate.md
+for i in {2..41}; do ./run.sh GPT4Test MR$i 5; done | tee testcases.validate.md
 ```

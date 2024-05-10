@@ -1,8 +1,8 @@
 #include <algorithm>
 #include <cmath>
 #include <gtest/gtest.h>
-#include <vector>
 #include <tuple>
+#include <vector>
 
 #include "../src/function.h"
 #include "utils.h"
@@ -14,1249 +14,1159 @@ using namespace std;
 class BSearchParamTest : public ::testing::TestWithParam<BSearch2Input> {};
 
 /**
- * @brief Metamorphic relation 1: Adding an element greater than the max value of the array should not change the search outcome.
- *
- */
-TEST_P(BSearchParamTest, MR1) {
-    std::vector<int> vec;
-    int target;
-#if NOT_SATISFIED
-    std::tie(vec, target) = GetParam();
-#else
-    BSearch2Input input = GetParam();
-    vec = input.vec, target = input.target;
-#endif
-
-    bool source_out = bin_search(vec, target);
-
-    // Append a larger element and test again
-    vec.push_back(vec.back() + 1);
-    bool follow_up_out = bin_search(vec, target);
-
-    EXPECT_EQ(source_out, follow_up_out);
-}
-
-/**
- * @brief Metamorphic relation 2: If the array and target element are scaled by a positive multiplier, the result should be the same.
+ * @brief Metamorphic relation 2: Sorting a second array in descending order, the element should not be found in the new array.
  *
  */
 TEST_P(BSearchParamTest, MR2) {
-    std::vector<int> vec;
-    int target;
-#if NOT_SATISFIED
-    std::tie(vec, target) = GetParam();
-#else
+    /* Get source input */
     BSearch2Input input = GetParam();
-    vec = input.vec, target = input.target;
-#endif
+    vector<int> vec = input.vec;
+    int target = input.target;
 
+    /* Get source output */
     bool source_out = bin_search(vec, target);
 
-    int multiplier = 2;
-    std::vector<int> scaled_vec;
-    std::transform(vec.begin(), vec.end(), std::back_inserter(scaled_vec), [multiplier](int x) { return x * multiplier; });
-    int scaled_target = target * multiplier;
+    /* Construct follow-up input on a sorted array in descending order */
+    vector<int> follow_vec(vec.rbegin(), vec.rend());
 
-    bool follow_up_out = bin_search(scaled_vec, scaled_target);
+    /* Get follow-up output */
+    bool follow_out = bin_search(follow_vec, target);
 
-    EXPECT_EQ(source_out, follow_up_out);
+    /* Verification */
+    // As the binary search assumes the array is sorted in ascending order,
+    // if the array is sorted in descending order, the binary search should always fail.
+    EXPECT_FALSE(follow_out);
 }
 
 /**
- * @brief Metamorphic relation 3: Removing elements other than the target should not change the result of the search.
+ * @brief Metamorphic relation 3: After adding or deleting a repeated target value in the array, the output should be the same.
  *
  */
-TEST_P(BSearchParamTest, MR3) {
-    std::vector<int> vec;
-    int target;
-#if NOT_SATISFIED
-    std::tie(vec, target) = GetParam();
-#else
+TEST_P(BSearchParamTest, MR3) { // Fixed
+    /* Get source input */
     BSearch2Input input = GetParam();
-    vec = input.vec, target = input.target;
-#endif
+    vector<int> vec = input.vec;
+    int target = input.target;
 
+    /* Make sure the size of vec is larger than 1 */
+    if (vec.size() == 1)
+        vec.emplace_back(vec[0]);
+
+    /* Get source output */
     bool source_out = bin_search(vec, target);
 
-    // Remove an element that is not the target
-    if (vec.size() > 1 && vec[0] != target) {
-        vec.erase(vec.begin());
+    /* Construct follow-up input */
+    vector<int> follow_vec = vec;
+
+    // Add an extra instance of the target if it was found, otherwise remove an arbitrary element
+    if (source_out) {
+        follow_vec.push_back(target);
+    } else if (!follow_vec.empty()) {
+        follow_vec.pop_back();
     }
-    bool follow_up_out = bin_search(vec, target);
 
-    EXPECT_EQ(source_out, follow_up_out);
-}
-
-/**
- * @brief Metamorphic relation 4: Dividing all elements and the target by a common divisor should not affect the search result.
- *
- */
-TEST_P(BSearchParamTest, MR4) {
-    std::vector<int> vec;
-    int target;
-#if NOT_SATISFIED
-    std::tie(vec, target) = GetParam();
-#else
-    BSearch2Input input = GetParam();
-    vec = input.vec, target = input.target;
-#endif
-
-    bool source_out = bin_search(vec, target);
-
-    int divisor = 2;
-
-    if (target % divisor == 0) {
-        // Divide the elements and the target by the divisor to produce a follow-up input
-        std::vector<int> reduced_vec;
-        std::transform(vec.begin(), vec.end(), std::back_inserter(reduced_vec), [divisor](int x) { return x / divisor; });
-        int reduced_target = target / divisor;
-
-        bool follow_up_out = bin_search(reduced_vec, reduced_target);
-        EXPECT_EQ(source_out, follow_up_out);
+    // If the extra instance has been added, sort the array again
+    if (source_out) {
+        sort(follow_vec.begin(), follow_vec.end());
     }
+
+    /* Get follow-up output */
+    bool follow_out = bin_search(follow_vec, target);
+
+    /* Verification */
+    EXPECT_EQ(source_out, follow_out);
 }
 
 /**
- * @brief Metamorphic relation 5: Reversing the input vector (which breaks the sorted order) should result in a false return since the specification requires an
- * ascending array.
+ * @brief Metamorphic relation 4: Permuting the array while keeping it sorted should not affect the result of the search.
  *
  */
-TEST_P(BSearchParamTest, MR5) {
-    std::vector<int> vec;
-    int target;
-#if NOT_SATISFIED
-    std::tie(vec, target) = GetParam();
-#else
+TEST_P(BSearchParamTest, MR4) { // Fixed
+    /* Get source input */
     BSearch2Input input = GetParam();
-    vec = input.vec, target = input.target;
-#endif
+    vector<int> vec = input.vec;
+    int target = input.target;
 
-    std::vector<int> reversed_vec(vec.rbegin(), vec.rend()); // Create a reversed vector
-
-    EXPECT_FALSE(bin_search(reversed_vec, target));
-}
-
-/**
- * @brief If you remove an element that does not exist in the array, the outcome of the search should remain the same.
- *
- */
-TEST_P(BSearchParamTest, MR6) {
-    std::vector<int> vec;
-    int target;
-#if NOT_SATISFIED
-    std::tie(vec, target) = GetParam();
-#else
-    BSearch2Input input = GetParam();
-    vec = input.vec, target = input.target;
-#endif
-
-    // Initial binary search
+    /* Get source output */
     bool source_out = bin_search(vec, target);
 
-    // Insert a random element that is not the target and re-sort the array
-    int new_element = vec.back() + 1; // Ensure it's larger than any element in the array
-    vec.push_back(new_element);
-    std::sort(vec.begin(), vec.end());
+    /* Construct follow-up input by permuting the elements of the array while keeping it sorted */
+    // Permute the array
+    random_shuffle(vec.begin(), vec.end());
+    sort(vec.begin(), vec.end());
 
-    // Now, remove the element we just added
-    vec.pop_back(); // Element is at the end, as vector was sorted
+    /* Get follow-up output */
+    bool follow_out = bin_search(vec, target);
 
-    // Follow-up binary search
-    bool follow_up_out = bin_search(vec, target);
-
-    // The result should remain the same regardless of the modification
-    EXPECT_EQ(source_out, follow_up_out);
+    /* Verification */
+    EXPECT_EQ(source_out, follow_out);
 }
 
 /**
- * @brief Perform a binary search on subsets of the array containing the target should return true.
- *
- */
-TEST_P(BSearchParamTest, MR7) {
-    std::vector<int> vec;
-    int target;
-#if NOT_SATISFIED
-    std::tie(vec, target) = GetParam();
-#else
-    BSearch2Input input = GetParam();
-    vec = input.vec, target = input.target;
-#endif
-
-    // Ensure the target exists in the array before testing this relation
-    bool source_out = bin_search(vec, target);
-    if (!source_out)
-        return;
-
-    // Get the position of the target
-    auto it = std::find(vec.begin(), vec.end(), target);
-    if (it != vec.end()) {
-        int index = it - vec.begin();
-
-        // Create a subset of the array that includes the target
-        std::vector<int> subset(vec.begin(), vec.begin() + index + 1);
-
-        // Follow-up binary search in the subset
-        bool follow_up_out = bin_search(subset, target);
-
-        // The result should be the same since the target is in the subset
-        EXPECT_EQ(source_out, follow_up_out);
-    }
-}
-
-/**
- * @brief If `bin_search` finds the target, then doubling every element except the target value should not change the outcome of the function.
- *
- */
-TEST_P(BSearchParamTest, MR8) {
-    std::vector<int> vec;
-    int target;
-#if NOT_SATISFIED
-    std::tie(vec, target) = GetParam();
-#else
-    BSearch2Input input = GetParam();
-    vec = input.vec, target = input.target;
-#endif
-
-    // Perform the initial search
-    bool source_out = bin_search(vec, target);
-    if (!source_out)
-        return;
-
-    // Double every element except the target
-    std::vector<int> modified_vec;
-    std::transform(vec.begin(), vec.end(), std::back_inserter(modified_vec), [&target](int val) { return val == target ? val : val * 2; });
-
-    // Perform the follow-up search
-    bool follow_up_out = bin_search(modified_vec, target);
-
-    // The result should not change as the search for the target should still be successful
-    EXPECT_EQ(source_out, follow_up_out);
-}
-
-/**
- * @brief If the `target` is present in the array, then replacing the `target` with another number not already in the array, re-sorting it, and searching for
- * the original `target` should yield `false`.c
- *
- */
-TEST_P(BSearchParamTest, MR9) {
-    std::vector<int> vec;
-    int target;
-#if NOT_SATISFIED
-    std::tie(vec, target) = GetParam();
-#else
-    BSearch2Input input = GetParam();
-    vec = input.vec, target = input.target;
-#endif
-
-    // Only proceed if the target is in the array
-    bool source_out = bin_search(vec, target);
-    if (!source_out)
-        return;
-
-    std::vector<int> modified_vec = vec;
-
-    // Find and replace the target with a new value
-    auto target_position = std::find(modified_vec.begin(), modified_vec.end(), target);
-    if (target_position != modified_vec.end()) {
-        int new_value = vec.back() + 1; // Ensure to pick a value not in the array
-        *target_position = new_value;
-        std::sort(modified_vec.begin(), modified_vec.end()); // Re-sort the array
-
-        // Perform the search again
-        bool follow_up_out = bin_search(modified_vec, target);
-        EXPECT_FALSE(follow_up_out);
-    }
-}
-
-/**
- * @brief If the `target` exists in the original array and you add a duplicate of the `target`, the result should still be `true`.
- *
- */
-TEST_P(BSearchParamTest, MR10) {
-    std::vector<int> vec;
-    int target;
-#if NOT_SATISFIED
-    std::tie(vec, target) = GetParam();
-#else
-    BSearch2Input input = GetParam();
-    vec = input.vec, target = input.target;
-#endif
-
-    bool source_out = bin_search(vec, target);
-    if (!source_out)
-        return;
-
-    // Add a duplicate of the target to the array and re-sort
-    vec.push_back(target);
-    std::sort(vec.begin(), vec.end());
-
-    // Perform the search again
-    bool follow_up_out = bin_search(vec, target);
-
-    // The output should remain true as the target is still in the array
-    EXPECT_TRUE(follow_up_out);
-}
-
-/**
- * @brief For an array that does not contain the `target`, adding the `target` to the array, re-sorting it, and then searching should yield `true`.
- *
- */
-TEST_P(BSearchParamTest, MR11) {
-    std::vector<int> vec;
-    int target;
-#if NOT_SATISFIED
-    std::tie(vec, target) = GetParam();
-#else
-    BSearch2Input input = GetParam();
-    vec = input.vec, target = input.target;
-#endif
-
-    bool source_out = bin_search(vec, target);
-    if (source_out)
-        return; // Skip if the target is already in the array
-
-    // Add the target to the array
-    vec.push_back(target);
-    std::sort(vec.begin(), vec.end());
-
-    // Perform the search again
-    bool follow_up_out = bin_search(vec, target);
-
-    // Now the target has been added, and the result should be true
-    EXPECT_TRUE(follow_up_out);
-}
-
-/**
- * @brief If the `target` is at the beginning of the array, adding a new element smaller than the `target` at the beginning should not change the result (if the
- * target was in the array).
- *
- */
-TEST_P(BSearchParamTest, MR12) {
-    std::vector<int> vec;
-    int target;
-#if NOT_SATISFIED
-    std::tie(vec, target) = GetParam();
-#else
-    BSearch2Input input = GetParam();
-    vec = input.vec, target = input.target;
-#endif
-
-    // Perform the initial search
-    bool source_out = bin_search(vec, target);
-    if (!source_out)
-        return;
-
-    // Add a smaller element than the smallest one in the vector at the beginning
-    vec.insert(vec.begin(), vec.front() - 1);
-
-    // Perform the search again
-    bool follow_up_out = bin_search(vec, target);
-
-    // The result should not change since the target is still in the array
-    EXPECT_EQ(source_out, follow_up_out);
-}
-
-/**
- * @brief If `target` is at the end of the array, adding a new element larger than the `target` at the end should not change the result (if the target was in
- * the array).
- *
- */
-TEST_P(BSearchParamTest, MR13) {
-    std::vector<int> vec;
-    int target;
-#if NOT_SATISFIED
-    std::tie(vec, target) = GetParam();
-#else
-    BSearch2Input input = GetParam();
-    vec = input.vec, target = input.target;
-#endif
-
-    // Perform the initial search
-    bool source_out = bin_search(vec, target);
-    if (!source_out)
-        return;
-
-    // Add a larger element than the largest one in the vector at the end
-    vec.push_back(vec.back() + 1);
-
-    // Perform the search again
-    bool follow_up_out = bin_search(vec, target);
-
-    // The result should not change since the target is still in the array
-    EXPECT_EQ(source_out, follow_up_out);
-}
-
-/**
- * @brief If `target` is not found in the array, and elements in the array are shuffled randomly (disrupting the ascending order), `bin_search` should still
- * return `false` if it checks for sorted order as a precondition.
- *
- */
-TEST_P(BSearchParamTest, MR14) {
-    std::vector<int> vec;
-    int target;
-#if NOT_SATISFIED
-    std::tie(vec, target) = GetParam();
-#else
-    BSearch2Input input = GetParam();
-    vec = input.vec, target = input.target;
-#endif
-
-    // Perform the initial search
-    bool source_out = bin_search(vec, target);
-    if (source_out)
-        return; // Skip if the target is already in the array
-
-    // Shuffle the array elements
-    std::random_shuffle(vec.begin(), vec.end());
-
-    // Perform the search again
-    bool follow_up_out = bin_search(vec, target);
-
-    // The result should still be false, as the binary search requires sorted order
-    EXPECT_FALSE(follow_up_out);
-}
-
-/**
- * @brief If an array does not contain the `target`, inserting the `target` multiple times (to create duplicates), then sorting the array, should change the
- * search result from `false` to `true`.
- *
- */
-TEST_P(BSearchParamTest, MR15) {
-    std::vector<int> vec;
-    int target;
-#if NOT_SATISFIED
-    std::tie(vec, target) = GetParam();
-#else
-    BSearch2Input input = GetParam();
-    vec = input.vec, target = input.target;
-#endif
-
-    // Perform the initial search
-    bool source_out = bin_search(vec, target);
-    if (source_out)
-        return; // Skip test if target is found
-
-    // Insert the target into multiple positions
-    vec.push_back(target);
-    vec.push_back(target);
-    std::sort(vec.begin(), vec.end()); // Sort the vector again
-
-    // Perform the search after adding duplicates
-    bool follow_up_out = bin_search(vec, target);
-
-    // Now the target has been added, the search result should be true
-    EXPECT_TRUE(follow_up_out);
-}
-
-/**
- * @brief If the array contains the `target`, inverting the sign of every element in the array as well as the `target` should not change the outcome of the
+ * @brief Metamorphic relation 5: Scaling all elements of the array, including the target by a positive non-zero constant should not change the result of the
  * search.
  *
  */
-TEST_P(BSearchParamTest, MR16) {
-    std::vector<int> vec;
-    int target;
-#if NOT_SATISFIED
-    std::tie(vec, target) = GetParam();
-#else
+TEST_P(BSearchParamTest, MR5) {
+    /* Get source input */
     BSearch2Input input = GetParam();
-    vec = input.vec, target = input.target;
-#endif
+    vector<int> vec = input.vec;
+    int target = input.target;
 
-    // Perform the initial search
+    /* Get source output */
     bool source_out = bin_search(vec, target);
 
-    // Invert signs of all elements and the target
-    for (auto &element : vec) {
-        element = -element;
+    /* Construct follow-up input */
+    int scale = 3; // A positive non-zero constant
+    vector<int> follow_vec;
+    for (int val : vec) {
+        follow_vec.push_back(val * scale);
     }
-    std::sort(vec.begin(), vec.end()); // Sort the vector again since the order is reversed
-    int inverted_target = -target;
+    int follow_target = target * scale;
 
-    // Perform the search after inverting the signs
-    bool follow_up_out = bin_search(vec, inverted_target);
+    /* Get follow-up output */
+    bool follow_out = bin_search(follow_vec, follow_target);
 
-    // The result should remain the same
-    EXPECT_EQ(source_out, follow_up_out);
+    /* Verification */
+    EXPECT_EQ(source_out, follow_out);
 }
 
 /**
- * @brief If the target is at the beginning or end of the array, reversing the array and using the negative of the target should yield the same result if
- * numbers are symmetrically distributed.
+ * @brief Metamorphic relation 6: Doubling the array size by appending the same elements should not change the result if the target is present in the original
+ * array.
+ *
+ */
+TEST_P(BSearchParamTest, MR6) {
+    /* Get source input */
+    BSearch2Input input = GetParam();
+    vector<int> vec = input.vec;
+    int target = input.target;
+
+    /* Get source output */
+    bool source_out = bin_search(vec, target);
+
+    /* Construct follow-up input by doubling the array size */
+    vector<int> follow_vec = vec;
+    follow_vec.insert(follow_vec.end(), vec.begin(), vec.end());
+    sort(follow_vec.begin(), follow_vec.end());
+
+    /* Get follow-up output */
+    bool follow_out = bin_search(follow_vec, target);
+
+    /* Verification */
+    if (source_out) {
+        EXPECT_EQ(source_out, follow_out);
+    }
+}
+
+/**
+ * @brief Metamorphic relation 7: Searching for a value outside the range of the array elements should always return false.
+ *
+ */
+TEST_P(BSearchParamTest, MR7) {
+    /* Get source input */
+    BSearch2Input input = GetParam();
+    vector<int> vec = input.vec;
+    int max_elem = *max_element(vec.begin(), vec.end());
+    int min_elem = *min_element(vec.begin(), vec.end());
+
+    /* Search for out-of-range values */
+    bool out_of_range_high_out = bin_search(vec, max_elem + 1);
+    bool out_of_range_low_out = bin_search(vec, min_elem - 1);
+
+    /* Verification */
+    EXPECT_FALSE(out_of_range_high_out);
+    EXPECT_FALSE(out_of_range_low_out);
+}
+
+/**
+ * @brief Metamorphic relation 8: Inverting all elements of the array, including the target, should not change the result if the target is present.
+ *
+ */
+TEST_P(BSearchParamTest, MR8) {
+    /* Get source input */
+    BSearch2Input input = GetParam();
+    vector<int> vec = input.vec;
+    int target = input.target;
+
+    /* Get source output */
+    bool source_out = bin_search(vec, target);
+
+    /* Construct follow-up input by inverting all elements */
+    vector<int> follow_vec;
+    for (int val : vec) {
+        follow_vec.push_back(-val);
+    }
+    sort(follow_vec.begin(), follow_vec.end());
+    int follow_target = -target;
+
+    /* Get follow-up output */
+    bool follow_out = bin_search(follow_vec, follow_target);
+
+    /* Verification */
+    EXPECT_EQ(source_out, follow_out);
+}
+
+/**
+ * @brief Metamorphic relation 9: Removing an element other than the target from a duplicated array should not change the result of the search for the target.
+ *
+ */
+TEST_P(BSearchParamTest, MR9) {
+    /* Get source input */
+    BSearch2Input input = GetParam();
+    vector<int> vec = input.vec;
+    int target = input.target;
+
+    /* Ensure the target is in the vector before testing this MR */
+    bool source_out = bin_search(vec, target);
+
+    if (source_out && vec.size() > 1) {
+        /* Construct follow-up input by duplicating and then removing a non-target element */
+        vector<int> follow_vec = vec;
+        follow_vec.push_back(vec[0] != target ? vec[0] : vec[1]); // Duplicate a non-target element
+        sort(follow_vec.begin(), follow_vec.end());
+        auto it = find_if(follow_vec.begin(), follow_vec.end(), [&](int v) { return v != target; });
+        follow_vec.erase(it); // Remove a non-target element
+
+        /* Get follow-up output */
+        bool follow_out = bin_search(follow_vec, target);
+
+        /* Verification */
+        EXPECT_EQ(source_out, follow_out);
+    }
+}
+
+/**
+ * @brief Metamorphic relation 10: Adding a new element greater than all existing elements in the array should not affect the result for the existing targets.
+ *
+ */
+TEST_P(BSearchParamTest, MR10) {
+    /* Get source input */
+    BSearch2Input input = GetParam();
+    vector<int> vec = input.vec;
+    int target = input.target;
+
+    /* Get source output */
+    bool source_out = bin_search(vec, target);
+
+    /* Construct follow-up input by adding a larger element at the end */
+    vector<int> follow_vec = vec;
+    follow_vec.push_back(*max_element(vec.begin(), vec.end()) + 10); // Add an element that is larger than the largest in vec
+
+    /* Get follow-up output */
+    bool follow_out = bin_search(follow_vec, target);
+
+    /* Verification */
+    EXPECT_EQ(source_out, follow_out);
+}
+
+/**
+ * @brief Metamorphic relation 11: If the target is found in the source array, adding a new element smaller than all existing elements in the array should not
+ * affect the result.
+ *
+ */
+TEST_P(BSearchParamTest, MR11) {
+    /* Get source input */
+    BSearch2Input input = GetParam();
+    vector<int> vec = input.vec;
+    int target = input.target;
+
+    /* Get source output */
+    bool source_out = bin_search(vec, target);
+
+    /* If the target was found then test the MR */
+    if (source_out) {
+        /* Construct follow-up input by adding a smaller element at the start */
+        vector<int> follow_vec = vec;
+        follow_vec.insert(follow_vec.begin(), *min_element(vec.begin(), vec.end()) - 10); // Add an element that is smaller than the smallest in vec
+
+        /* Get follow-up output */
+        bool follow_out = bin_search(follow_vec, target);
+
+        /* Verification */
+        EXPECT_EQ(source_out, follow_out);
+    }
+}
+
+/**
+ * @brief Metamorphic relation 12: Changing the order of elements in the array without de-sorting should yield the same result.
+ *
+ * For example, if the array is [1, 2, 3, 4], then permutations such as [1, 3, 2, 4] are not allowed,
+ * as they are not sorted, but [1, 1, 2, 3, 4] or [1, 2, 2, 3, 4] are allowed as they maintain the sorted property.
+ *
+ */
+TEST_P(BSearchParamTest, MR12) {
+    /* Get source input */
+    BSearch2Input input = GetParam();
+    vector<int> vec = input.vec;
+    int target = input.target;
+
+    /* Proceed only if there are duplicates in the vector to maintain the sorted property while changing order */
+    std::map<int, int> elem_counts;
+    for (int elem : vec) {
+        elem_counts[elem]++;
+    }
+    vector<int> vec_with_duplicates;
+    for (auto &[elem, count] : elem_counts) {
+        if (count > 1) {
+            // Just double one element with duplicates, maintaining sort order
+            vec_with_duplicates.push_back(elem);
+            vec_with_duplicates.push_back(elem);
+        } else {
+            vec_with_duplicates.push_back(elem);
+        }
+    }
+
+    /* If we were able to create a vector that maintains sorted order and changes element order proceed with the test */
+    if (vec_with_duplicates.size() > vec.size()) {
+        /* Get source output */
+        bool source_out = bin_search(vec, target);
+
+        /* Get follow-up output */
+        bool follow_out = bin_search(vec_with_duplicates, target);
+
+        /* Verification */
+        EXPECT_EQ(source_out, follow_out);
+    }
+}
+
+/**
+ * @brief Metamorphic relation 13: If the target does not exist in the array, reversing the array should also yield false when searching for the same target.
+ *
+ */
+TEST_P(BSearchParamTest, MR13) {
+    /* Get source input */
+    BSearch2Input input = GetParam();
+    vector<int> vec = input.vec;
+    int target = input.target;
+
+    /* Get source output */
+    bool source_out = bin_search(vec, target);
+
+    /* If the target was not found then test the MR */
+    if (!source_out) {
+        /* Construct follow-up input by reversing sorted array */
+        vector<int> follow_vec(vec.rbegin(), vec.rend()); // Reverse vec
+
+        /* Get follow-up output */
+        bool follow_out = bin_search(follow_vec, target);
+
+        /* Verification */
+        EXPECT_FALSE(follow_out); // Should still be false, as reversing won't make it suddenly exist
+    }
+}
+
+/**
+ * @brief Metamorphic relation 14: Removing all instances of the target from the array should return false when searching for the target.
+ *
+ */
+TEST_P(BSearchParamTest, MR14) {
+    /* Get source input */
+    BSearch2Input input = GetParam();
+    vector<int> vec = input.vec;
+    int target = input.target;
+
+    /* Get source output */
+    bool source_out = bin_search(vec, target);
+
+    /* If the target was found then test the MR */
+    if (source_out) {
+        /* Construct follow-up input by removing all instances of the target */
+        vector<int> follow_vec;
+        copy_if(vec.begin(), vec.end(), back_inserter(follow_vec), [target](int v) { return v != target; });
+
+        /* Get follow-up output */
+        bool follow_out = bin_search(follow_vec, target);
+
+        /* Verification */
+        EXPECT_FALSE(follow_out); // Should return false, as the target has been removed
+    }
+}
+
+/**
+ * @brief Metamorphic relation 15: Replacing the target with another element that exists in the array should yield a positive result if the target was present,
+ * otherwise the result should remain the same.
+ *
+ */
+TEST_P(BSearchParamTest, MR15) {
+    /* Get source input */
+    BSearch2Input input = GetParam();
+    vector<int> vec = input.vec;
+    int target = input.target;
+
+    /* Get source output */
+    bool source_out = bin_search(vec, target);
+
+    /* Select a replacement element that is different from the target and known to exist in the array */
+    int replacement = vec[0] == target ? vec[1] : vec[0];
+
+    /* Get follow-up output */
+    bool follow_out = bin_search(vec, replacement);
+
+    /* Verification */
+    if (source_out) {
+        // If the original target was in the list, then replacing it with another element from the list should also result in true.
+        EXPECT_TRUE(follow_out);
+    } else {
+        // If the original target was not in the list, it should remain the same as the source output.
+        EXPECT_EQ(source_out, follow_out);
+    }
+}
+
+/**
+ * @brief Metamorphic relation 16: If the array contains duplicates of the target, removing one occurrence should still yield true when searching for the
+ * target.
+ *
+ */
+TEST_P(BSearchParamTest, MR16) {
+    /* Get source input */
+    BSearch2Input input = GetParam();
+    vector<int> vec = input.vec;
+    int target = input.target;
+
+    /* Ensure that there is more than one occurrence of the target in the vector */
+    bool has_duplicates = std::count(vec.begin(), vec.end(), target) > 1;
+
+    if (has_duplicates) {
+        /* Get source output */
+        bool source_out = bin_search(vec, target);
+
+        /* Construct follow-up input by removing one occurrence of the target */
+        vector<int> follow_vec;
+        bool removed = false;
+        for (int v : vec) {
+            if (v == target && !removed) {
+                removed = true; // Remove only one occurrence of the target
+                continue;
+            }
+            follow_vec.push_back(v);
+        }
+
+        /* Get follow-up output */
+        bool follow_out = bin_search(follow_vec, target);
+
+        /* Verification */
+        EXPECT_EQ(source_out, follow_out); // Should still return true
+    }
+}
+
+/**
+ * @brief Metamorphic relation 17: If the target is greater than the largest element in the array,
+ * adding additional elements smaller than the target should not affect the result.
  *
  */
 TEST_P(BSearchParamTest, MR17) {
-    std::vector<int> vec;
-    int target;
-#if NOT_SATISFIED
-    std::tie(vec, target) = GetParam();
-#else
+    /* Get source input */
     BSearch2Input input = GetParam();
-    vec = input.vec, target = input.target;
-#endif
+    vector<int> vec = input.vec;
+    int target = *max_element(vec.begin(), vec.end()) + 5; // Ensure the target is not in the original vector.
 
-    // Perform the initial search
+    /* Get source output */
     bool source_out = bin_search(vec, target);
-    if (!source_out)
-        return; // Skip if the target is not found
 
-    // Reverse the array and negate the target
-    std::reverse(vec.begin(), vec.end());
-    int neg_target = -target;
+    /* Construct follow-up input by adding elements smaller than the target */
+    vector<int> follow_vec = vec;
+    follow_vec.push_back(target - 1);
+    follow_vec.push_back(target - 2);
+    sort(follow_vec.begin(), follow_vec.end());
 
-    // Assuming the negative of every element also exists in the array,
-    // perform the search again with the negative target on the reversed array
-    bool follow_up_out = bin_search(vec, neg_target);
+    /* Get follow-up output */
+    bool follow_out = bin_search(follow_vec, target);
 
-    // The result should be the same
-    EXPECT_EQ(source_out, follow_up_out);
+    /* Verification */
+    EXPECT_EQ(source_out, follow_out); // Should return false as in the source output.
 }
 
 /**
- * @brief For an array containing the `target`, replacing any single element that is not the `target` with another value (while maintaining the sorted property)
- * should not change the result of searching for `target`.c
+ * @brief Metamorphic relation 18: For an array with unique elements, doubling the target and
+ * multiplying all array elements by two should not affect the presence of the target.
  *
  */
 TEST_P(BSearchParamTest, MR18) {
-    std::vector<int> vec;
-    int target;
-#if NOT_SATISFIED
-    std::tie(vec, target) = GetParam();
-#else
+    /* Get source input */
     BSearch2Input input = GetParam();
-    vec = input.vec, target = input.target;
-#endif
+    vector<int> vec = input.vec;
+    int target = input.target;
 
-    // Initial search
-    bool source_out = bin_search(vec, target);
-    if (!source_out)
-        return; // Skip this relation if the target is not in the array
+    /* Check if array elements are unique to apply this MR */
+    std::set<int> unique_elements(vec.begin(), vec.end());
+    if (unique_elements.size() == vec.size()) {
+        /* Get source output */
+        bool source_out = bin_search(vec, target);
 
-    // Change a non-target element
-    if (vec.size() > 1) {
-        for (auto &el : vec) {
-            if (el != target) {
-                el = (vec.front() - 1); // Replace with a value smaller than the smallest to keep array sorted
-                break;
-            }
-        }
+        /* Construct follow-up input by multiplying elements and target by two */
+        vector<int> follow_vec;
+        std::transform(vec.begin(), vec.end(), std::back_inserter(follow_vec), [](int v) { return v * 2; });
+        int follow_target = target * 2;
+
+        /* Get follow-up output */
+        bool follow_out = bin_search(follow_vec, follow_target);
+
+        /* Verification */
+        EXPECT_EQ(source_out, follow_out);
     }
-
-    // Follow-up search
-    bool follow_out = bin_search(vec, target);
-
-    // The result should remain true
-    EXPECT_TRUE(follow_out);
 }
 
 /**
- * @brief If `target` exists in the array, inversely scaling the array (multiplying by -1) and searching for the negative `target` should yield `true`.
+ * @brief Metamorphic relation 19: For every target value that is found in the array, incrementing that target value by one
+ * should result in a 'false' search result, assuming the incremented value does not exist in the array.
  *
  */
 TEST_P(BSearchParamTest, MR19) {
-    std::vector<int> vec;
-    int target;
-#if NOT_SATISFIED
-    std::tie(vec, target) = GetParam();
-#else
+    /* Get source input */
     BSearch2Input input = GetParam();
-    vec = input.vec, target = input.target;
-#endif
+    vector<int> vec = input.vec;
+    int target = input.target;
 
-    // Initial search
+    /* Get source output */
     bool source_out = bin_search(vec, target);
-    if (!source_out)
-        return; // Skip if the target is not present
 
-    // Inverse scaling
-    for (auto &el : vec) {
-        el *= -1; // Multiply by -1
+    /* Apply this MR only if the target is found and incrementing it won't make it an existing element */
+    if (source_out && std::find(vec.begin(), vec.end(), target + 1) == vec.end()) {
+        /* Increment the target */
+        int incremented_target = target + 1;
+
+        /* Get follow-up output */
+        bool follow_out = bin_search(vec, incremented_target);
+
+        /* Verification */
+        EXPECT_FALSE(follow_out); // The incremented value should not be found
     }
-    std::sort(vec.begin(), vec.end()); // Re-sort to maintain ascending order
-
-    // New target is the negative of the original
-    int new_target = -target;
-
-    // Follow-up search
-    bool follow_out = bin_search(vec, new_target);
-
-    // The result should still be true
-    EXPECT_TRUE(follow_out);
 }
 
 /**
- * @brief If `target` does not exist in the array, removing elements neither affects nor alters the non-presence of the `target`.
+ * @brief Metamorphic relation 20: For any target not found in the array, decrementing the largest element of the array should not
+ * make the original target found.
  *
  */
 TEST_P(BSearchParamTest, MR20) {
-    std::vector<int> vec;
-    int target;
-#if NOT_SATISFIED
-    std::tie(vec, target) = GetParam();
-#else
+    /* Get source input */
     BSearch2Input input = GetParam();
-    vec = input.vec, target = input.target;
-#endif
+    vector<int> vec = input.vec;
+    int target = input.target;
 
-    // Initial search
+    /* Get source output */
     bool source_out = bin_search(vec, target);
-    if (source_out)
-        return; // Skip the following checks if target is initially found
 
-    // Remove elements while keeping array sorted and ensuring the target is still not present
-    vec.erase(vec.begin() + vec.size() / 2);
+    /* Apply this MR only if the target is not found */
+    if (!source_out) {
+        /* Find the largest element and decrement it */
+        auto max_it = std::max_element(vec.begin(), vec.end());
+        int new_max = *max_it - 1;
 
-    // Follow-up search
-    bool follow_out = bin_search(vec, target);
+        /* Construct follow-up input */
+        vec.erase(max_it);
+        vec.push_back(new_max);
+        sort(vec.begin(), vec.end());
 
-    // The result should still be false
-    EXPECT_FALSE(follow_out);
+        /* Get follow-up output */
+        bool follow_out = bin_search(vec, target);
+
+        /* Verification */
+        EXPECT_FALSE(follow_out); // The original target should not be found
+    }
 }
 
 /**
- * @brief If the `target` does exist in the array, and we create a second array by replicating each element of the original array, the search result for the
- * `target` in the new array should still be `true`.
+ * @brief Metamorphic relation 21: Removing any element that is not equal to the target should not affect the result of the
+ * search operation if the target is actually present in the array.
  *
  */
-TEST_P(BSearchParamTest, MR21) {
-    std::vector<int> vec;
-    int target;
-#if NOT_SATISFIED
-    std::tie(vec, target) = GetParam();
-#else
+TEST_P(BSearchParamTest, MR21) { // Fixed
+    /* Get source input */
     BSearch2Input input = GetParam();
-    vec = input.vec, target = input.target;
-#endif
+    vector<int> vec = input.vec;
+    int target = input.target;
 
-    // Perform the initial search
+    /* Get source output */
     bool source_out = bin_search(vec, target);
-    if (!source_out)
-        return; // Skip if target is not in the array
 
-    // Create a new vector by duplicating each element of the original
-    std::vector<int> vec_duplicated;
-    for (const auto &el : vec) {
-        vec_duplicated.push_back(el);
-        vec_duplicated.push_back(el); // Duplicate element
+    /* Construction of follow-up test only makes sense if the target is found (source_out is true) */
+    if (source_out) {
+        /* Construct follow-up input by removing an element that is not the target */
+        vector<int> follow_vec;
+        bool has_removed = false;
+        for (int v : vec) {
+            if (v != target && !has_removed) {
+                has_removed = true; // Only remove one such element
+            } else {
+                follow_vec.push_back(v);
+            }
+        }
+
+        /* Get follow-up output */
+        bool follow_out = bin_search(follow_vec, target);
+
+        /* Verification */
+        EXPECT_EQ(source_out, follow_out); // Removal of a non-target element should not affect the presence of the target
     }
-
-    // Perform search in the new array with duplicated elements
-    bool follow_out = bin_search(vec_duplicated, target);
-
-    // The result should remain true as the target is still present
-    EXPECT_TRUE(follow_out);
 }
 
 /**
- * @brief In the case where the `target` is not in the array, concatenating the original array with an exact copy of itself should still return a `false` search
- * result for the `target`.
+ * @brief Metamorphic relation 22: Truncating the array before the position of the found target should keep the result unchanged.
+ * That is, for any target found in the array, if we create a sub-array from the beginning up to the target, the target should still be
+ * found in this new array.
  *
  */
 TEST_P(BSearchParamTest, MR22) {
-    std::vector<int> vec;
-    int target;
-#if NOT_SATISFIED
-    std::tie(vec, target) = GetParam();
-#else
+    /* Get source input */
     BSearch2Input input = GetParam();
-    vec = input.vec, target = input.target;
-#endif
+    vector<int> vec = input.vec;
+    int target = input.target;
 
-    // Perform the initial search
+    /* Get source output */
     bool source_out = bin_search(vec, target);
-    if (source_out)
-        return; // Skip if target is in the array
 
-    // Concatenate the vector with itself
-    std::vector<int> vec_concatenated(vec);
-    vec_concatenated.insert(vec_concatenated.end(), vec.begin(), vec.end());
+    /* If the target is found in the array, truncate the array to test the MR */
+    if (source_out) {
+        auto target_position = std::find(vec.begin(), vec.end(), target);
 
-    // Perform search in the concatenated vector
-    bool follow_out = bin_search(vec_concatenated, target);
+        /* Construct follow-up input with elements up to and including the target */
+        vector<int> follow_vec(vec.begin(), target_position + 1);
 
-    // The result should remain false as the target was not in the original array
-    EXPECT_FALSE(follow_out);
+        /* Get follow-up output */
+        bool follow_out = bin_search(follow_vec, target);
+
+        /* Verification */
+        EXPECT_TRUE(follow_out); // The target should still be present in the follow-up output
+    }
 }
 
 /**
- * @brief If the `target` is present in the array, taking a prefix of the array that contains the `target` and searching for `target` should return `true`.
+ * @brief Metamorphic relation 23: For any missing target, repeating the array elements should still result in the same output.
  *
  */
 TEST_P(BSearchParamTest, MR23) {
-    std::vector<int> vec;
-    int target;
-#if NOT_SATISFIED
-    std::tie(vec, target) = GetParam();
-#else
+    /* Get source input */
     BSearch2Input input = GetParam();
-    vec = input.vec, target = input.target;
-#endif
+    vector<int> vec = input.vec;
+    int target = input.target;
 
+    /* Get source output */
     bool source_out = bin_search(vec, target);
-    if (!source_out)
-        return; // Skip if target is not in the array
 
-    // Assuming the vector is sorted, the target must be within the first 'i' elements
-    for (size_t i = 0; i < vec.size(); ++i) {
-        if (vec[i] == target) {
-            // Create prefix vector containing target
-            std::vector<int> prefix_vec(vec.begin(), vec.begin() + i + 1);
+    /* If the target is not found in the array, repeat the array to test the MR */
+    if (!source_out) {
+        vector<int> repeated_vec(vec);
+        repeated_vec.insert(repeated_vec.end(), vec.begin(), vec.end());
 
-            // Search for the target within the prefix vector
-            bool follow_out = bin_search(prefix_vec, target);
+        /* Get follow-up output */
+        bool follow_out = bin_search(repeated_vec, target);
 
-            // We expect the result to be true as target is within the prefix
-            EXPECT_TRUE(follow_out);
-            break;
-        }
+        /* Verification */
+        EXPECT_FALSE(follow_out); // The target should still not be present in the follow-up output
     }
 }
 
 /**
- * @brief Doubling the target value and every element in the array, and then dividing them all back by two should not change the search result.
+ * @brief Metamorphic relation 24: For an array containing the target, appending elements larger than the target should not affect the result.
  *
  */
 TEST_P(BSearchParamTest, MR24) {
-    std::vector<int> vec;
-    int target;
-#if NOT_SATISFIED
-    std::tie(vec, target) = GetParam();
-#else
+    /* Get source input */
     BSearch2Input input = GetParam();
-    vec = input.vec, target = input.target;
-#endif
+    vector<int> vec = input.vec;
+    int target = input.target;
 
-    // Perform the initial search
+    /* Get source output */
     bool source_out = bin_search(vec, target);
 
-    // Double every element and the target
-    std::transform(vec.begin(), vec.end(), vec.begin(), [](int n) { return n * 2; });
-    target *= 2;
+    /* If target is found in source input */
+    if (source_out) {
+        /* Construct follow-up input by appending elements larger than any in the current array */
+        int max_elem = *max_element(vec.begin(), vec.end());
+        vec.push_back(max_elem + 1);
+        vec.push_back(max_elem + 2);
 
-    bool mid_out = bin_search(vec, target);
+        /* Get follow-up output */
+        bool follow_out = bin_search(vec, target);
 
-    // Now divide them all by two to revert to the original numbers
-    std::transform(vec.begin(), vec.end(), vec.begin(), [](int n) { return n / 2; });
-    target /= 2;
-
-    bool follow_up_out = bin_search(vec, target);
-
-    // The result should not change throughout
-    EXPECT_TRUE(mid_out);
-    EXPECT_EQ(source_out, follow_up_out);
-}
-
-/**
- * @brief If the `target` does not exist in the array, inserting the `target` into its correctly sorted position then removing it should yield a `false` search
- * result throughout.
- *
- */
-TEST_P(BSearchParamTest, MR25) {
-    std::vector<int> vec;
-    int target;
-#if NOT_SATISFIED
-    std::tie(vec, target) = GetParam();
-#else
-    BSearch2Input input = GetParam();
-    vec = input.vec, target = input.target;
-#endif
-
-    // Initial search
-    bool source_out = bin_search(vec, target);
-    if (source_out)
-        return; // Skip if target is in the array initially
-
-    // Insert the target into its sorted position
-    auto it = std::lower_bound(vec.begin(), vec.end(), target);
-    vec.insert(it, target);
-
-    // Perform search after inserting
-    bool mid_out = bin_search(vec, target);
-    EXPECT_TRUE(mid_out);
-
-    // Now remove the target
-    vec.erase(std::remove(vec.begin(), vec.end(), target), vec.end());
-
-    // Perform search after removing
-    bool follow_out = bin_search(vec, target);
-    EXPECT_FALSE(follow_out);
-}
-
-/**
- * @brief For a non-empty array that excludes the `target`, searching for any value not in the array (including the `target`) after inverting the array
- * sign-wise should not yield the search result `true`.
- *
- */
-TEST_P(BSearchParamTest, MR26) {
-    std::vector<int> vec;
-    int target;
-#if NOT_SATISFIED
-    std::tie(vec, target) = GetParam();
-#else
-    BSearch2Input input = GetParam();
-    vec = input.vec, target = input.target;
-#endif
-
-    // Skip if the array is empty or target is found
-    bool source_out = bin_search(vec, target);
-    if (source_out || vec.empty())
-        return;
-
-    // Invert the sign of each element and the target
-    std::transform(vec.begin(), vec.end(), vec.begin(), std::negate<int>());
-    target = -target;
-    std::sort(vec.begin(), vec.end()); // Re-sort the vector after inversion
-
-    // Perform search in the sign-inverted array
-    bool follow_out = bin_search(vec, target);
-
-    // The result should remain false as the target was not in the original array
-    EXPECT_FALSE(follow_out);
-}
-
-/**
- * @brief If the `target` doesn't exist in the array and we change the order of the elements in the array without adding or removing any, `bin_search` should
- * still return `false`.
- *
- */
-TEST_P(BSearchParamTest, MR27) {
-    std::vector<int> vec;
-    int target;
-#if NOT_SATISFIED
-    std::tie(vec, target) = GetParam();
-#else
-    BSearch2Input input = GetParam();
-    vec = input.vec, target = input.target;
-#endif
-
-    // Perform the initial search
-    bool source_out = bin_search(vec, target);
-    if (source_out)
-        return; // Skip if target is initially found
-
-    // Attempt to shuffle the elements, which would break the precondition of bin_search
-    std::random_shuffle(vec.begin(), vec.end());
-
-    // Perform the search again
-    bool follow_up_out = bin_search(vec, target);
-
-    // The result should also be false
-    EXPECT_FALSE(follow_up_out);
-}
-
-/**
- * @brief If the `target` is greater than all elements in the array, increasing all elements by a constant that gives a new array where all elements are still
- * less than the `target` should not change the outcome from `false`.
- *
- */
-TEST_P(BSearchParamTest, MR28) {
-    std::vector<int> vec;
-    int target;
-#if NOT_SATISFIED
-    std::tie(vec, target) = GetParam();
-#else
-    BSearch2Input input = GetParam();
-    vec = input.vec, target = input.target;
-#endif
-
-    // Initial search
-    bool source_out = bin_search(vec, target);
-    if (vec.empty() || vec.back() >= target)
-        return; // if the array is empty or target is less than max element
-
-    // Increase all elements by a constant
-    int constant_increase = target - vec.back() - 1;
-    std::transform(vec.begin(), vec.end(), vec.begin(), [constant_increase](int val) { return val + constant_increase; });
-
-    // Follow-up search
-    bool follow_up_out = bin_search(vec, target);
-
-    // The result should still be false
-    EXPECT_FALSE(follow_up_out);
-}
-
-/**
- * @brief If the `target` exists in the array, taking any contiguous subarray that includes the `target` and performing `bin_search` should return `true`.
- *
- */
-TEST_P(BSearchParamTest, MR29) {
-    std::vector<int> vec;
-    int target;
-#if NOT_SATISFIED
-    std::tie(vec, target) = GetParam();
-#else
-    BSearch2Input input = GetParam();
-    vec = input.vec, target = input.target;
-#endif
-
-    // Perform the initial search
-    bool source_out = bin_search(vec, target);
-    if (!source_out)
-        return; // Proceed only if the target exists in the array
-
-    // Find the index of the target to form a subarray including the target
-    auto it = std::find(vec.begin(), vec.end(), target);
-    if (it != vec.end()) {
-        // Take a subarray including the target
-        int idx = std::distance(vec.begin(), it);
-        std::vector<int> sub_vec(vec.begin() + std::max(idx - 2, 0), vec.begin() + std::min(idx + 3, int(vec.size())));
-
-        // Perform search on the subarray
-        bool follow_up_out = bin_search(sub_vec, target);
-
-        // The result should be the same
-        EXPECT_TRUE(follow_up_out);
+        /* Verification */
+        EXPECT_TRUE(follow_out); // As the target is present, appending larger numbers don't affect result
     }
 }
 
 /**
- * @brief For any array that does not include the `target`, inverting the sign of all its elements, including the `target`, then re-sorting the array, should
- * not change the result of the binary search (assuming the array remains sorted).
+ * @brief Metamorphic relation 25: For an array not containing the target, removing elements should still not find the target.
  *
  */
-TEST_P(BSearchParamTest, MR30) {
-    std::vector<int> vec;
-    int target;
-#if NOT_SATISFIED
-    std::tie(vec, target) = GetParam();
-#else
+TEST_P(BSearchParamTest, MR25) {
+    /* Get source input */
     BSearch2Input input = GetParam();
-    vec = input.vec, target = input.target;
-#endif
+    vector<int> vec = input.vec;
+    int target = input.target;
 
-    // Perform the initial search
+    /* Get source output */
     bool source_out = bin_search(vec, target);
 
-    // Invert the sign of all elements and the target, then sort the array
-    std::transform(vec.begin(), vec.end(), vec.begin(), std::negate<>());
-    std::sort(vec.begin(), vec.end());
-    target = -target; // Invert the target
+    /* If target is not found in source input */
+    if (!source_out) {
+        /* Construct follow-up input by removing elements */
+        if (!vec.empty()) {
+            vec.pop_back();         // Remove an element
+            vec.erase(vec.begin()); // Remove another element
+        }
 
-    // Perform the search again
-    bool follow_up_out = bin_search(vec, target);
+        /* Get follow-up output */
+        bool follow_out = bin_search(vec, target);
 
-    // The result should remain the same
-    EXPECT_EQ(source_out, follow_up_out);
+        /* Verification */
+        EXPECT_FALSE(follow_out); // As the target is not present initially, removal of elements don't affect result
+    }
 }
 
 /**
- * @brief If an array contains the `target`, repeating the array elements (i.e., concatenating the array with itself) should still yield `true` when searching
- * for the `target`.
+ * @brief Metamorphic relation 26: For an array that does not include the target, inserting the target anywhere inside the array, the target should be found.
  *
  */
-TEST_P(BSearchParamTest, MR31) {
-    std::vector<int> vec;
-    int target;
-#if NOT_SATISFIED
-    std::tie(vec, target) = GetParam();
-#else
+TEST_P(BSearchParamTest, MR26) {
+    /* Get source input */
     BSearch2Input input = GetParam();
-    vec = input.vec, target = input.target;
-#endif
+    vector<int> vec = input.vec;
+    int target = input.target;
 
-    // Initial search
+    /* Get source output */
     bool source_out = bin_search(vec, target);
 
-    // Skip if target is not found initially
-    if (!source_out)
-        return;
+    /* If target is not found in source input */
+    if (!source_out) {
+        vector<int> follow_vec = vec;
+        auto it = std::upper_bound(follow_vec.begin(), follow_vec.end(), target);
+        follow_vec.insert(it, target); // Insert target in a sorted position
 
-    // Repeat the array
-    std::vector<int> repeated_vec = vec;
-    repeated_vec.insert(repeated_vec.end(), vec.begin(), vec.end());
+        /* Get follow-up output */
+        bool follow_out = bin_search(follow_vec, target);
 
-    // Perform the search on the repeated array
-    bool follow_out = bin_search(repeated_vec, target);
+        /* Verification */
+        EXPECT_TRUE(follow_out); // Now the target should be in the follow-up input, and found
+    }
+}
 
-    // The result should still be true
+/**
+ * @brief Metamorphic relation 27: For an array where the target is found, shuffling the array without changing the elements should result in search failure due
+ * to order violation.
+ *
+ */
+TEST_P(BSearchParamTest, MR27) {
+    /* Get source input */
+    BSearch2Input input = GetParam();
+    vector<int> vec = input.vec;
+    int target = input.target;
+
+    /* Get source output */
+    bool source_out = bin_search(vec, target);
+
+    /* If target is found in source input */
+    if (source_out) {
+        vector<int> shuffled_vec = vec;
+        std::random_shuffle(shuffled_vec.begin(), shuffled_vec.end()); // Shuffle elements
+
+        /* Get follow-up output */
+        bool follow_out = bin_search(shuffled_vec, target);
+
+        /* Verification */
+        EXPECT_FALSE(follow_out); // Since order is not maintained, binary search should not find the target
+    }
+}
+
+/**
+ * @brief Metamorphic relation 28: For an array containing the target, duplicating the target should not affect the search result.
+ *
+ */
+TEST_P(BSearchParamTest, MR28) {
+    /* Get source input */
+    BSearch2Input input = GetParam();
+    vector<int> vec = input.vec;
+    int target = input.target;
+
+    /* Get source output */
+    bool source_out = bin_search(vec, target);
+
+    /* If target is found in source input */
+    if (source_out) {
+        vector<int> duplicated_vec = vec;
+        duplicated_vec.insert(std::lower_bound(duplicated_vec.begin(), duplicated_vec.end(), target), target); // Duplicate the target
+
+        /* Get follow-up output */
+        bool follow_out = bin_search(duplicated_vec, target);
+
+        /* Verification */
+        EXPECT_TRUE(follow_out); // As the target is present, duplicating it doesn't change the search result
+    }
+}
+
+/**
+ * @brief Metamorphic relation 29: If the source array contains the target and is multiplied with -1,
+ * searching for the negative of the original target should yield a true result.
+ *
+ */
+TEST_P(BSearchParamTest, MR29) {
+    /* Get source input */
+    BSearch2Input input = GetParam();
+    vector<int> vec = input.vec;
+    int target = input.target;
+
+    /* Get source output */
+    bool source_out = bin_search(vec, target);
+
+    if (source_out) {
+        /* Construct follow-up input by negating all elements */
+        vector<int> negated_vec;
+        std::transform(vec.begin(), vec.end(), std::back_inserter(negated_vec), [](int v) { return -v; });
+        // Sorting is required as negation changes element order
+        std::sort(negated_vec.begin(), negated_vec.end());
+
+        /* Get follow-up output */
+        bool follow_out = bin_search(negated_vec, -target);
+
+        /* Verification */
+        EXPECT_TRUE(follow_out); // Target's negation should be found
+    }
+}
+
+/**
+ * @brief Metamorphic relation 30: For an array with a known target,
+ * searching for any element not equal to the target should remain consistent even
+ * after repeatedly reversing the array.
+ *
+ */
+TEST_P(BSearchParamTest, MR30) {
+    /* Get source input */
+    BSearch2Input input = GetParam();
+    vector<int> vec = input.vec;
+    int target = input.target;
+    int non_target_value = target + 1; // Assume that non_target_value does not exist in the array
+
+    /* Get source output */
+    bool source_out = bin_search(vec, non_target_value);
+
+    /* Construct follow-up input by reversing the array multiple times */
+    vector<int> reversed_vec = vec;
+    std::reverse(reversed_vec.begin(), reversed_vec.end());
+    std::reverse(reversed_vec.begin(), reversed_vec.end());
+
+    /* Get follow-up output */
+    bool follow_out = bin_search(reversed_vec, non_target_value);
+
+    /* Verification */
+    EXPECT_EQ(source_out, follow_out); // Searching for a non-existing element should yield the same result
+}
+
+/**
+ * @brief Metamorphic relation 31: For an array not containing the target,
+ * splitting the array into two sub-arrays and performing a binary search should also result in a negative result.
+ *
+ */
+TEST_P(BSearchParamTest, MR31) { // Fixed
+    /* Get source input */
+    BSearch2Input input = GetParam();
+    vector<int> vec = input.vec;
+    int target = input.target;
+
+    /* Make sure the size of array is larger than 1 */
+    if (vec.size() == 1)
+        vec.emplace_back(vec.back() + 1);
+
+    /* Get source output */
+    bool source_out = bin_search(vec, target);
+
+    /* Apply MR only when the target is not found */
+    if (!source_out) {
+        /* Split the array into two sub-arrays */
+        vector<int> sub_vec1(vec.begin(), vec.begin() + vec.size() / 2);
+        vector<int> sub_vec2(vec.begin() + vec.size() / 2, vec.end());
+
+        /* Get follow-up outputs */
+        bool follow_out1 = bin_search(sub_vec1, target);
+        bool follow_out2 = bin_search(sub_vec2, target);
+
+        /* Verification */
+        EXPECT_FALSE(follow_out1); // The target should not be found in the first half
+        EXPECT_FALSE(follow_out2); // The target should not be found in the second half
+    }
+}
+
+/**
+ * @brief Metamorphic relation 32: Complementing a MR where the array is negated, for an array not including a negative target,
+ * negating and sorting the array should also result in a negative find for the positive target.
+ *
+ */
+TEST_P(BSearchParamTest, MR32) {
+    /* Get source input */
+    BSearch2Input input = GetParam();
+    vector<int> vec = input.vec;
+    int target = -input.target; // Use a target value that is not in the array
+
+    /* Get source output */
+    bool source_out = bin_search(vec, target);
+
+    if (!source_out) {
+        /* Construct follow-up input by negating all elements */
+        vector<int> negated_vec;
+        std::transform(vec.begin(), vec.end(), std::back_inserter(negated_vec), [](int v) { return -v; });
+        // Sorting is required as negation changes element order
+        std::sort(negated_vec.begin(), negated_vec.end());
+
+        /* Get follow-up output */
+        bool follow_out = bin_search(negated_vec, -target);
+
+        /* Verification */
+        EXPECT_FALSE(follow_out); // A non-existing negative target should still be non-existent when inverted
+    }
+}
+
+/**
+ * @brief Metamorphic relation 33: Inserting the target multiple times at different locations
+ * should not affect the outcome of the binary search if the target was initially found.
+ *
+ */
+TEST_P(BSearchParamTest, MR33) {
+    /* Get source input */
+    BSearch2Input input = GetParam();
+    vector<int> vec = input.vec;
+    int target = input.target;
+
+    /* Get source output */
+    bool source_out = bin_search(vec, target);
+
+    if (source_out) {
+        /* Construct follow-up input by inserting the target multiple times */
+        vector<int> extended_vec = vec;
+        extended_vec.insert(extended_vec.begin() + extended_vec.size() / 3, target);
+        extended_vec.insert(extended_vec.begin() + 2 * extended_vec.size() / 3, target);
+        sort(extended_vec.begin(), extended_vec.end());
+
+        /* Get follow-up output */
+        bool follow_out = bin_search(extended_vec, target);
+
+        /* Verification */
+        EXPECT_TRUE(follow_out); // The target should still be detected
+    }
+}
+
+/**
+ * @brief Metamorphic relation 34: If the target is not initially found,
+ * ensuring that all array element values are changed to a single constant (not equal to target) should also result in not finding the target.
+ *
+ */
+TEST_P(BSearchParamTest, MR34) { // Fixed
+    /* Get source input */
+    BSearch2Input input = GetParam();
+    vector<int> vec = input.vec;
+    int target = input.target;
+
+    /* Get source output */
+    bool source_out = bin_search(vec, target);
+
+    if (!source_out) {
+        /* Construct follow-up input */
+        vector<int> uniform_vec(vec.size(), vec[0]); // Use any constant value that is not equal to the target
+
+        /* Get follow-up output */
+        bool follow_out = bin_search(uniform_vec, target);
+
+        /* Verification */
+        EXPECT_FALSE(follow_out); // The target should not be found as it does not match the uniform element value
+    }
+}
+
+/**
+ * @brief Metamorphic relation 35: Changing the target to any value within the range of the array
+ * should either give a true (if the chosen value exists) or false (if the chosen value does not exist) regardless of the original outcome.
+ *
+ */
+TEST_P(BSearchParamTest, MR35) {
+    /* Get source input */
+    BSearch2Input input = GetParam();
+    vector<int> vec = input.vec;
+
+    /* Get source output with an arbitrary target */
+    int target = vec[vec.size() / 2];
+    bool source_out = bin_search(vec, target);
+
+    /* Choose a different target value within the range of the array */
+    int new_target = target;
+    if (source_out) {
+        // Choose a value that is less than the smallest element in the vector
+        new_target = *min_element(vec.begin(), vec.end()) - 1;
+    } else {
+        // Choose a valid existing element
+        new_target = vec[vec.size() / 2];
+    }
+
+    /* Get follow-up output */
+    bool follow_out = bin_search(vec, new_target);
+
+    /* We know new_target should be in the array, as we picked it from there */
     EXPECT_TRUE(follow_out);
 }
 
 /**
- * @brief If the target is not present in the array, changing the target to another value that is also not present should not affect the outcome of
- * `bin_search`.
- *
- */
-TEST_P(BSearchParamTest, MR32) {
-    std::vector<int> vec;
-    int target;
-#if NOT_SATISFIED
-    std::tie(vec, target) = GetParam();
-#else
-    BSearch2Input input = GetParam();
-    vec = input.vec, target = input.target;
-#endif
-
-    // Perform the initial search
-    bool source_out = bin_search(vec, target);
-
-    if (source_out)
-        return; // Proceed only if the initial target is not found
-
-    // Change target to a new value that isn't present in the array
-    int new_target = vec.back() + 1; // Assuming the array contains positive integers
-
-    // Perform the search with the new target
-    bool follow_up_out = bin_search(vec, new_target);
-
-    // The result should still be false
-    EXPECT_EQ(source_out, follow_up_out);
-}
-
-/**
- * @brief For an array containing the `target`, incrementing all elements in the array including the `target` by the same positive value should not change the
- * result of the binary search.
- *
- */
-TEST_P(BSearchParamTest, MR33) {
-    std::vector<int> vec;
-    int target;
-#if NOT_SATISFIED
-    std::tie(vec, target) = GetParam();
-#else
-    BSearch2Input input = GetParam();
-    vec = input.vec, target = input.target;
-#endif
-
-    const int increment_value = 10; // Use any positive value for increment
-
-    // Perform the initial search before modification
-    bool source_out = bin_search(vec, target);
-    if (!source_out)
-        return; // Proceed only if the target is found intially
-
-    // Increment all elements and the target by a positive value
-    for (auto &el : vec) {
-        el += increment_value;
-    }
-    target += increment_value;
-
-    // Perform the search after incrementing
-    bool follow_up_out = bin_search(vec, target);
-
-    EXPECT_EQ(source_out, follow_up_out);
-}
-
-/**
- * @brief For an array that does not contain the `target`, searching for any value that is less than the minimum value in the array should consistently yield
- * `false`.
- *
- */
-TEST_P(BSearchParamTest, MR34) {
-    std::vector<int> vec;
-    int target;
-#if NOT_SATISFIED
-    std::tie(vec, target) = GetParam();
-#else
-    BSearch2Input input = GetParam();
-    vec = input.vec, target = input.target;
-#endif
-
-    // Perform the initial search to confirm absence of the target
-    bool source_out = bin_search(vec, target);
-    if (source_out || vec.empty())
-        return; // Proceed only if the array is not empty and the target is not found
-
-    // Search for a value less than the minimum value of the array
-    int new_target = vec.front() - 1;
-    bool follow_up_out = bin_search(vec, new_target);
-
-    EXPECT_FALSE(follow_up_out);
-}
-
-/**
- * @brief Duplicate one of the elements of the array that is not the `target`. This operation should not affect the search result for the `target`.
- *
- */
-TEST_P(BSearchParamTest, MR35) {
-    std::vector<int> vec;
-    int target;
-#if NOT_SATISFIED
-    std::tie(vec, target) = GetParam();
-#else
-    BSearch2Input input = GetParam();
-    vec = input.vec, target = input.target;
-#endif
-
-    // Perform the initial search
-    bool source_out = bin_search(vec, target);
-
-    // Skip if the target is not in array or if the array is empty
-    if (!source_out || vec.empty())
-        return;
-
-    // Duplicate an element that is not the target
-    for (auto &el : vec) {
-        if (el != target) {
-            vec.push_back(el);
-            break;
-        }
-    }
-    std::sort(vec.begin(), vec.end()); // Sort the array after insertion to maintain precondition
-
-    // Perform the binary search again
-    bool follow_up_out = bin_search(vec, target);
-
-    EXPECT_EQ(source_out, follow_up_out);
-}
-
-/**
- * @brief If an array does not contain the `target`, subdividing the array into smaller arrays (still sorted) and searching for the `target` in each subarray
- * should yield `false` for each search.
+ * @brief Metamorphic relation 36: If the source array does not contain the target, replacing any single
+ * element with the target should result in finding the new target in the array.
  *
  */
 TEST_P(BSearchParamTest, MR36) {
-    std::vector<int> vec;
-    int target;
-#if NOT_SATISFIED
-    std::tie(vec, target) = GetParam();
-#else
+    /* Get source input */
     BSearch2Input input = GetParam();
-    vec = input.vec, target = input.target;
-#endif
+    vector<int> vec = input.vec;
+    int target = input.target;
 
-    // Perform the initial search to confirm absence of the target
+    /* Get source output */
     bool source_out = bin_search(vec, target);
-    if (source_out)
-        return; // Proceed only if the target is not found
 
-    // Divide the array into subarrays and search the target in each
-    std::size_t subarray_size = vec.size() / 2;
-    bool subarray_search_out = true; // Defaults to true for edge case with empty vector
-    for (size_t i = 0; i < vec.size(); i += subarray_size) {
-        std::vector<int> subvec(vec.begin() + i, std::min(vec.begin() + i + subarray_size, vec.end()));
-        subarray_search_out &= bin_search(subvec, target);
+    /* Apply MR only if the target is not found initially */
+    if (!source_out) {
+        /* Construct follow-up input by replacing an array element with the target */
+        vec[vec.size() / 2] = target;      // Replace the middle element with the target
+        std::sort(vec.begin(), vec.end()); // Sort the vector again
+
+        /* Get follow-up output */
+        bool follow_out = bin_search(vec, target);
+
+        /* Verification */
+        EXPECT_TRUE(follow_out); // The target is now inserted into the vector
     }
-
-    // Should still not find the target in any subarray
-    EXPECT_FALSE(subarray_search_out);
 }
 
 /**
- * @brief For an array that contains the `target`, removing the first element (if it is not the `target`) should still result in `target` being found via
- * `bin_search`.
+ * @brief Metamorphic relation 37: Replicating the array into a larger array
+ * and searching for the target should give the same result.
  *
  */
 TEST_P(BSearchParamTest, MR37) {
-    std::vector<int> vec;
-    int target;
-#if NOT_SATISFIED
-    std::tie(vec, target) = GetParam();
-#else
+    /* Get source input */
     BSearch2Input input = GetParam();
-    vec = input.vec, target = input.target;
-#endif
+    vector<int> vec = input.vec;
+    int target = input.target;
 
-    // Initial search to ensure the target exists
+    /* Construct follow-up input */
+    vector<int> larger_vec;
+    larger_vec.reserve(3 * vec.size());
+    for (int i = 0; i < 3; ++i) {
+        larger_vec.insert(larger_vec.end(), vec.begin(), vec.end());
+    }
+
+    /* Get source output */
     bool source_out = bin_search(vec, target);
-    if (!source_out || vec.front() == target || vec.empty())
-        return;
 
-    // Removing the first element (not the target)
-    vec.erase(vec.begin());
+    /* Get follow-up output */
+    bool follow_out = bin_search(larger_vec, target);
 
-    // Perform the search after removing the first element
-    bool follow_up_out = bin_search(vec, target);
-
-    EXPECT_TRUE(follow_up_out);
+    /* Verification */
+    EXPECT_EQ(source_out, follow_out); // Larger array composed of repeated blocks should give the same result
 }
 
 /**
- * @brief For any array, searching for the minimum value minus one should yield `false`.
+ * @brief Metamorphic relation 38: If the target is not found, inserting a sequence of ascending
+ * numbers that does not include the target should still result in the target not being found.
  *
  */
 TEST_P(BSearchParamTest, MR38) {
-    std::vector<int> vec;
-#if NOT_SATISFIED
-    std::tie(vec, std::ignore) = GetParam(); // Ignore the target for this relation
-#else
+    /* Get source input */
     BSearch2Input input = GetParam();
-    int target;
-    vec = input.vec, target = input.target;
-#endif
+    vector<int> vec = input.vec;
+    int target = input.target;
 
-    if (vec.empty())
-        return; // Skip if the vector is empty
+    /* Get source output */
+    bool source_out = bin_search(vec, target);
 
-    int new_target = vec.front() - 1; // The new target is less than the minimum value in the array
+    if (!source_out) {
+        /* Construct follow-up input */
+        vector<int> extended_vec(vec.begin(), vec.end());
+        extended_vec.push_back(target - 2);
+        extended_vec.push_back(target - 1);
+        std::sort(extended_vec.begin(), extended_vec.end());
 
-    // Perform the search for the new target
-    bool follow_up_out = bin_search(vec, new_target);
+        /* Get follow-up output */
+        bool follow_out = bin_search(extended_vec, target);
 
-    EXPECT_FALSE(follow_up_out);
+        /* Verification */
+        EXPECT_FALSE(follow_out); // The target is still not included in the array
+    }
 }
 
 /**
- * @brief If the `target` is within the array, transforming the array by adding a constant to all elements except the `target`, and then subtracting that
- * constant, should result in the same search outcome.
+ * @brief Metamorphic relation 39: If the target is found, appending a series of elements larger
+ * than the target in descending order (which keeps the entire array sorted) should not affect the search result.
  *
  */
 TEST_P(BSearchParamTest, MR39) {
-    std::vector<int> vec;
-    int target;
-#if NOT_SATISFIED
-    std::tie(vec, target) = GetParam();
-#else
+    /* Get source input */
     BSearch2Input input = GetParam();
-    vec = input.vec, target = input.target;
-#endif
+    vector<int> vec = input.vec;
+    int target = input.target;
 
-    // Initial search to confirm the presence of the target
+    /* Get source output */
     bool source_out = bin_search(vec, target);
-    if (!source_out)
-        return;
 
-    int increment = 5; // The constant to add and then subtract
-    for (auto &el : vec) {
-        if (el != target) {
-            el += increment;
+    if (source_out) {
+        /* Construct follow-up input */
+        vector<int> extended_vec(vec.begin(), vec.end());
+        int max_elem = *max_element(vec.begin(), vec.end());
+        for (int i = 1; i <= 3; ++i) {
+            extended_vec.push_back(max_elem + i);
         }
-    }
-    // Subtract the constant right away
-    for (auto &el : vec) {
-        if (el != target) {
-            el -= increment;
-        }
-    }
 
-    // Perform the search after the transformation
-    bool follow_up_out = bin_search(vec, target);
+        /* Get follow-up output */
+        bool follow_out = bin_search(extended_vec, target);
 
-    // The result should still be true as the target's relative position is unchanged
-    EXPECT_TRUE(follow_up_out);
+        /* Verification */
+        EXPECT_TRUE(follow_out); // The target should still be found
+    }
 }
 
 /**
- * @brief For an array containing both positive and negative numbers, including the `target`, multiplying all the elements by `-1`, and flipping the `target`
- * sign, should not change the result of the binary search.
+ * @brief Metamorphic relation 40: If the target is found, removing elements from the array
+ * without removing the target should still result in finding the target.
  *
  */
-TEST_P(BSearchParamTest, MR40) {
-    std::vector<int> vec;
-    int target;
-#if NOT_SATISFIED
-    std::tie(vec, target) = GetParam();
-#else
+TEST_P(BSearchParamTest, MR40) { // Fixed
+    /* Get source input */
     BSearch2Input input = GetParam();
-    vec = input.vec, target = input.target;
-#endif
+    vector<int> vec = input.vec;
+    int target = input.target;
 
-    // Initial search to confirm the presence of the target
+    /* Make sure the size of vec is larger than 1 */
+    if (vec.size() == 1)
+        vec.emplace_back(vec.back() + 1);
+
+    /* Get source output */
     bool source_out = bin_search(vec, target);
-    if (!source_out)
-        return;
 
-    target = -target; // flip the target sign
-    std::transform(vec.begin(), vec.end(), vec.begin(), [](int el) { return -el; });
+    if (source_out) {
+        /* Construct follow-up input */
+        vector<int> reduced_vec = vec;
+        if (vec[0] != target) {
+            reduced_vec.erase(reduced_vec.begin());
+        } else {
+            reduced_vec.pop_back();
+        }
 
-    // Sort the array as the order will now be reversed
-    std::sort(vec.begin(), vec.end());
+        /* Get follow-up output */
+        bool follow_out = bin_search(reduced_vec, target);
 
-    // Perform the search after the transformation
-    bool follow_up_out = bin_search(vec, target);
+        /* Verification */
+        EXPECT_TRUE(follow_out); // The target should still be found
+    }
+}
 
-    // The result should still hold as the target still exists in the array even after flip
-    EXPECT_TRUE(follow_up_out);
+/**
+ * @brief Metamorphic relation 41: For an array containing only a single distinct value,
+ * searching for any other value should consistently yield false.
+ *
+ */
+TEST_P(BSearchParamTest, MR41) {
+    /* Get source input */
+    BSearch2Input input = GetParam();
+    vector<int> vec(10, 5); // Create an array of 10 elements, all with the value of 5.
+    int target = 7;         // Choose a target that is not in the array
+
+    /* Try searching for a target in this homogeneous array */
+    bool source_out = bin_search(vec, target);
+
+    /* Verification */
+    EXPECT_FALSE(source_out); // Target is not present, so it should return false
 }
 
 INSTANTIATE_TEST_CASE_P(TrueReturn, BSearchParamTest, testing::ValuesIn(get_tcs_randomly()));
