@@ -16,7 +16,7 @@ vector<ClosestPairInput> gen_tcs_randomly() {
     mt19937 rng(random_device{}());
 
     /* clang-format off */
-    uniform_int_distribution<int> dist_size(1, 100),   /* Range of vector's size */
+    uniform_int_distribution<int> dist_size(2, 100),   /* Range of vector's size */
                                   dist_value(-1000, 1000);  /* Range of value */
     /* clang-format on */
 
