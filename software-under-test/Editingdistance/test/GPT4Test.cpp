@@ -32,6 +32,7 @@ TEST_P(EditingdistanceParamTest, MR2) {
     /* Verification */
     EXPECT_EQ(follow_out, source_out);
 }
+
 /**
  * @brief Metamorphic relation 3: If two characters in str1 are swapped, the output should be the same or larger.
  *
@@ -56,6 +57,7 @@ TEST_P(EditingdistanceParamTest, MR3) {
         EXPECT_GE(follow_out, source_out);
     }
 }
+
 /**
  * @brief Metamorphic relation 4: Adding the same suffix to both str1 and str2 should not change the edit distance.
  *
@@ -79,6 +81,7 @@ TEST_P(EditingdistanceParamTest, MR4) {
     /* Verification */
     EXPECT_EQ(follow_out, source_out);
 }
+
 /**
  * @brief Metamorphic relation 5: Prefixing both strings with the same sequence of characters does not change the edit distance.
  *
@@ -102,6 +105,7 @@ TEST_P(EditingdistanceParamTest, MR5) { // Fixed, the length of prefix is shorte
     /* Verification */
     EXPECT_EQ(follow_out, source_out);
 }
+
 /**
  * @brief Metamorphic relation 6: Deleting the same character from both strings should not change the edit distance.
  *
@@ -119,7 +123,8 @@ TEST_P(EditingdistanceParamTest, MR6) {
             break;
         }
     }
-    if (common_char == '\0') return; // No common character to delete
+    if (common_char == '\0')
+        return; // No common character to delete
 
     /* Get source output */
     int source_out = edit_dist(str1, str2);
@@ -134,6 +139,7 @@ TEST_P(EditingdistanceParamTest, MR6) {
     /* Verification */
     EXPECT_EQ(follow_out, source_out);
 }
+
 /**
  * @brief Metamorphic relation 7: If str1 is a non-trivial suffix of str2, the edit distance should be the difference in length.
  *
@@ -160,6 +166,7 @@ TEST_P(EditingdistanceParamTest, MR7) {
     /* Verification */
     EXPECT_EQ(source_out, expected_out);
 }
+
 /**
  * @brief Metamorphic relation 8: Doubling str1 should double the edit distance when str2 is empty (and vice versa).
  *
@@ -182,6 +189,7 @@ TEST_P(EditingdistanceParamTest, MR8) {
     /* Verification */
     EXPECT_EQ(follow_out, 2 * source_out);
 }
+
 /**
  * @brief Metamorphic relation 9: Removing a common prefix from both strings should not change the edit distance.
  *
@@ -196,8 +204,7 @@ TEST_P(EditingdistanceParamTest, MR9) {
 
     /* Determine the length of the common prefix */
     size_t common_prefix_length = 0;
-    while (common_prefix_length < str1.length() && common_prefix_length < str2.length() &&
-           str1[common_prefix_length] == str2[common_prefix_length]) {
+    while (common_prefix_length < str1.length() && common_prefix_length < str2.length() && str1[common_prefix_length] == str2[common_prefix_length]) {
         ++common_prefix_length;
     }
 
@@ -216,6 +223,7 @@ TEST_P(EditingdistanceParamTest, MR9) {
     /* Verification */
     EXPECT_EQ(follow_out, source_out);
 }
+
 /**
  * @brief Metamorphic relation 10: Appending the reverse of str2 to str1 increases the edit distance by the length of str2.
  *
@@ -238,15 +246,17 @@ TEST_P(EditingdistanceParamTest, MR10) {
     /* Verification */
     EXPECT_EQ(follow_out, source_out + str2.length());
 }
+
 /**
- * @brief Metamorphic relation 11: Concatenating a third string to both str1 and str2 should increase the edit distance by at most the length of that third string.
+ * @brief Metamorphic relation 11: Concatenating a third string to both str1 and str2 should increase the edit distance by at most the length of that third
+ * string.
  *
  */
 TEST_P(EditingdistanceParamTest, MR11) {
     /* Get source input */
     EditingdistanceInput input = GetParam();
     string str1 = input.str1, str2 = input.str2;
-    string str3 = "thirdStr";  // The third string to concatenate
+    string str3 = "thirdStr"; // The third string to concatenate
 
     /* Get source output */
     int source_out = edit_dist(str1, str2);
@@ -261,6 +271,7 @@ TEST_P(EditingdistanceParamTest, MR11) {
     /* Verification */
     EXPECT_LE(follow_out, source_out + str3.length());
 }
+
 /**
  * @brief Metamorphic relation 12: Exchanging str1 with str2 should not change the edit distance.
  *
@@ -282,11 +293,12 @@ TEST_P(EditingdistanceParamTest, MR12) {
     /* Verification */
     EXPECT_EQ(follow_out, source_out);
 }
+
 /**
  * @brief Metamorphic relation 13: Inserting the same character at the same position in both str1 and str2 should not change the edit distance.
  *
  */
-TEST_P(EditingdistanceParamTest, MR13) {
+TEST_P(EditingdistanceParamTest, MR13) { // Fixed
     /* Get source input */
     EditingdistanceInput input = GetParam();
     string str1 = input.str1, str2 = input.str2;
@@ -299,9 +311,19 @@ TEST_P(EditingdistanceParamTest, MR13) {
 
     /* Construct follow-up input */
     // Choose a position to insert; for simplicity, we use one before the last character if possible
-    size_t position = (str1.length() > 1) ? str1.length() - 1 : 0;
-    str1.insert(str1.begin() + position, insert_char);
-    str2.insert(str2.begin() + position, insert_char);
+    string follow_str1, follow_str2;
+
+    if (str1.length() > 1) {
+        follow_str1 = str1.substr(0, str1.length() - 1) + insert_char + str1.substr(str1.length() - 1);
+    } else {
+        follow_str1 = str1 + insert_char;
+    }
+
+    if (str2.length() > 1) {
+        follow_str2 = str2.substr(0, str2.length() - 1) + insert_char + str2.substr(str2.length() - 1);
+    } else {
+        follow_str2 = str2 + insert_char;
+    }
 
     /* Get follow-up output */
     int follow_out = edit_dist(str1, str2);
@@ -309,11 +331,12 @@ TEST_P(EditingdistanceParamTest, MR13) {
     /* Verification */
     EXPECT_EQ(follow_out, source_out);
 }
+
 /**
  * @brief Metamorphic relation 14: Increasing all characters in both str1 and str2 by one should not change the edit distance.
  *
  */
-TEST_P(EditingdistanceParamTest, MR14) {
+TEST_P(EditingdistanceParamTest, MR14) {    // Fixed
     /* Get source input */
     EditingdistanceInput input = GetParam();
     string str1 = input.str1, str2 = input.str2;
@@ -325,10 +348,10 @@ TEST_P(EditingdistanceParamTest, MR14) {
     string follow_str1 = str1;
     string follow_str2 = str2;
     for (char &c : follow_str1) {
-        if (c < 'z') c += 1;
+        c += 1;
     }
     for (char &c : follow_str2) {
-        if (c < 'z') c += 1;
+        c += 1;
     }
 
     /* Get follow-up output */
@@ -337,11 +360,12 @@ TEST_P(EditingdistanceParamTest, MR14) {
     /* Verification */
     EXPECT_EQ(follow_out, source_out);
 }
+
 /**
  * @brief Metamorphic relation 15: If str1 contains str2 as a substring, the edit distance should be equal to the difference in lengths of str1 and str2.
  *
  */
-TEST_P(EditingdistanceParamTest, MR15) {    // Fixed, the length of suffix is shortened
+TEST_P(EditingdistanceParamTest, MR15) { // Fixed, the length of suffix is shortened
     /* Get source input */
     EditingdistanceInput input = GetParam();
     string str1 = input.str1, str2 = input.str2;
@@ -363,6 +387,7 @@ TEST_P(EditingdistanceParamTest, MR15) {    // Fixed, the length of suffix is sh
     /* Verification */
     EXPECT_EQ(source_out, dist);
 }
+
 /**
  * @brief Metamorphic relation 16: Inserting a character in str1 that already exists at the same position in str2 should not increase the edit distance.
  *
@@ -381,7 +406,8 @@ TEST_P(EditingdistanceParamTest, MR16) {
     }
 
     /* If no suitable position is found, return as this metamorphic property cannot be applied */
-    if (position == std::min(str1.length(), str2.length())) return;
+    if (position == std::min(str1.length(), str2.length()))
+        return;
 
     /* Get source output */
     int source_out = edit_dist(str1, str2);
@@ -390,8 +416,7 @@ TEST_P(EditingdistanceParamTest, MR16) {
     string follow_str1 = str1;
     if (position < str2.length()) {
         follow_str1.insert(position, 1, str2[position]);
-    }
-    else {
+    } else {
         return; // If position exceeds str2 length, we cannot apply this relation
     }
 
@@ -401,6 +426,7 @@ TEST_P(EditingdistanceParamTest, MR16) {
     /* Verification */
     EXPECT_LE(follow_out, source_out);
 }
+
 /**
  * @brief Metamorphic relation 17: Swapping non-adjacent characters in str1 should not decrease the edit distance.
  *
@@ -411,7 +437,8 @@ TEST_P(EditingdistanceParamTest, MR17) {
     string str1 = input.str1, str2 = input.str2;
 
     /* Ensure that str1 has at least two non-adjacent characters to swap */
-    if (str1.length() < 3) return;
+    if (str1.length() < 3)
+        return;
 
     /* Get source output */
     int source_out = edit_dist(str1, str2);
@@ -428,6 +455,7 @@ TEST_P(EditingdistanceParamTest, MR17) {
     /* Verification */
     EXPECT_GE(follow_out, source_out);
 }
+
 /**
  * @brief Metamorphic relation 18: Swapping str1 with any permutation of str2 should yield the same edit distance.
  *
@@ -450,8 +478,10 @@ TEST_P(EditingdistanceParamTest, MR18) {
     /* Verification */
     EXPECT_EQ(follow_out, source_out);
 }
+
 /**
- * @brief Metamorphic relation 19: If str2 is non-empty, removing the first character from str2 should increase the edit distance by one, unless that character matches the first character in str1.
+ * @brief Metamorphic relation 19: If str2 is non-empty, removing the first character from str2 should increase the edit distance by one, unless that character
+ * matches the first character in str1.
  *
  */
 TEST_P(EditingdistanceParamTest, MR19) {
@@ -460,7 +490,8 @@ TEST_P(EditingdistanceParamTest, MR19) {
     string str1 = input.str1, str2 = input.str2;
 
     /* Check if str2 is non-empty */
-    if (str2.empty()) return;
+    if (str2.empty())
+        return;
 
     /* Get source output */
     int source_out = edit_dist(str1, str2);
@@ -475,6 +506,7 @@ TEST_P(EditingdistanceParamTest, MR19) {
     int expected_increase = (str1[0] == str2[0]) ? 0 : 1;
     EXPECT_EQ(follow_out, source_out + expected_increase);
 }
+
 /**
  * @brief Metamorphic relation 20: Concatenating str1 with str2 should not increase the edit distance between str1 and str2.
  *
@@ -496,6 +528,7 @@ TEST_P(EditingdistanceParamTest, MR20) {
     /* Verification */
     EXPECT_LE(follow_out, source_out);
 }
+
 /**
  * @brief Metamorphic relation 21: Replacing a character in str1 with the same character should not change the edit distance.
  *
@@ -506,7 +539,8 @@ TEST_P(EditingdistanceParamTest, MR21) {
     string str1 = input.str1, str2 = input.str2;
 
     /* Ensure str1 has at least one character */
-    if (str1.empty()) return;
+    if (str1.empty())
+        return;
 
     /* Get source output */
     int source_out = edit_dist(str1, str2);
@@ -522,8 +556,10 @@ TEST_P(EditingdistanceParamTest, MR21) {
     /* Verification */
     EXPECT_EQ(follow_out, source_out);
 }
+
 /**
- * @brief Metamorphic relation 22: Given two strings with a known edit distance, adding the same character to the end of each should increase the distance by at most one.
+ * @brief Metamorphic relation 22: Given two strings with a known edit distance, adding the same character to the end of each should increase the distance by at
+ * most one.
  *
  */
 TEST_P(EditingdistanceParamTest, MR22) {
@@ -535,7 +571,7 @@ TEST_P(EditingdistanceParamTest, MR22) {
     int source_out = edit_dist(str1, str2);
 
     /* Construct follow-up input by appending the same character to both strings */
-    char c = 'x';  // Example character
+    char c = 'x'; // Example character
     string follow_str1 = str1 + c;
     string follow_str2 = str2 + c;
 
@@ -545,11 +581,12 @@ TEST_P(EditingdistanceParamTest, MR22) {
     /* Verification */
     EXPECT_LE(follow_out, source_out + 1);
 }
+
 /**
  * @brief Metamorphic relation 23: If str1 is an anagram of str2, then the edit distance should be less than or equal to the length of the strings.
  *
  */
-TEST_P(EditingdistanceParamTest, MR23) {    // FIxed
+TEST_P(EditingdistanceParamTest, MR23) { // FIxed
     /* Get source input */
     EditingdistanceInput input = GetParam();
     string str1 = input.str1;
@@ -564,11 +601,12 @@ TEST_P(EditingdistanceParamTest, MR23) {    // FIxed
     /* Verification */
     EXPECT_LE(source_out, str1.length());
 }
+
 /**
  * @brief Metamorphic relation 24: Clearing one of the strings should result in the edit distance being equal to the length of the other string.
  *
  */
-TEST_P(EditingdistanceParamTest, MR24) {    // Fixed
+TEST_P(EditingdistanceParamTest, MR24) { // Fixed
     /* Get source input */
     EditingdistanceInput input = GetParam();
     string str1 = input.str1;
@@ -584,11 +622,13 @@ TEST_P(EditingdistanceParamTest, MR24) {    // Fixed
     /* Verification */
     EXPECT_EQ(follow_out, follow_str2.length());
 }
+
 /**
- * @brief Metamorphic relation 25: Changing a character in str1 to match the corresponding character in str2 should decrease the edit distance by one, if they were different.
+ * @brief Metamorphic relation 25: Changing a character in str1 to match the corresponding character in str2 should decrease the edit distance by one, if they
+ * were different.
  *
  */
-TEST_P(EditingdistanceParamTest, MR25) {    // Fixed
+TEST_P(EditingdistanceParamTest, MR25) { // Fixed
     /* Get source input */
     EditingdistanceInput input = GetParam();
     string str1 = input.str1;
@@ -603,7 +643,8 @@ TEST_P(EditingdistanceParamTest, MR25) {    // Fixed
     }
 
     /* If all characters in the compared length are the same or we've reached the end of one string, this relation doesn't apply */
-    if (idx == str1.size() || idx == str2.size()) return;
+    if (idx == str1.size() || idx == str2.size())
+        return;
 
     /* Get source output */
     int source_out = edit_dist(str1, str2);
@@ -618,8 +659,10 @@ TEST_P(EditingdistanceParamTest, MR25) {    // Fixed
     /* Verification */
     EXPECT_EQ(follow_out, source_out - 1);
 }
+
 /**
- * @brief Metamorphic relation 26: Swapping two different characters in str1 for two matching characters already in str2 at the same positions should decrease the edit distance by two when they were both mismatches.
+ * @brief Metamorphic relation 26: Swapping two different characters in str1 for two matching characters already in str2 at the same positions should decrease
+ * the edit distance by two when they were both mismatches.
  *
  */
 TEST_P(EditingdistanceParamTest, MR26) {
@@ -642,7 +685,8 @@ TEST_P(EditingdistanceParamTest, MR26) {
     }
 
     /* Check if at least two mismatches are found */
-    if (mismatch_index1 == string::npos || mismatch_index2 == string::npos) return;
+    if (mismatch_index1 == string::npos || mismatch_index2 == string::npos)
+        return;
 
     /* Get source output */
     int source_out = edit_dist(str1, str2);
@@ -658,6 +702,7 @@ TEST_P(EditingdistanceParamTest, MR26) {
     /* Verification */
     EXPECT_LE(follow_out, source_out - 2);
 }
+
 /**
  * @brief Metamorphic relation 27: If a character from str1 is moved to a different position, the edit distance should not decrease.
  *
@@ -668,7 +713,8 @@ TEST_P(EditingdistanceParamTest, MR27) {
     string str1 = input.str1, str2 = input.str2;
 
     /* Ensure str1 is long enough to move a character */
-    if (str1.length() < 2) return;
+    if (str1.length() < 2)
+        return;
 
     /* Get source output */
     int source_out = edit_dist(str1, str2);
@@ -683,11 +729,12 @@ TEST_P(EditingdistanceParamTest, MR27) {
     /* Verification */
     EXPECT_GE(follow_out, source_out);
 }
+
 /**
  * @brief Metamorphic relation 28: If str2 is a substring within str1, the edit distance is the difference in their lengths.
  *
  */
-TEST_P(EditingdistanceParamTest, MR28) {    // Fixed, the length of prefix is shortened
+TEST_P(EditingdistanceParamTest, MR28) { // Fixed, the length of prefix is shortened
     /* Get source input */
     EditingdistanceInput input = GetParam();
     string str1 = input.str1, str2 = input.str2;
@@ -706,6 +753,7 @@ TEST_P(EditingdistanceParamTest, MR28) {    // Fixed, the length of prefix is sh
     /* Verification */
     EXPECT_EQ(source_out, expected_dist);
 }
+
 /**
  * @brief Metamorphic relation 29: The edit distance between any string and itself must be zero.
  *
@@ -721,11 +769,13 @@ TEST_P(EditingdistanceParamTest, MR29) {
     /* Verification */
     EXPECT_EQ(source_out, 0);
 }
+
 /**
- * @brief Metamorphic relation 30: The edit distance between str1 and a concatenation of str2 and an arbitrary string str3 should be at least as large as the edit distance between str1 and str2.
+ * @brief Metamorphic relation 30: The edit distance between str1 and a concatenation of str2 and an arbitrary string str3 should be at least as large as the
+ * edit distance between str1 and str2.
  *
  */
-TEST_P(EditingdistanceParamTest, MR30) {    // Fixed, the length of str3 is shortened
+TEST_P(EditingdistanceParamTest, MR30) { // Fixed, the length of str3 is shortened
     /* Get source input */
     EditingdistanceInput input = GetParam();
     string str1 = input.str1, str2 = input.str2, str3 = "xx";
@@ -742,8 +792,10 @@ TEST_P(EditingdistanceParamTest, MR30) {    // Fixed, the length of str3 is shor
     /* Verification */
     EXPECT_GE(follow_out, source_out);
 }
+
 /**
- * @brief Metamorphic relation 31: If str1 contains consecutive duplicate characters and str2 does not, removing the duplicates from str1 should not increase the edit distance.
+ * @brief Metamorphic relation 31: If str1 contains consecutive duplicate characters and str2 does not, removing the duplicates from str1 should not increase
+ * the edit distance.
  *
  */
 TEST_P(EditingdistanceParamTest, MR31) {
@@ -756,8 +808,7 @@ TEST_P(EditingdistanceParamTest, MR31) {
 
     /* Construct follow-up input by removing consecutive duplicates from str1 */
     string follow_str1;
-    std::unique_copy(str1.begin(), str1.end(), std::back_inserter(follow_str1), 
-                     [](char a, char b) { return a == b; });
+    std::unique_copy(str1.begin(), str1.end(), std::back_inserter(follow_str1), [](char a, char b) { return a == b; });
 
     /* Get follow-up output */
     int follow_out = edit_dist(follow_str1, str2);
@@ -765,6 +816,7 @@ TEST_P(EditingdistanceParamTest, MR31) {
     /* Verification */
     EXPECT_LE(follow_out, source_out);
 }
+
 /**
  * @brief Metamorphic relation 32: If str1 is empty and str2 consists of the same character repeated, the edit distance should be equal to the length of str2.
  *
@@ -772,7 +824,7 @@ TEST_P(EditingdistanceParamTest, MR31) {
 TEST_P(EditingdistanceParamTest, MR32) {
     /* Get source input */
     EditingdistanceInput input = GetParam();
-    string str1 = ""; // Empty string
+    string str1 = "";              // Empty string
     string str2 = string(10, 'a'); // String of 10 'a's
 
     /* Get follow-up output */
@@ -781,8 +833,10 @@ TEST_P(EditingdistanceParamTest, MR32) {
     /* Verification */
     EXPECT_EQ(follow_out, str2.length());
 }
+
 /**
- * @brief Metamorphic relation 33: If a character is inserted at a certain position in str1 and the same character is removed from the same position in str2, the edit distance should remain unchanged.
+ * @brief Metamorphic relation 33: If a character is inserted at a certain position in str1 and the same character is removed from the same position in str2,
+ * the edit distance should remain unchanged.
  *
  */
 TEST_P(EditingdistanceParamTest, MR33) {
@@ -791,7 +845,8 @@ TEST_P(EditingdistanceParamTest, MR33) {
     string str1 = input.str1, str2 = input.str2;
 
     /* Ensure that str2 is long enough for removal */
-    if (str2.empty()) return;
+    if (str2.empty())
+        return;
 
     /* Get source output */
     int source_out = edit_dist(str1, str2);
@@ -808,6 +863,7 @@ TEST_P(EditingdistanceParamTest, MR33) {
     /* Verification */
     EXPECT_EQ(follow_out, source_out);
 }
+
 /**
  * @brief Metamorphic relation 34: Interchanging the positions of non-matching pairs of characters between str1 and str2 should not change the edit distance.
  *
@@ -832,7 +888,8 @@ TEST_P(EditingdistanceParamTest, MR34) {
     }
 
     /* Check if at least two non-matching positions are found */
-    if (pos1 == string::npos || pos2 == string::npos) return;
+    if (pos1 == string::npos || pos2 == string::npos)
+        return;
 
     /* Get source output */
     int source_out = edit_dist(str1, str2);
@@ -849,6 +906,7 @@ TEST_P(EditingdistanceParamTest, MR34) {
     /* Verification */
     EXPECT_EQ(follow_out, source_out);
 }
+
 /**
  * @brief Metamorphic relation 35: The edit distance between two distinct single-character strings should be one.
  *
@@ -864,6 +922,7 @@ TEST_P(EditingdistanceParamTest, MR35) {
     /* Verification */
     EXPECT_EQ(follow_out, 1);
 }
+
 /**
  * @brief Metamorphic relation 36: Inserting an arbitrary character at the beginning of str1 should never decrease the edit distance.
  *
@@ -886,8 +945,10 @@ TEST_P(EditingdistanceParamTest, MR36) {
     /* Verification */
     EXPECT_GE(follow_out, source_out);
 }
+
 /**
- * @brief Metamorphic relation 37: The edit distance between two strings should be the same regardless of case sensitivity, assuming the edit distance implementation is case-sensitive.
+ * @brief Metamorphic relation 37: The edit distance between two strings should be the same regardless of case sensitivity, assuming the edit distance
+ * implementation is case-sensitive.
  *
  */
 TEST_P(EditingdistanceParamTest, MR37) {
@@ -896,15 +957,19 @@ TEST_P(EditingdistanceParamTest, MR37) {
     string str1 = input.str1, str2 = input.str2;
 
     /* Convert str1 and str2 to uppercase */
-    for (char &c : str1) c = toupper(c);
-    for (char &c : str2) c = toupper(c);
+    for (char &c : str1)
+        c = toupper(c);
+    for (char &c : str2)
+        c = toupper(c);
 
     /* Get source output */
     int source_out = edit_dist(str1, str2);
 
     /* Convert str1 and str2 to lowercase */
-    for (char &c : str1) c = tolower(c);
-    for (char &c : str2) c = tolower(c);
+    for (char &c : str1)
+        c = tolower(c);
+    for (char &c : str2)
+        c = tolower(c);
 
     /* Get follow-up output */
     int follow_out = edit_dist(str1, str2);
@@ -912,8 +977,10 @@ TEST_P(EditingdistanceParamTest, MR37) {
     /* Verification */
     EXPECT_EQ(follow_out, source_out);
 }
+
 /**
- * @brief Metamorphic relation 38: Inserting a sequence of characters into str1 that appears in str2 at the respective position should not increase the edit distance.
+ * @brief Metamorphic relation 38: Inserting a sequence of characters into str1 that appears in str2 at the respective position should not increase the edit
+ * distance.
  *
  */
 TEST_P(EditingdistanceParamTest, MR38) {
@@ -923,9 +990,10 @@ TEST_P(EditingdistanceParamTest, MR38) {
 
     /* Identify insertion position */
     size_t insert_pos = 1; // For example, after the first character
-    
+
     /* Ensure the insertion position is valid */
-    if (insert_pos >= str2.size()) return;
+    if (insert_pos >= str2.size())
+        return;
 
     /* Get a sequence from str2 */
     string sequence = str2.substr(0, insert_pos);
@@ -942,8 +1010,10 @@ TEST_P(EditingdistanceParamTest, MR38) {
     /* Verification */
     EXPECT_LE(follow_out, source_out);
 }
+
 /**
- * @brief Metamorphic relation 39: Replace a single character in str2 with an arbitrary different character. If str1 is not the same as str2, this should not decrease the edit distance.
+ * @brief Metamorphic relation 39: Replace a single character in str2 with an arbitrary different character. If str1 is not the same as str2, this should not
+ * decrease the edit distance.
  *
  */
 TEST_P(EditingdistanceParamTest, MR39) {
@@ -953,9 +1023,10 @@ TEST_P(EditingdistanceParamTest, MR39) {
 
     /* Get source output */
     int source_out = edit_dist(str1, str2);
-    
+
     /* Ensure that str2 can be altered */
-    if (str2.empty()) return;
+    if (str2.empty())
+        return;
 
     /* Construct follow-up input by replacing a character in str2 */
     str2[0] = str2[0] == 'z' ? 'y' : 'z'; // Swap the first character for a different character
@@ -966,8 +1037,10 @@ TEST_P(EditingdistanceParamTest, MR39) {
     /* Verification */
     EXPECT_GE(follow_out, source_out);
 }
+
 /**
- * @brief Metamorphic relation 40: If we concatenate str2 onto itself to form str2str2, the edit distance between str1 and this new string should be at least as large as the edit distance between str1 and str2.
+ * @brief Metamorphic relation 40: If we concatenate str2 onto itself to form str2str2, the edit distance between str1 and this new string should be at least as
+ * large as the edit distance between str1 and str2.
  *
  */
 TEST_P(EditingdistanceParamTest, MR40) {
@@ -987,8 +1060,10 @@ TEST_P(EditingdistanceParamTest, MR40) {
     /* Verification */
     EXPECT_GE(follow_out, source_out);
 }
+
 /**
- * @brief Metamorphic relation 41: Modifying both str1 and str2 by the same rule that doesn't change their existing relative characters (like Caesar cipher) should keep the edit distance unchanged.
+ * @brief Metamorphic relation 41: Modifying both str1 and str2 by the same rule that doesn't change their existing relative characters (like Caesar cipher)
+ * should keep the edit distance unchanged.
  *
  */
 TEST_P(EditingdistanceParamTest, MR41) {
@@ -1020,93 +1095,5 @@ TEST_P(EditingdistanceParamTest, MR41) {
     /* Verification */
     EXPECT_EQ(follow_out, source_out);
 }
-/**
- * @brief Metamorphic relation 42: Incrementing all char codes in str2 should not change the edit distance if we also increment all char codes in str1 by the same amount.
- *
- */
-TEST_P(EditingdistanceParamTest, MR42) {
-    /* Get source input */
-    EditingdistanceInput input = GetParam();
-    string str1 = input.str1, str2 = input.str2;
-
-    /* Get source output */
-    int source_out = edit_dist(str1, str2);
-
-    /* Construct follow-up input by incrementing char codes */
-    string follow_str1(str1.size(), ' '), follow_str2(str2.size(), ' ');
-    std::transform(str1.begin(), str1.end(), follow_str1.begin(), [](char c) { return c + 1; });
-    std::transform(str2.begin(), str2.end(), follow_str2.begin(), [](char c) { return c + 1; });
-
-    /* Get follow-up output */
-    int follow_out = edit_dist(follow_str1, follow_str2);
-
-    /* Verification */
-    EXPECT_EQ(follow_out, source_out);
-}
-/**
- * @brief Metamorphic relation 43: If str1 is a prefix of str2, the edit distance should be the difference between their lengths.
- *
- */
-TEST_P(EditingdistanceParamTest, MR43) {
-    /* Get source input */
-    EditingdistanceInput input = GetParam();
-    string str1 = "prefix", str2 = "prefixsuffix";
-
-    /* Expected edit distance is the length difference between str2 and str1 */
-    int expected_distance = str2.length() - str1.length();
-
-    /* Get follow-up output */
-    int follow_out = edit_dist(str1, str2);
-
-    /* Verification */
-    EXPECT_EQ(follow_out, expected_distance);
-}
-/**
- * @brief Metamorphic relation 44: Swapping the first half and the second half of str1 should not decrease the edit distance when neither of the halves is a substring of str2.
- *
- */
-TEST_P(EditingdistanceParamTest, MR44) {
-    /* Get source input */
-    EditingdistanceInput input = GetParam();
-    string str1 = input.str1, str2 = input.str2;
-
-    /* Ensure str1 is long enough and its parts are not substrings of str2 */
-    if (str1.size() < 4 || str2.find(str1.substr(0, str1.size() / 2)) != string::npos ||
-        str2.find(str1.substr(str1.size() / 2)) != string::npos) {
-        return;
-    }
-
-    /* Get source output */
-    int source_out = edit_dist(str1, str2);
-
-    /* Construct follow-up input */
-    string follow_str1 = str1.substr(str1.size() / 2) + str1.substr(0, str1.size() / 2);
-
-    /* Get follow-up output */
-    int follow_out = edit_dist(follow_str1, str2);
-
-    /* Verification */
-    EXPECT_GE(follow_out, source_out);
-}
-/**
- * @brief Metamorphic relation 45: If str2 is formed by inserting arbitrary text into str1, then the edit distance should not exceed the length of the inserted text.
- *
- */
-TEST_P(EditingdistanceParamTest, MR45) {
-    /* Get source input */
-    EditingdistanceInput input = GetParam();
-    string str1 = input.str1, inserted_text = "arbitraryText";
-    string str2 = str1.substr(0, str1.size() / 2) + inserted_text + str1.substr(str1.size() / 2);
-
-    /* Expected edit distance is the length of inserted_text */
-    int expected_distance = inserted_text.length();
-
-    /* Get follow-up output */
-    int follow_out = edit_dist(str1, str2);
-
-    /* Verification */
-    EXPECT_LE(follow_out, expected_distance);
-}
-
 
 INSTANTIATE_TEST_CASE_P(TrueReturn, EditingdistanceParamTest, testing::ValuesIn(gen_tcs_randomly()));
