@@ -6,7 +6,25 @@
 #include "utils.h"
 
 using namespace std;
+/**
+ * @brief 将测试数据写入文件, 方便调试
+ *
+ * @param tcs 测试数据
+ * @param filename 输出文件路径
+ */
+void write_tcs(InterleavingStringInput tcs, string filename) {
+    ofstream fout("testcases.txt");
+    fout << "A: " << tcs.A << endl;
+    fout << "B: " << tcs.B << endl;
+    fout << "C: " << tcs.C << endl;
+    fout << endl;
+}
 
+/**
+ * @brief 随机生成测试数据
+ *
+ * @return vector<InterleavingStringInput>
+ */
 vector<InterleavingStringInput> gen_tcs_randomly() {
     vector<InterleavingStringInput> tcs;
     mt19937 rng(random_device{}());
@@ -43,17 +61,6 @@ vector<InterleavingStringInput> gen_tcs_randomly() {
             }
         }
         tcs.push_back(InterleavingStringInput(A, B, C));
-    }
-
-    /* 输出到文件, 方便调试 */
-    ofstream fout("testcases.txt");
-    for (int i = 0; i < TESTCASE_NUM; i++) {
-        fout << "Testcase " << i << ": " << endl;
-        fout << "------------------------------" << endl;
-        fout << "A: " << tcs[i].A << endl;
-        fout << "B: " << tcs[i].B << endl;
-        fout << "C: " << tcs[i].C << endl;
-        fout << endl;
     }
 
     return tcs;

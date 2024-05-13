@@ -15,6 +15,8 @@ typedef struct InterleavingStringInput {
     string A, B, C;
 } InterleavingStringInput;
 
+void write_tcs(InterleavingStringInput tcs, string filename);
+
 vector<InterleavingStringInput> gen_tcs_randomly();
 
 #endif
