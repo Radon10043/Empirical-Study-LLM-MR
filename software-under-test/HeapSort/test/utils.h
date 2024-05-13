@@ -14,6 +14,8 @@ typedef struct HeapSortInput {
     vector<int> vec;
 } HeapSortInput;
 
+void write_tcs(HeapSortInput input, string filename);
+
 vector<HeapSortInput> gen_tcs_randomly();
 
 #endif
