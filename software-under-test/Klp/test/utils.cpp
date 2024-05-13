@@ -7,6 +7,29 @@
 
 using namespace std;
 
+/**
+ * @brief 将测试数据写入文件, 调试用
+ *
+ * @param input
+ * @param filename
+ */
+void write_tcs(KLPInput input, string filename) {
+    ofstream fout(filename);
+    vector<vector<int>> matrix = input.matrix;
+    int num_r = matrix.size(), num_c = matrix[0].size();
+    for (int x = 0; x < num_r; x++) {
+        for (int y = 0; y < num_c; y++) {
+            fout << matrix[x][y] << ",";
+        }
+        fout << endl;
+    }
+}
+
+/**
+ * @brief 随机生成测试数据
+ *
+ * @return vector<KLPInput>
+ */
 vector<KLPInput> gen_tcs_randomly() {
     vector<KLPInput> tcs;
     mt19937 rng(random_device{}());
@@ -25,22 +48,6 @@ vector<KLPInput> gen_tcs_randomly() {
             for (int y = 0; y < num_c; y++)
                 matrix[x][y] = dist_value(rng);
         tcs.push_back(KLPInput(matrix));
-    }
-
-    /* 写入文件, 方便调试 */
-    ofstream fout("testcases.txt");
-    for (int i = 0; i < TESTCASE_NUM; i++) {
-        vector<vector<int>> matrix = tcs[i].matrix;
-        int num_r = matrix.size(), num_c = matrix[0].size();
-        fout << "Testcase " << i << ": " << endl;
-        fout << "------------------------------" << endl;
-        for (int x = 0; x < num_r; x++) {
-            for (int y = 0; y < num_c; y++) {
-                fout << matrix[x][y] << ",";
-            }
-            fout << endl;
-        }
-        fout << endl;
     }
 
     return tcs;

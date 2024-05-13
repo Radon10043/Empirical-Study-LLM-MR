@@ -15,6 +15,8 @@ typedef struct KLPInput {
     vector<vector<int>> matrix;
 } KLPInput;
 
+void write_tcs(KLPInput input, string filename);
+
 vector<KLPInput> gen_tcs_randomly();
 
 #endif
