@@ -1,13 +1,34 @@
+#include <algorithm>
 #include <fstream>
 #include <iostream>
 #include <random>
 #include <vector>
-#include <algorithm>
 
 #include "utils.h"
 
 using namespace std;
 
+/**
+ * @brief 将测试数据写入文件, 调试用
+ *
+ * @param input
+ * @param filename
+ */
+void write_tcs(RSAInput input, string filename) {
+    ofstream fout(filename);
+    fout << "m: " << input.m << endl;
+    fout << "e: " << input.e << endl;
+    fout << "p: " << input.p << endl;
+    fout << "q: " << input.q << endl;
+    fout << endl;
+    fout.close();
+}
+
+/**
+ * @brief 随机生成测试数据
+ *
+ * @return vector<RSAInput>
+ */
 vector<RSAInput> gen_tcs_randomly() {
     vector<RSAInput> tcs;
     mt19937 rng(random_device{}());
@@ -27,19 +48,6 @@ vector<RSAInput> gen_tcs_randomly() {
         int m = dist2(rng);
         tcs.push_back(RSAInput(m, e, p, q));
     }
-
-    /* 写入文件, 方便调试 */
-    ofstream fout("testcases.txt");
-    for (int i = 0; i < TESTCASE_NUM; i++) {
-        fout << "Testcase " << i << ": " << endl;
-        fout << "------------------------------" << endl;
-        fout << "m: " << tcs[i].m << endl;
-        fout << "e: " << tcs[i].e << endl;
-        fout << "p: " << tcs[i].p << endl;
-        fout << "q: " << tcs[i].q << endl;
-        fout << endl;
-    }
-    fout.close();
 
     return tcs;
 }

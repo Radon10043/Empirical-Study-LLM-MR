@@ -65,6 +65,8 @@ static vector<int> prime_nums = {
     9697, 9719, 9721, 9733, 9739, 9743, 9749, 9767, 9769, 9781, 9787, 9791, 9803, 9811, 9817, 9829, 9833, 9839, 9851, 9857, 9859, 9871, 9883, 9887, 9901, 9907,
     9923, 9929, 9931, 9941, 9949, 9967, 9973};
 
+void write_tcs(RSAInput input, string filename);
+
 vector<RSAInput> gen_tcs_randomly();
 
 #endif
