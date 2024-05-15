@@ -469,7 +469,7 @@ TEST_P(MultiMAXSUMParamTest, MR18) {
  * @brief Metamorphic Relation 19: Appending an array with elements sufficiently large should increase the source output.
  *
  */
-TEST_P(MultiMAXSUMParamTest, MR19) {
+TEST_P(MultiMAXSUMParamTest, MR19) {    // Fixed
     /* Get source input */
     MultiMAXSUMInput input = GetParam();
     vector<int> source_vec = input.vec;
@@ -479,7 +479,7 @@ TEST_P(MultiMAXSUMParamTest, MR19) {
     int source_out = multi_maxsum(source_vec, source_m);
 
     /* Construct follow-up input by appending a large value array */
-    vector<int> append_array(source_m, INT_MAX / source_m); // Large values to ensure they will be included
+    vector<int> append_array(source_m, 1e9 / source_m); // Large values to ensure they will be included
     vector<int> follow_vec = source_vec;
     follow_vec.insert(follow_vec.end(), append_array.begin(), append_array.end());
 
@@ -782,7 +782,7 @@ TEST_P(MultiMAXSUMParamTest, MR30) {
  * @brief Metamorphic Relation 31: Increasing all elements by the same ratio should scale the output by that ratio.
  *
  */
-TEST_P(MultiMAXSUMParamTest, MR31) {
+TEST_P(MultiMAXSUMParamTest, MR31) {    // Fixed
     /* Get source input */
     MultiMAXSUMInput input = GetParam();
     vector<int> source_vec = input.vec;
@@ -792,7 +792,7 @@ TEST_P(MultiMAXSUMParamTest, MR31) {
     int source_out = multi_maxsum(source_vec, source_m);
 
     /* Scaling ratio */
-    const double ratio = 1.5;
+    const double ratio = 2;
 
     /* Construct follow-up input by scaling each element */
     vector<int> follow_vec;
@@ -802,7 +802,7 @@ TEST_P(MultiMAXSUMParamTest, MR31) {
     int follow_out = multi_maxsum(follow_vec, source_m);
 
     /* Verification */
-    EXPECT_NEAR(static_cast<int>(source_out * ratio), follow_out, 1);
+    EXPECT_EQ(source_out * ratio, follow_out);
 }
 
 /**
