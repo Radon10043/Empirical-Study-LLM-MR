@@ -24,7 +24,7 @@ TEST_P(QuickSortParamTest, MR4) {
 
     /* Get source output */
     vector<int> source_out = quick_sort(source_vec);
-    
+
     /* Construct follow-up input */
     vector<int> follow_vec = source_vec;
     reverse(follow_vec.begin(), follow_vec.end());
@@ -40,14 +40,14 @@ TEST_P(QuickSortParamTest, MR4) {
  * @brief Metamorphic Relation 5: If any element is duplicated in the input array, the output should have those duplicates next to each other.
  *
  */
-TEST_P(QuickSortParamTest, MR5) {
+TEST_P(QuickSortParamTest, MR5) { // Fixed
     /* Get source input */
     QuickSortInput input = GetParam();
     vector<int> source_vec = input.vec;
 
     /* Get source output */
     vector<int> source_out = quick_sort(source_vec);
-    
+
     /* Construct follow-up input */
     vector<int> follow_vec = source_vec;
     follow_vec.push_back(follow_vec[0]); // Assuming there is at least one element in the vector
@@ -56,14 +56,11 @@ TEST_P(QuickSortParamTest, MR5) {
     vector<int> follow_out = quick_sort(follow_vec);
 
     /* Verification */
-    for (size_t i = 0, j = 0; i < source_out.size(); ++i, ++j) {
-        if(source_out[i] == follow_out[j]) {
-            if(i + 1 < source_out.size() && source_out[i] == source_out[i+1]) {
-                EXPECT_EQ(follow_out[j], follow_out[j+1]);
-                ++j;
-            }
-        } else {
-            GTEST_FAIL() << "Elements at position " << i << " do not match";
+    bool has_matched = false;
+    for (size_t i = 0; i < source_out.size(); i++) {
+        if (source_out[i] == follow_vec[0] && !has_matched) {
+            has_matched = true;
+            EXPECT_EQ(source_out[i], follow_out[i + 1]);
         }
     }
 }
@@ -79,7 +76,7 @@ TEST_P(QuickSortParamTest, MR6) {
 
     /* Get source output */
     vector<int> source_out = quick_sort(source_vec);
-    
+
     /* Construct follow-up input without duplicates */
     vector<int> follow_vec = source_vec;
     sort(follow_vec.begin(), follow_vec.end());
@@ -102,8 +99,9 @@ TEST_P(QuickSortParamTest, MR6) {
 }
 
 /**
- * @brief Metamorphic Relation 7: Concatenating another sorted array should not change the order of the original elements, and the concatenated elements should also follow the order.
- * 
+ * @brief Metamorphic Relation 7: Concatenating another sorted array should not change the order of the original elements, and the concatenated elements should
+ * also follow the order.
+ *
  */
 TEST_P(QuickSortParamTest, MR7) {
     /* Get source input */
@@ -112,7 +110,7 @@ TEST_P(QuickSortParamTest, MR7) {
 
     /* Get source output */
     vector<int> source_out = quick_sort(source_vec);
-    
+
     /* Construct follow-up input */
     vector<int> extra_sorted_array = {100, 101, 102, 103, 104}; // Example sorted vector
     vector<int> follow_vec(source_vec);
@@ -143,6 +141,7 @@ TEST_P(QuickSortParamTest, MR8) {
     /* Verification */
     EXPECT_EQ(source_vec, source_out);
 }
+
 /**
  * @brief Metamorphic Relation 9: Doubling each element in the input array, the relative order in the output array should remain the same.
  *
@@ -207,14 +206,14 @@ TEST_P(QuickSortParamTest, MR11) {
     QuickSortInput input = GetParam();
     vector<int> source_vec = input.vec;
     if (source_vec.size() <= 1) {
-        source_vec.push_back(source_vec[0] - 1);  // Append an element for partial sorting
+        source_vec.push_back(source_vec[0] - 1); // Append an element for partial sorting
     }
 
     /* Get source output of the whole vector */
     vector<int> sorted_all = quick_sort(source_vec);
 
     /* Get source output of the part vector */
-    vector<int> part_vec(source_vec.begin(), source_vec.begin() + source_vec.size() / 2);  // Take first half for partial sort
+    vector<int> part_vec(source_vec.begin(), source_vec.begin() + source_vec.size() / 2); // Take first half for partial sort
     vector<int> sorted_part = quick_sort(part_vec);
 
     /* Verification */
@@ -264,7 +263,7 @@ TEST_P(QuickSortParamTest, MR13) {
 
     /* Get source output */
     vector<int> source_out = quick_sort(source_vec);
-    
+
     /* Construct follow-up input */
     vector<int> follow_vec_max = source_vec;
     follow_vec_max.push_back(max_value);
@@ -279,8 +278,10 @@ TEST_P(QuickSortParamTest, MR13) {
     EXPECT_EQ(follow_out_max[follow_out_max.size() - 1], max_value);
     EXPECT_EQ(follow_out_min[0], min_value);
 }
+
 /**
- * @brief Metamorphic Relation 14: Concatenating a non-sorted array to the sorted input array should result in the non-sorted elements being integrated in place.
+ * @brief Metamorphic Relation 14: Concatenating a non-sorted array to the sorted input array should result in the non-sorted elements being integrated in
+ * place.
  *
  */
 TEST_P(QuickSortParamTest, MR14) {
@@ -313,7 +314,7 @@ TEST_P(QuickSortParamTest, MR15) {
     vector<int> source_vec = input.vec;
 
     /* Make sure input vector has at least one element to remove */
-    if(source_vec.empty()) {
+    if (source_vec.empty()) {
         source_vec.push_back(1); // Add a dummy element for this test
     }
 
@@ -331,14 +332,15 @@ TEST_P(QuickSortParamTest, MR15) {
 
     /* Verification */
     auto it_source_out = std::find(source_out.begin(), source_out.end(), removed_element);
-    if(it_source_out != source_out.end()) {
+    if (it_source_out != source_out.end()) {
         source_out.erase(it_source_out);
     }
     EXPECT_EQ(follow_out, source_out);
 }
 
 /**
- * @brief Metamorphic Relation 16: Interleaving the input array with another sorted array should maintain the order of each element from both arrays in the output.
+ * @brief Metamorphic Relation 16: Interleaving the input array with another sorted array should maintain the order of each element from both arrays in the
+ * output.
  *
  */
 TEST_P(QuickSortParamTest, MR16) {
@@ -348,12 +350,12 @@ TEST_P(QuickSortParamTest, MR16) {
 
     /* Second sorted array for interleaving */
     vector<int> sorted_vec2 = {7, 8, 9, 10, 11};
-    quick_sort(sorted_vec2);  // Ensure the array is sorted even if the input numbers are modified
+    quick_sort(sorted_vec2); // Ensure the array is sorted even if the input numbers are modified
 
     /* Construct follow-up input by interleaving the two arrays */
     vector<int> follow_vec;
     auto it1 = source_vec.begin(), it2 = sorted_vec2.begin();
-    while(it1 != source_vec.end() && it2 != sorted_vec2.end()) {
+    while (it1 != source_vec.end() && it2 != sorted_vec2.end()) {
         follow_vec.push_back(*it1++);
         follow_vec.push_back(*it2++);
     }
@@ -369,7 +371,7 @@ TEST_P(QuickSortParamTest, MR16) {
     // Check that relative ordering within each interleaved set is maintained
     for (size_t i = 0; i < source_vec.size(); ++i) {
         size_t pos_in_output = std::find(follow_out.begin(), follow_out.end(), source_vec[i]) - follow_out.begin();
-        if(i < source_vec.size() - 1) {
+        if (i < source_vec.size() - 1) {
             size_t next_pos_in_output = std::find(follow_out.begin(), follow_out.end(), source_vec[i + 1]) - follow_out.begin();
             EXPECT_LT(pos_in_output, next_pos_in_output);
         }
@@ -394,6 +396,7 @@ TEST_P(QuickSortParamTest, MR17) {
     /* Verification */
     EXPECT_EQ(once_sorted, twice_sorted);
 }
+
 /**
  * @brief Metamorphic Relation 18: Sorting an array composed only of one unique element should yield the same array.
  *
@@ -431,7 +434,8 @@ TEST_P(QuickSortParamTest, MR19) {
 }
 
 /**
- * @brief Metamorphic Relation 20: Sorting an array that is the concatenation of two sorted arrays should not change the order of elements within each original array.
+ * @brief Metamorphic Relation 20: Sorting an array that is the concatenation of two sorted arrays should not change the order of elements within each original
+ * array.
  *
  */
 TEST_P(QuickSortParamTest, MR20) {
@@ -452,9 +456,8 @@ TEST_P(QuickSortParamTest, MR20) {
 
     /* Verification */
     // All elements from the first array should be before any element from the second array
-    auto it = std::find_if(sorted_concatenated.begin(), sorted_concatenated.end(), [&sorted_vec2](const int& val) {
-        return std::find(sorted_vec2.begin(), sorted_vec2.end(), val) != sorted_vec2.end();
-    });
+    auto it = std::find_if(sorted_concatenated.begin(), sorted_concatenated.end(),
+                           [&sorted_vec2](const int &val) { return std::find(sorted_vec2.begin(), sorted_vec2.end(), val) != sorted_vec2.end(); });
     EXPECT_TRUE(std::is_sorted(sorted_concatenated.begin(), it));
     EXPECT_TRUE(std::is_sorted(it, sorted_concatenated.end()));
 }
@@ -470,14 +473,13 @@ TEST_P(QuickSortParamTest, MR21) {
 
     /* Increment elements in the input vector by their index */
     vector<int> modified_vec;
-    std::transform(source_vec.begin(), source_vec.end(), std::back_inserter(modified_vec), 
-                   [i = 0](int x) mutable { return x + i++; });
-    
+    std::transform(source_vec.begin(), source_vec.end(), std::back_inserter(modified_vec), [i = 0](int x) mutable { return x + i++; });
+
     /* Sort the modified array */
     vector<int> sorted_modified = quick_sort(modified_vec);
 
     /* Verify that relative ordering is maintained */
-    auto cmp = [](const int& a, const int& b) { return a < b; };
+    auto cmp = [](const int &a, const int &b) { return a < b; };
     EXPECT_TRUE(std::is_sorted(sorted_modified.begin(), sorted_modified.end(), cmp));
 }
 
@@ -498,6 +500,7 @@ TEST_P(QuickSortParamTest, MR22) {
     EXPECT_TRUE(std::is_sorted(first_half.begin(), first_half.end()));
     EXPECT_TRUE(std::is_sorted(second_half.begin(), second_half.end()));
 }
+
 /**
  * @brief Metamorphic Relation 23: Splitting the input array into even and odd indices, sorting both, and merging should result in a sorted array.
  *
@@ -598,8 +601,10 @@ TEST_P(QuickSortParamTest, MR25) {
         }
     }
 }
+
 /**
- * @brief Metamorphic Relation 26: Sorting an array whose elements are squared should yield a sorted array, and the order should be maintained after taking the square root.
+ * @brief Metamorphic Relation 26: Sorting an array whose elements are squared should yield a sorted array, and the order should be maintained after taking the
+ * square root.
  *
  */
 TEST_P(QuickSortParamTest, MR26) {
@@ -641,13 +646,13 @@ TEST_P(QuickSortParamTest, MR27) {
     /* Concatenate the input array with itself */
     vector<int> concatenated_vec(source_vec);
     concatenated_vec.insert(concatenated_vec.end(), source_vec.begin(), source_vec.end());
-    
+
     /* Sort the concatenated array */
     vector<int> sorted_concatenated_vec = quick_sort(concatenated_vec);
 
     /* Verification */
-    for (size_t i = 0; i < concatenated_vec.size(); i+=2) {
-        EXPECT_EQ(sorted_concatenated_vec[i], sorted_concatenated_vec[i+1]);
+    for (size_t i = 0; i < concatenated_vec.size(); i += 2) {
+        EXPECT_EQ(sorted_concatenated_vec[i], sorted_concatenated_vec[i + 1]);
     }
 }
 
@@ -659,8 +664,8 @@ TEST_P(QuickSortParamTest, MR28) {
     /* Get source input and ensure it has more than one element */
     QuickSortInput input = GetParam();
     vector<int> source_vec = input.vec;
-    if(source_vec.size() < 2) {
-        source_vec.push_back(source_vec.front() + 1);  // ensure at least two different elements
+    if (source_vec.size() < 2) {
+        source_vec.push_back(source_vec.front() + 1); // ensure at least two different elements
     }
 
     /* Sort the source array */
@@ -706,14 +711,14 @@ TEST_P(QuickSortParamTest, MR30) {
     vector<int> source_vec = input.vec;
 
     /* Double the value of each element */
-    for(auto& val : source_vec) {
+    for (auto &val : source_vec) {
         val *= 2;
     }
     /* Sort the modified source array */
     vector<int> sorted_doubled_vec = quick_sort(source_vec);
 
     /* Halve the value of each element in the sorted doubled array */
-    for(auto& val : sorted_doubled_vec) {
+    for (auto &val : sorted_doubled_vec) {
         val /= 2;
     }
     /* Sort the original source array */
@@ -722,8 +727,10 @@ TEST_P(QuickSortParamTest, MR30) {
     /* Verification */
     EXPECT_EQ(sorted_vec, sorted_doubled_vec);
 }
+
 /**
- * @brief Metamorphic Relation 31: Sorting an input array of negative elements should yield a sorted array where the relative order is inverse to the sorting of their absolute values.
+ * @brief Metamorphic Relation 31: Sorting an input array of negative elements should yield a sorted array where the relative order is inverse to the sorting of
+ * their absolute values.
  *
  */
 TEST_P(QuickSortParamTest, MR31) {
@@ -769,7 +776,8 @@ TEST_P(QuickSortParamTest, MR32) {
 }
 
 /**
- * @brief Metamorphic Relation 33: Sorting an array where each element is incremented by an index-dependent variable should have no effect on the sorted array except each element should be increased by the same variable.
+ * @brief Metamorphic Relation 33: Sorting an array where each element is incremented by an index-dependent variable should have no effect on the sorted array
+ * except each element should be increased by the same variable.
  *
  */
 TEST_P(QuickSortParamTest, MR33) {
@@ -785,7 +793,8 @@ TEST_P(QuickSortParamTest, MR33) {
     vector<int> sorted_incremented_vec = quick_sort(incremented_vec);
 
     /* Correct the increment to get the original sort order */
-    std::transform(sorted_incremented_vec.begin(), sorted_incremented_vec.end(), sorted_incremented_vec.begin(), [decrement = (int)source_vec.size() - 1](int x) mutable { return x - decrement--; });
+    std::transform(sorted_incremented_vec.begin(), sorted_incremented_vec.end(), sorted_incremented_vec.begin(),
+                   [decrement = (int)source_vec.size() - 1](int x) mutable { return x - decrement--; });
 
     /* Sort the original array */
     vector<int> sorted_vec = quick_sort(source_vec);
@@ -795,7 +804,8 @@ TEST_P(QuickSortParamTest, MR33) {
 }
 
 /**
- * @brief Metamorphic Relation 34: Sorting an array and then removing outliers (smallest and largest elements) should not affect the order of the remaining elements.
+ * @brief Metamorphic Relation 34: Sorting an array and then removing outliers (smallest and largest elements) should not affect the order of the remaining
+ * elements.
  *
  */
 TEST_P(QuickSortParamTest, MR34) {
@@ -807,9 +817,9 @@ TEST_P(QuickSortParamTest, MR34) {
     vector<int> sorted_vec = quick_sort(source_vec);
 
     /* Remove first and last elements (smallest and largest) if the array has at least 3 elements */
-    if(sorted_vec.size() > 2) {
-        sorted_vec.erase(sorted_vec.begin());            // Remove smallest
-        sorted_vec.erase(--sorted_vec.end());           // Remove largest
+    if (sorted_vec.size() > 2) {
+        sorted_vec.erase(sorted_vec.begin()); // Remove smallest
+        sorted_vec.erase(--sorted_vec.end()); // Remove largest
     }
 
     /* Verification */
@@ -837,11 +847,13 @@ TEST_P(QuickSortParamTest, MR35) {
         EXPECT_LE(transformed_vec[i - 1], transformed_vec[i]);
     }
 }
+
 /**
- * @brief Metamorphic Relation 36: Sorting an array and inverting the sign of each element should result in a sorted array with signs inverted and reversed order.
+ * @brief Metamorphic Relation 36: Sorting an array and inverting the sign of each element should result in a sorted array with signs inverted and reversed
+ * order.
  *
  */
-TEST_P(QuickSortParamTest, MR36) {
+TEST_P(QuickSortParamTest, MR36) {  // Fixed
     /* Get source input */
     QuickSortInput input = GetParam();
     vector<int> source_vec = input.vec;
@@ -851,17 +863,20 @@ TEST_P(QuickSortParamTest, MR36) {
 
     /* Invert the sign of each element and sort again */
     std::transform(sorted_vec.begin(), sorted_vec.end(), sorted_vec.begin(), [](int x) { return -x; });
-    vector<int> sorted_inverted_signs_vec = quick_sort(sorted_vec);
+
+    /* Construct a sorted array with signs inverted and reverse its order */
+    vector<int> follow_vec = source_vec;
+    std::transform(follow_vec.begin(), follow_vec.end(), follow_vec.begin(), [](int x) { return -x; });
+    vector<int> follow_out = quick_sort(follow_vec);
+    std::reverse(follow_out.begin(), follow_out.end());
 
     /* Verification */
-    std::reverse(sorted_inverted_signs_vec.begin(), sorted_inverted_signs_vec.end());
-    for (size_t i = 0; i < source_vec.size(); ++i) {
-        EXPECT_EQ(sorted_inverted_signs_vec[i], -sorted_vec[i]);
-    }
+    EXPECT_EQ(sorted_vec, follow_out);
 }
 
 /**
- * @brief Metamorphic Relation 37: Concatenating multiples of the same array, resizing, and sorting should not change the order of elements within the sub-range of the original array size.
+ * @brief Metamorphic Relation 37: Concatenating multiples of the same array, resizing, and sorting should not change the order of elements within the sub-range
+ * of the original array size.
  *
  */
 TEST_P(QuickSortParamTest, MR37) {
@@ -933,7 +948,7 @@ TEST_P(QuickSortParamTest, MR39) {
     /* Apply ceiling function on sorted array */
     vector<int> ceiling_vec = sorted_vec;
     std::transform(ceiling_vec.begin(), ceiling_vec.end(), ceiling_vec.begin(), [](int x) -> int {
-        return (x % 10) ? (x + 10 - x % 10) : x;  // Ceiling to the nearest multiple of 10
+        return (x % 10) ? (x + 10 - x % 10) : x; // Ceiling to the nearest multiple of 10
     });
 
     /* Verification: ceiling(sorted_vec) should have the same relative order as sorted_vec */
@@ -967,6 +982,7 @@ TEST_P(QuickSortParamTest, MR40) {
         EXPECT_EQ(sorted_median_vec[i], median);
     }
 }
+
 /**
  * @brief Metamorphic Relation 41: Sorting an array and then extracting every k-th element should result in a sorted subset.
  *
@@ -1090,6 +1106,5 @@ TEST_P(QuickSortParamTest, MR45) {
         EXPECT_TRUE(std::is_sorted(sorted_vec.begin() + i, sorted_vec.begin() + end_range));
     }
 }
-
 
 INSTANTIATE_TEST_CASE_P(TrueReturn, QuickSortParamTest, testing::ValuesIn(gen_tcs_randomly()));
