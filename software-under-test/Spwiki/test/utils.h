@@ -15,6 +15,8 @@ typedef struct SpwikiInput {
     int src, dst, n;
 } SpwikiInput;
 
+void write_tcs(SpwikiInput input, string filename);
+
 vector<SpwikiInput> gen_tcs_randomly();
 
 #endif

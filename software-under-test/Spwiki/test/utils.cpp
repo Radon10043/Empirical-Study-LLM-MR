@@ -7,6 +7,30 @@
 
 using namespace std;
 
+/**
+ * @brief 将测试数据写入文件, 调试用
+ *
+ * @param input
+ * @param filename
+ */
+void write_tcs(SpwikiInput input, string filename) {
+    ofstream fout(filename);
+    fout << "edges: ";
+    for (auto &edge : input.edges)
+        fout << "(" << edge[0] << ", " << edge[1] << ", " << edge[2] << "), ";
+    fout << endl;
+    fout << "src: " << input.src << endl;
+    fout << "dst: " << input.dst << endl;
+    fout << "n  : " << input.n << endl;
+    fout << endl;
+    fout.close();
+}
+
+/**
+ * @brief 随机生成测试数据
+ *
+ * @return vector<SpwikiInput>
+ */
 vector<SpwikiInput> gen_tcs_randomly() {
     vector<SpwikiInput> tcs;
     mt19937 rng(random_device{}());
@@ -31,22 +55,6 @@ vector<SpwikiInput> gen_tcs_randomly() {
 
         tcs.push_back(SpwikiInput(edges, src, dst, num_v));
     }
-
-    /* 保存到文件, 方便调试 */
-    ofstream fout("testcases.txt");
-    for (int i = 0; i < TESTCASE_NUM; i++) {
-        fout << "Testcase " << i << ": " << endl;
-        fout << "------------------------------" << endl;
-        fout << "edges: ";
-        for (auto &edge : tcs[i].edges)
-            fout << "(" << edge[0] << ", " << edge[1] << ", " << edge[2] << "), ";
-        fout << endl;
-        fout << "src: " << tcs[i].src << endl;
-        fout << "dst: " << tcs[i].dst << endl;
-        fout << "n  : " << tcs[i].n << endl;
-        fout << endl;
-    }
-    fout.close();
 
     return tcs;
 }
