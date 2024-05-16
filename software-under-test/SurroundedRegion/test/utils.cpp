@@ -7,6 +7,25 @@
 
 using namespace std;
 
+/**
+ * @brief 将测试数据写入文件, 调试用
+ *
+ * @param input
+ * @param filename
+ */
+void write_tcs(SurroundedRegionInput input, string filename) {
+    ofstream fout(filename);
+    for (auto &row : input.vec)
+        fout << row << endl;
+    fout << endl;
+    fout.close();
+}
+
+/**
+ * @brief 随机生成测试数据
+ *
+ * @return vector<SurroundedRegionInput>
+ */
 vector<SurroundedRegionInput> gen_tcs_randomly() {
     vector<SurroundedRegionInput> tcs;
     vector<char> chars = {'X', 'O'};
@@ -22,16 +41,6 @@ vector<SurroundedRegionInput> gen_tcs_randomly() {
             for (auto &c : row)
                 c = chars[dist_char(rng)];
         tcs.push_back(SurroundedRegionInput(vec));
-    }
-
-    /* 写入文件, 方便调试 */
-    ofstream fout("testcases.txt");
-    for (int i = 0; i < TESTCASE_NUM; i++) {
-        fout << "Testcase " << i << ": " << endl;
-        fout << "------------------------------" << endl;
-        for (auto &row : tcs[i].vec)
-            fout << row << endl;
-        fout << endl;
     }
 
     return tcs;
