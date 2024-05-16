@@ -10,8 +10,14 @@ Run specified test:
 python tests/GPT3D5_test.py -k test2_
 ```
 
-Run all test cases of GPT3D5_test, each test case is repeated five times:
+Run all tests of GPT3D5, each test is repeated 5 times:
 
 ```sh
-for i in {2..41}; do ./run.sh GPT3D5_test test$i 5; done | tee testcases.validate.md
+for i in {1..40}; do ./run.sh GPT3D5 MR$i 5; done | tee testcases.validate.md
+```
+
+Run all tests of GPT4, each test is repeated 5 times:
+
+```sh
+for i in {2..41}; do ./run.sh GPT4 MR$i 5; done | tee testcases.validate.md
 ```
