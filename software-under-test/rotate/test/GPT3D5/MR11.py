@@ -1,8 +1,18 @@
-from utils import *
+import os
+import sys
+import unittest
+
+import numpy as np
+from scipy import ndimage, datasets
+from parameterized import parameterized
+
+sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
+
+from utils import gen_tcs_randomly
 
 
 class TestingClass(unittest.TestCase):
-    @parameterized.expand(load_test_cases)
+    @parameterized.expand(gen_tcs_randomly(1000))
     def test11(self, img: np.array, angle: float):
         """Metamorphic Relation 11: Rotating the image by 90 degrees and then rotating the result by 180 degrees should result in the same output as rotating the original image by 270 degrees."""
         # Get source output
@@ -18,7 +28,7 @@ class TestingClass(unittest.TestCase):
 
         # Verification
         expected_out = ndimage.rotate(img, 270)  # Rotate the original image by 270 degrees
-        self.assertTrue(np.any(follow_out - expected_out) == 0) # Fixed
+        self.assertTrue(np.any(follow_out - expected_out) == 0)  # Fixed
 
 
 if __name__ == "__main__":

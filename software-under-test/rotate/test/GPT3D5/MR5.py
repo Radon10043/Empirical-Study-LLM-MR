@@ -1,9 +1,19 @@
-from utils import *
+import os
+import sys
+import unittest
+
+import numpy as np
+from scipy import ndimage, datasets
+from parameterized import parameterized
+
+sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
+
+from utils import gen_tcs_randomly
 
 
 class TestingClass(unittest.TestCase):
     # fixed
-    @parameterized.expand(load_test_cases)
+    @parameterized.expand(gen_tcs_randomly(1000))
     def test5(self, img: np.array, angle: float):
         """Metamorphic Relation 5: Rotating an image and then rotating the result by the same angle should result in the same output as rotating the original image by 2 times the angle."""
         # Get source output
