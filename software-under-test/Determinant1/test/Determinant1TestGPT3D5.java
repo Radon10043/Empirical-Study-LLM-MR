@@ -825,7 +825,7 @@ public class Determinant1TestGPT3D5 {
      * k^(n) * det(A), where k is a factor and n is the size of A.
      */
     @ParameterizedTest
-    @MethodSource("testcaseProvider")
+    @MethodSource("testcaseProvider1")
     public void test35(Matrix m) {
         assumeTrue(m.isDiagonal()); // Check if the matrix is diagonal
         int size = m.getNumberOfRows();
