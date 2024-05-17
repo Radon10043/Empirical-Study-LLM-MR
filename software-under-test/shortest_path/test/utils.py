@@ -6,6 +6,7 @@ from random import randint, choice
 from copy import deepcopy
 from parameterized import parameterized
 from scipy.sparse.csgraph import shortest_path
+from scipy.sparse import csr_matrix
 
 # fmt:off
 # ========== GLOBAL VARIABLES =========
@@ -47,7 +48,7 @@ def gen_graph_randomly(num_v: int) -> list:
 
 
 def gen_tcs_randomly(tcs_num: int) -> list:
-    """随机生成测试用例,包含图, 起点, 终点和方法
+    """随机生成测试用例, 包含图, 起点, 终点和方法
 
     Parameters
     ----------
@@ -73,6 +74,10 @@ def gen_tcs_randomly(tcs_num: int) -> list:
         # 随机生成起点和终点
         src = randint(0, num_v - 1)
         dst = randint(0, num_v - 1)
+
+        # 确保起点和终点不相同
+        while src == dst:
+            dst = randint(0, num_v - 1)
 
         # 随机生成要使用的方法
         method = choice(["FW", "D"])
@@ -104,11 +109,11 @@ def get_shortest_path(predecessors: np.ndarray, src: int, dst: int) -> list:
     list
         最短路径的节点列表
     """
-    path = [src]
-    while path[-1] != dst:
-        mid = path[-1]
-        if predecessors[mid][dst] == mid:
-            path.append(dst)
-        else:
-            path.append(predecessors[mid][dst])
+    path = list()
+    node = dst
+    while node != src:
+        path.append(node)
+        node = predecessors[src][node]
+    path.append(src)
+    path.reverse()
     return path
