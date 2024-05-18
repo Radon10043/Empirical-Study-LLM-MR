@@ -1,10 +1,9 @@
 package test;
 
+import static org.junit.Assume.assumeFalse;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.io.IOException;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.params.ParameterizedTest;
@@ -139,10 +138,8 @@ public class ERSTestGPT4 {
 
     /**
      * Metamorphic Relation 5: The total reimbursement amount should be invariant to
-     * permutations of
-     * otherexpensesamount and airfareamount if monthlysalesamount exceeds the
-     * specific threshold
-     * for both and stafflevel is "seniormanager".
+     * permutations of otherexpensesamount and airfareamount if monthlysalesamount
+     * exceeds the specific threshold for both and stafflevel is "seniormanager".
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
@@ -172,9 +169,8 @@ public class ERSTestGPT4 {
 
     /**
      * Metamorphic Relation 6: For any stafflevel, reducing actualmonthlymileage to
-     * zero should
-     * not increase the total reimbursement amount due to the adjustment to the
-     * allowable mileage.
+     * zero should not increase the total reimbursement amount due to the adjustment
+     * to the allowable mileage.
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
@@ -203,11 +199,9 @@ public class ERSTestGPT4 {
 
     /**
      * Metamorphic Relation 7: Increasing monthlysalesamount to meet or exceed the
-     * airfare reimbursement
-     * threshold for managers and supervisors, who initially did not meet the
-     * threshold, should result
-     * in an increase in the total reimbursement amount that is at least equal to
-     * the airfare amount.
+     * airfare reimbursement threshold for managers and supervisors, who initially
+     * did not meet the threshold, should result in an increase in the total
+     * reimbursement amount that is at least equal to the airfare amount.
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
@@ -238,11 +232,9 @@ public class ERSTestGPT4 {
 
     /**
      * Metamorphic Relation 8: If the actualmonthlymileage is decreased but still
-     * above the
-     * allowable mileage for a given staff level, and other inputs remain constant,
-     * the total
-     * reimbursement amount should decrease proportionally to the reduction in
-     * actualmonthlymileage.
+     * above the allowable mileage for a given staff level, and other inputs remain
+     * constant, the total reimbursement amount should decrease proportionally to
+     * the reduction in actualmonthlymileage.
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
@@ -272,11 +264,9 @@ public class ERSTestGPT4 {
 
     /**
      * Metamorphic Relation 9: The same reimbursement amount should be calculated if
-     * stafflevel,
-     * actualmonthlymileage, monthlysalesamount, and sum of airfareamount plus
-     * otherexpensesamount
-     * are kept the same, regardless of how airfareamount and otherexpensesamount
-     * are distributed.
+     * stafflevel, actualmonthlymileage, monthlysalesamount, and sum of
+     * airfareamount plus otherexpensesamount are kept the same, regardless of how
+     * airfareamount and otherexpensesamount are distributed.
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
@@ -321,10 +311,8 @@ public class ERSTestGPT4 {
 
     /**
      * Metamorphic Relation 10: If actualmonthlymileage is always less than
-     * allowable mileage,
-     * then any constant increase in the actualmonthlymileage should not change the
-     * total
-     * reimbursement amount.
+     * allowable mileage, then any constant increase in the actualmonthlymileage
+     * should not change the total reimbursement amount.
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
@@ -354,10 +342,9 @@ public class ERSTestGPT4 {
 
     /**
      * Metamorphic Relation 11: Switching from a stafflevel with a lower allowable
-     * mileage to one with a higher
-     * allowable mileage, when actualmonthlymileage is between the two allowable
-     * mileages, should not increase
-     * total reimbursement amount.
+     * mileage to one with a higher allowable mileage, when actualmonthlymileage is
+     * between the two allowable mileages, should not increase total reimbursement
+     * amount.
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
@@ -402,19 +389,16 @@ public class ERSTestGPT4 {
 
     /**
      * Metamorphic Relation 12: Given any permissible increase in both
-     * monthlysalesamount and airfareamount
-     * for a manager or supervisor, where the monthlysalesamount initially did not
-     * meet the airfare reimbursement
+     * monthlysalesamount and airfareamount for a manager or supervisor, where the
+     * monthlysalesamount initially did not meet the airfare reimbursement
      * threshold, the follow-up output should not be lower than the source output.
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
     public void test12(String stafflevel, double actualmonthlymileage, double monthlysalesamount,
-            double airfareamount, double otherexpensesamount) {
+            double airfareamount, double otherexpensesamount) { // Fixed
         final double airfareThreshold = 15000.00; // Assumed threshold for airfare reimbursement
-        if ("seniormanager".equals(stafflevel) || monthlysalesamount >= airfareThreshold) {
-            return;
-        }
+        assumeFalse("seniormanager".equals(stafflevel) || monthlysalesamount >= airfareThreshold);
 
         double source_out = new ExpenseReimbursementSystem().calculateReimbursementAmount(
                 stafflevel, actualmonthlymileage, monthlysalesamount, airfareamount, otherexpensesamount);
@@ -433,10 +417,9 @@ public class ERSTestGPT4 {
 
     /**
      * Metamorphic Relation 13: Increasing otherexpensesamount while decreasing
-     * airfareamount by the same
-     * amount, where the monthlysalesamount exceeds the specific threshold for both
-     * expenses, should not change
-     * the total reimbursement amount for any staff level.
+     * airfareamount by the same amount, where the monthlysalesamount exceeds the
+     * specific threshold for both expenses, should not change the total
+     * reimbursement amount for any staff level.
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
@@ -538,10 +521,9 @@ public class ERSTestGPT4 {
 
     /**
      * Metamorphic Relation 16: Distributing the airfareamount in parts over
-     * multiple calls while keeping
-     * other parameters same should result in the same total reimbursement amount
-     * for a "seniormanager",
-     * since they get full airfare reimbursement regardless of the sales amount.
+     * multiple calls while keeping other parameters same should result in the same
+     * total reimbursement amount for a "seniormanager", since they get full airfare
+     * reimbursement regardless of the sales amount.
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
@@ -569,11 +551,9 @@ public class ERSTestGPT4 {
 
     /**
      * Metamorphic Relation 17: Doubling all financial input parameters
-     * (actualmonthlymileage,
-     * monthlysalesamount, airfareamount, and otherexpensesamount) should not double
-     * the total
-     * reimbursement amount due to the fixed limits on reimbursement rates and cap
-     * on mileage.
+     * (actualmonthlymileage, monthlysalesamount, airfareamount, and
+     * otherexpensesamount) should not double the total reimbursement amount due to
+     * the fixed limits on reimbursement rates and cap on mileage.
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
@@ -599,10 +579,9 @@ public class ERSTestGPT4 {
 
     /**
      * Metamorphic Relation 18: Increments in monthlysalesamount that do not cross
-     * any reimbursement
-     * thresholds should not affect the total reimbursement amount. (Assuming that
-     * there are set
-     * thresholds for monthlysalesamount regarding reimbursements.)
+     * any reimbursement thresholds should not affect the total reimbursement
+     * amount. (Assuming that there are set thresholds for monthlysalesamount
+     * regarding reimbursements.)
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
@@ -708,65 +687,61 @@ public class ERSTestGPT4 {
 
     /**
      * Metamorphic Relation 21: If the mileage overuse fee is calculated correctly,
-     * halving the
-     * costPerKilometer while doubling the actualmonthlymileage should result in the
-     * same total
-     * reimbursement amount if the actual monthly mileage is above the allowable
-     * limit.
+     * halving the costPerKilometer while doubling the actualmonthlymileage should
+     * result in the same total reimbursement amount if the actual monthly mileage
+     * is above the allowable limit.
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
     public void test21(String stafflevel, double actualmonthlymileage, double monthlysalesamount,
-            double airfareamount, double otherexpensesamount) { // TODO
-        // double allowableMileage = staffAllowableMileage(stafflevel);
-        // if (actualmonthlymileage <= allowableMileage) {
-        // return; // Skip test if below or at allowable mileage
-        // }
-
-        // ExpenseReimbursementSystem ERS = new ExpenseReimbursementSystem();
-
-        // // Original cost
-        // double source_out = ERS.calculateReimbursementAmount(
-        // stafflevel, actualmonthlymileage, monthlysalesamount, airfareamount,
-        // otherexpensesamount);
-
-        // // Adjust mileage and cost per kilometer
-        // double adjustedMileage = actualmonthlymileage * 2;
-        // double adjustedCostPerKilometer = costPerKilometer() / 2;
-
-        // // Function to calculate reimbursement with adjusted cost per kilometer: this
-        // is
-        // // a placeholder and would
-        // // require an additional interface to the ExpenseReimbursementSystem allowing
-        // // for such adjustments
-        // double adjusted_out =
-        // ERS.calculateReimbursementAmountWithAdjustedCostPerKilometer(
-        // stafflevel, adjustedMileage, monthlysalesamount, airfareamount,
-        // otherexpensesamount,
-        // adjustedCostPerKilometer);
-
-        // // Verify that the adjustment does not change reimbursement
-        // assertEquals(source_out, adjusted_out);
+            double airfareamount, double otherexpensesamount) {
+        /*
+         * double allowableMileage = staffAllowableMileage(stafflevel);
+         * if (actualmonthlymileage <= allowableMileage) {
+         * return; // Skip test if below or at allowable mileage
+         * }
+         * 
+         * ExpenseReimbursementSystem ERS = new ExpenseReimbursementSystem();
+         * 
+         * // Original cost
+         * double source_out = ERS.calculateReimbursementAmount(
+         * stafflevel, actualmonthlymileage, monthlysalesamount, airfareamount,
+         * otherexpensesamount);
+         * 
+         * // Adjust mileage and cost per kilometer
+         * double adjustedMileage = actualmonthlymileage * 2;
+         * double adjustedCostPerKilometer = costPerKilometer() / 2;
+         * 
+         * // Function to calculate reimbursement with adjusted cost per kilometer: this
+         * is
+         * // a placeholder and would require an additional interface to the
+         * // ExpenseReimbursementSystem allowing for such adjustments
+         * double adjusted_out =
+         * ERS.calculateReimbursementAmountWithAdjustedCostPerKilometer(
+         * stafflevel, adjustedMileage, monthlysalesamount, airfareamount,
+         * otherexpensesamount,
+         * adjustedCostPerKilometer);
+         * 
+         * // Verify that the adjustment does not change reimbursement
+         * assertEquals(source_out, adjusted_out);
+         */
     }
 
     /**
      * Metamorphic Relation 22: Swapping the actualmonthlymileage and
-     * monthlysalesamount should not
-     * affect the total reimbursement amount, provided that both are below their
-     * respective thresholds
-     * and actualmonthlymileage is within the allowable mileage limit.
+     * monthlysalesamount should not affect the total reimbursement amount, provided
+     * that both are below their respective thresholds and actualmonthlymileage is
+     * within the allowable mileage limit.
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
     public void test22(String stafflevel, double actualmonthlymileage, double monthlysalesamount,
-            double airfareamount, double otherexpensesamount) {
+            double airfareamount, double otherexpensesamount) { // Fixed
         // Placeholder thresholds
         final double mileageThreshold = staffAllowableMileage(stafflevel);
         final double salesThreshold = 10000.00; // Assumed sales threshold for demonstration
 
-        if (actualmonthlymileage > mileageThreshold || monthlysalesamount > salesThreshold) {
-            return; // Skip test if any value is above threshold
-        }
+        assumeFalse(actualmonthlymileage > mileageThreshold || monthlysalesamount > salesThreshold);
 
         double source_out = new ExpenseReimbursementSystem().calculateReimbursementAmount(
                 stafflevel, actualmonthlymileage, monthlysalesamount, airfareamount, otherexpensesamount);
@@ -777,12 +752,6 @@ public class ERSTestGPT4 {
                 stafflevel, monthlysalesamount, actualmonthlymileage, airfareamount, otherexpensesamount);
 
         assertEquals(source_out, swapped_out);
-    }
-
-    // Placeholder method to get cost per kilometer. Must be defined according to
-    // actual values used by the software
-    private double costPerKilometer() {
-        return 0.50;
     }
 
     /**
@@ -825,10 +794,9 @@ public class ERSTestGPT4 {
 
     /**
      * Metamorphic Relation 24: If all inputs except stafflevel are held constant,
-     * changing the stafflevel
-     * from a lower rank to a higher rank should not decrease the total
-     * reimbursement amount given the
-     * general business practice that higher ranks have equal or greater benefits.
+     * changing the stafflevel from a lower rank to a higher rank should not
+     * decrease the total reimbursement amount given the general business practice
+     * that higher ranks have equal or greater benefits.
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
@@ -856,11 +824,9 @@ public class ERSTestGPT4 {
 
     /**
      * Metamorphic Relation 25: Setting actualmonthlymileage to a negative value
-     * (which should be invalid)
-     * would ideally not change the outcome assuming the business logic resets any
-     * negative mileage to
-     * zero, as indicated by the intent of accounting for mileage at a minimum as
-     * the allowable mileage.
+     * (which should be invalid) would ideally not change the outcome assuming the
+     * business logic resets any negative mileage to zero, as indicated by the
+     * intent of accounting for mileage at a minimum as the allowable mileage.
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
@@ -900,20 +866,16 @@ public class ERSTestGPT4 {
 
     /**
      * Metamorphic Relation 26: When a staff member's actualmonthlymileage is at the
-     * allowable mileage
-     * threshold, increasing the actualmonthlymileage should result in an increase
-     * in the total
-     * reimbursement amount according to the cost per kilometer (assuming no changes
-     * in other parameters).
+     * allowable mileage threshold, increasing the actualmonthlymileage should
+     * result in an increase in the total reimbursement amount according to the cost
+     * per kilometer (assuming no changes in other parameters).
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
     public void test26(String stafflevel, double actualmonthlymileage, double monthlysalesamount,
-            double airfareamount, double otherexpensesamount) {
+            double airfareamount, double otherexpensesamount) { // Fixed
         double allowableMileage = staffAllowableMileage(stafflevel);
-        if (actualmonthlymileage != allowableMileage) {
-            return; // This test is only valid when the initial mileage is at the threshold.
-        }
+        actualmonthlymileage = allowableMileage;
 
         ExpenseReimbursementSystem ERS = new ExpenseReimbursementSystem();
         double source_out = ERS.calculateReimbursementAmount(
@@ -927,25 +889,21 @@ public class ERSTestGPT4 {
 
         // Verify that the reimbursement increases proportionally to the mileage
         // increase
-        double expected_increase = additionalMileage * costPerKilometer();
+        double expected_increase = additionalMileage * costPerKilometer(stafflevel);
         assertEquals(source_out + expected_increase, follow_out, 0.01); // Consider some precision tolerance
     }
 
     /**
      * Metamorphic Relation 27: Decreasing monthlysalesamount should never increase
-     * the airfare reimbursement
-     * for "manager" and "supervisor" stafflevels assuming the reduced amount falls
-     * below the airfare threshold.
+     * the airfare reimbursement for "manager" and "supervisor" stafflevels assuming
+     * the reduced amount falls below the airfare threshold.
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
     public void test27(String stafflevel, double actualmonthlymileage, double monthlysalesamount,
-            double airfareamount, double otherexpensesamount) {
+            double airfareamount, double otherexpensesamount) { // Fixed
         final double airfareThreshold = 15000.00; // Assumed threshold for airfare reimbursement
-        if (monthlysalesamount <= airfareThreshold || "seniormanager".equals(stafflevel)) {
-            return; // This relation is not applicable if already below the threshold or for senior
-                    // managers.
-        }
+        assumeFalse(monthlysalesamount <= airfareThreshold || "seniormanager".equals(stafflevel));
 
         ExpenseReimbursementSystem ERS = new ExpenseReimbursementSystem();
         double source_out = ERS.calculateReimbursementAmount(
@@ -963,22 +921,16 @@ public class ERSTestGPT4 {
 
     /**
      * Metamorphic Relation 28: For a non-senior manager whose monthly sales are
-     * below the
-     * airfare reimbursement threshold, keeping all other parameters constant, their
-     * total
-     * reimbursement amount should be less than or equal to that of a senior manager
-     * when airfare
-     * is added to the total.
+     * below the airfare reimbursement threshold, keeping all other parameters
+     * constant, their total reimbursement amount should be less than or equal to
+     * that of a senior manager when airfare is added to the total.
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
     public void test28(String stafflevel, double actualmonthlymileage, double monthlysalesamount,
-            double airfareamount, double otherexpensesamount) {
+            double airfareamount, double otherexpensesamount) { // Fixed
         final double airfareThreshold = 15000.00; // Assumed threshold for airfare reimbursement
-        if ("seniormanager".equals(stafflevel) || monthlysalesamount >= airfareThreshold) {
-            return; // This metamorphic relation does not apply to senior managers or when the sales
-                    // threshold is met or exceeded
-        }
+        assumeFalse("seniormanager".equals(stafflevel) || monthlysalesamount >= airfareThreshold);
 
         ExpenseReimbursementSystem ERS = new ExpenseReimbursementSystem();
         double nonSeniorManager_out = ERS.calculateReimbursementAmount(
@@ -994,23 +946,17 @@ public class ERSTestGPT4 {
 
     /**
      * Metamorphic Relation 29: If an employee's total reimbursement is not affected
-     * by airfare
-     * (due to not meeting the sales threshold), then varying the airfareamount
-     * while keeping other parameters
-     * constant should not change the total reimbursement amount for both manager
-     * and supervisor levels.
+     * by airfare (due to not meeting the sales threshold), then varying the
+     * airfareamount while keeping other parameters constant should not change the
+     * total reimbursement amount for both manager and supervisor levels.
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
     public void test29(String stafflevel, double actualmonthlymileage, double monthlysalesamount,
-            double airfareamount, double otherexpensesamount) {
+            double airfareamount, double otherexpensesamount) { // Fixed
         final double airfareSalesThreshold = 15000.00; // Assumed threshold for airfare reimbursement
-        if (!stafflevel.equals("manager") && !stafflevel.equals("supervisor")) {
-            return; // Only applicable for manager and supervisor levels
-        }
-        if (monthlysalesamount >= airfareSalesThreshold) {
-            return; // Test only applicable for sales below threshold
-        }
+        assumeFalse(!stafflevel.equals("manager") && !stafflevel.equals("supervisor"));
+        assumeFalse(monthlysalesamount >= airfareSalesThreshold);
 
         ExpenseReimbursementSystem ERS = new ExpenseReimbursementSystem();
         double original_reimbursement = ERS.calculateReimbursementAmount(
@@ -1028,18 +974,15 @@ public class ERSTestGPT4 {
 
     /**
      * Metamorphic Relation 30: If actual monthly mileage equals zero, which is
-     * below the allowable mileage,
-     * increasing other input parameters (monthlysalesamount, airfareamount, or
-     * otherexpensesamount) by
-     * any positive amount should not decrease the total reimbursement amount.
+     * below the allowable mileage, increasing other input parameters
+     * (monthlysalesamount, airfareamount, or otherexpensesamount) by any positive
+     * amount should not decrease the total reimbursement amount.
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
     public void test30(String stafflevel, double actualmonthlymileage, double monthlysalesamount,
-            double airfareamount, double otherexpensesamount) {
-        if (actualmonthlymileage != 0) {
-            return; // This relation is only valid for mileage equal to zero
-        }
+            double airfareamount, double otherexpensesamount) { // Fixed
+        actualmonthlymileage = 0;
 
         ExpenseReimbursementSystem ERS = new ExpenseReimbursementSystem();
         double original_reimbursement = ERS.calculateReimbursementAmount(
@@ -1061,24 +1004,20 @@ public class ERSTestGPT4 {
 
     /**
      * Metamorphic Relation 31: For any staff level, increasing monthly sales
-     * without passing the
-     * threshold should not affect the eligibility for airfare and other expenses
-     * reimbursement.
-     * Therefore, the relative difference in the total reimbursement amount should
-     * only be due to
-     * overuse of the car if applicable.
+     * without passing the threshold should not affect the eligibility for airfare
+     * and other expenses reimbursement. Therefore, the relative difference in the
+     * total reimbursement amount should only be due to overuse of the car if
+     * applicable.
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
     public void test31(String stafflevel, double actualmonthlymileage, double monthlysalesamount,
-            double airfareamount, double otherexpensesamount) {
+            double airfareamount, double otherexpensesamount) { // Fixed
         final double airfareSalesThreshold = 15000.00; // Assumed threshold for airfare reimbursement
         final double otherExpensesThreshold = 20000.00; // Assumed threshold for other expenses reimbursement
 
         // Ensuring we are below both thresholds
-        if (monthlysalesamount >= airfareSalesThreshold || monthlysalesamount >= otherExpensesThreshold) {
-            return; // Test only applicable for sales below thresholds
-        }
+        assumeFalse(monthlysalesamount >= airfareSalesThreshold || monthlysalesamount >= otherExpensesThreshold);
 
         double smallerIncrement = 500.00; // Increment smaller than what would cross the threshold
         ExpenseReimbursementSystem ERS = new ExpenseReimbursementSystem();
@@ -1104,18 +1043,15 @@ public class ERSTestGPT4 {
 
     /**
      * Metamorphic Relation 32: If actualmonthlymileage is increased such that it
-     * remains less than allowable mileage,
-     * then the total reimbursement amount should remain unchanged given the mileage
-     * is adjusted to allowable mileage.
+     * remains less than allowable mileage, then the total reimbursement amount
+     * should remain unchanged given the mileage is adjusted to allowable mileage.
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
     public void test32(String stafflevel, double actualmonthlymileage, double monthlysalesamount,
-            double airfareamount, double otherexpensesamount) {
+            double airfareamount, double otherexpensesamount) { // Fixed
         double allowableMileage = staffAllowableMileage(stafflevel);
-        if (actualmonthlymileage >= allowableMileage) {
-            return; // This test only valid if original mileage is less than allowable
-        }
+        actualmonthlymileage = allowableMileage - 1; // Ensure mileage is below allowable
 
         ExpenseReimbursementSystem ERS = new ExpenseReimbursementSystem();
         double original_reimbursement = ERS.calculateReimbursementAmount(
@@ -1134,17 +1070,14 @@ public class ERSTestGPT4 {
 
     /**
      * Metamorphic Relation 33: For a "seniormanager", a reduction in
-     * monthlysalesamount should not affect
-     * the total reimbursement amount as they are eligible for full reimbursement
-     * regardless of sales.
+     * monthlysalesamount should not affect the total reimbursement amount as they
+     * are eligible for full reimbursement regardless of sales.
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
     public void test33(String stafflevel, double actualmonthlymileage, double monthlysalesamount,
-            double airfareamount, double otherexpensesamount) {
-        if (!"seniormanager".equals(stafflevel)) {
-            return; // This test only applies to senior managers
-        }
+            double airfareamount, double otherexpensesamount) { // Fixed
+        assumeFalse(!"seniormanager".equals(stafflevel));
 
         ExpenseReimbursementSystem ERS = new ExpenseReimbursementSystem();
         double original_reimbursement = ERS.calculateReimbursementAmount(
@@ -1161,11 +1094,10 @@ public class ERSTestGPT4 {
 
     /**
      * Metamorphic Relation 34: Adding a constant amount to actualmonthlymileage,
-     * monthlysalesamount, airfareamount,
-     * and otherexpensesamount separately should have no negative impact on the
-     * total reimbursement amount,
-     * because an increase in actual expenses or sales should generally lead to the
-     * same or increased reimbursement.
+     * monthlysalesamount, airfareamount, and otherexpensesamount separately should
+     * have no negative impact on the total reimbursement amount, because an
+     * increase in actual expenses or sales should generally lead to the same or
+     * increased reimbursement.
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
@@ -1196,20 +1128,16 @@ public class ERSTestGPT4 {
 
     /**
      * Metamorphic Relation 35: For any staff level, if the actual monthly mileage
-     * remains constant and
-     * the monthly sales amount incrementally increases without exceeding the other
-     * expenses threshold,
-     * the total reimbursement amount should either stay the same or increase, but
-     * not decrease.
+     * remains constant and the monthly sales amount incrementally increases without
+     * exceeding the other expenses threshold, the total reimbursement amount should
+     * either stay the same or increase, but not decrease.
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
     public void test35(String stafflevel, double actualmonthlymileage, double monthlysalesamount,
-            double airfareamount, double otherexpensesamount) {
+            double airfareamount, double otherexpensesamount) { // Fixed
         final double otherExpensesThreshold = 30000.00; // Assumed threshold for other expenses reimbursement
-        if (monthlysalesamount >= otherExpensesThreshold) {
-            return; // The test is only applicable if the sales are below the threshold
-        }
+        assumeFalse(monthlysalesamount >= otherExpensesThreshold);
 
         ExpenseReimbursementSystem ERS = new ExpenseReimbursementSystem();
         double originalReimbursement = ERS.calculateReimbursementAmount(
@@ -1230,19 +1158,16 @@ public class ERSTestGPT4 {
 
     /**
      * Metamorphic Relation 36: Reducing the otherexpensesamount to zero should not
-     * increase the total
-     * reimbursement amount, assuming all other inputs remain constant and the
-     * monthly sales amount is below
-     * the threshold for other expenses reimbursement eligibility.
+     * increase the total reimbursement amount, assuming all other inputs remain
+     * constant and the monthly sales amount is below the threshold for other
+     * expenses reimbursement eligibility.
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
     public void test36(String stafflevel, double actualmonthlymileage, double monthlysalesamount,
-            double airfareamount, double otherexpensesamount) {
+            double airfareamount, double otherexpensesamount) { // Fixed
         final double otherExpensesThreshold = 30000.00; // Assumed threshold for other expenses reimbursement
-        if (monthlysalesamount >= otherExpensesThreshold) {
-            return; // The test is only applicable for sales below the threshold
-        }
+        assumeFalse(monthlysalesamount >= otherExpensesThreshold);
 
         ExpenseReimbursementSystem ERS = new ExpenseReimbursementSystem();
         double originalReimbursement = ERS.calculateReimbursementAmount(
@@ -1259,19 +1184,16 @@ public class ERSTestGPT4 {
 
     /**
      * Metamorphic Relation 37: If the actualmonthlymileage is doubled for all staff
-     * levels and the value
-     * exceeds the allowable mileage, the total reimbursement for overuse of the car
-     * should double, assuming
-     * all other inputs remain constant and the cost per kilometer is fixed.
+     * levels and the value exceeds the allowable mileage, the total reimbursement
+     * for overuse of the car should double, assuming all other inputs remain
+     * constant and the cost per kilometer is fixed.
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
     public void test37(String stafflevel, double actualmonthlymileage, double monthlysalesamount,
-            double airfareamount, double otherexpensesamount) {
+            double airfareamount, double otherexpensesamount) { // Fixed
         double allowableMileage = staffAllowableMileage(stafflevel);
-        if (actualmonthlymileage <= allowableMileage) {
-            return; // The test is only applicable if original mileage exceeds the allowable mileage
-        }
+        assumeFalse(actualmonthlymileage <= allowableMileage);
 
         ExpenseReimbursementSystem ERS = new ExpenseReimbursementSystem();
         double originalReimbursement = ERS.calculateReimbursementAmount(
@@ -1287,26 +1209,24 @@ public class ERSTestGPT4 {
         // doubling the actual mileage should result in doubling the fee for overuse of
         // the car.
         double expectedIncreasedReimbursement = originalReimbursement +
-                (doubleMileage - allowableMileage) * costPerKilometer();
+                (doubleMileage - allowableMileage) * costPerKilometer(stafflevel);
         assertEquals(expectedIncreasedReimbursement, updatedReimbursement, 0.01); // Allowing for some floating-point
                                                                                   // imprecision
     }
 
     /**
      * Metamorphic Relation 38: For a "supervisor" transitioning to "manager" with
-     * an increase in monthlysalesamount,
-     * while not exceeding the airfare threshold, the total reimbursement amount
-     * should not decrease given managers
-     * have equal or more privileges compared to supervisors.
+     * an increase in monthlysalesamount, while not exceeding the airfare threshold,
+     * the total reimbursement amount should not decrease given managers have equal
+     * or more privileges compared to supervisors.
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
     public void test38(String stafflevel, double actualmonthlymileage, double monthlysalesamount,
-            double airfareamount, double otherexpensesamount) {
+            double airfareamount, double otherexpensesamount) { // Fixed
         final double airfareThreshold = 20000.00; // Assumed threshold for airfare reimbursement
-        if (!stafflevel.equals("supervisor") || monthlysalesamount >= airfareThreshold) {
-            return; // This test is only applicable to supervisors below the airfare threshold
-        }
+        stafflevel = "supervisor"; // Starting as a supervisor
+        monthlysalesamount = airfareThreshold - 1000.00; // Below the threshold
 
         ExpenseReimbursementSystem ERS = new ExpenseReimbursementSystem();
         double supervisorReimbursement = ERS.calculateReimbursementAmount(
@@ -1324,19 +1244,17 @@ public class ERSTestGPT4 {
 
     /**
      * Metamorphic Relation 39: If monthlysalesamount and airfareamount are swapped
-     * (while the sales amount is less
-     * than the threshold), then the total reimbursement amount should not change
-     * for a "seniormanager" who gets full
+     * (while the sales amount is less than the threshold), then the total
+     * reimbursement amount should not change for a "seniormanager" who gets full
      * airfare reimbursement regardless of sales amount.
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
     public void test39(String stafflevel, double actualmonthlymileage, double monthlysalesamount,
-            double airfareamount, double otherexpensesamount) {
+            double airfareamount, double otherexpensesamount) { // Fixed
         final double airfareThreshold = 20000.00; // Assumed threshold for airfare reimbursement
-        if (!stafflevel.equals("seniormanager") || monthlysalesamount >= airfareThreshold) {
-            return; // This test is only for "seniormanager" with sales below the threshold
-        }
+        stafflevel = "seniormanager"; // Fixed to senior manager for this test
+        monthlysalesamount = airfareThreshold - 1000.00; // Below the threshold
 
         ExpenseReimbursementSystem ERS = new ExpenseReimbursementSystem();
         double originalReimbursement = ERS.calculateReimbursementAmount(
@@ -1353,18 +1271,15 @@ public class ERSTestGPT4 {
 
     /**
      * Metamorphic Relation 40: A modification in stafflevel from "seniormanager" to
-     * "manager" or "supervisor" without
-     * changing other parameters should not result in an increased total
-     * reimbursement amount since "seniormanager"
-     * is presumed to have the highest reimbursement entitlements.
+     * "manager" or "supervisor" without changing other parameters should not result
+     * in an increased total reimbursement amount since "seniormanager" is presumed
+     * to have the highest reimbursement entitlements.
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
     public void test40(String stafflevel, double actualmonthlymileage, double monthlysalesamount,
-            double airfareamount, double otherexpensesamount) {
-        if (!stafflevel.equals("seniormanager")) {
-            return; // This test is specific to "seniormanager" role changes
-        }
+            double airfareamount, double otherexpensesamount) { // Fixed
+        stafflevel = "seniormanager"; // Fixed to senior manager for this test
 
         ExpenseReimbursementSystem ERS = new ExpenseReimbursementSystem();
         double seniorManagerReimbursement = ERS.calculateReimbursementAmount(
