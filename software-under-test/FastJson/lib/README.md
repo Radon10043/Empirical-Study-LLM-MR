@@ -6,6 +6,8 @@ commons-lang3: [download](https://central.sonatype.com/artifact/org.apache.commo
 
 fastjson-1.2.83: [download](https://repo1.maven.org/maven2/com/alibaba/fastjson/1.2.83/)
 
+gson-2.10.1: [download]()
+
 # Commands
 
 ```sh
