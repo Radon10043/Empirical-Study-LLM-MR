@@ -1,7 +1,6 @@
 package test;
 
 import org.joda.time.DateTime;
-import org.joda.time.Duration;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
