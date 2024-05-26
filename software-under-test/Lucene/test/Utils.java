@@ -55,7 +55,23 @@ public class Utils {
      * @throws Exception
      */
     public static ArrayList<String> fullTextSearch(String index_dir, ArrayList<String> search_terms) throws Exception {
+        /* 将搜索项转换为String对象 */
+        String s = "";
+        for (String term : search_terms) {
+            s += term + " ";
+        }
+        return fullTextSearch(index_dir, s);
+    }
 
+    /**
+     * 根据搜索项进行全文检索
+     * 
+     * @param index_dir    索引文件所在目录
+     * @param search_terms 搜索项
+     * @return 符合搜索项的所有文件的路径
+     * @throws Exception
+     */
+    public static ArrayList<String> fullTextSearch(String index_dir, String search_terms) throws Exception {
         /* @formatter:off */
         FSDirectory     directory   = FSDirectory.getDirectory(new File(index_dir), false);
         IndexSearcher   searcher    = new IndexSearcher(directory);
@@ -63,11 +79,7 @@ public class Utils {
         /* @formatter:on */
 
         /* 将搜索项转换为Query对象 */
-        String s = "";
-        for (String term : search_terms) {
-            s += term + " ";
-        }
-        Query query = parser.parse(s);
+        Query query = parser.parse(search_terms);
 
         /* 寻找与搜索项匹配的文件, 并将路径存入result */
         Hits hits = searcher.search(query);
@@ -78,6 +90,5 @@ public class Utils {
 
         /* 返回所有符合搜索项的文件的路径 */
         return result;
-
     }
 }

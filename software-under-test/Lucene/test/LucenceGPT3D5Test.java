@@ -18,7 +18,6 @@ import java.util.concurrent.Future;
 import java.util.stream.Stream;
 
 import org.apache.lucene.analysis.StopAnalyzer;
-import org.apache.lucene.document.Document;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -103,7 +102,7 @@ public class LucenceGPT3D5Test {
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
-    public void test3(String index_dir, ArrayList<String> search_terms) throws Exception {
+    public void test3(String index_dir, ArrayList<String> search_terms) throws Exception {  // Fixed
         /* Get source output */
         ArrayList<String> source_out = Utils.fullTextSearch(index_dir, search_terms);
 
@@ -114,6 +113,9 @@ public class LucenceGPT3D5Test {
 
         /* Get follow-up output */
         ArrayList<String> follow_out = Utils.fullTextSearch(index_dir, follow_search_terms);
+
+        Collections.sort(source_out);
+        Collections.sort(follow_out);
 
         /* Verification */
         assertEquals(source_out, follow_out);
@@ -318,7 +320,7 @@ public class LucenceGPT3D5Test {
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
-    public void test10(String index_dir, ArrayList<String> search_terms) throws Exception {
+    public void test10(String index_dir, ArrayList<String> search_terms) throws Exception { // Fixed
         /* Get source output */
         ArrayList<String> source_out = Utils.fullTextSearch(index_dir, search_terms);
 
@@ -329,9 +331,14 @@ public class LucenceGPT3D5Test {
                 follow_search_terms.add(term);
             }
         }
+
+        assumeTrue(follow_search_terms.size() > 0);
+
         if (isKeyword(follow_search_terms.get(0))) {
             follow_search_terms.remove(0);
         }
+
+        assumeTrue(follow_search_terms.size() > 0);
 
         /* Get follow-up output */
         ArrayList<String> follow_out = Utils.fullTextSearch(index_dir, follow_search_terms);
@@ -441,7 +448,7 @@ public class LucenceGPT3D5Test {
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
-    public void test15(String index_dir, ArrayList<String> search_terms) throws Exception {
+    public void test15(String index_dir, ArrayList<String> search_terms) throws Exception { // Fixed
         /* Get source output */
         ArrayList<String> source_out = Utils.fullTextSearch(index_dir, search_terms);
 
@@ -452,9 +459,18 @@ public class LucenceGPT3D5Test {
                 follow_search_terms.add(term);
             }
         }
+
+        assumeTrue(follow_search_terms.size() > 0);
+
+        if (follow_search_terms.size() == 2 && isKeyword(follow_search_terms.get(1))) {
+            follow_search_terms.remove(1);
+        }
+
         if (isKeyword(follow_search_terms.get(0))) {
             follow_search_terms.remove(0);
         }
+
+        assumeTrue(follow_search_terms.size() > 0);
 
         /* Get follow-up output */
         ArrayList<String> follow_out = Utils.fullTextSearch(index_dir, follow_search_terms);
@@ -672,7 +688,7 @@ public class LucenceGPT3D5Test {
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
-    public void test25(String index_dir, ArrayList<String> search_terms) throws Exception {
+    public void test25(String index_dir, ArrayList<String> search_terms) throws Exception { // Fixed
         /* Get source output */
         ArrayList<String> source_out = Utils.fullTextSearch(index_dir, search_terms);
 
@@ -682,6 +698,9 @@ public class LucenceGPT3D5Test {
 
         /* Get follow-up output */
         ArrayList<String> follow_out = Utils.fullTextSearch(index_dir, follow_search_terms);
+
+        Collections.sort(source_out);
+        Collections.sort(follow_out);
 
         /* Verification */
         assertEquals(source_out, follow_out);
