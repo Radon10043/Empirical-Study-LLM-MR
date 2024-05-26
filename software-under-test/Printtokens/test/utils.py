@@ -2,25 +2,32 @@
 Author: Radon
 Date: 2024-01-09 17:27:20
 LastEditors: Radon
-LastEditTime: 2024-02-13 18:09:40
+LastEditTime: 2024-05-26 01:59:18
 Description: Hi, say something
 """
 
 import os
 import shutil
 import string
+import unittest
+import subprocess, time, sys
+import random
+import re
+
+from parameterized import parameterized
 
 from random import randint
 
 
 # fmt:off
 # ==================== GLOBAL BARIABLES ====================
-RANGE_LINE   = (1, 100)
-RANGE_SMALL  = (1, 5)
-RANGE_LARGE  = (1, 100)
-RANGE_COUNT  = (1, 10)
-KEYWORDS     = ["lambda", "and", "or", "if", "xor"]
-SPECIAL      = ["(", ")", "[", "]", "'", "`", ",", "=>"]
+RANGE_LINE          = (1, 100)
+RANGE_SMALL         = (1, 5)
+RANGE_LARGE         = (1, 100)
+RANGE_COUNT         = (1, 10)
+KEYWORDS            = ["lambda", "and", "or", "if", "xor"]
+SPECIAL             = ["(", ")", "[", "]", "'", "`", ",", "=>"]
+PRINT_TOKENS_PATH   = os.path.join(os.path.dirname(__file__), "..", "src", "print_tokens.out")
 # ==========================================================
 # fmt:on
 
@@ -152,6 +159,32 @@ def gen_tcs_randomly(num: int):
         f.close()
 
     print("\nDone!")
+
+
+def load_test_cases(num: int) -> list:
+    """读取所有测试用例
+
+    Parameters
+    ----------
+    num : int
+        测试用例数量
+
+    Returns
+    -------
+    list
+        存储测试用例内容的列表
+    """
+    gen_tcs_randomly(num)
+
+    tcs_dir = os.path.join(os.path.dirname(__file__), "..", "testcases")
+    tcs = list()
+
+    # 遍历存储测试用例的根目录, 依次读取文件
+    for file in os.listdir(tcs_dir):
+        with open(os.path.join(tcs_dir, file), "r") as f:
+            tcs.append(f.read())
+
+    return tcs
 
 
 if __name__ == "__main__":

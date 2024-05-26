@@ -5,7 +5,7 @@ import random
 from parameterized import parameterized
 
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
-from generate import *
+from test.utils import *
 
 # GLOBAL VRAIABLES
 PRINT_TOKENS_PATH = os.path.join(os.path.dirname(__file__), "..", "..", "src", "print_tokens.out")
