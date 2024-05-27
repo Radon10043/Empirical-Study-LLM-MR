@@ -12,12 +12,12 @@ class TestingClass(unittest.TestCase):
         format rather than the match count.
         """
         # Search with the original pattern
-        process = os.popen(f"{GREP_PATH} -c {pattern} {file}")
+        process = os.popen(f"{GREP_PATH} -c -f {pattern} {file}")
         original_matches = int(process.read().strip())
         process.close()
 
         # Search with the pattern using after context control 'A'
-        process = os.popen(f"{GREP_PATH} -A 1 -c {pattern} {file}")
+        process = os.popen(f"{GREP_PATH} -A 1 -c -f {pattern} {file}")
         with_after_context_matches = int(process.read().strip())
         process.close()
 

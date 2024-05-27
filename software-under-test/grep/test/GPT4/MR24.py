@@ -12,12 +12,12 @@ class TestingClass(unittest.TestCase):
         options should yield the same results.
         """
         # Get source output with the fixed-strings option
-        process = os.popen(f"{GREP_PATH} -F -c {pattern} {file}")
+        process = os.popen(f"{GREP_PATH} -F -c -f {pattern} {file}")
         source_matches = int(process.read().strip())
         process.close()
 
         # Get follow-up output with a basic regular expression
-        process = os.popen(f"{GREP_PATH} -c {pattern} {file}")
+        process = os.popen(f"{GREP_PATH} -c -f {pattern} {file}")
         follow_matches = int(process.read().strip())
         process.close()
 

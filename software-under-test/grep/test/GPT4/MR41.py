@@ -11,15 +11,19 @@ class TestingClass(unittest.TestCase):
         same number of matches as searching with the pattern without the group.
         """
         # Search with the original pattern
-        process = os.popen(f"{GREP_PATH} -c {pattern} {file}")
+        process = os.popen(f"{GREP_PATH} -c -f {pattern} {file}")
         original_matches = int(process.read().strip())
         process.close()
 
-        # Create a pattern with a group
-        grouped_pattern = f"({pattern})"
+        grouped_pattern = os.path.join(os.path.dirname(pattern), "grouped_pattern.txt")
+        tmp = str()
+        with open(pattern, "r") as f:
+            tmp = f.read()
+        with open(grouped_pattern, "w") as f:
+            f.write(f"({tmp})")
 
         # Search with the grouped pattern
-        process = os.popen(f"{GREP_PATH} -E -c {grouped_pattern} {file}")
+        process = os.popen(f"{GREP_PATH} -E -c -f {grouped_pattern} {file}")
         grouped_matches = int(process.read().strip())
         process.close()
 

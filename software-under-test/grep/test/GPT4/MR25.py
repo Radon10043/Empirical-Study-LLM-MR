@@ -12,17 +12,17 @@ class TestingClass(unittest.TestCase):
         two separate searches.
         """
         # Get source output from searching the first file
-        process = os.popen(f"{GREP_PATH} -c {pattern} {file1}")
+        process = os.popen(f"{GREP_PATH} -c -f {pattern} {file1}")
         file1_matches = int(process.read().strip())
         process.close()
 
         # Get source output from searching the second file
-        process = os.popen(f"{GREP_PATH} -c {pattern} {file2}")
+        process = os.popen(f"{GREP_PATH} -c -f {pattern} {file2}")
         file2_matches = int(process.read().strip())
         process.close()
 
         # Search in both files together without printing filenames
-        process = os.popen(f"{GREP_PATH} --no-filename -c {pattern} {file1} {file2}")
+        process = os.popen(f"{GREP_PATH} --no-filename -c -f {pattern} {file1} {file2}")
         combined_matches = int(process.read().strip())
         process.close()
 

@@ -6,17 +6,17 @@ from utils import *
 
 class TestingClass(unittest.TestCase):
     @parameterized.expand(load_test_cases(1000))
-    def test8(self, pattern: str, file: str):
+    def test8(self, pattern: str, file: str):   # Fixed
         """Metamorphic Relation 8: When using the line-number option, the number of distinct line numbers
         in the output should be equal to the number of lines returned without using the line-number option.
         """
         # Get source output
-        process = os.popen(f"{GREP_PATH} {pattern} {file}")
+        process = os.popen(f"{GREP_PATH} -f {pattern} {file}")
         source_lines = process.readlines()
         process.close()
 
         # Get follow-up output with line-number
-        process = os.popen(f"{GREP_PATH} -n {pattern} {file}")
+        process = os.popen(f"{GREP_PATH} -n -f {pattern} {file}")
         follow_lines = process.readlines()
         follow_line_numbers = {int(line.split(":", 1)[0]) for line in follow_lines}
         process.close()

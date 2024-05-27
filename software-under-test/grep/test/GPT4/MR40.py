@@ -11,15 +11,19 @@ class TestingClass(unittest.TestCase):
         if the file searched is symmetrical around its midpoint.
         """
         # Search with the original pattern
-        process = os.popen(f"{GREP_PATH} -c {pattern} {file}")
+        process = os.popen(f"{GREP_PATH} -c -f {pattern} {file}")
         original_matches = int(process.read().strip())
         process.close()
 
-        # Create a reversed pattern by reversing the order of characters in the original pattern
-        reversed_pattern = pattern[::-1]
+        reversed_pattern = os.path.join(os.path.dirname(pattern), "reversed_pattern.txt")
+        tmp = str()
+        with open(pattern, "r") as f:
+            tmp = f.read()
+        with open(reversed_pattern, "w") as f:
+            f.write(tmp[::-1])
 
         # Search with the reversed pattern
-        process = os.popen(f"{GREP_PATH} -c {reversed_pattern} {file}")
+        process = os.popen(f"{GREP_PATH} -c -f {reversed_pattern} {file}")
         reversed_matches = int(process.read().strip())
         process.close()
 

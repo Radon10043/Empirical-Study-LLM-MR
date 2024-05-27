@@ -11,17 +11,17 @@ class TestingClass(unittest.TestCase):
         the number of matches equal to the sum of matches from each file when searched separately.
         """
         # Search in the first file
-        process = os.popen(f"{GREP_PATH} -c {pattern} {file1}")
+        process = os.popen(f"{GREP_PATH} -c -f {pattern} {file1}")
         file1_matches = int(process.read().strip())
         process.close()
 
         # Search in the second file
-        process = os.popen(f"{GREP_PATH} -c {pattern} {file2}")
+        process = os.popen(f"{GREP_PATH} -c -f {pattern} {file2}")
         file2_matches = int(process.read().strip())
         process.close()
 
         # Concatenate files
-        concatenated_file = f"{file1}{file2}"
+        concatenated_file = os.path.join(os.path.dirname(file1), "concatenated_files.txt")
         with open(concatenated_file, "w") as outfile:
             with open(file1, "r") as file1_content:
                 outfile.write(file1_content.read())

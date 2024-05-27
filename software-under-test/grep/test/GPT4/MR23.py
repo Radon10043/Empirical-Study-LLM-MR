@@ -6,22 +6,24 @@ from utils import *
 
 class TestingClass(unittest.TestCase):
     @parameterized.expand(load_test_cases(1000))
-    def test23(self, pattern: str, file: str):
+    def test23(self, pattern: str, file: str):  # Fixed
         """Metamorphic Relation 23: Inverting a match and then inverting it again should result in the
         same number of matches as the original query.
         """
+        self.fail("Illegal MR")
+
         # Get source output by searching with the original pattern
-        process = os.popen(f"{GREP_PATH} -c {pattern} {file}")
+        process = os.popen(f"{GREP_PATH} -c -f {pattern} {file}")
         source_matches = int(process.read().strip())
         process.close()
 
         # Invert match of the original pattern
-        process = os.popen(f"{GREP_PATH} -v -c {pattern} {file}")
+        process = os.popen(f"{GREP_PATH} -v -c -f {pattern} {file}")
         invert_match1 = int(process.read().strip())
         process.close()
 
         # Invert match again
-        process = os.popen(f"{GREP_PATH} -v -c {pattern} {file} | {GREP_PATH} -v -c")
+        process = os.popen(f"{GREP_PATH} -v -c -f {pattern} {file} | {GREP_PATH} -v -c")
         invert_match2 = int(process.read().strip())
         process.close()
 

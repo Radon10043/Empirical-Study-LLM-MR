@@ -6,21 +6,21 @@ from utils import *
 
 class TestingClass(unittest.TestCase):
     @parameterized.expand(load_test_cases(1000))
-    def test35(self, pattern: str, file: str):
+    def test35(self, pattern: str, file: str):  # Fixed
         """Metamorphic Relation 35: Running 'grep' with a pattern on a symlink to a file should yield
         the same matches as running 'grep' on the original file.
         """
         # Get output from the original file
-        process = os.popen(f"{GREP_PATH} -c {pattern} {file}")
+        process = os.popen(f"{GREP_PATH} -c -f {pattern} {file}")
         original_matches = int(process.read().strip())
         process.close()
 
         # Create a symlink to the original file
-        symlink = f"{file}_symlink"
+        symlink = os.path.join(os.path.dirname(file), f"{file}_symlink")
         os.symlink(file, symlink)
 
         # Get output from the symlink
-        process = os.popen(f"{GREP_PATH} -c {pattern} {symlink}")
+        process = os.popen(f"{GREP_PATH} -c -f {pattern} {symlink}")
         symlink_matches = int(process.read().strip())
         process.close()
 

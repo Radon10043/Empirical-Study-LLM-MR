@@ -6,17 +6,17 @@ from utils import *
 
 class TestingClass(unittest.TestCase):
     @parameterized.expand(load_test_cases(1000))
-    def test4(self, pattern: str, file: str):
+    def test4(self, pattern: str, file: str):   # Fixed
         """Metamorphic Relation 4: If the invert-match option is used, the sum of the counts of matching 
         and non-matching lines should be equal to the total number of lines in the file.
         """
         # Get source output
-        process = os.popen(f"{GREP_PATH} -c {pattern} {file}")
+        process = os.popen(f"{GREP_PATH} -c -f {pattern} {file}")
         source_count = int(process.read().strip())
         process.close()
 
         # Get follow-up output with invert-match
-        process = os.popen(f"{GREP_PATH} -v -c {pattern} {file}")
+        process = os.popen(f"{GREP_PATH} -v -c -f {pattern} {file}")
         follow_count = int(process.read().strip())
         process.close()
 

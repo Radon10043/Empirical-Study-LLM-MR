@@ -11,12 +11,12 @@ class TestingClass(unittest.TestCase):
         to standard input should yield the same results as searching in both files separately.
         """
         # Search in the first file
-        process = os.popen(f"{GREP_PATH} -c {pattern} {file1}")
+        process = os.popen(f"{GREP_PATH} -c -f {pattern} {file1}")
         file1_matches = int(process.read().strip())
         process.close()
 
         # Search in the second file redirected to stdin
-        process = os.popen(f"cat {file2} | {GREP_PATH} -c {pattern}")
+        process = os.popen(f"cat {file2} | {GREP_PATH} -c -f {pattern}")
         file2_stdin_matches = int(process.read().strip())
         process.close()
 

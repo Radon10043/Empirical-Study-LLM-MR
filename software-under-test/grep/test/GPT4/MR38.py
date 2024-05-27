@@ -13,12 +13,12 @@ class TestingClass(unittest.TestCase):
         files = [file1, file2]
 
         # Search for files with matches
-        process = os.popen(f"{GREP_PATH} -l {pattern} " + " ".join(files))
+        process = os.popen(f"{GREP_PATH} -l -f {pattern} " + " ".join(files))
         files_with_matches = set(process.read().strip().split('\n'))
         process.close()
 
         # Search for files without matches
-        process = os.popen(f"{GREP_PATH} -L {pattern} " + " ".join(files))
+        process = os.popen(f"{GREP_PATH} -L -f {pattern} " + " ".join(files))
         files_without_matches = set(process.read().strip().split('\n'))
         process.close()
 

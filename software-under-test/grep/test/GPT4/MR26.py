@@ -11,15 +11,20 @@ class TestingClass(unittest.TestCase):
         should yield at least the same number of matches as the original pattern or more.
         """
         # Get source output with the original pattern
-        process = os.popen(f"{GREP_PATH} -E -c {pattern} {file}")
+        process = os.popen(f"{GREP_PATH} -E -c -f {pattern} {file}")
         source_matches = int(process.read().strip())
         process.close()
 
         # Append an optional character with '?'
-        modified_pattern = f"{pattern}a?"
+        follow_pattern = os.path.join(os.path.dirname(pattern), "follow_pattern.txt")
+        tmp = str()
+        with open(pattern, "r") as f:
+            tmp = f.read().strip()
+        with open(follow_pattern, "w") as f:
+            f.write(f"{tmp}a?")
 
         # Get follow-up output with the modified pattern
-        process = os.popen(f"{GREP_PATH} -E -c {modified_pattern} {file}")
+        process = os.popen(f"{GREP_PATH} -E -c -f {follow_pattern} {file}")
         follow_matches = int(process.read().strip())
         process.close()
 

@@ -6,17 +6,17 @@ from utils import *
 
 class TestingClass(unittest.TestCase):
     @parameterized.expand(load_test_cases(1000))
-    def test17(self, pattern: str, file: str):
+    def test17(self, pattern: str, file: str):  # Fixed
         """Metamorphic Relation 17: A pattern search with the '--extended-regexp' option
         followed by disabling it should yield fewer or the same matches.
         """
         # Extended regexp search
-        process = os.popen(f"{GREP_PATH} -E -c {pattern} {file}")
+        process = os.popen(f"{GREP_PATH} -E -c -f {pattern} {file}")
         extended_regexp_matches = int(process.read().strip())
         process.close()
 
         # Basic regexp search
-        process = os.popen(f"{GREP_PATH} -c {pattern} {file}")
+        process = os.popen(f"{GREP_PATH} -c -f {pattern} {file}")
         basic_regexp_matches = int(process.read().strip())
         process.close()
 

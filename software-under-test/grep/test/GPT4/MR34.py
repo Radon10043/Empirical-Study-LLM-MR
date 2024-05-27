@@ -5,19 +5,19 @@ from utils import *
 
 
 class TestingClass(unittest.TestCase):
-    @parameterized.expand(load_test_cases(1000))
+    @parameterized.expand(load_test_cases_combinations(1000))
     def test34(self, pattern: str, file1: str, file2: str):
         """Metamorphic Relation 34: Searching for a pattern in two files with '--no-messages' should not
         report errors for non-existing files, and the number of matches should only count from existing
         files.
         """
         # Search in the existing file
-        process = os.popen(f"{GREP_PATH} -c {pattern} {file1}")
+        process = os.popen(f"{GREP_PATH} -c -f {pattern} {file1}")
         existing_file_matches = int(process.read().strip())
         process.close()
 
         # Search in both existing and non-existing files with no error messages
-        process = os.popen(f"{GREP_PATH} --no-messages -c {pattern} {file1} nonexistent_file {file2}")
+        process = os.popen(f"{GREP_PATH} --no-messages -c -f {pattern} {file1} nonexistent_file {file2}")
         combined_matches = process.read().strip()
         process.close()
 
@@ -25,7 +25,7 @@ class TestingClass(unittest.TestCase):
         # If file2 exists, combined_matches should be the sum of matches in file1 and file2.
         # If file2 does not exist, combined_matches should be equal to existing_file_matches.
         if os.path.exists(file2):
-            process = os.popen(f"{GREP_PATH} -c {pattern} {file2}")
+            process = os.popen(f"{GREP_PATH} -c -f {pattern} {file2}")
             file2_matches = int(process.read().strip())
             process.close()
             combined_expected = existing_file_matches + file2_matches

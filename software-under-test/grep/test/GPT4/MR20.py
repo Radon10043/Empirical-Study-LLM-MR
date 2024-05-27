@@ -6,17 +6,17 @@ from utils import *
 
 class TestingClass(unittest.TestCase):
     @parameterized.expand(load_test_cases(1000))
-    def test20(self, pattern: str, file: str):
+    def test20(self, pattern: str, file: str):  # Fixed
         """Metamorphic Relation 20: Running grep with and without '--binary-files=text' on a text file
         should not change the number of matches found.
         """
         # Normal pattern search
-        process = os.popen(f"{GREP_PATH} -c {pattern} {file}")
+        process = os.popen(f"{GREP_PATH} -c -f {pattern} {file}")
         normal_matches = int(process.read().strip())
         process.close()
 
         # Pattern search treating binary files as text
-        process = os.popen(f"{GREP_PATH} --binary-files=text -c {pattern} {file}")
+        process = os.popen(f"{GREP_PATH} --binary-files=text -c -f {pattern} {file}")
         binary_as_text_matches = int(process.read().strip())
         process.close()
 
