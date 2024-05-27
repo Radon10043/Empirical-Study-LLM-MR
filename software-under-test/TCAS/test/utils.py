@@ -2,7 +2,7 @@
 Author: Radon
 Date: 2024-01-10 21:23:15
 LastEditors: Radon
-LastEditTime: 2024-05-27 11:09:07
+LastEditTime: 2024-05-27 14:18:29
 Description: Hi, say something
 """
 import os
@@ -18,13 +18,12 @@ from random import randint
 
 # fmt:off
 # ==================== GLOBAL VRAIABLES ====================
-TETSCASE_NUM           = 1000
 RANGE_VALUE            = (0, 1000)
 RANGE_ALT_LAYER_VALUE  = (0, 3)
 RANGE_OTEHER_RAC       = (0, 2)
 RANGE_OTHER_CAPABILITY = (1, 2)
 RANGE_CLIMB_INHIBIT    = (0, 1)
-TCAS_PATH              = os.path.join(os.path.dirname(__file__), "..", "..", "src", "tcas.out")
+TCAS_PATH              = os.path.join(os.path.dirname(__file__), "..", "src", "tcas.out")
 
 INDEX = {
     "Cur_Vertical_Sep"          : 0,
@@ -68,7 +67,7 @@ def gen_tcs_randomly(num: int):
         shutil.rmtree(tcs_dir)
     os.mkdir(tcs_dir)
 
-    for i in range(TETSCASE_NUM):
+    for i in range(num):
         print(f"\rGenerating testcase {i}", end="")
         Cur_Vertical_Sep = randint(*RANGE_VALUE)
         High_Confidence = randint(*RANGE_VALUE)
@@ -101,7 +100,7 @@ def load_test_cases(num: int) -> list:
     """
     gen_tcs_randomly(num)
 
-    tcs_dir = os.path.join(os.path.dirname(__file__), "..", "..", "testcases")
+    tcs_dir = os.path.join(os.path.dirname(__file__), "..", "testcases")
     tcs = list()
 
     # 遍历存储测试用例的根目录, 依次读取文件
@@ -131,7 +130,3 @@ def run_TCAS(vals: list) -> str:
     cmd_list.extend(tmp_list)
     output = subprocess.check_output(cmd_list, text=True).split("\n")
     return output
-
-
-if __name__ == "__main__":
-    gen_tcs_randomly()
