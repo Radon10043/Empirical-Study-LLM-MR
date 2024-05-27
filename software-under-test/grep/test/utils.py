@@ -2,20 +2,25 @@
 Author: Radon
 Date: 2024-01-09 15:59:19
 LastEditors: Radon
-LastEditTime: 2024-02-13 16:29:29
+LastEditTime: 2024-05-27 14:49:21
 Description: Hi, say something
 """
-import os, shutil
+import os
+import sys
+import shutil
+import unittest
 
 from random import randint
 from string import ascii_letters, digits
+from parameterized import parameterized
 
 
 # fmt:off
 # ========== GLOBAL VARIABLES ==========
-RANGE_TEXT_LINE   = (1, 1000)   # 文本文件行数范围
-RANGE_TEXT_LEN    = (1, 100)    # 文本文件行长度范围
-RANGE_PATTERN_LEN = (1, 5)     # 搜索项长度范围
+RANGE_TEXT_LINE     = (1, 1000)   # 文本文件行数范围
+RANGE_TEXT_LEN      = (1, 100)    # 文本文件行长度范围
+RANGE_PATTERN_LEN   = (1, 5)     # 搜索项长度范围
+GREP_PATH           = os.path.join(os.path.dirname(__file__), "..", "src", "grep-3.11", "obj-temp", "src", "grep")
 # ======================================
 # fmt:on
 
@@ -140,5 +145,60 @@ def gen_tcs_randomly_combination(num: int):
     print(f"{num} testcases are created!")
 
 
-if __name__ == "__main__":
-    gen_tcs_randomly()
+def load_test_cases(num: int) -> list:
+    """加载测试用例
+
+    Parameters
+    ----------
+    num : int
+        测试用例数量
+
+    Returns
+    -------
+    list
+        _description_
+    """
+    # 每次测试开始前先创建测试用例
+    gen_tcs_randomly(num)
+
+    tc_dir = os.path.join(os.path.dirname(__file__), "..", "testcases")  # 文件系统中存储所有测试用例的根目录
+    dirs = [os.path.join(tc_dir, dir) for dir in os.listdir(tc_dir)]  # 存储了测试用例文件路径的列表
+    testcases = list()  # 用于存储所有测试用例的列表
+
+    # 遍历存储了测试用例的文件夹, 读取测试用例的内容
+    for dir in dirs:
+        pattern_path = os.path.join(dir, "pattern.txt")
+        text_path = os.path.join(dir, "text.txt")  # 获取要进行搜索的文本路径
+        testcases.append((pattern_path, text_path))
+
+    return testcases
+
+
+def load_test_cases_combinations(num: int) -> list:
+    """加载测试用例
+
+    Parameters
+    ----------
+    num : int
+        测试用例数量
+
+    Returns
+    -------
+    list
+        text1, text2和pattern文件的地址
+    """
+    # 每次测试开始前先创建测试用例
+    gen_tcs_randomly_combination(num)
+
+    tc_dir = os.path.join(os.path.dirname(__file__), "..", "testcases")  # 文件系统中存储所有测试用例的根目录
+    dirs = [os.path.join(tc_dir, dir) for dir in os.listdir(tc_dir)]  # 存储了测试用例文件路径的列表
+    testcases = list()  # 用于存储所有测试用例的列表
+
+    # 遍历存储了测试用例的文件夹, 读取测试用例的内容
+    for dir in dirs:
+        pattern_path = os.path.join(dir, "pattern.txt")
+        text1_path = os.path.join(dir, "text1.txt")  # 获取要进行搜索的文本路径
+        text2_path = os.path.join(dir, "text2.txt")  # 获取要进行搜索的文本路径
+        testcases.append((pattern_path, text1_path, text2_path))
+
+    return testcases
