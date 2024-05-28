@@ -14,13 +14,13 @@ class TestingClass(unittest.TestCase):
         proc.close()
 
     @parameterized.expand(load_test_cases(1000))
-    def test15(self, tc: str):
+    def test15(self, tc: str):  # Fixed
         """Metamorphic Relation 15: Appending code that does not introduce new tokens or affect state (e.g., comments or non-executed lines like those after a return in the main function) should not change the token output."""
         # Get source output
         source_out = subprocess.check_output(PRINT_TOKENS_PATH, input=tc, text=True).split("\n")
 
         # Construct follow-up input by appending non-affecting comments or code
-        follow_tc = tc + "\n" + "// This is a comment line\nreturn;"  # Using return to simulate unreachable code
+        follow_tc = tc + "\n" + "; This is a comment line"  # Using return to simulate unreachable code
 
         # Get follow-up output
         follow_out = subprocess.check_output(PRINT_TOKENS_PATH, input=follow_tc, text=True).split("\n")

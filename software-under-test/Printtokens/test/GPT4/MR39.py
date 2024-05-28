@@ -18,6 +18,8 @@ class TestingClass(unittest.TestCase):
         """Metamorphic Relation 39: Duplicating lines while preserving the order of tokens should duplicate tokens."""
         # Get source output
         source_output = subprocess.check_output(PRINT_TOKENS_PATH, input=tc, text=True).split("\n")
+        for _ in range(2):
+            source_output.pop()
 
         # Construct follow-up input
         # Duplicate each line to see if token order is preserved
@@ -25,6 +27,8 @@ class TestingClass(unittest.TestCase):
 
         # Get follow-up output and extract tokens
         follow_up_output = subprocess.check_output(PRINT_TOKENS_PATH, input=follow_up_input, text=True).split("\n")
+        for _ in range(2):
+            follow_up_output.pop()
 
         # Verification
         # Compare the doubled source output to the follow-up output

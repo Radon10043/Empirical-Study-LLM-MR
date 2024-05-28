@@ -14,13 +14,13 @@ class TestingClass(unittest.TestCase):
         proc.close()
 
     @parameterized.expand(load_test_cases(1000))
-    def test17(self, tc: str):
+    def test17(self, tc: str):  # Fixed
         """Metamorphic Relation 17: Inserting comments between tokens should not change the output."""
         # Get source output
         source_out = subprocess.check_output(PRINT_TOKENS_PATH, input=tc, text=True).split("\n")
 
         # Construct follow-up input with comments inserted between tokens
-        follow_tc = tc.replace(" ", " //comment// ")
+        follow_tc = tc.replace(" ", " ;comment ")
 
         # Get follow-up output
         follow_out = subprocess.check_output(PRINT_TOKENS_PATH, input=follow_tc, text=True).split("\n")

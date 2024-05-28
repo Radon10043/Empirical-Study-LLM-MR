@@ -14,7 +14,7 @@ class TestingClass(unittest.TestCase):
         proc.close()
 
     @parameterized.expand(load_test_cases(1000))
-    def test34(self, tc: str):
+    def test34(self, tc: str):  # Fixed
         """Metamorphic Relation 34: Swapping the order of independent function calls should not change the set of tokens."""
         # Get source output
         source_out = set(subprocess.check_output(PRINT_TOKENS_PATH, input=tc, text=True).split("\n"))
@@ -25,13 +25,20 @@ class TestingClass(unittest.TestCase):
         if len(lines_with_function_calls) > 1:
             lines_with_function_calls[0], lines_with_function_calls[1] = lines_with_function_calls[1], lines_with_function_calls[0]
 
-        follow_tc = "\n".join(lines_with_function_calls if line.endswith('();') else line for line in lines)
+        follow_tc = str()
+        index = 0
+        for line in lines:
+            if line.endswith('();'):
+                follow_tc += lines_with_function_calls[index] + "\n"
+                index += 1
+            else:
+                follow_tc += line + "\n"
 
         # Get follow-up output
         follow_out = set(subprocess.check_output(PRINT_TOKENS_PATH, input=follow_tc, text=True).split("\n"))
 
         # Verification - Check whether the set of tokens remains unchanged
-        self.assertEqual(source_out, follow_out)
+        self.assertEqual(set(source_out), set(follow_out))
 
 
 if __name__ == "__main__":
