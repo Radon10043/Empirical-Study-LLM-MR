@@ -15,3 +15,9 @@ For GPT3.5:
 ```shell
 for i in {3..42}; do ./run.sh GPT3D5 MR$i 5; done | tee testcases.validate.md
 ```
+
+For GPT4:
+
+```shell
+for i in {3..42}; do ./run.sh GPT4 MR$i 5; done | tee testcases.validate.md
+```
