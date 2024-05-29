@@ -14,13 +14,13 @@ class TestingClass(unittest.TestCase):
         proc.close()
 
     @parameterized.expand(load_test_cases(1000))
-    def test17(self, tc: str):
+    def test17(self, tc: str):  # Fixed
         """Metamorphic Relation 17: Adding a new token of a different type at the end should increase the token count."""
         # Get source output
         source_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=tc, text=True).split("\n")
 
         # Construct follow-up input by adding a different type of token at the end (e.g., a numeric when it was originally a string)
-        follow_tc = f"{tc} 123"
+        follow_tc = f"{tc} 123\n"
 
         # Get follow-up output
         follow_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=follow_tc, text=True).split("\n")

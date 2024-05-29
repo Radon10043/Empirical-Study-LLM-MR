@@ -14,13 +14,13 @@ class TestingClass(unittest.TestCase):
         proc.close()
 
     @parameterized.expand(load_test_cases(1000))
-    def test16(self, tc: str):
+    def test16(self, tc: str):  # Fixed
         """Metamorphic Relation 16: Enclosing the entire input within a comment block should result in no tokens being output."""
         # Get source output
         source_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=tc, text=True).split("\n")
 
         # Construct follow-up input by enclosing the entire input within a comment block
-        follow_tc = f"/*{tc}*/"
+        follow_tc = f";{tc}"
 
         # Get follow-up output
         follow_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=follow_tc, text=True).split("\n")

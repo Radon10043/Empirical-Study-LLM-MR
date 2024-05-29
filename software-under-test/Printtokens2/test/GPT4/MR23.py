@@ -14,13 +14,13 @@ class TestingClass(unittest.TestCase):
         proc.close()
 
     @parameterized.expand(load_test_cases(1000))
-    def test23(self, tc: str):
+    def test23(self, tc: str):  # Fixed
         """Metamorphic Relation 23: Changing tokens within a single-line comment should not affect the output tokens."""
         # Get source output
         source_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=tc, text=True).split("\n")
 
         # Construct follow-up input by modifying tokens within single-line comments
-        follow_tc = re.sub(r'//(.*?)$', lambda m: '// modified_comment', tc, flags=re.MULTILINE)
+        follow_tc = re.sub(r';(.*?)$', lambda m: '; modified_comment', tc, flags=re.MULTILINE)
 
         # Get follow-up output
         follow_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=follow_tc, text=True).split("\n")

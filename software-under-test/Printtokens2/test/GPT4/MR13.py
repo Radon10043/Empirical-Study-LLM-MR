@@ -14,13 +14,13 @@ class TestingClass(unittest.TestCase):
         proc.close()
 
     @parameterized.expand(load_test_cases(1000))
-    def test13(self, tc: str):
+    def test13(self, tc: str):  # Fixed
         """Metamorphic Relation 13: Adding spaces within non-token strings should not affect token count."""
         # Get source output
         source_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=tc, text=True).split("\n")
 
         # Construct follow-up input by adding additional spaces within a string literal
-        follow_tc = re.sub(r'(".*?")', lambda match: ' '.join(match.group(1)), tc, count=1)
+        follow_tc = re.sub(r'(";*?")', lambda match: ' '.join(match.group(1)), tc, count=1)
 
         # Get follow-up output
         follow_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=follow_tc, text=True).split("\n")

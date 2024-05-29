@@ -14,7 +14,7 @@ class TestingClass(unittest.TestCase):
         proc.close()
 
     @parameterized.expand(load_test_cases(1000))
-    def test37(self, tc: str):
+    def test37(self, tc: str):  # Fixed
         """Metamorphic Relation 37: In a well-formed input, adding valid syntax that does not introduce new tokens should not change the token count."""
         # Get source output
         source_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=tc, text=True).split("\n")
@@ -25,6 +25,7 @@ class TestingClass(unittest.TestCase):
             follow_tc = f"{tc} ;"
         else:
             follow_tc = f"{tc};"
+        follow_tc += "\n"
 
         # Get follow-up output
         follow_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=follow_tc, text=True).split("\n")

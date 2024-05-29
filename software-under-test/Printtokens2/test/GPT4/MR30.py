@@ -14,14 +14,16 @@ class TestingClass(unittest.TestCase):
         proc.close()
 
     @parameterized.expand(load_test_cases(1000))
-    def test30(self, tc: str):
+    def test30(self, tc: str):  # Fixed
         """Metamorphic Relation 30: Replacing a token with a synonym or equivalent representation should not change the number of output tokens."""
+        tc += "&& &&\n"
+
         # Get source output
         source_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=tc, text=True).split("\n")
 
         # Construct follow-up input by replacing a token with its synonym
         # Example: replacement of '&&' with 'and' assuming the tokenizer treats them as equivalent
-        follow_tc = tc.replace('&&', 'and')
+        follow_tc = tc.replace("&&", "and")
 
         # Get follow-up output
         follow_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=follow_tc, text=True).split("\n")

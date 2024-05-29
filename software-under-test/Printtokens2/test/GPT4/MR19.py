@@ -14,13 +14,13 @@ class TestingClass(unittest.TestCase):
         proc.close()
 
     @parameterized.expand(load_test_cases(1000))
-    def test19(self, tc: str):
+    def test19(self, tc: str):  # Fixed
         """Metamorphic Relation 19: Reversing the order of lines in a file should not change the number of tokens."""
         # Get source output
         source_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=tc, text=True).split("\n")
 
         # Construct follow-up input by reversing the order of lines
-        follow_tc = "\n".join(reversed(tc.split("\n")))
+        follow_tc = "\n".join(reversed(tc.split("\n"))) + "\n"
 
         # Get follow-up output
         follow_out = subprocess.check_output(PRINT_TOKENS2_PATH, input=follow_tc, text=True).split("\n")
