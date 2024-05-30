@@ -13,7 +13,7 @@ from utils import gen_tcs_randomly
 
 class TestingClass(unittest.TestCase):
     @parameterized.expand(gen_tcs_randomly(1000))
-    def test_rotate_half_turn(self, img: np.array):
+    def test_rotate_half_turn(self, img: np.array, angle: float):   # Fixed
         """Metamorphic Relation 40: Rotating an image by 180 degrees twice should result in the original image."""
         # Apply a 180-degree rotation two times
         rotated_img = ndimage.rotate(ndimage.rotate(img, 180, reshape=False), 180, reshape=False)

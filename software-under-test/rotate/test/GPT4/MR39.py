@@ -13,7 +13,7 @@ from utils import gen_tcs_randomly
 
 class TestingClass(unittest.TestCase):
     @parameterized.expand(gen_tcs_randomly(1000))
-    def test_rotate_quarter_turns(self, img: np.array):
+    def test_rotate_quarter_turns(self, img: np.array, angle: float):   # Fixed
         """Metamorphic Relation 39: Rotating an image by 90 degrees successively four times should result in the original image."""
         # Apply a 90-degree rotation four times
         rotated_img = img
