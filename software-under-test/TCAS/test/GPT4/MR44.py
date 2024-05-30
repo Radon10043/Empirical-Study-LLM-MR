@@ -14,10 +14,12 @@ class TestingClass(unittest.TestCase):
         proc.close()
 
     @parameterized.expand(load_test_cases(1000))
-    def test44(self, vals: list):
+    def test44(self, vals: list):   # Fixed
         """Metamorphic Relation 44: If the intruder aircraft makes a large climb or descent, the own aircraft should be advised the opposite direction, provided it's originally at a significant vertical separation."""
         large_movement = 2000  # Value for significant climb/descent by the intruder
         significant_sep = 5000  # Value for significant vertical separation
+
+        vals[INDEX["Cur_Vertical_Sep"]] += significant_sep
 
         # Initial vertical separation is significant
         if vals[INDEX["Cur_Vertical_Sep"]] < significant_sep:

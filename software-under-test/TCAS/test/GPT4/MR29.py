@@ -14,10 +14,12 @@ class TestingClass(unittest.TestCase):
         proc.close()
 
     @parameterized.expand(load_test_cases(1000))
-    def test29(self, vals: list):
+    def test29(self, vals: list):   # Fixed
         """Metamorphic Relation 29: If the vertical separation between aircrafts is beyond a safe threshold, changing the Own_Tracked_Alt_Rate slightly should not change the advisory."""
         safe_vertical_separation = 2000  # An arbitrary but safe separation distance
         rate_variation = 100  # A slight change in altitude rate
+
+        vals[INDEX["Cur_Vertical_Sep"]] = safe_vertical_separation + randint(0, 1000)  # Ensure safe separation
 
         if vals[INDEX["Cur_Vertical_Sep"]] < safe_vertical_separation:
             return

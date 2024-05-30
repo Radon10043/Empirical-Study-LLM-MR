@@ -14,15 +14,9 @@ class TestingClass(unittest.TestCase):
         proc.close()
 
     @parameterized.expand(load_test_cases(1000))
-    def test41(self, vals: list):
+    def test41(self, vals: list):   #Fixed
         """Metamorphic Relation 41: If the initial advisory is for the own aircraft to descend (DOWNWARD_RA) due to close proximity to an intruder above, then increasing Down_Separation should maintain or nullify the advisory, not lead to an UPWARD_RA."""
-        close_proximity = 600  # Arbitrary close vertical separation distance
         increased_separation = 1200  # Arbitrary increased downward separation
-
-        # Initial conditions: Intruding aircraft is close and above the own aircraft
-        vals[INDEX["Cur_Vertical_Sep"]] = close_proximity
-        vals[INDEX["Other_Tracked_Alt"]] = vals[INDEX["Own_Tracked_Alt"]] + close_proximity
-        vals[INDEX["Own_Tracked_Alt_Rate"]] = 0  # Own aircraft maintains level flight
 
         # Get the baseline output advisory
         base_cmd = [TCAS_PATH] + [str(x) for x in vals]
