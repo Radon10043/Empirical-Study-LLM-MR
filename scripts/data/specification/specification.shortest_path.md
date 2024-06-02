@@ -3,7 +3,7 @@
 > ### Function Signature
 >
 > ```python
-> scipy.sparse.csgraph.shortest_path(csgraph, method='auto', directed=True, return_predecessors=False, unweighted=False, overwrite=False, indices=None, limit=None)
+> scipy.sparse.csgraph.shortest_path(csgraph, method='auto', directed=True, return_predecessors=False, unweighted=False, overwrite=False, indices=None)
 > ```
 >
 > ### Parameters
@@ -14,7 +14,6 @@
 > - `unweighted`: If `True`, the graph is considered unweighted, and a simpler algorithm is used. Default is `False`.
 > - `overwrite`: If `True`, the function may overwrite the input csgraph data. Default is `False`.
 > - `indices`: Indices of the nodes to consider for the shortest paths. If not provided, the shortest paths for all pairs of nodes are computed.
-> - `limit`: Cut-off threshold for Dijkstra's algorithm. Paths longer than the limit will not be considered. If `None`, there is no limit.
 >
 > ### Returns
 > - `dist_matrix`: A matrix of shortest path distances between nodes. If `indices` is specified, the matrix includes only the paths between the specified nodes and all other nodes.
