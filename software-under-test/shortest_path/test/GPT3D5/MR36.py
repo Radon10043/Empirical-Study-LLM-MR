@@ -7,21 +7,20 @@ from utils import *
 class TestingClass(unittest.TestCase):
     @parameterized.expand(gen_tcs_randomly(1000))
     def test36(self, graph: list, src: int, dst: int, method: str):
-        """Metamorphic Relation 36: Given the same graph, the same source and destination vertices, 
-        but with an additional edge between two vertices, 
-        the shortest path length should remain the same or decrease."""
-        # Get the original shortest path length
-        original_distance = shortest_path(graph, method=method)[src][dst]
+        """Metamorphic Relation 36: Given the same graph, the same source and destination vertices,
+        but with all edge weights set to the same value, the result should remain unchanged."""
+        # Get source output
+        source_out = shortest_path(graph, method=method)
 
-        # Add an additional edge with a lower weight
-        follow_graph = [row[:] for row in graph]
-        follow_graph[0][1] = 1  # Add an edge (0, 1) with weight 1
+        # Modify graph by setting all edge weights to the same value
+        constant_value = 5
+        follow_graph = [[constant_value for x in row] for row in graph]
 
-        # Get the new shortest path length
-        new_distance = shortest_path(follow_graph, method=method)[src][dst]
+        # Get follow-up output
+        follow_out = shortest_path(follow_graph, method=method)
 
         # Verification
-        self.assertLessEqual(new_distance, original_distance)
+        self.assertTrue(np.array_equal(source_out, follow_out))
 
 
 if __name__ == "__main__":

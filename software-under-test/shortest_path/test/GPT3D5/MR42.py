@@ -6,15 +6,17 @@ from utils import *
 
 class TestingClass(unittest.TestCase):
     @parameterized.expand(gen_tcs_randomly(1000))
-    def test35(self, graph: list, src: int, dst: int, method: str): # Fixed
-        """Metamorphic Relation 35: Given the same graph, the same source and destination vertices,
-        but with the addition of a new edge with weight 0 between any two vertices, the result should remain unchanged."""
+    def test42(self, graph: list, src: int, dst: int, method: str):
+        """Metamorphic Relation 42: Given the same graph, the same source and destination vertices, 
+        but adding an additional path between two vertices, the result should remain unchanged."""
         # Get source output
         source_out = shortest_path(graph, method=method)
 
-        # Add a new edge with weight 0 between any two vertices
+        # Add an additional path between two vertices
         follow_graph = graph.copy()
-        follow_graph[src][dst] = 0
+        new_vertex = 5
+        follow_graph[src][new_vertex] = follow_graph[new_vertex][dst] = 2
+        follow_graph[src][dst] = follow_graph[dst][src] = 3
 
         # Get follow-up output
         follow_out = shortest_path(follow_graph, method=method)

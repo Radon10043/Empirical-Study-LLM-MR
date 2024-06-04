@@ -7,14 +7,16 @@ from utils import *
 class TestingClass(unittest.TestCase):
     @parameterized.expand(gen_tcs_randomly(1000))
     def test9(self, graph: list, src: int, dst: int, method: str):
-        """Metamorphic Relation 9: Given the same graph with different edge weights, the output follows the triangle inequality."""
-        # Get source outputs
-        dist_a_b = shortest_path(graph, method=method)[src][dst]
-        dist_a_c = shortest_path(graph, method=method)[src][1] # Example vertex
-        dist_c_b = shortest_path(graph, method=method)[1][dst] # Example vertex
+        """Metamorphic Relation 9: Given the same graph, the same source and destination vertices,
+        but with the source and destination vertices reversed, the output should be the same."""
+        # Get source output
+        source_out = shortest_path(graph, method=method)[src][dst]
 
-        # Verification - Triangle Inequality
-        self.assertTrue(dist_a_b <= dist_a_c + dist_c_b)
+        # Reverse the order of source and destination vertices
+        follow_out = shortest_path(graph, method=method)[::-1, ::-1][src][dst]
+
+        # Verification
+        self.assertEqual(source_out, follow_out)
 
 
 if __name__ == "__main__":

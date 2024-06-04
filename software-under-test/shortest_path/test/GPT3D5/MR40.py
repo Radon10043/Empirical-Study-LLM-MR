@@ -8,19 +8,20 @@ class TestingClass(unittest.TestCase):
     @parameterized.expand(gen_tcs_randomly(1000))
     def test40(self, graph: list, src: int, dst: int, method: str):
         """Metamorphic Relation 40: Given the same graph, the same source and destination vertices,
-        but with one additional edge, the shortest path should remain the same or be shorter."""
-        # Get the original shortest path length
-        original_distance = shortest_path(graph, method=method)[src][dst]
+        but modifying the graph to have cycles removed, the result should remain unchanged."""
+        # Get source output
+        source_out = shortest_path(graph, method=method)
 
-        # Add an additional edge
-        follow_graph = [row[:] for row in graph]
-        follow_graph[3][4] = 3  # Add an edge (3, 4) with weight 3
+        # Remove cycles from the graph
+        follow_graph = graph.copy()
+        for i in range(len(follow_graph)):
+            follow_graph[i][i] = 0  # Remove self-loops
 
-        # Get the new shortest path length
-        new_distance = shortest_path(follow_graph, method=method)[src][dst]
+        # Get follow-up output
+        follow_out = shortest_path(follow_graph, method=method)
 
         # Verification
-        self.assertLessEqual(new_distance, original_distance)
+        self.assertTrue(np.array_equal(source_out, follow_out))
 
 
 if __name__ == "__main__":

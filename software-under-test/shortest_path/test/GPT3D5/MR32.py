@@ -8,21 +8,18 @@ class TestingClass(unittest.TestCase):
     @parameterized.expand(gen_tcs_randomly(1000))
     def test32(self, graph: list, src: int, dst: int, method: str):
         """Metamorphic Relation 32: Given the same graph, the same source and destination vertices,
-        but with edge weights multiplied by a constant factor,
-        the new shortest path length should be multiplied by the same factor."""
-        scale_factor = 2
+        but with some edge weights set to negative infinity, the result should remain unchanged or path may be longer."""
+        # Get source output
+        source_out = shortest_path(graph, method=method)
 
-        # Get the original shortest path length
-        original_distance = shortest_path(graph, method=method)[src][dst]
+        # Modify graph by setting some edge weights to negative infinity
+        follow_graph = [[float('-inf') if x < 3 else x for x in row] for row in graph]
 
-        # Multiply all edge weights by the scale factor
-        follow_graph = [[weight * scale_factor for weight in row] for row in graph]
-
-        # Get the new shortest path length
-        new_distance = shortest_path(follow_graph, method=method)[src][dst]
+        # Get follow-up output
+        follow_out = shortest_path(follow_graph, method=method)
 
         # Verification
-        self.assertAlmostEqual(new_distance, original_distance * scale_factor)
+        self.assertTrue(np.array_equal(source_out, follow_out) or np.all(follow_out >= source_out))
 
 
 if __name__ == "__main__":

@@ -7,19 +7,19 @@ from utils import *
 class TestingClass(unittest.TestCase):
     @parameterized.expand(gen_tcs_randomly(1000))
     def test24(self, graph: list, src: int, dst: int, method: str):
-        """Metamorphic Relation 24: Given the same graph and vertices, but with the edge weights scaled by a constant factor, the output should also be scaled by the same factor."""
-        scale_factor = 2
+        """Metamorphic Relation 24: Given the same graph, the same source and destination vertices,
+        but with the edge weights modified to negative values, the result should remain unchanged."""
         # Get source output
-        source_out = shortest_path(graph, method=method)[src][dst]
+        source_out = shortest_path(graph, method=method)
 
-        # Construct follow-up input with scaled edge weights
-        follow_graph = [[weight * scale_factor for weight in row] for row in graph]
+        # Modify edge weights to negative values
+        follow_graph = [[-x for x in row] for row in graph]
 
         # Get follow-up output
-        follow_out = shortest_path(follow_graph, method=method)[src][dst]
+        follow_out = shortest_path(follow_graph, method=method)
 
         # Verification
-        self.assertAlmostEqual(source_out * scale_factor, follow_out)
+        self.assertTrue(np.array_equal(source_out, follow_out))
 
 
 if __name__ == "__main__":

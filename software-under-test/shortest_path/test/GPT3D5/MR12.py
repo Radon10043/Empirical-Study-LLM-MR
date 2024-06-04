@@ -7,19 +7,19 @@ from utils import *
 class TestingClass(unittest.TestCase):
     @parameterized.expand(gen_tcs_randomly(1000))
     def test12(self, graph: list, src: int, dst: int, method: str):
-        """Metamorphic Relation 12: Given the same graph, the same source and destination vertices,
-        but with a different scale for the edge weights, the output should have the property of monotonicity."""
-        # Get source outputs
-        source_out = shortest_path(graph, method=method)[src][dst]
+        """Metamorphic Relation 12: Given the same graph with negative weights, the result should remain the same if all weights are shifted by adding a large positive constant K."""
+        # Get source output
+        source_out = shortest_path(graph, method=method)
 
-        follow_graph = list()
-        for row in graph:
-            follow_graph.append([x * 2 for x in row])
+        # Shift all weights by adding a large positive constant K
+        constant_k = 1000
+        follow_graph = [[x + constant_k for x in row] for row in graph]
 
-        follow_out = shortest_path(follow_graph, method=method)[src][dst]
+        # Get follow-up output
+        follow_out = shortest_path(follow_graph, method=method)
 
-        # Verification - Monotonicity
-        self.assertTrue(source_out <= follow_out)
+        # Verification
+        self.assertTrue(np.array_equal(source_out, follow_out))
 
 
 if __name__ == "__main__":

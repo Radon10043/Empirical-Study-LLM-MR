@@ -8,15 +8,16 @@ class TestingClass(unittest.TestCase):
     @parameterized.expand(gen_tcs_randomly(1000))
     def test7(self, graph: list, src: int, dst: int, method: str):
         """Metamorphic Relation 7: Given the same graph, the same source and destination vertices,
-        but using unweighted input graph, the output should be the same."""
+        but with the graph where all edge weights are added by a constant C, the output should be the same."""
         # Get source output
-        source_out = shortest_path(graph, method=method, unweighted=False)[src][dst]
+        source_out = shortest_path(graph, method=method)
 
-        # Construct follow-up input
-        follow_out = shortest_path(graph, method=method, unweighted=True)[src][dst]
+        constant_c = 5
+        follow_graph = [[x + constant_c for x in row] for row in graph]
+        follow_out = shortest_path(follow_graph, method=method)
 
         # Verification
-        self.assertEqual(source_out, follow_out)
+        self.assertTrue(np.array_equal(source_out, follow_out))
 
 
 if __name__ == "__main__":

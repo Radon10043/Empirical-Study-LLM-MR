@@ -6,14 +6,17 @@ from utils import *
 
 class TestingClass(unittest.TestCase):
     @parameterized.expand(gen_tcs_randomly(1000))
-    def test3(self, graph: list, src: int, dst: int, method: str):
+    def test3(self, graph: list, src: int, dst: int, method: str):  # Fixed
         """Metamorphic Relation 3: Given the same graph, the same source and destination vertices,
-        but with a cut-off threshold for Dijkstra's algorithm, the output should be the same."""
+        but the graph is transposed, the output should be the same."""
         # Get source output
-        source_out = shortest_path(graph, method=method, limit=None)[src][dst]
+        source_out = shortest_path(graph, method=method)[src][dst]
 
-        # Construct follow-up input
-        follow_out = shortest_path(graph, method=method, limit=10)[src][dst]
+        follow_graph = np.transpose(graph)
+        follow_graph = np.ascontiguousarray(follow_graph)
+
+        # Get follow-up output
+        follow_out = shortest_path(follow_graph, method)[src][dst]
 
         # Verification
         self.assertEqual(source_out, follow_out)

@@ -5,25 +5,22 @@ from utils import *
 
 
 class TestingClass(unittest.TestCase):
-    # fixed
     @parameterized.expand(gen_tcs_randomly(1000))
     def test22(self, graph: list, src: int, dst: int, method: str):
         """Metamorphic Relation 22: Given the same graph, the same source and destination vertices,
-        but with different algorithms, the output should follow the same sequence of vertices for the shortest path."""
+        but with the graph modified to have a self loop added to the source vertex, the result should remain unchanged or path may be shorter."""
         # Get source output
-        predecessors = shortest_path(graph, method=method, return_predecessors=True)[1]
-        source_out = get_shortest_path(predecessors, src, dst)
+        source_out = shortest_path(graph, method=method)
 
-        # Construct follow-up input: using a different algorithm
-        if method != "D":
-            method = "D"
-        else:
-            method = "FW"
-        predecessors = shortest_path(graph, method=method, return_predecessors=True)[1]
-        follow_out = get_shortest_path(predecessors, src, dst)
+        # Modify the graph to add a self loop to the source vertex
+        follow_graph = graph.copy()
+        follow_graph[src][src] = 1
+
+        # Get follow-up output
+        follow_out = shortest_path(follow_graph, method=method)
 
         # Verification
-        self.assertTrue(source_out == follow_out)
+        self.assertTrue(np.array_equal(source_out, follow_out) or np.all(follow_out <= source_out))
 
 
 if __name__ == "__main__":

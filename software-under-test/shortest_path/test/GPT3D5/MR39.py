@@ -7,19 +7,21 @@ from utils import *
 class TestingClass(unittest.TestCase):
     @parameterized.expand(gen_tcs_randomly(1000))
     def test39(self, graph: list, src: int, dst: int, method: str):
-        """Metamorphic Relation 39: Given the same graph, the same source and destination vertices, and the same algorithm,
-        but with all weights set to the same value, the resulting shortest path should remain the same."""
-        # Get the original shortest path length
-        original_distance = shortest_path(graph, method=method)[src][dst]
+        """Metamorphic Relation 39: Given the same graph, the same source and destination vertices,
+        but removing specific edges, the result should remain unchanged or path may be longer."""
+        # Get source output
+        source_out = shortest_path(graph, method=method)
 
-        # Set all weights in the graph to the same value
-        follow_graph = [[5 for _ in row] for row in graph]
+        # Remove specific edges from the graph
+        follow_graph = graph.copy()
+        follow_graph[src][dst] = 0
+        follow_graph[dst][src] = 0
 
-        # Get the new shortest path length
-        new_distance = shortest_path(follow_graph, method=method)[src][dst]
+        # Get follow-up output
+        follow_out = shortest_path(follow_graph, method=method)
 
         # Verification
-        self.assertEqual(original_distance, new_distance)
+        self.assertTrue(np.array_equal(source_out, follow_out) or np.all(follow_out >= source_out))
 
 
 if __name__ == "__main__":

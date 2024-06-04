@@ -6,23 +6,23 @@ from utils import *
 
 class TestingClass(unittest.TestCase):
     @parameterized.expand(gen_tcs_randomly(1000))
-    def test13(self, graph: list, src: int, dst: int, method: str):  # Fixed
+    def test13(self, graph: list, src: int, dst: int, method: str): # Fixed
         """Metamorphic Relation 13: Given the same graph, the same source and destination vertices,
-        but with the weights multiplied by a positive constant, the shortest path remains the same."""
+        but with the graph modified to have additional vertices and edges, the result should remain unchanged."""
         # Get source output
-        _, predecessors = shortest_path(graph, method=method, return_predecessors=True)
-        if predecessors[src][dst] == -9999:
-            unittest.skip("No path from source to destination")
-        source_out = self.get_shortest_path(predecessors, src, dst)
+        source_out = shortest_path(graph, method=method)[src][dst]
 
-        follow_graph = [[weight * 2 for weight in row] for row in graph]
+        # Modify the graph to have additional vertices and edges
+        follow_graph = graph.copy()
+        for row in follow_graph:
+            row.append(0)
+        follow_graph.append([0] * (len(graph)+1))
 
-        # Get folllow-up output
-        _, predecessors = shortest_path(follow_graph, method=method, return_predecessors=True)
-        follow_out = self.get_shortest_path(predecessors, src, dst)
+        # Get follow-up output
+        follow_out = shortest_path(follow_graph, method=method)[src][dst]
 
         # Verification
-        self.assertEqual(source_out, follow_out)
+        self.assertTrue(np.array_equal(source_out, follow_out))
 
 
 if __name__ == "__main__":

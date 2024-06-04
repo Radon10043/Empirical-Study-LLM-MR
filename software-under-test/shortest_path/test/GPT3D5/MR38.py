@@ -8,19 +8,18 @@ class TestingClass(unittest.TestCase):
     @parameterized.expand(gen_tcs_randomly(1000))
     def test38(self, graph: list, src: int, dst: int, method: str):
         """Metamorphic Relation 38: Given the same graph, the same source and destination vertices,
-        but with the graph represented as a completely disconnected graph, 
-        the shortest path length should be infinity."""
-        # Get the original shortest path length
-        original_distance = shortest_path(graph, method=method)[src][dst]
+        but with some edge weights set to zero, the result should remain unchanged or path may be longer."""
+        # Get source output
+        source_out = shortest_path(graph, method=method)
 
-        # Create a disconnected graph
-        follow_graph = [[float('inf') if weight!=0 else 0 for weight in row] for row in graph]
+        # Modify graph by setting some edge weights to zero
+        follow_graph = [[0 if x < 3 else x for x in row] for row in graph]
 
-        # Get the new shortest path length
-        new_distance = shortest_path(follow_graph, method=method)[src][dst]
+        # Get follow-up output
+        follow_out = shortest_path(follow_graph, method=method)
 
         # Verification
-        self.assertEqual(new_distance, float('inf'))
+        self.assertTrue(np.array_equal(source_out, follow_out) or np.all(follow_out >= source_out))
 
 
 if __name__ == "__main__":

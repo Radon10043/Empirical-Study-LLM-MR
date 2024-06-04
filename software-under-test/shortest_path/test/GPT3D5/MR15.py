@@ -6,22 +6,22 @@ from utils import *
 
 class TestingClass(unittest.TestCase):
     @parameterized.expand(gen_tcs_randomly(1000))
-    def test15(self, graph: list, src: int, dst: int, method: str): # Fixed
+    def test15(self, graph: list, src: int, dst: int, method: str):
         """Metamorphic Relation 15: Given the same graph, the same source and destination vertices,
-        but with the weights changed with a constant offset, the shortest path remains the same."""
+        but with the graph modified to have isolated vertices connected, the result should remain unchanged."""
         # Get source output
-        _, source_predecessors = shortest_path(graph, method=method, return_predecessors=True)
-        source_out = get_shortest_path(source_predecessors, src, dst)
+        source_out = shortest_path(graph, method=method)
 
-        offset = 5
-        follow_graph = [[weight + offset for weight in row] for row in graph]
+        # Modify the graph to connect isolated vertices
+        follow_graph = graph.copy()
+        for i in range(len(follow_graph)):
+            follow_graph[i][i] = 0
 
         # Get follow-up output
-        _, predecessors = shortest_path(follow_graph, method=method, return_predecessors=True)
-        follow_out = get_shortest_path(predecessors, src, dst)
+        follow_out = shortest_path(follow_graph, method=method)
 
         # Verification
-        self.assertEqual(source_out, follow_out)
+        self.assertTrue(np.array_equal(source_out, follow_out))
 
 
 if __name__ == "__main__":

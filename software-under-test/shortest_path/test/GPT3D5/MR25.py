@@ -7,21 +7,24 @@ from utils import *
 class TestingClass(unittest.TestCase):
     @parameterized.expand(gen_tcs_randomly(1000))
     def test25(self, graph: list, src: int, dst: int, method: str): # Fixed
-        """Metamorphic Relation 25: Given the same graph, the same source and destination vertices, and the same algorithm, 
-        but with all weights increased by a constant value, the resulting shortest path should remain the same."""
-        # Get source output
-        predecessors = shortest_path(graph, method=method, return_predecessors=True)[1]
-        source_out = get_shortest_path(predecessors, src, dst)
+        """Metamorphic Relation 25: Given the same graph, the same source and destination vertices,
+        but edges present with very large weights are removed, the result should remain unchanged or path may be shorter."""
+        for i in range(len(graph)):
+            for j in range(len(graph)):
+                if randint(1, 100) <= 50:
+                    graph[i][j] *= 1000
 
-        # Increase all weights in the graph by a constant value
-        follow_graph = [[weight + 5 for weight in row] for row in graph]
+        # Get source output
+        source_out = shortest_path(graph, method=method)
+
+        # Modify graph by removing edges with very large weights
+        follow_graph = [[0 if x > 1000 else x for x in row] for row in graph]
 
         # Get follow-up output
-        predecessors = shortest_path(follow_graph, method=method, return_predecessors=True)[1]
-        follow_out = get_shortest_path(predecessors, src, dst)
+        follow_out = shortest_path(follow_graph, method=method)
 
         # Verification
-        self.assertEqual(source_out, follow_out)
+        self.assertTrue(np.array_equal(source_out, follow_out) or np.all(follow_out <= source_out))
 
 
 if __name__ == "__main__":

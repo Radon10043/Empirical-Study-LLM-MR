@@ -8,13 +8,14 @@ class TestingClass(unittest.TestCase):
     @parameterized.expand(gen_tcs_randomly(1000))
     def test4(self, graph: list, src: int, dst: int, method: str):
         """Metamorphic Relation 4: Given the same graph, the same source and destination vertices,
-        but representing a sub-graph (specific indices), the output should be the same."""
+        but with the graph converted to an unweighted graph, the output should be the same."""
         # Get source output
-        source_out = shortest_path(graph, method=method, indices=None)[src][dst]
+        source_out = shortest_path(graph, method=method)[src][dst]
 
-        # Construct follow-up input
-        indices = [1, 3, 5]  # Example indices
-        follow_out = shortest_path(graph, method=method, indices=indices)[src][dst]
+        follow_graph = [[1 if x != 0 else 0 for x in row] for row in graph]
+
+        # Get follow-up output
+        follow_out = shortest_path(follow_graph, method)[src][dst]
 
         # Verification
         self.assertEqual(source_out, follow_out)
