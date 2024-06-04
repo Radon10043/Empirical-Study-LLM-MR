@@ -42,7 +42,7 @@ def gen_graph_randomly(num_v: int) -> list:
             if i == j:
                 graph[i][j] = 0
             else:
-                graph[i][j] = randint(1, MAX_WEIGHT)
+                graph[i][j] = randint(0, MAX_WEIGHT)
 
     return graph
 
