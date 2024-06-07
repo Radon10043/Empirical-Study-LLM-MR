@@ -6,25 +6,17 @@ from utils import *
 
 class TestingClass(unittest.TestCase):
     @parameterized.expand(gen_tcs_randomly(1000))
-    def test6(self, graph: list, src: int, dst: int, method: str):  # Fixed
-        """Metamorphic Relation 6: When directed is False, the shortest path from node i to j should be the same as
-        the shortest path from node j to i."""
-        csgraph = csr_matrix(graph)
-        directed = True
+    def test6(self, graph: list, src: int, dst: int, method: str):
+        """Metamorphic Relation 6: For an undirected graph, the shortest path from node A to B
+        is the same as from B to A."""
+        # Get source output
+        source_out = shortest_path(graph, method=method, directed=False)[src][dst]
 
-        if directed:
-            # Convert graph to undirected
-            undirected_graph = csgraph + csgraph.T
+        # Get follow-up output (reverse query)
+        follow_out = shortest_path(graph, method=method, directed=False)[dst][src]
 
-            # Get source output
-            source_out = shortest_path(undirected_graph, directed=False)
-
-            # Verification
-            num_vertices = len(source_out)
-            for i in range(num_vertices):
-                for j in range(num_vertices):
-                    if i != j:
-                        self.assertEqual(source_out[i][j], source_out[j][i])
+        # Verification
+        self.assertEqual(source_out, follow_out)
 
 
 if __name__ == "__main__":

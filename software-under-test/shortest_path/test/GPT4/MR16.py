@@ -7,41 +7,27 @@ from scipy.sparse import csr_matrix
 
 class TestingClass(unittest.TestCase):
     @parameterized.expand(gen_tcs_randomly(1000))
-    def test16(self, graph: list, src: int, dst: int, method: str): # Fixed
-        """Metamorphic Relation 16: Doubling the weights of every edge in the graph should not change 
-        the shortest path sequence of vertices, though the lengths will be doubled."""
-        csgraph = csr_matrix(graph)
+    def test16(self, graph: list, src: int, dst: int, method: str):
+        """Metamorphic Relation 16: Connecting all vertices to a new vertex with zero-weighted edges 
+        should not affect shortest path calculations in the original graph since zero-weighted edges
+        offer no shortcut."""
+        directed = choice([True, False])
 
-        # Double each edge weight
-        doubled_csgraph = csgraph * 2
-        doubled_csgraph = csr_matrix(doubled_csgraph)  # Sparse representation
+        # Get source output
+        source_out = shortest_path(graph, method=method, directed=directed)
 
-        # Original shortest paths and predecessors
-        original_dists, original_preds = shortest_path(csgraph, return_predecessors=True)
+        # Connect all nodes to new node with zero-weighted edge
+        extended_graph = graph.copy()
+        extended_graph.append([0] * len(extended_graph))
+        for i in range(len(extended_graph)):
+            extended_graph[i].append(0)
 
-        # Shortest paths and predecessors after doubling
-        doubled_dists, doubled_preds = shortest_path(doubled_csgraph, return_predecessors=True)
-
-        num_vertices = original_dists.shape[0]
+        # Get follow-up output
+        follow_out = shortest_path(extended_graph, method=method, directed=directed)
 
         # Verification
-        for i in range(num_vertices):
-            for j in range(num_vertices):
-                # Compare the shortest path lengths
-                self.assertEqual(doubled_dists[i, j], original_dists[i, j] * 2)
-
-                # Compare the predecessor sequences
-                orig_seq, double_seq = [], []
-
-                orig_pred, double_pred = j, j
-                while orig_pred != -9999 and double_pred != -9999:  # Assuming -9999 indicates no predecessor
-                    orig_seq.append(orig_pred)
-                    double_seq.append(double_pred)
-
-                    orig_pred = original_preds[i, orig_pred]
-                    double_pred = doubled_preds[i, double_pred]
-
-                self.assertEqual(orig_seq, double_seq)
+        # Compare only the part of the output matrix that corresponds to the original graph
+        self.assertTrue(np.array_equal(source_out, follow_out[:-1, :-1]))
 
 
 if __name__ == "__main__":

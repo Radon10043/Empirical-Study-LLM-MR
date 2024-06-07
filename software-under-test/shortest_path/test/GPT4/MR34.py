@@ -6,28 +6,26 @@ from utils import *
 
 class TestingClass(unittest.TestCase):
     @parameterized.expand(gen_tcs_randomly(1000))
-    def test34(self, graph: list, src: int, dst: int, method: str):
-        """Metamorphic Relation 34: For a connected undirected graph, removing edges should
-        not decrease the shortest path lengths between nodes."""
-        csgraph = csr_matrix(graph)
+    def test34(self, graph: list, src: int, dst: int, method: str): # Fixed
+        """Metamorphic Relation 34: Connecting all nodes to a new node with infinite weight edges does 
+        not change the shortest paths in the original graph."""
+        # Get shortest paths for the original graph
+        original_distances = shortest_path(graph, method=method)
 
-        # Start with an undirected graph by making the original_csgraph symmetric
-        undirected_graph = csgraph + csgraph.T
+        # Connect all existing nodes to a new node with infinite weight
+        extended_graph = graph.copy()
+        extended_graph.append([float("inf")] * len(extended_graph))
+        for i in range(len(extended_graph)):
+            extended_graph[i].append(float("inf"))
 
-        # Remove a random sample of edges, not disconnected the graph
-        removal_indices = np.random.choice(undirected_graph.nnz, size=10, replace=False)
-        undirected_graph.data[removal_indices] = 0  # Set selected edges to weight 0
-        undirected_graph.eliminate_zeros()  # Remove zero-weight edges effectively
+        # Get shortest paths for the extended graph
+        extended_distances = shortest_path(extended_graph, method=method)
 
-        # Get shortest path distances from the original and modified graphs
-        original_dists = shortest_path(csgraph, directed=False)
-        modified_dists = shortest_path(undirected_graph, directed=False)
-
-        # Check that the shortest path distances are not decreased after edge removal
-        n = original_dists.shape[0]
-        for i in range(n):
-            for j in range(n):
-                self.assertGreaterEqual(modified_dists[i, j], original_dists[i, j])
+        # Verify that distances in the original graph are unchanged
+        for i in range(original_distances.shape[0]):
+            for j in range(original_distances.shape[1]):
+                if i != j:  # Ignore self-distances, as a new node adds a 0-distance edge
+                    self.assertEqual(original_distances[i][j], extended_distances[i][j])
 
 
 if __name__ == "__main__":

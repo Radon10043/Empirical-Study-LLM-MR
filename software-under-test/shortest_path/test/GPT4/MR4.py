@@ -7,23 +7,13 @@ from utils import *
 class TestingClass(unittest.TestCase):
     @parameterized.expand(gen_tcs_randomly(1000))
     def test4(self, graph: list, src: int, dst: int, method: str):  # Fixed
-        """Metamorphic Relation 4: If we select a subset of indices, the distances to those indices from any node
-        should be the same as when we calculate them without any indices specified."""
-        indices = [0, 1]
-        csgraph = csr_matrix(graph)
-
-        # Get source output for all pairs
-        full_dist_matrix = shortest_path(csgraph)
-
-        # Get follow-up output for selected indices only
-        subset_dist_matrix = shortest_path(csgraph, indices=indices)
+        """Metamorphic Relation 4: The shortest path from a node to itself should always be zero, 
+        regardless of the graph or method."""
+        # Get source and follow-up output (should be the same)
+        path_length = shortest_path(graph, method=method)[src][src]
 
         # Verification
-        for index in indices:
-            for other_index in range(len(full_dist_matrix)):
-                source_out = full_dist_matrix[other_index][index]
-                follow_out = subset_dist_matrix[other_index]
-                self.assertEqual(source_out, follow_out)
+        self.assertEqual(path_length, 0)
 
 
 if __name__ == "__main__":

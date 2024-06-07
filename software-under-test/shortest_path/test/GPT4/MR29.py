@@ -7,26 +7,27 @@ from utils import *
 class TestingClass(unittest.TestCase):
     @parameterized.expand(gen_tcs_randomly(1000))
     def test29(self, graph: list, src: int, dst: int, method: str):
-        """Metamorphic Relation 29: Removing an edge with an infinite weight (or a very large weight if infinity is 
-        not used) should not change the shortest path lengths, as these edges are effectively non-edges."""
-        csgraph = csr_matrix(graph)
+        """Metamorphic Relation 29: Converting an undirected graph to a directed one by replacing 
+        each undirected edge with two directed edges (one in each direction) should not change 
+        the shortest path distances."""
+        # Make sure the input graph is undirected for this test case
+        for i in range(len(graph)):
+            for j in range(i + 1, len(graph)):
+                graph[i][j] = 0
 
-        # Assume an edge with infinite weight exists in the graph
-        i, j = find_infinite_weight_edge(csgraph)  # Assuming this function exists
+        # Get source output for the undirected graph
+        undirected_distance = shortest_path(graph, method=method, directed=False)[src][dst]
 
-        # Compute shortest paths before edge removal
-        original_paths = shortest_path(csgraph)
+        # Convert undirected graph to directed by creating two directed edges for each undirected edge
+        for i in range(len(graph)):
+            for j in range(i + 1, len(graph)):
+                graph[j][i] = graph[i][j]
 
-        # Remove the edge by setting the weight to 0 or removing from the sparse matrix
-        modified_csgraph = csgraph.copy()
-        modified_csgraph[i, j] = 0
-        modified_csgraph.eliminate_zeros()  # Removes zero entries from the sparse matrix
+        # Get follow-up output after converting to directed
+        directed_distance = shortest_path(graph, method=method, directed=True)[src][dst]
 
-        # Compute shortest paths after edge removal
-        modified_paths = shortest_path(modified_csgraph)
-
-        # Verify shortest paths remain unchanged after removal of the infinite-weight edge
-        np.testing.assert_array_equal(original_paths, modified_paths)
+        # Verification
+        self.assertEqual(undirected_distance, directed_distance)
 
 
 if __name__ == "__main__":

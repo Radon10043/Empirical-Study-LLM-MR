@@ -8,21 +8,23 @@ from scipy.sparse import csr_matrix
 class TestingClass(unittest.TestCase):
     @parameterized.expand(gen_tcs_randomly(1000))
     def test21(self, graph: list, src: int, dst: int, method: str): # Fixed
-        """Metamorphic Relation 21:  For a symmetric (undirected) graph, doubling the weight of all edges should
-        keep the same shortest path, with doubled path length."""
-        indices = [0, 1]
-        csgraph = csr_matrix(graph)
+        """Metamorphic Relation 21: If we convert a directed graph to its equivalent undirected version 
+        by symmetrizing it, the shortest path in the undirected graph should be less than or equal to 
+        the directed version."""
+        # Get source output for the directed graph
+        directed_distance = shortest_path(graph, method=method, directed=True)[src][dst]
 
-        # Double the weight of all edges
-        modified_csgraph = csgraph.copy()
-        modified_csgraph.data *= 2
+        # Create an equivalent undirected graph by symmetrizing it
+        undirected_graph = graph.copy()
+        for i in range(len(undirected_graph)):
+            for j in range(i, len(undirected_graph)):
+                undirected_graph[j][i] = undirected_graph[i][j]
 
-        # Get the shortest paths for the original and modified graphs
-        original_path_lengths = shortest_path(csgraph, indices=indices)
-        modified_path_lengths = shortest_path(modified_csgraph, indices=indices)
+        # Get follow-up output with undirected graph
+        undirected_distance = shortest_path(undirected_graph, method=method, directed=False)[src][dst]
 
-        # Verification: The modified shortest path lengths should be double the original lengths
-        np.testing.assert_allclose(original_path_lengths * 2, modified_path_lengths)
+        # Verification: the shortest path in the undirected graph should be shorter or equal
+        self.assertLessEqual(undirected_distance, directed_distance)
 
 
 if __name__ == "__main__":

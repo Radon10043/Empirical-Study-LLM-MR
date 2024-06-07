@@ -6,25 +6,25 @@ from utils import *
 
 class TestingClass(unittest.TestCase):
     @parameterized.expand(gen_tcs_randomly(1000))
-    def test4(self, graph: list, src: int, dst: int, method: str):  # Fixed
-        """Metamorphic Relation 5: Adding a limit to Dijkstra's algorithm should not change the shortest path
-        distances for paths shorter than the limit."""
-        limit = np.random.randint(1, 1000)
+    def test5(self, graph: list, src: int, dst: int, method: str):  # Fixed
+        """Metamorphic Relation 5: If edges' weights are incremented by a constant factor, the shortest
+        path distance should also be incremented by the same factor for an unweighted graph turned weighted."""
+        # Get source output from an unweighted graph
+        source_out = shortest_path(graph, method=method, unweighted=True)[src][dst]
 
-        # Get source output without limit
-        source_out = shortest_path(graph, method=method)
+        add_weight = 3
+        # Create a weighted graph by adding a constant weight to unweighted edges
+        weighted_graph = graph.copy()
+        for r in range(len(weighted_graph)):
+            for c in range(len(weighted_graph)):
+                if weighted_graph[r][c] != 0:
+                    weighted_graph[r][c] += add_weight
 
-        # Get follow-up output with a specified limit
-        follow_out = shortest_path(graph, method=method, limit=limit)
+        # Get follow-up output
+        follow_out = shortest_path(weighted_graph, method=method, unweighted=False)[src][dst]
 
         # Verification
-        num_vertices = len(source_out)
-        for i in range(num_vertices):
-            for j in range(num_vertices):
-                if source_out[i][j] <= limit:
-                    self.assertEqual(source_out[i][j], follow_out[i][j])
-                else:
-                    self.assertTrue(follow_out[i][j] > limit or follow_out[i][j] == np.inf)
+        self.assertEqual(source_out + add_weight, follow_out)
 
 
 if __name__ == "__main__":

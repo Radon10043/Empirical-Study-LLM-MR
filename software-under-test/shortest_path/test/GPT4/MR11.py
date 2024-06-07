@@ -6,31 +6,29 @@ from utils import *
 
 class TestingClass(unittest.TestCase):
     @parameterized.expand(gen_tcs_randomly(1000))
-    def test1(self, graph: list, src: int, dst: int, method: str):  # Fixed
-        """Metamorphic Relation 11: If every edge weight in the graph is increased by a constant factor k,
-        the shortest path from any node to any other node should also be increased by that factor k."""
-        csgraph = csr_matrix(graph)
+    def test11(self, graph: list, src: int, dst: int, method: str): # Fixed
+        """Metamorphic Relation 11: Adding a disconnected subgraph to the original graph should not affect existing shortest paths."""
+        directed = choice([True, False])
 
-        k = 10
+        # Get source output for all pairs
+        source_out = shortest_path(graph, method=method, directed=directed)
 
-        # Add a constant factor k to every edge weight
-        modified_csgraph = csgraph.copy()
-        modified_csgraph.data = modified_csgraph.data + k
+        # Add a disconnected subgraph
+        extended_graph = graph.copy()
+        source_v_num = len(graph)
+        extended_graph.append([0] * source_v_num)
+        extended_graph.append([0] * source_v_num)
+        for i in range(len(extended_graph)):
+            extended_graph[i].append(0)
+            extended_graph[i].append(0)
+        extended_graph[source_v_num][source_v_num + 1] = 1
 
-        # Get source output from the original graph
-        source_out = shortest_path(csgraph)
+        # Get follow-up output for the same nodes as in the original graph
+        follow_out = shortest_path(extended_graph, method=method, directed=directed)
 
-        # Get follow-up output from the modified graph
-        follow_out = shortest_path(modified_csgraph)
-
-        # Verification for each pair of nodes
-        # Assuming no negative weights and disconnected paths (inf)
-        num_vertices = source_out.shape[0]
-        for i in range(num_vertices):
-            for j in range(num_vertices):
-                if np.isfinite(source_out[i][j]):
-                    expected_follow_out = source_out[i][j] + k * (len(csgraph.indices[csgraph.indptr[i] : csgraph.indptr[i + 1]]) - 1)
-                    self.assertAlmostEqual(follow_out[i][j], expected_follow_out)
+        # Verification
+        # We only compare the sections of the matrices that correspond to the original graph
+        self.assertTrue(np.array_equal(source_out, follow_out[:source_out.shape[0], :source_out.shape[1]]))
 
 
 if __name__ == "__main__":

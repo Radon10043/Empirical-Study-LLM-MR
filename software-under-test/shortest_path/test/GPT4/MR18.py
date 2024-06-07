@@ -8,21 +8,24 @@ from scipy.sparse import csr_matrix
 class TestingClass(unittest.TestCase):
     @parameterized.expand(gen_tcs_randomly(1000))
     def test18(self, graph: list, src: int, dst: int, method: str): # Fixed
-        """Metamorphic Relation 18: Transposing the graph (inverting the direction of all edges) should not 
-        change the shortest path distance in an undirected graph."""
-        csgraph = csr_matrix(graph)
+        """Metamorphic Relation 18: Concatenating two paths to form a third path should result in 
+        a distance that is at least the distance of the longest single path (Triangle Inequality)."""
+        # Select an intermediate node that is different from src and dst
+        intermediate_node = 1
+        if src == intermediate_node or dst == intermediate_node:
+            self.skipTest("Intermediate node is the same as src or dst")
 
-        # Get the original shortest path output
-        original_output = shortest_path(csgraph, directed=False)
+        # Compute the shortest paths
+        src_to_intermediate = shortest_path(graph, method=method)[src][intermediate_node]
+        intermediate_to_dst = shortest_path(graph, method=method)[intermediate_node][dst]
 
-        # Transpose the csgraph
-        transposed_csgraph = csgraph.transpose()
+        concatenated_path_distance = src_to_intermediate + intermediate_to_dst
 
-        # Get the shortest path for the transposed csgraph
-        transposed_output = shortest_path(transposed_csgraph, directed=False)
+        # The shortest distance from src to dst can't be longer than the concatenated path
+        shortest_distance = shortest_path(graph, method=method)[src][dst]
 
-        # The outputs should be equal for an undirected csgraph
-        np.testing.assert_array_equal(original_output, transposed_output)
+        # Verification
+        self.assertLessEqual(shortest_distance, concatenated_path_distance)
 
 
 if __name__ == "__main__":

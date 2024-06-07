@@ -6,24 +6,27 @@ from utils import *
 
 class TestingClass(unittest.TestCase):
     @parameterized.expand(gen_tcs_randomly(1000))
-    def test38(self, graph: list, src: int, dst: int, method: str):
-        """Metamorphic Relation 38: Scaling the weights of all edges by a positive factor should result in the shortest path 
-        distances being scaled by that same factor."""
-        scale_factor = np.random.randint(1, 11);
-        csgraph = csr_matrix(graph)
+    def test38(self, graph: list, src: int, dst: int, method: str): # Fixed
+        """Metamorphic Relation 38: Reversing the direction of all edges in a weighted directed graph should 
+        not change the shortest path if the graph was symmetrical. If it was not symmetrical, the shortest 
+        path distance could change."""
+        for i in range(len(graph)):
+            for j in range(i, len(graph[i])):
+                graph[i][j] = graph[i][j]
+        graph = csr_matrix(graph)
 
-        # Scale the graph by a positive factor
-        scaled_csgraph = csgraph.copy()
-        scaled_csgraph.data *= scale_factor
+        # Create a reverse graph by reversing the edge directions
+        reverse_graph = graph.T
 
-        # Get the original shortest path distances
-        original_distances = shortest_path(csgraph)
+        # Calculate shortest path in the original graph
+        original_distance = shortest_path(graph, method=method)[src][dst]
 
-        # Get the shortest path distances after scaling the graph
-        scaled_distances = shortest_path(scaled_csgraph)
+        # Calculate shortest path in the reversed graph
+        reversed_distance = shortest_path(reverse_graph, method=method)[dst][src]
 
-        # Shortest path distances should be scaled by the same factor
-        np.testing.assert_array_almost_equal(scaled_distances, original_distances * scale_factor)
+        # Verification: if original graph is symmetrical, distances should be equal
+        # If it is not symmetrical, no equality check is performed
+        self.assertEqual(original_distance, reversed_distance)
 
 
 if __name__ == "__main__":

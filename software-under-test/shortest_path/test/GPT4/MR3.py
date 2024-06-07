@@ -7,20 +7,21 @@ from utils import *
 class TestingClass(unittest.TestCase):
     @parameterized.expand(gen_tcs_randomly(1000))
     def test3(self, graph: list, src: int, dst: int, method: str):  # Fixed
-        """Metamorphic Relation 3: For an undirected graph, the shortest path from a source to a destination
-        should be the same as the shortest path from the destination to the source."""
-        csgraph = csr_matrix(graph)
-        directed = True
+        """Metamorphic Relation 3: Reversing a directed graph and querying the shortest path 
+        from the destination to the source should provide the same result as the original graph when querying
+        from the source to the destination."""
+        # Get source output
+        source_out = shortest_path(graph, method=method, directed=True)[src][dst]
 
-        if directed:
-            # Get source output
-            source_out = shortest_path(csgraph, directed=False)[src][dst]
+        # Reverse the graph
+        reversed_graph = np.transpose(graph)
+        reversed_graph = np.ascontiguousarray(reversed_graph)
 
-            # Get follow-up output
-            follow_out = shortest_path(csgraph, directed=False)[dst][src]
+        # Get follow-up output
+        follow_out = shortest_path(reversed_graph, method=method, directed=True)[dst][src]
 
-            # Verification
-            self.assertEqual(source_out, follow_out)
+        # Verification
+        self.assertEqual(source_out, follow_out)
 
 
 if __name__ == "__main__":

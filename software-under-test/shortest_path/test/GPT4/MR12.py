@@ -6,28 +6,22 @@ from utils import *
 
 class TestingClass(unittest.TestCase):
     @parameterized.expand(gen_tcs_randomly(1000))
-    def test12(self, graph: list, src: int, dst: int, method: str): # Fixed
-        """Metamorphic Relation 12: Multiplying all edge weights by a negative should not change the
-        shortest path (in absolute terms) for undirected graphs or positively weighted directed graphs,
-        although paths may change if there are multiple shortest paths."""
-        csgraph = csr_matrix(graph)
+    def test12(self, graph: list, src: int, dst: int, method: str):
+        """Metamorphic Relation 12: If we add the same constant weight to all edges in a directed acyclic graph,
+        the shortest path between any two vertices might increase by at most that constant."""
+        constant_weight = 5
 
-        # Note: the relation assumes no negative cycles would be introduced by this transformation.
+        # Get source output
+        source_out = shortest_path(graph, method=method)[src][dst]
 
-        # Multiply each edge weight by -1
-        modified_csgraph = -1 * csgraph
+        # Increase the weight of all edges by constant_weight
+        updated_graph = graph + (graph != 0).astype(int) * constant_weight
 
-        # Get source output from the original graph
-        source_out = shortest_path(csgraph)
+        # Get follow-up output
+        follow_out = shortest_path(updated_graph, method=method)[src][dst]
 
-        # Get follow-up output from the modified graph with all negative weights
-        follow_out = shortest_path(modified_csgraph, method='FW')
-
-        # Verification for each pair of nodes
-        num_vertices = source_out.shape[0]
-        for i in range(num_vertices):
-            for j in range(num_vertices):
-                self.assertAlmostEqual(abs(source_out[i][j]), abs(follow_out[i][j]))
+        # Verification
+        self.assertTrue(follow_out <= source_out + constant_weight)
 
 
 if __name__ == "__main__":

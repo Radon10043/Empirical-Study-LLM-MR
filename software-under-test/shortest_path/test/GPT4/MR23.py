@@ -7,27 +7,24 @@ from scipy.sparse import csr_matrix
 
 class TestingClass(unittest.TestCase):
     @parameterized.expand(gen_tcs_randomly(1000))
-    def test23(self, graph: list, src: int, dst: int, method: str):  # Fixed
-        """Metamorphic Relation 23: Applying the same random permutation to the rows and columns of the graph
-        adjacency matrix should not affect the shortest path lengths."""
-        seed = 100
-        csgraph = csr_matrix(graph)
+    def test23(self, graph: list, src: int, dst: int, method: str): # Fixed
+        """Metamorphic Relation 23: If we add a new edge with a very large weight, it should not be 
+        part of the shortest path because its weight will make the path significantly longer."""
+        # Get source output
+        source_distance = shortest_path(graph, method=method)[src][dst]
 
-        rng = np.random.default_rng(seed)  # Ensures reproducibility
-        num_vertices = csgraph.shape[0]
-        permutation = rng.permutation(num_vertices)
+        # Add a new edge with a very large weight between two non-source and non-destination nodes
+        large_weight_graph = graph.copy()
+        for i in range(len(graph)):
+            for j in range(i, len(graph)):
+                if i != j and graph[i][j] == 0:
+                    large_weight_graph[i][j] = 1000000
+                    break
 
-        # Apply the permutation to the rows and columns of the csgraph
-        permuted_csgraph = csgraph[permutation, :][:, permutation]
+        follow_distance = shortest_path(large_weight_graph, method=method)[src][dst]
 
-        # Get the shortest path lengths for the original and permuted graphs
-        original_path_lengths = shortest_path(csgraph)
-        permuted_path_lengths = shortest_path(permuted_csgraph)
-
-        # Verification: The permuted shortest path lengths should match the original
-        for i in range(num_vertices):
-            for j in range(num_vertices):
-                self.assertEqual(original_path_lengths[i, j], permuted_path_lengths[permutation[i], permutation[j]])
+        # Verification: the additional edge with large weight should not affect original shortest path
+        self.assertEqual(source_distance, follow_distance)
 
 
 if __name__ == "__main__":

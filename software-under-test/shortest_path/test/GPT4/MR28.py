@@ -7,23 +7,31 @@ from utils import *
 class TestingClass(unittest.TestCase):
     @parameterized.expand(gen_tcs_randomly(1000))
     def test28(self, graph: list, src: int, dst: int, method: str):
-        """Metamorphic Relation 28: Replacing all non-zero weights with their negations should result 
-        in the same shortest path topology, provided that there are no negative cycles."""
-        csgraph = csr_matrix(graph)
+        """Metamorphic Relation 28: Removing the highest weight edge from the graph does not decrease
+        the shortest path distance, unless the edge is part of the only shortest path."""
+        # Get source output for the original graph
+        original_distance = shortest_path(graph, method=method)[src][dst]
 
-        # Get original shortest paths
-        original_path_lengths, original_predecessors = shortest_path(csgraph, return_predecessors=True)
+        # Find the edge with the highest weight that is not a self-loop
+        max_weight_edge = 0
+        for i in range(len(graph)):
+            for j in range(len(graph)):
+                if i != j:
+                    max_weight_edge = max(max_weight_edge, graph[i][j])
+                    break
 
-        # Negate all weights
-        negated_csgraph = csgraph.copy()
-        negated_csgraph.data *= -1
+        # Remove the highest weight edge
+        graph_without_max_edge = graph.copy()
+        for i in range(len(graph)):
+            for j in range(len(graph)):
+                if graph[i][j] == max_weight_edge:
+                    graph_without_max_edge[i][j] = 0
 
-        # Get shortest paths for the graph with negated weights
-        negated_path_lengths, negated_predecessors = shortest_path(negated_csgraph, return_predecessors=True)
+        # Get follow-up output after removing the highest weight edge
+        new_distance = shortest_path(graph_without_max_edge, method=method)[src][dst]
 
-        # Verify that the topology of paths (sequence of nodes) remains the same, while distances will be negated
-        np.testing.assert_array_equal(original_predecessors, negated_predecessors)
-        np.testing.assert_allclose(original_path_lengths, -negated_path_lengths, atol=1e-6)
+        # Verification
+        self.assertGreaterEqual(new_distance, original_distance)
 
 
 if __name__ == "__main__":

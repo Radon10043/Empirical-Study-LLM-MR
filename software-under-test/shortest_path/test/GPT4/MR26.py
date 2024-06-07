@@ -6,25 +6,36 @@ from utils import *
 
 class TestingClass(unittest.TestCase):
     @parameterized.expand(gen_tcs_randomly(1000))
-    def test26(self, graph: list, src: int, dst: int, method: str):  # Fixed
-        """Metamorphic Relation 26: Adding disconnected nodes (zero-weight edges to all other nodes) to the graph 
-        should not affect the shortest path between the existing nodes."""
-        csgraph = csr_matrix(graph)
+    def test26(self, graph: list, src: int, dst: int, method: str):
+        """Metamorphic Relation 26: Removing a vertex (and its associated edges) that is not on the
+        shortest path from src to dst should not affect the distance of the shortest path."""
+        graph = csr_matrix(graph)
 
-        # Add additional disconnected nodes to the graph
-        num_additional_nodes = 2
-        original_num_nodes = csgraph.shape[0]
-        modified_csgraph = csr_matrix(
-            (original_num_nodes + num_additional_nodes, original_num_nodes + num_additional_nodes)
-        )
-        modified_csgraph[:original_num_nodes, :original_num_nodes] = csgraph
+        # Check that the condition is met: there are vertices not part of the shortest path
+        mat, pred_matrix = shortest_path(graph, method=method, return_predecessors=True)
+        non_involved_vertex = 1
+        path = get_shortest_path(pred_matrix, src, dst)
+        if non_involved_vertex in path:
+            self.skipTest("Vertex is part of the shortest path")
 
-        # Compute shortest paths before and after addition of nodes
-        original_paths = shortest_path(csgraph)
-        modified_paths = shortest_path(modified_csgraph)
+        # Get source output for the original graph
+        original_distance = shortest_path(graph, method=method)[src][dst]
 
-        # Shortest paths among original nodes should remain unaffected by addition of disconnected nodes
-        np.testing.assert_array_equal(original_paths, modified_paths[:original_num_nodes, :original_num_nodes])
+        # Remove the vertex and related edges
+        graph_minus_vertex = self.remove_vertex_and_edges(graph, non_involved_vertex)
+
+        # Get follow-up output
+        new_distance = shortest_path(graph_minus_vertex, method=method)[src][dst]
+
+        # Verification
+        self.assertEqual(original_distance, new_distance)
+
+    def remove_vertex_and_edges(self, graph, vertex):
+        """Remove the specified vertex and its associated edges from the graph."""
+        graph = graph.tolil()  # Assuming graph is in a sparse SciPy format that supports row/column deletion
+        graph[vertex, :] = 0  # Remove all outgoing edges from 'vertex'
+        graph[:, vertex] = 0  # Remove all incoming edges to 'vertex'
+        return graph.tocsr()
 
 
 if __name__ == "__main__":

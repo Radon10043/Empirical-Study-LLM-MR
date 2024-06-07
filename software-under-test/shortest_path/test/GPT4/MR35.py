@@ -7,41 +7,29 @@ from utils import *
 class TestingClass(unittest.TestCase):
     @parameterized.expand(gen_tcs_randomly(1000))
     def test35(self, graph: list, src: int, dst: int, method: str): # Fixed
-        """Metamorphic Relation 35: If the weight of an edge (i, j) in a graph is the minimum weight 
-        of all outgoing edges from i, then removing this edge should increase the shortest path 
-        distance from i to j."""
-        csgraph = csr_matrix(graph)
+        """Metamorphic Relation 35: Computing the shortest paths between a subset of nodes should yield 
+        the same results as computing the shortest paths for the whole graph and extracting the relevant 
+        subset."""
+        indices = [src, dst]
+        graph = csr_matrix(graph)
 
-        # Find an edge (i, j) such that edge weight is the minimum of all outgoing edges from i
-        i, min_weight_outgoing_edge_idx = self.find_min_outgoing_edge(csgraph)
-        j = csgraph.indices[min_weight_outgoing_edge_idx]
+        # Compute the shortest path for the full graph
+        full_distances = shortest_path(graph, method=method, directed=True)
 
-        # Remove edge (i, j)
-        modified_csgraph = csgraph.copy()
-        modified_csgraph[i, j] = 0
-        modified_csgraph.eliminate_zeros()  # Remove zero-weight edges effectively
+        # Choose random subset of nodes, including src and dst
+        subset = [src, dst] if indices is None else indices
+        if len(subset) < graph.shape[0]:
+            other_nodes = list(set(range(graph.shape[0])) - set(subset))
+            subset.extend(choices(other_nodes, k=min(3, len(other_nodes))))
 
-        # Get shortest path distances from the original and modified graphs
-        original_dist_i_to_j = shortest_path(csgraph, indices=[i])[0][j]
-        modified_dist_i_to_j = shortest_path(modified_csgraph, indices=[i])[0][j]
+        # Compute the shortest paths for the nodes subset
+        subset_distances = shortest_path(graph, method=method, directed=True, indices=subset)
 
-        # Check that the shortest path distance from i to j is increased after edge removal
-        self.assertGreater(modified_dist_i_to_j, original_dist_i_to_j)
-
-    def find_min_outgoing_edge(self, csgraph):
-        min_weight = np.inf
-        min_weight_idx = -1
-        node_idx = -1
-        for i in range(csgraph.shape[0]):
-            outgoing_edges = csgraph.indices[csgraph.indptr[i]:csgraph.indptr[i+1]]
-            outgoing_weights = csgraph.data[csgraph.indptr[i]:csgraph.indptr[i+1]]
-            if outgoing_weights.size > 0:
-                min_outgoing_weight_idx = outgoing_weights.argmin()
-                if outgoing_weights[min_outgoing_weight_idx] < min_weight:
-                    min_weight = outgoing_weights[min_outgoing_weight_idx]
-                    min_weight_idx = csgraph.indptr[i] + min_outgoing_weight_idx
-                    node_idx = i
-        return node_idx, min_weight_idx
+        # Verify distances in the subset match the corresponding distances in the full set
+        for i, full_src in enumerate(subset):
+            for j, full_dst in enumerate(subset):
+                if full_src != full_dst:
+                    self.assertEqual(full_distances[full_src][full_dst], subset_distances[i][j])
 
 
 if __name__ == "__main__":

@@ -6,22 +6,30 @@ from utils import *
 
 class TestingClass(unittest.TestCase):
     @parameterized.expand(gen_tcs_randomly(1000))
-    def test25(self, graph: list, src: int, dst: int, method: str):
-        """Metamorphic Relation 25: For an undirected graph, converting to a directed graph by duplicating 
-        each edge should result in the same shortest path distances."""
-        csgraph = csr_matrix(graph)
+    def test25(self, graph: list, src: int, dst: int, method: str): # Fixed
+        """Metamorphic Relation 25: For any two nodes (a, b), and any third node (c), the shortest 
+        path from a to b through c should be at least as long as the direct shortest path from a to b."""
+        graph = csr_matrix(graph)
 
-        # Ensure the graph is undirected by making it symmetric
-        symmetric_csgraph = csgraph + csgraph.T
+        # Compute the shortest direct path from a to b
+        direct_path_distance = shortest_path(graph, method=method)[src][dst]
 
-        # Get shortest path distances on the undirected graph
-        undirected_distances = shortest_path(symmetric_csgraph, directed=False)
+        # Choose a third node
+        third_node = self.select_third_node(src, dst, graph.shape[0])
 
-        # Get shortest path distances on the same graph but considered directed
-        directed_distances = shortest_path(symmetric_csgraph, directed=True)
+        # Compute the shortest path from a to b through c
+        path_a_c = shortest_path(graph, method=method)[src][third_node]
+        path_c_b = shortest_path(graph, method=method)[third_node][dst]
+        through_c_path_distance = path_a_c + path_c_b
 
-        # Shortest path distances should be the same regardless of directed or undirected representation
-        np.testing.assert_array_equal(undirected_distances, directed_distances)
+        # Verification
+        self.assertLessEqual(direct_path_distance, through_c_path_distance)
+
+    def select_third_node(self, a, b, num_nodes):
+        """Selects a third node that's different from the two specified nodes."""
+        for node in range(num_nodes):
+            if node != a and node != b:
+                return node  # Take the first node that's different (could be randomized as well)
 
 
 if __name__ == "__main__":

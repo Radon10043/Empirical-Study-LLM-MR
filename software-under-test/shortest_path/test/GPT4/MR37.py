@@ -6,21 +6,23 @@ from utils import *
 
 class TestingClass(unittest.TestCase):
     @parameterized.expand(gen_tcs_randomly(1000))
-    def test37(self, graph: list, src: int, dst: int, method: str):  # Fixed
-        """Metamorphic Relation 37: Reversing the direction of every edge in a graph should not change the distances
-        in the shortest path matrix when the graph is undirected."""
-        csgraph = csr_matrix(graph)
+    def test37(self, graph: list, src: int, dst: int, method: str):
+        """Metamorphic Relation 37: If all weights are multiplied by a positive constant, the shortest path 
+        should be the same but scaled by that constant."""
+        graph = csr_matrix(graph)
 
-        reversed_csgraph = csgraph.T  # Transpose to reverse edge directions
+        scaling_factor = 2
+        # Get the original shortest path
+        original_distance = shortest_path(graph, method=method)[src][dst]
 
-        # Get the original shortest path distances
-        original_distances = shortest_path(csgraph, directed=False)
+        # Scale all weights by a positive constant
+        scaled_graph = graph * scaling_factor
 
-        # Get the distances after edges are reversed in the graph
-        reversed_distances = shortest_path(reversed_csgraph, directed=False)
+        # Get shortest path in scaled graph
+        scaled_distance = shortest_path(scaled_graph, method=method)[src][dst]
 
-        # Distances in the shortest path matrix should remain unchanged because the graph is undirected
-        np.testing.assert_array_almost_equal(original_distances, reversed_distances)
+        # Verify scaled distance is equal to the original distance multiplied by the scaling factor
+        self.assertEqual(scaled_distance, original_distance * scaling_factor)
 
 
 if __name__ == "__main__":

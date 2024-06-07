@@ -8,25 +8,21 @@ from scipy.sparse import csr_matrix
 
 class TestingClass(unittest.TestCase):
     @parameterized.expand(gen_tcs_randomly(1000))
-    def test14(self, graph: list, src: int, dst: int, method: str):
-        """Metamorphic Relation 14: Adding a new vertex that does not decrease the distance of existing
-        shortest paths should not affect the shortest paths between existing vertices."""
-        # Get source output
-        source_out = shortest_path(csr_matrix(graph))
+    def test14(self, graph: list, src: int, dst: int, method: str): # Fixed
+        """Metamorphic Relation 14: Increasing the weight of a self-loop (e.g., edge from a vertex to itself) 
+        should not affect the shortest paths in the graph."""
+        # Get source output for all pairs
+        source_out = shortest_path(graph, method=method)
 
-        # Add a new vertex to the graph that does not decrease the distance of existing shortest paths
-        num_v = len(graph)
-        row = [99999] * (num_v + 1)
-        follow_graph = graph.copy()
-        for row in follow_graph:
-            row.append(99999)
-        follow_graph.append(row)
+        # Increase the weight of the self-loop at src
+        updated_graph = graph.copy()
+        updated_graph[src][src] += 1
 
-        # Get follow-up output
-        follow_out = shortest_path(csr_matrix(follow_graph))
-        for i in range(num_v):
-            for j in range(num_v):
-                self.assertEqual(source_out[i][j], follow_out[i][j])
+        # Get follow-up output for all pairs
+        follow_out = shortest_path(updated_graph, method=method)
+
+        # Verification
+        self.assertTrue(np.array_equal(source_out, follow_out))
 
 
 if __name__ == "__main__":

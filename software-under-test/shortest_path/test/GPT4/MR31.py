@@ -6,28 +6,23 @@ from utils import *
 
 class TestingClass(unittest.TestCase):
     @parameterized.expand(gen_tcs_randomly(1000))
-    def test31(self, graph: list, src: int, dst: int, method: str):
-        """Metamorphic Relation 31: Reducing the weights of all edges by a constant amount down to a
-        minimum of zero should not increase the length of any shortest path."""
-        csgraph = csr_matrix(graph)
+    def test31(self, graph: list, src: int, dst: int, method: str): # Fixed
+        """Metamorphic Relation 31: If all edge weights are set to 1 in a weighted graph, the shortest 
+        path computation should yield the same result as setting the 'unweighted' flag to True."""
+        graph = csr_matrix(graph)
 
-        # Calculate the minimum positive weight in the graph
-        min_positive_weight = csgraph.data[csgraph.data > 0].min()
+        # Compute shortest path with original weights
+        weighted_distance = shortest_path(graph, method=method, unweighted=False)[src][dst]
 
-        # Reduce all weights by min_positive_weight down to a minimum of zero
-        modified_csgraph = csgraph.copy()
-        modified_csgraph.data -= min_positive_weight
-        modified_csgraph.data[modified_csgraph.data < 0] = 0
+        # Set all non-zero weights to 1 to simulate an unweighted graph
+        unweighted_graph = graph.copy()
+        unweighted_graph[unweighted_graph.nonzero()] = 1
 
-        # Get the original and modified shortest path lengths
-        original_dists = shortest_path(csgraph)
-        modified_dists = shortest_path(modified_csgraph)
+        # Compute shortest path in the transformed graph
+        unweighted_distance = shortest_path(unweighted_graph, method=method, unweighted=True)[src][dst]
 
-        n = original_dists.shape[0]
-        for i in range(n):
-            for j in range(n):
-                # Verify that the modified shortest path distances are not greater than the original
-                self.assertLessEqual(modified_dists[i, j], original_dists[i, j])
+        # Verification
+        self.assertEqual(weighted_distance, unweighted_distance)
 
 
 if __name__ == "__main__":

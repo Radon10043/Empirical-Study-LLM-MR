@@ -2,7 +2,7 @@ import unittest
 
 import numpy as np
 
-from random import randint, choice
+from random import randint, choice, sample, choices
 from copy import deepcopy
 from parameterized import parameterized
 from scipy.sparse.csgraph import shortest_path

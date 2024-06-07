@@ -6,22 +6,19 @@ from utils import *
 
 class TestingClass(unittest.TestCase):
     @parameterized.expand(gen_tcs_randomly(1000))
-    def test40(self, graph: list, src: int, dst: int, method: str):  # Fixed
-        """Metamorphic Relation 40: Inverting the weight of all edges in an undirected graph (negating them and adding a
-        constant to avoid negative weights) should not change the topology (the sequence of nodes) of the shortest paths."""
-        csgraph = csr_matrix(graph)
-        additive_inverse_offset = 100000
+    def test40(self, graph: list, src: int, dst: int, method: str): # Fixed
+        """Metamorphic Relation 40: Changing the algorithm ('method' parameter) should not affect the 
+        computed distances between nodes in the graph, assuming all algorithms are correct."""
+        graph = csr_matrix(graph)
 
-        # Negate all edge weights and add a constant to invert the weight without creating negative weights
-        inverted_csgraph = csgraph.copy()
-        inverted_csgraph.data = -inverted_csgraph.data + additive_inverse_offset
+        # Get source output using original algorithm
+        original_distance = shortest_path(graph, method=method)[src][dst]
 
-        # Calculate shortest path predecessors for the original and inverted graphs
-        _, original_preds = shortest_path(csgraph, directed=False, return_predecessors=True)
-        _, inverted_preds = shortest_path(inverted_csgraph, directed=False, return_predecessors=True)
-
-        # Verify that the shortest path topology (the sequence of nodes) remains unchanged
-        np.testing.assert_array_equal(original_preds, inverted_preds)
+        # Test with each alternative algorithm and compare the result with the original distance
+        for alternative_method in ['FW', 'D', 'BF', 'auto']:
+            if method != alternative_method:
+                follow_distance = shortest_path(graph, method=alternative_method)[src][dst]
+                self.assertEqual(original_distance, follow_distance)
 
 
 if __name__ == "__main__":

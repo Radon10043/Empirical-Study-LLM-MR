@@ -6,30 +6,33 @@ from utils import *
 
 class TestingClass(unittest.TestCase):
     @parameterized.expand(gen_tcs_randomly(1000))
-    def test42(self, graph: list, src: int, dst: int, method: str):
-        """Metamorphic Relation 42: In an undirected graph, making a copy of the graph and interchanging 
-        two nodes should not affect the shortest path lengths between any other pair of nodes."""
-        csgraph = csr_matrix(graph)
-        
-        # Create a copy of the original graph
-        permuted_csgraph = csgraph.copy()
+    def test42(self, graph: list, src: int, dst: int, method: str): # Fixed
+        """Metamorphic Relation 42: After negating all the weights in the graph, the shortest path 
+        between any two nodes should still be the same path, but with negated weights."""
+        graph = csr_matrix(graph)
 
-        # Select two nodes to interchange
-        num_nodes = csgraph.shape[0]
-        node_a, node_b = np.random.choice(num_nodes, size=2, replace=False)
+        # Assuming the shortest path software can handle negative weights:
+        # Get source output for the original graph
+        original_distance = shortest_path(graph, method=method)[src][dst]
+        original_predecessors = shortest_path(graph, method=method, return_predecessors=True)[1]
 
-        # Interchange the nodes in the graph's adjacency matrix
-        permuted_csgraph[[node_a, node_b], :] = permuted_csgraph[[node_b, node_a], :]
-        permuted_csgraph[:, [node_a, node_b]] = permuted_csgraph[:, [node_b, node_a]]
+        # Negate weights of the graph
+        # This step assumes that the graph supports direct negation of its values
+        negated_weight_graph = graph.copy()
+        negated_weight_graph.data *= -1
 
-        # Compute shortest path lengths for both graphs
-        original_distances = shortest_path(csgraph, directed=False)
-        permuted_distances = shortest_path(permuted_csgraph, directed=False)
+        # Get follow-up output for the graph with negated weights
+        negated_weight_distance = shortest_path(negated_weight_graph, method=method)[src][dst]
+        negated_weight_predecessors = shortest_path(negated_weight_graph, method=method, return_predecessors=True)[1]
 
-        # Verify that the shortest path lengths between other nodes remain the same
-        mask = np.ones(num_nodes, dtype=bool)
-        mask[[node_a, node_b]] = False
-        np.testing.assert_array_equal(original_distances[mask][:, mask], permuted_distances[mask][:, mask])
+        # Extract the path using the predecessors list
+        path_original = get_shortest_path(original_predecessors, src, dst)
+        path_negated = get_shortest_path(negated_weight_predecessors, src, dst)
+
+        # Verify that the paths are the same
+        self.assertEqual(path_original, path_negated)
+        # Verify the distances are each other's negation
+        self.assertAlmostEqual(original_distance, -negated_weight_distance)
 
 
 if __name__ == "__main__":

@@ -7,23 +7,22 @@ from utils import *
 class TestingClass(unittest.TestCase):
     @parameterized.expand(gen_tcs_randomly(1000))
     def test7(self, graph: list, src: int, dst: int, method: str):  # Fixed
-        """Metamorphic Relation 7: Reversing the direction of edges in a directed graph should not affect the
-        shortest path in the original graph if the destination is set as the new source."""
-        csgraph = csr_matrix(graph)
+        """Metamorphic Relation 7: Doubling the weights of all edges in the graph should result in 
+        the shortest path being doubled as well."""
+        # Get source output
+        source_out = shortest_path(graph, method=method)[src][dst]
 
-        # Assume the graph is directed and we can reverse it
-        reversed_csgraph = csgraph.T
+        # Double the weights of all edges in the graph for follow-up input
+        double_weight_graph = graph.copy()
+        for i in range(len(double_weight_graph)):
+            for j in range(len(double_weight_graph[i])):
+                double_weight_graph[i][j] *= 2
 
-        # Source output: every node to the destination
-        source_out_all_to_dst = shortest_path(csgraph)[:, dst]
+        # Get follow-up output
+        follow_out = shortest_path(double_weight_graph, method=method)[src][dst]
 
-        # Follow-up output: new source is the old destination
-        follow_out_src_to_all = shortest_path(reversed_csgraph, indices=[dst])[0]
-
-        # Verification for each node as a new source
-        num_vertices = len(follow_out_src_to_all)
-        for i in range(num_vertices):
-            self.assertEqual(source_out_all_to_dst[i], follow_out_src_to_all[i])
+        # Verification
+        self.assertEqual(source_out * 2, follow_out)
 
 
 if __name__ == "__main__":

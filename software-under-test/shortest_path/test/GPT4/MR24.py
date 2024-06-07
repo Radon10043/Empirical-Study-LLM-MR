@@ -7,25 +7,36 @@ from utils import *
 class TestingClass(unittest.TestCase):
     @parameterized.expand(gen_tcs_randomly(1000))
     def test24(self, graph: list, src: int, dst: int, method: str): # Fixed
-        """Metamorphic Relation 24: Adding an edge with an extremely high weight between two nodes should not 
-        change the shortest path between them."""
-        csgraph = csr_matrix(graph)
+        """Metamorphic Relation 24: Replacing all positive weights with a uniform positive value should preserve the optimal path, 
+        although the path cost will be directly proportional to the number of edges on the path."""
+        directed = choice([True, False])
 
-        # Get original shortest path output
-        original_output = shortest_path(csgraph)
+        uniform_weight = 10
+        # Get the shortest path and path nodes for the original weighted graph
+        original_matrix, predecessors = shortest_path(graph, method=method, directed=directed, return_predecessors=True)
+        original_path_nodes = get_shortest_path(predecessors, src, dst)
 
-        # Add new edge with high weight to the csgraph
-        u, v, high_weight = 1, 2, 1000000
-        modified_csgraph = csgraph.copy()
-        modified_csgraph[u, v] = high_weight
-        modified_csgraph[v, u] = high_weight
+        # Construct a graph with uniform positive weights
+        uniform_weight_graph = self.create_uniform_weight_graph(graph, uniform_weight)
 
-        # Get new shortest path output
-        modified_output = shortest_path(modified_csgraph)
+        # Get follow-up distances and path nodes for uniform weight graph
+        uniform_matrix, uniform_predecessors = shortest_path(uniform_weight_graph, method=method, directed=directed, return_predecessors=True)
+        uniform_path_nodes = get_shortest_path(uniform_predecessors, src, dst)
+        uniform_distance = uniform_matrix[src][dst]
 
-        # The shortest path should not change for any pair of nodes due to the high weight of the new edge
-        np.testing.assert_array_equal(original_output, modified_output)
+        # The shortest path nodes should be the same, even though the weight of the path is different
+        self.assertEqual(original_path_nodes, uniform_path_nodes)
+        # The weight of the path will now be the uniform weight times the number of edges in the original path
+        self.assertEqual(uniform_distance, uniform_weight * (len(original_path_nodes) - 1))
 
+    def create_uniform_weight_graph(self, graph, uniform_weight):
+        """Replace all positive weights in the graph with a uniform value."""
+        uniform_weight_graph = graph.copy()
+        for i in range(len(uniform_weight_graph)):
+            for j in range(i, len(uniform_weight_graph)):
+                if uniform_weight_graph[i][j] > 0:
+                    uniform_weight_graph[i][j] = uniform_weight
+        return uniform_weight_graph
 
 if __name__ == "__main__":
     unittest.main()
