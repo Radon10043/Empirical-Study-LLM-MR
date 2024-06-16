@@ -6,20 +6,24 @@ from utils import *
 
 class TestingClass(unittest.TestCase):
     @parameterized.expand(gen_tcs_randomly(1000))
-    def test24(self, graph: list, src: int, dst: int, method: str):
-        """Metamorphic Relation 24: Given the same graph, the same source and destination vertices, 
-        but with additional weights assigned to certain edges, the shortest path satisfies the updated weights."""
-        modified_graph = [row[:] for row in graph]
-        modified_graph[0][1] = 10  # Assigning additional weight to an edge
+    def test24(self, graph: list, src: int, dst: int, method: str): # Fixed
+        """Metamorphic Relation 24: Given the same graph, source, and destination vertices,
+        if we apply a positive linear transformation to the edge weights, 
+        the shortest path from source to destination should be scaled accordingly."""
+        constant = randint(2, 100)
+        intercept = randint(2, 100)
 
         # Get source output
-        source_out = shortest_path(graph, method=method)[src][dst]
+        original_shortest_path = shortest_path(graph, method=method)[src][dst]
+
+        # Construct follow-up input by applying a positive linear transformation to the edge weights
+        follow_graph = [[x * constant + intercept for x in row] for row in graph]
 
         # Get follow-up output
-        follow_out = shortest_path(modified_graph, method=method)[src][dst]
+        modified_shortest_path = shortest_path(follow_graph, method=method)[src][dst]
 
         # Verification
-        self.assertEqual(source_out, follow_out)
+        self.assertEqual(modified_shortest_path, constant * original_shortest_path + intercept)
 
 
 if __name__ == "__main__":

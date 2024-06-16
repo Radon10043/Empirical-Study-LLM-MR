@@ -7,25 +7,20 @@ from utils import *
 
 class TestingClass(unittest.TestCase):
     @parameterized.expand(gen_tcs_randomly(1000))
-    def test13(self, graph: list, src: int, dst: int, method: str):
-        """Metamorphic Relation 13: Given the same graph, the same source and destination vertices,
-        but with a subset of edges removed, the output should still satisfy the shortest path property."""
-        
+    def test14(self, graph: list, src: int, dst: int, method: str):
+        """Metamorphic Relation 14: Given the same graph, source, and destination vertices,
+        if some edge weights are set to infinity, the shortest path should not change."""
         # Get source output
         source_out = shortest_path(graph, method=method)[src][dst]
 
-        # Remove a subset of edges from the graph
-        num_edges_to_remove = len(graph) // 2
-        edges_to_remove = random.sample(range(len(graph)), num_edges_to_remove)
-        filtered_graph = [row[:] for row in graph]
-        for i in edges_to_remove:
-            filtered_graph[i] = [float('inf')] * len(graph)
+        # Construct follow-up input with some edge weights set to infinity
+        follow_graph = [[float('inf') if (i+j) % 2 == 0 else x for j, x in enumerate(row)] for i, row in enumerate(graph)]
 
         # Get follow-up output
-        follow_out = shortest_path(filtered_graph, method=method)[src][dst]
+        follow_out = shortest_path(follow_graph, method=method)[src][dst]
 
         # Verification
-        self.assertTrue(follow_out >= source_out)
+        self.assertEqual(source_out, follow_out)
 
 
 if __name__ == "__main__":

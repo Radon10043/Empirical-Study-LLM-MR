@@ -6,14 +6,23 @@ from utils import *
 
 class TestingClass(unittest.TestCase):
     @parameterized.expand(gen_tcs_randomly(1000))
-    def test42(self, graph: list, src: int, dst: int, method: str): # Fixed
-        """Metamorphic Relation 42: Given the same graph and vertices, if the weights are all set to 1, 
-        the shortest path should still be the same as the original graph."""
-        # Set all edge weights to 1
-        modified_graph = [[1 for _ in range(len(graph))] for _ in range(len(graph))]
+    def test42(self, graph: list, src: int, dst: int, method: str):
+        """Metamorphic Relation 42: Given the same graph, source, and destination vertices,
+        if we remove a constant from the weight of a specific vertex, 
+        the shortest path should reflect the removal of this constant from the specific vertex."""
+        # Get source output
+        original_shortest_path = shortest_path(graph, method=method)[src][dst]
 
-        # Verify that the shortest path remains unchanged
-        np.testing.assert_array_equal(shortest_path(graph, method=method), shortest_path(modified_graph, method=method))
+        # Construct follow-up input by removing a constant from the weight of a specific vertex
+        constant = 3
+        follow_graph = list(graph)
+        follow_graph[src][src] -= constant
+
+        # Get follow-up output
+        modified_shortest_path = shortest_path(follow_graph, method=method)[src][dst]
+
+        # Verification
+        self.assertEqual(modified_shortest_path, original_shortest_path - constant)
 
 
 if __name__ == "__main__":

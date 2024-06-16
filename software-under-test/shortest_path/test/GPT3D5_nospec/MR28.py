@@ -6,23 +6,24 @@ from utils import *
 
 class TestingClass(unittest.TestCase):
     @parameterized.expand(gen_tcs_randomly(1000))
-    def test28(self, graph: list, src: int, dst: int, method: str):
-        """Metamorphic Relation 28: Given the same graph, the same source and destination vertices,
-        but with the weights in the graph adjusted such that all weights are scaled by a constant factor,
-        the shortest path between the vertices should also be scaled by the same constant factor."""
-        factor = 2
-
-        # Get the original shortest path
+    def test28(self, graph: list, src: int, dst: int, method: str):  # Fixed
+        """Metamorphic Relation 28: Given the same graph, source, and destination vertices,
+        if we reverse the direction of a specific edge in the graph,
+        the shortest path should be impacted accordingly."""
+        # Get source output
         original_shortest_path = shortest_path(graph, method=method)[src][dst]
 
-        # Scale the weights in the graph by the constant factor
-        scaled_graph = [[edge_weight * factor for edge_weight in row] for row in graph]
+        # Construct follow-up input by reversing the direction of a specific edge
+        follow_graph = deepcopy(graph)
+        tmp = follow_graph[src][dst]
+        follow_graph[src][dst] = follow_graph[dst][src]
+        follow_graph[dst][src] = tmp
 
-        # Get the shortest path in the scaled graph
-        scaled_shortest_path = shortest_path(scaled_graph, method=method)[src][dst]
+        # Get follow-up output
+        modified_shortest_path = shortest_path(follow_graph, method=method)[src][dst]
 
         # Verification
-        self.assertEqual(original_shortest_path * factor, scaled_shortest_path)
+        self.assertLessEqual(original_shortest_path, modified_shortest_path)
 
 
 if __name__ == "__main__":

@@ -6,21 +6,24 @@ from utils import *
 
 class TestingClass(unittest.TestCase):
     @parameterized.expand(gen_tcs_randomly(1000))
-    def test3(self, graph: list, src: int, dst: int, method: str):
-        """Metamorphic Relation 3: Given the same graph, the same source and destination vertices,
-        but with the weights in the graph negated, the output should be the same as the original graph."""
+    def test3(self, graph: list, src: int, dst: int, method: str):  # Fixed
+        """Metamorphic Relation 3: Given the same graph with reversed direction edges,
+        the shortest path from source to destination should be the reverse of the original shortest path."""
         # Get source output
-        source_out = shortest_path(graph, method=method)[src][dst]
+        _, predecessors = shortest_path(graph, method=method, return_predecessors=True)
+        source_path = get_shortest_path(predecessors, src, dst)
 
-        follow_graph = list()
+        # Construct follow-up input with reversed direction edges
+        follow_graph = []
         for row in graph:
-            follow_graph.append([-x for x in row])
+            follow_graph.append(row[::-1])
 
         # Get follow-up output
-        follow_out = shortest_path(follow_graph, method)[src][dst]
+        _, predecessors = shortest_path(follow_graph, method=method, return_predecessors=True)
+        follow_path = get_shortest_path(predecessors, src, dst)
 
         # Verification
-        self.assertEqual(source_out, follow_out)
+        self.assertEqual(source_path, list(reversed(follow_path)))
 
 
 if __name__ == "__main__":

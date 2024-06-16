@@ -7,21 +7,19 @@ from utils import *
 class TestingClass(unittest.TestCase):
     @parameterized.expand(gen_tcs_randomly(1000))
     def test11(self, graph: list, src: int, dst: int, method: str):
-        """Metamorphic Relation 11: Given the same graph, the same source and destination vertices, 
-        but with the weights randomized, the output should still satisfy the shortest path property."""
-        import random
-
+        """Metamorphic Relation 11: Given the same graph, source and destination vertices, 
+        if the source vertex index and destination vertex index are multiplied by a positive constant k, 
+        the shortest path should remain the same."""
         # Get source output
         source_out = shortest_path(graph, method=method)[src][dst]
 
-        # Randomize the weights in the graph
-        random_graph = [[random.randint(1, 100) for _ in range(len(graph))] for _ in range(len(graph))]
-
-        # Get follow-up output
-        follow_out = shortest_path(random_graph, method=method)[src][dst]
+        # Construct follow-up input with multiplied source and destination vertex indices
+        follow_src = src * 3
+        follow_dst = dst * 3
+        follow_out = shortest_path(graph, method=method)[follow_src][follow_dst]
 
         # Verification
-        self.assertTrue(follow_out >= source_out)
+        self.assertEqual(source_out, follow_out)
 
 
 if __name__ == "__main__":

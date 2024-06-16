@@ -7,13 +7,21 @@ from utils import *
 class TestingClass(unittest.TestCase):
     @parameterized.expand(gen_tcs_randomly(1000))
     def test38(self, graph: list, src: int, dst: int, method: str):
-        """Metamorphic Relation 38: Given the same graph and vertices, if all edge weights are set to zero,
-        the shortest path length should be zero for all vertices to itself."""
-        # Set all edge weights to zero
-        zero_graph = [[0 for _ in row] for row in graph]
+        """Metamorphic Relation 38: Given the same graph, source and destination vertices,
+        if we add a constant to the weight of all edges in the graph and then subtract the same constant, 
+        the shortest path remains the same as the original shortest path."""
+        # Get source output
+        original_shortest_path = shortest_path(graph, method=method)[src][dst]
 
-        for i in range(len(graph)):
-            self.assertEqual(shortest_path(zero_graph, method=method)[i][i], 0)
+        # Construct follow-up input by adding and then subtracting a constant from the edge weights
+        constant = 5
+        follow_graph = [[x - constant for x in row] for row in [[x + constant for x in row] for row in graph]]
+
+        # Get follow-up output
+        modified_shortest_path = shortest_path(follow_graph, method=method)[src][dst]
+
+        # Verification
+        self.assertEqual(modified_shortest_path, original_shortest_path)
 
 
 if __name__ == "__main__":

@@ -6,24 +6,24 @@ from utils import *
 
 
 class TestingClass(unittest.TestCase):
-    @parameterized.expand(gen_tcs_randomly(1))
+    @parameterized.expand(gen_tcs_randomly(1000))
     def test23(self, graph: list, src: int, dst: int, method: str):
-        """Metamorphic Relation 23: Given the same graph, the same source and destination vertices, 
-        but with some of the edges in the graph having their weights multiplied by -1, 
-        the shortest path should remain the same."""
-        # Modify the weights of a subset of edges by multiplying them with -1
-        modified_graph = [[weight * -1 if random.random() < 0.3 else weight for weight in row] for row in graph]
-
+        """Metamorphic Relation 23: Given the same graph, source, and destination vertices,
+        if every edge weight is multiplied by a constant and additional constant weight is added to all edges,
+        the shortest path should also include the effect of these transformations."""
         # Get source output
-        _, predecessors = shortest_path(graph, method=method, return_predecessors=True)
-        source_out = get_shortest_path(predecessors, src, dst)
+        original_shortest_path = shortest_path(graph, method=method)[src][dst]
+
+        # Construct follow-up input by multiplying every edge weight and then adding a constant weight to all edges
+        constant_multiplier = 2
+        additional_constant = 10
+        follow_graph = [[x * constant_multiplier + additional_constant for x in row] for row in graph]
 
         # Get follow-up output
-        _, predecessors = shortest_path(modified_graph, method=method, return_predecessors=True)
-        follow_out = get_shortest_path(predecessors, src, dst)
+        modified_shortest_path = shortest_path(follow_graph, method=method)[src][dst]
 
         # Verification
-        self.assertEqual(source_out, follow_out)
+        self.assertEqual(original_shortest_path * constant_multiplier + additional_constant, modified_shortest_path)
 
 
 if __name__ == "__main__":

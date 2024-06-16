@@ -6,20 +6,20 @@ from utils import *
 
 class TestingClass(unittest.TestCase):
     @parameterized.expand(gen_tcs_randomly(1000))
-    def test6(self, graph: list, src: int, dst: int, method: str):
-        """Metamorphic Relation 6: Given the same graph, the same source and destination vertices,
-        but with the source and destination vertices shifted by a constant, the output should be the same."""
+    def test6(self, graph: list, src: int, dst: int, method: str):  # Fixed
+        """Metamorphic Relation 6: Given the same graph, source and destination vertices,
+        but with the destination vertex changed to be the source vertex, 
+        the shortest path should be the reverse of the original shortest path."""
         # Get source output
-        source_out = shortest_path(graph, method=method)[src][dst]
+        _, predecessors = shortest_path(graph, method=method, return_predecessors=True)
+        source_out = get_shortest_path(predecessors, src, dst)
 
-        shifted_src = (src + 2) % len(graph)  # shifting source vertex by 2
-        shifted_dst = (dst + 2) % len(graph)  # shifting destination vertex by 2
-
-        # Get follow-up output
-        follow_out = shortest_path(graph, method)[shifted_src][shifted_dst]
+        # Get follow-up output with changed source and destination vertices
+        _, predecessors = shortest_path(graph, method=method, return_predecessors=True)
+        follow_out = get_shortest_path(predecessors, dst, src)
 
         # Verification
-        self.assertEqual(source_out, follow_out)
+        self.assertEqual(source_out, list(reversed(follow_out)))
 
 
 if __name__ == "__main__":

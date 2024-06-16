@@ -6,20 +6,23 @@ from utils import *
 
 class TestingClass(unittest.TestCase):
     @parameterized.expand(gen_tcs_randomly(1000))
-    def test41(self, graph: list, src: int, dst: int, method: str): # Fixed
-        """Metamorphic Relation 41: Given the same graph and vertices, if the weights of all edges are set to a negative value,
-        the shortest path results should remain the same."""
-        # Set all edge weights to a negative value
-        negative_graph = [[-1 for _ in row] for row in graph]
+    def test41(self, graph: list, src: int, dst: int, method: str):
+        """Metamorphic Relation 41: Given the same graph, source, and destination vertices,
+        if we add a constant to the weight of a specific vertex, 
+        the shortest path should reflect the addition of this constant to the specific vertex."""
+        # Get source output
+        original_shortest_path = shortest_path(graph, method=method)[src][dst]
 
-        _, predecessors = shortest_path(graph, method=method, return_predecessors=True)
-        source_out = get_shortest_path(predecessors, src, dst)
+        # Construct follow-up input by adding a constant to the weight of a specific vertex
+        constant = 5
+        follow_graph = list(graph)
+        follow_graph[dst][dst] += constant
 
-        _, predecessors = shortest_path(negative_graph, method=method, return_predecessors=True)
-        follow_out = get_shortest_path(predecessors, src, dst)
+        # Get follow-up output
+        modified_shortest_path = shortest_path(follow_graph, method=method)[src][dst]
 
-        # Verify the shortest path results
-        self.assertListEqual(source_out, follow_out)
+        # Verification
+        self.assertEqual(modified_shortest_path, original_shortest_path + constant)
 
 
 if __name__ == "__main__":

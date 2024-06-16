@@ -6,20 +6,23 @@ from utils import *
 
 class TestingClass(unittest.TestCase):
     @parameterized.expand(gen_tcs_randomly(1000))
-    def test27(self, graph: list, src: int, dst: int, method: str):
-        """Metamorphic Relation 27: Given the same graph, the same source and destination vertices, 
-        if an edge with a very large weight is added, the shortest path should avoid that edge."""
-        modified_graph = [row[:] for row in graph]
-        modified_graph[src][dst] = 999999  # Adding a very large weight to an edge
+    def test27(self, graph: list, src: int, dst: int, method: str): # Fixed
+        """Metamorphic Relation 27: Given the same graph and source and destination vertices,
+        if the weights of all edges are transformed by log function, 
+        the shortest path from source to destination should reflect the log transformation."""
+        import math
 
         # Get source output
-        source_out = shortest_path(graph, method=method)[src][dst]
+        original_shortest_path = shortest_path(graph, method=method)[src][dst]
+
+        # Construct follow-up input by transforming the weights of all edges using log function
+        follow_graph = [[math.log(x+1) for x in row] for row in graph]
 
         # Get follow-up output
-        follow_out = shortest_path(modified_graph, method=method)[src][dst]
+        modified_shortest_path = shortest_path(follow_graph, method=method)[src][dst]
 
         # Verification
-        self.assertTrue(follow_out > source_out)
+        self.assertAlmostEqual(modified_shortest_path, math.log(original_shortest_path+1), places=5)
 
 
 if __name__ == "__main__":

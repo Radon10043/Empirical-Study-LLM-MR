@@ -7,22 +7,28 @@ from utils import *
 
 class TestingClass(unittest.TestCase):
     @parameterized.expand(gen_tcs_randomly(1000))
-    def test17(self, graph: list, src: int, dst: int, method: str):
-        """Metamorphic Relation 17: Given the same graph, the same source and destination vertices, 
-        but with the source and destination vertices replaced with intermediate vertices, 
-        the output should still satisfy the shortest path property."""
-        # Get the intermediate node
-        num_nodes = len(graph)
-        mid_vertex = random.randint(0, num_nodes - 1)
+    def test17(self, graph: list, src: int, dst: int, method: str): # Fixed
+        """Metamorphic Relation 17: Given the same graph, source, and destination vertices,
+        if the graph is modified by removing certain vertices and their associated edges, 
+        the shortest path should remain the same."""
+        n = len(graph)
+        if src ==  n - 1 or dst == n - 1:
+            self.skipTest("Skip test where source or destination is the removed vertex")
 
         # Get source output
         source_out = shortest_path(graph, method=method)[src][dst]
 
-        # Get follow-up output with the intermediate vertex
-        follow_out = shortest_path(graph, method=method)[src][mid_vertex] + shortest_path(graph, method=method)[mid_vertex][dst]
+        # Construct follow-up input by removing certain vertices and their associated edges
+        follow_graph = graph.copy()
+        follow_graph.pop(n - 1)
+        for i in range(n - 1):
+            follow_graph[i] = follow_graph[i][:n - 1]
+
+        # Get follow-up output
+        follow_out = shortest_path(follow_graph, method=method)[src][dst]
 
         # Verification
-        self.assertTrue(follow_out >= source_out)
+        self.assertEqual(source_out, follow_out)
 
 
 if __name__ == "__main__":

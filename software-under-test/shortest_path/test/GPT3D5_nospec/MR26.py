@@ -6,20 +6,31 @@ from utils import *
 
 class TestingClass(unittest.TestCase):
     @parameterized.expand(gen_tcs_randomly(1000))
-    def test26(self, graph: list, src: int, dst: int, method: str):
-        """Metamorphic Relation 26: Given the same graph, the same source and destination vertices, 
-        if an alternative path is added with a higher cost, the shortest path method should still produce the original shortest path."""
-        modified_graph = [row[:] for row in graph]
-        modified_graph[src][dst] = 100  # Adding an alternative path with a higher cost
+    def test26(self, graph: list, src: int, dst: int, method: str): # Fixed
+        """Metamorphic Relation 26: Given the same graph, source, and destination vertices,
+        if we remove specific vertex and its associated edges, 
+        the shortest path from source to destination should also not include the removed vertex."""
+        if src == len(graph) - 1 or dst == len(graph) - 1:
+            self.skipTest("Source or destination vertex is the removed vertex")
 
         # Get source output
-        source_out = shortest_path(graph, method=method)[src][dst]
+        original_shortest_path = shortest_path(graph, method=method)[src][dst]
+
+        # Construct follow-up input by removing a specific vertex and its associated edges
+        def remove_specific_vertex(graph: list) -> list:
+            follow_graph = deepcopy(graph)
+            follow_graph.pop(len(graph) - 1)
+            for i in range(len(follow_graph)):
+                follow_graph[i].pop(len(graph) - 1)
+            return follow_graph
+        follow_graph = remove_specific_vertex(graph)
 
         # Get follow-up output
-        follow_out = shortest_path(modified_graph, method=method)[src][dst]
+        _, predecessors = shortest_path(follow_graph, method=method, return_predecessors=True)
+        follow_path = get_shortest_path(predecessors, src, dst)
 
         # Verification
-        self.assertEqual(source_out, follow_out)
+        self.assertTrue(len(graph) - 1 not in follow_path)
 
 
 if __name__ == "__main__":

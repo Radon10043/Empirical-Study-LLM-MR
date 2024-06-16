@@ -7,23 +7,24 @@ from utils import *
 class TestingClass(unittest.TestCase):
     @parameterized.expand(gen_tcs_randomly(1000))
     def test4(self, graph: list, src: int, dst: int, method: str):  # Fixed
-        """Metamorphic Relation 4: Given the same graph with an added vertex, the output should be the same as the original graph."""
+        """Metamorphic Relation 4: Given the same graph, the same source, and destination vertices,
+        but with an additional intermediate vertex added, the shortest path should be shortest
+        from source to intermediate vertex combined with shortest from intermediate to destination."""
         # Get source output
         source_out = shortest_path(graph, method=method)[src][dst]
 
-        # Adding an extra vertex with large weights
-        modified_graph = graph.copy()
-        inf = 99999
-        for row in modified_graph:
-            row.append(inf)
-        modified_graph.append([inf] * (len(modified_graph) + 1))
-        modified_graph[-1][-1] = 0
+        # Construct follow-up input with an additional intermediate vertex
+        follow_graph = graph.copy()
+        for i in range(len(graph)):
+            follow_graph[i].append(float("inf"))
+
+        follow_graph.append([float("inf") for _ in range(len(graph) + 1)])  # Add a row for the new vertex
 
         # Get follow-up output
-        follow_out = shortest_path(modified_graph, method)[src][dst]
+        matrix = shortest_path(follow_graph, method=method)
 
         # Verification
-        self.assertEqual(source_out, follow_out)
+        self.assertEqual(source_out, matrix[src][len(graph)] + matrix[len(graph)][dst])
 
 
 if __name__ == "__main__":

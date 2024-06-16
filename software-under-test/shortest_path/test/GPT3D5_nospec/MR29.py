@@ -6,16 +6,23 @@ from utils import *
 
 class TestingClass(unittest.TestCase):
     @parameterized.expand(gen_tcs_randomly(1000))
-    def test29(self, graph: list, src: int, dst: int, method: str):
-        """Metamorphic Relation 29: Given the same graph and vertices, the order of the vertices in the input should not affect the shortest path."""
-        # Get the original shortest path
+    def test29(self, graph: list, src: int, dst: int, method: str): # Fixed
+        """Metamorphic Relation 29: Given the same graph and source and destination vertices,
+        if the weights of all edges are transformed by the exponential function, 
+        the shortest path from source to destination should be impacted by the exponential transformation."""
+        import math
+
+        # Get source output
         original_shortest_path = shortest_path(graph, method=method)[src][dst]
 
-        # Get the shortest path with the vertices swapped
-        swapped_shortest_path = shortest_path(graph, method=method)[dst][src]
+        # Construct follow-up input by transforming the weights of all edges using the exponential function
+        follow_graph = [[math.exp(x) for x in row] for row in graph]
+
+        # Get follow-up output
+        modified_shortest_path = shortest_path(follow_graph, method=method)[src][dst]
 
         # Verification
-        self.assertEqual(original_shortest_path, swapped_shortest_path)
+        self.assertAlmostEqual(modified_shortest_path, math.exp(original_shortest_path), places=5)
 
 
 if __name__ == "__main__":

@@ -6,16 +6,22 @@ from utils import *
 
 class TestingClass(unittest.TestCase):
     @parameterized.expand(gen_tcs_randomly(1000))
-    def test40(self, graph: list, src: int, dst: int, method: str): # Fixed
-        """Metamorphic Relation 40: Given the same graph and vertices, if the graph is transposed, 
-        the shortest paths between vertices should remain unchanged."""
-        import numpy as np
+    def test40(self, graph: list, src: int, dst: int, method: str):
+        """Metamorphic Relation 40: Given the same graph, source, and destination vertices,
+        if we add a constant to the weight of all edges, 
+        the shortest path should reflect the addition of this constant to all edges."""
+        # Get source output
+        original_shortest_path = shortest_path(graph, method=method)[src][dst]
 
-        # Transpose the graph
-        transposed_graph = np.transpose(graph)
+        # Construct follow-up input by adding a constant to the weight of all edges
+        constant = 10
+        follow_graph = [[x + constant for x in row] for row in graph]
 
-        # Verify that the shortest paths are unchanged
-        np.testing.assert_array_equal(shortest_path(graph, method=method), shortest_path(transposed_graph, method=method))
+        # Get follow-up output
+        modified_shortest_path = shortest_path(follow_graph, method=method)[src][dst]
+
+        # Verification
+        self.assertEqual(modified_shortest_path, original_shortest_path + constant)
 
 
 if __name__ == "__main__":

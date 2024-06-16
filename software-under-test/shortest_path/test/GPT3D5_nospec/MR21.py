@@ -7,17 +7,17 @@ from utils import *
 class TestingClass(unittest.TestCase):
     @parameterized.expand(gen_tcs_randomly(1000))
     def test21(self, graph: list, src: int, dst: int, method: str): # Fixed
-        """Metamorphic Relation 21: Given the same graph, the same source and destination vertices, 
-        but with all weights set to the same value, the shortest path should not change."""
-        # Set all weights in the graph to the same value
-        same_weight_graph = [[10 for _ in range(len(graph))] for _ in range(len(graph))]
-
+        """Metamorphic Relation 21: Given a graph with non-negative edge weights, if the edge weights are squared,
+        the shortest path from source to destination should remain the same."""
         # Get source output
         _, predecessors = shortest_path(graph, method=method, return_predecessors=True)
         source_out = get_shortest_path(predecessors, src, dst)
 
+        # Construct follow-up input by squaring the edge weights
+        follow_graph = [[x**2 for x in row] for row in graph]
+
         # Get follow-up output
-        _, predecessors = shortest_path(same_weight_graph, method=method, return_predecessors=True)
+        _, predecessors = shortest_path(follow_graph, method=method, return_predecessors=True)
         follow_out = get_shortest_path(predecessors, src, dst)
 
         # Verification

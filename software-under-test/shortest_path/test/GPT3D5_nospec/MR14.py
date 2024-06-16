@@ -6,22 +6,17 @@ from utils import *
 
 class TestingClass(unittest.TestCase):
     @parameterized.expand(gen_tcs_randomly(1000))
-    def test14(self, graph: list, src: int, dst: int, method: str): # Fixed
-        """Metamorphic Relation 14: Given the same graph, the same source and destination vertices,
-        but with the weights in the graph modified such that all weights are multiplied by a constant factor, 
-        the shortest path remains the same"""
-        constant = 2  # multiplicative constant
-
+    def test14(self, graph: list, src: int, dst: int, method: str):
+        """Metamorphic Relation 14: Given the same graph, source, and destination vertices,
+        if some edge weights are set to infinity, the shortest path should not change."""
         # Get source output
-        _, predecessors = shortest_path(graph, method=method, return_predecessors=True)
-        source_out = get_shortest_path(predecessors, src, dst)
+        source_out = shortest_path(graph, method=method)[src][dst]
 
-        # Modify the graph such that all weights are multiplied by the constant factor
-        modified_graph = [[weight * constant for weight in row] for row in graph]
+        # Construct follow-up input with some edge weights set to infinity
+        follow_graph = [[float('inf') if (i+j) % 2 == 0 else x for j, x in enumerate(row)] for i, row in enumerate(graph)]
 
         # Get follow-up output
-        _, predecessors = shortest_path(modified_graph, method=method, return_predecessors=True)
-        follow_out = get_shortest_path(predecessors, src, dst)
+        follow_out = shortest_path(follow_graph, method=method)[src][dst]
 
         # Verification
         self.assertEqual(source_out, follow_out)

@@ -6,20 +6,24 @@ from utils import *
 
 class TestingClass(unittest.TestCase):
     @parameterized.expand(gen_tcs_randomly(1000))
-    def test25(self, graph: list, src: int, dst: int, method: str):
-        """Metamorphic Relation 25: Given the same graph, the same source and destination vertices, 
-        if an edge is disconnected in the follow-up graph, the shortest path should change."""
-        modified_graph = [row[:] for row in graph]
-        modified_graph[src][dst] = float('inf')  # Disconnecting an edge
-
+    def test25(self, graph: list, src: int, dst: int, method: str): # Fixed
+        """Metamorphic Relation 25: Given the same graph, source, and destination vertices,
+        if we add a new vertex with edges connecting it to the existing vertices,
+        the shortest path from source to destination should not be shorter than the original shortest path."""
         # Get source output
-        source_out = shortest_path(graph, method=method)[src][dst]
+        original_shortest_path = shortest_path(graph, method=method)[src][dst]
+
+        # Construct follow-up input by adding a new vertex with edges connecting it to the existing vertices
+        follow_graph = deepcopy(graph)
+        for i in range(len(graph)):
+            follow_graph[i].append(randint(1, 100))
+        follow_graph.append([randint(1, 100) for _ in range(len(graph) + 1)])
 
         # Get follow-up output
-        follow_out = shortest_path(modified_graph, method=method)[src][dst]
+        modified_shortest_path = shortest_path(follow_graph, method=method)[src][dst]
 
         # Verification
-        self.assertNotEqual(source_out, follow_out)
+        self.assertGreaterEqual(modified_shortest_path, original_shortest_path)
 
 
 if __name__ == "__main__":
