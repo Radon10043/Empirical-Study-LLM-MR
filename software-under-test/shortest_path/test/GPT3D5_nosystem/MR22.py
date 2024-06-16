@@ -6,43 +6,20 @@ from utils import *
 
 
 class TestingClass(unittest.TestCase):
-    def add_node_with_connections(self, graph: list) -> list:
-        """Add a new node with connections to existing nodes in the graph.
-
-        Parameters
-        ----------
-        graph : list
-            The adjacency matrix of the graph
-
-        Returns
-        -------
-        list
-            The new graph after adding a new node with connections to existing nodes
-        """
-        n = len(graph)
-        new_graph = [[0] * (n + 1) for _ in range(n + 1)]
-        for i in range(n):
-            for j in range(n):
-                new_graph[i][j] = graph[i][j]
-        for i in range(n):
-            new_graph[i][n] = random.randint(1, 1000)
-            new_graph[n][i] = random.randint(1, 1000)
-        return new_graph
-
     @parameterized.expand(gen_tcs_randomly(1000))
-    def test22(self, graph: list, src: int, dst: int, method: str):  # Fixed
-        """Metamorphic Relation 22: If the graph represents a real-world network, adding a new node with connections to existing nodes should change the shortest path distances."""
-        # Get source output
-        source_out = shortest_path(graph, method=method, directed=True)
+    def test22(self, graph: list, src: int, dst: int, method: str):
+        """Metamorphic Relation 22: Given the same graph, the same source and destination vertices,
+        if the graph is empty, the shortest path length should also be 0 for all vertices."""
+        # Construct an empty graph
+        empty_graph = [[np.inf if i != j else 0 for j in range(len(graph))] for i in range(len(graph))]
 
-        # Add a new node with connections to existing nodes
-        new_graph = self.add_node_with_connections(graph)
+        # Get source output with the empty graph
+        source_out_empty = shortest_path(empty_graph, method=method)
 
-        # Get follow-up output
-        follow_out = shortest_path(new_graph, method=method, directed=True)
-
-        # Verify that the distance has changed
-        self.assertNotEqual(source_out[src][dst], follow_out[src][dst])
+        # Verify that the shortest path length is 0 for all vertices
+        for i in range(len(graph)):
+            for j in range(len(graph)):
+                self.assertEqual(source_out_empty[i][j], 0)
 
 
 if __name__ == "__main__":

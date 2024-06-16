@@ -5,43 +5,28 @@ from utils import *
 
 
 class TestingClass(unittest.TestCase):
-    def get_transpose(self, graph: list) -> list:
-        """Get the transpose of the graph.
-
-        Parameters
-        ----------
-        graph : list
-            The adjacency matrix of the graph
-
-        Returns
-        -------
-        list
-            The transpose of the graph
-        """
-        n = len(graph)
-        transposed_graph = [[0] * n for _ in range(n)]
-        for i in range(n):
-            for j in range(n):
-                transposed_graph[i][j] = graph[j][i]
-        return transposed_graph
-
     @parameterized.expand(gen_tcs_randomly(1000))
     def test28(self, graph: list, src: int, dst: int, method: str): # Fixed
-        """Metamorphic Relation 28: Converting the graph to its transpose should not change the shortest path distances."""
+        """Metamorphic Relation 28: Given the same graph and the same source and destination vertices,
+        if we add a new vertex that is only connected to the source vertex, the shortest path length to any other vertex should be the source vertex distance plus the distance from the new vertex to that target vertex."""
         # Get source output
-        source_out = shortest_path(graph, method=method, directed=True)
+        source_out = shortest_path(graph, method=method)
 
-        # Get the transpose of the graph
-        transposed_graph = self.get_transpose(graph)
+        # Create a new graph with an additional vertex connected only to the source
+        extended_graph = graph.copy()
+        for i in range(len(extended_graph)):
+            extended_graph[i].append(0)
+        extended_graph.append([0] * len(extended_graph) + [0])
+        extended_graph[src][-1] = 1
+        extended_graph[-1][dst] = 1
 
         # Get follow-up output
-        follow_out = shortest_path(transposed_graph, method=method, directed=True)
+        follow_out = shortest_path(extended_graph, method=method)
 
-        # Verify that all distances remain the same
-        for i in range(len(source_out)):
-            for j in range(len(source_out[0])):
-                if i != j:
-                    self.assertEqual(source_out[i][j], follow_out[i][j])
+        # Verification
+        for target_vertex in range(len(graph)):
+            if target_vertex != src:
+                self.assertEqual(follow_out[src][target_vertex], source_out[src][target_vertex] + extended_graph[src][-1])
 
 
 if __name__ == "__main__":

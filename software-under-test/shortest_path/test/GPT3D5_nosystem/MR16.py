@@ -6,45 +6,19 @@ from utils import *
 
 
 class TestingClass(unittest.TestCase):
-    def add_vertex(self, graph: list) -> list:
-        """Add a new vertex to the graph.
-
-        Parameters
-        ----------
-        graph : list
-            The adjacency matrix of the graph
-
-        Returns
-        -------
-        list
-            The new graph after adding a new vertex
-        """
-        n = len(graph)
-        new_graph = [[0] * (n + 1) for _ in range(n + 1)]
-        for i in range(n + 1):
-            for j in range(n + 1):
-                if i < n and j < n:
-                    new_graph[i][j] = graph[i][j]
-                else:
-                    new_graph[i][j] = random.randint(1, 1000)
-        return new_graph
-
     @parameterized.expand(gen_tcs_randomly(1000))
-    def test16(self, graph: list, src: int, dst: int, method: str): # Fixed
-        """Metamorphic Relation 16: If a new vertex is added to the graph, the shortest path distances from all existing vertices to the new vertex should be greater than or equal to the shortest distances without the new vertex."""
+    def test16(self, graph: list, src: int, dst: int, method: str):
+        """ Metamorphic Relation 16: Given the same graph, if a node is removed from the graph,
+        the path length from any node to the removed node should be infinity """
         # Get source output
-        source_out = shortest_path(graph, method=method, directed=True)
-
-        new_graph = self.add_vertex(graph)
-
-        # Get follow-up output
-        follow_out = shortest_path(new_graph, method=method, directed=True)
-
-        # Verify that all distances have increased or remained the same
-        for i in range(len(source_out)):
-            for j in range(len(source_out[0])):
-                if i != j:
-                    self.assertGreaterEqual(follow_out[i][j], source_out[i][j])
+        source_out = shortest_path(graph, method=method)
+        
+        # Create a modified graph by removing a node
+        modified_graph = remove_node_from_graph(graph)
+        
+        # Verify that the distance to the removed node is always infinity
+        for i in range(len(graph)):
+            self.assertEqual(source_out[i][len(graph)], np.inf)
 
 
 if __name__ == "__main__":

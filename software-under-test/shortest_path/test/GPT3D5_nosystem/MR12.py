@@ -8,18 +8,19 @@ from utils import *
 class TestingClass(unittest.TestCase):
     @parameterized.expand(gen_tcs_randomly(1000))
     def test12(self, graph: list, src: int, dst: int, method: str): # Fixed
-        """Metamorphic Relation 12: For any two nodes, the shortest path from node A to node B passing through an intermediate node C should be greater than or equal to the shortest path from node A to C plus the shortest path from C to B."""
-        dist_matrix, predecessors = shortest_path_A_to_B = shortest_path(graph, method=method, directed=False, return_predecessors=True)
-        path = get_shortest_path(predecessors, src, dst)
-        intermediate = random.choice(path)
-        shortest_path_A_to_B = dist_matrix[src][dst]
-
+        """Metamorphic Relation 12: Given the same graph and the same source and destination vertices, 
+        the shortest path results should remain the same when the graph is represented using different sparse matrix formats."""
         # Get source output
-        shortest_path_A_to_C = shortest_path(graph, method=method, directed=False)[src][intermediate]
-        shortest_path_C_to_B = shortest_path(graph, method=method, directed=False)[intermediate][dst]
+        source_out = shortest_path(graph, method=method)
+
+        # Convert the graph to a different sparse matrix format
+        converted_graph = csr_matrix(graph)
+
+        # Get follow-up output
+        follow_out = shortest_path(converted_graph, method=method)
 
         # Verification
-        self.assertGreaterEqual(shortest_path_A_to_B, shortest_path_A_to_C + shortest_path_C_to_B)
+        self.assertTrue(np.array_equal(source_out, follow_out))
 
 
 if __name__ == "__main__":

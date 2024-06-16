@@ -5,40 +5,23 @@ from utils import *
 
 
 class TestingClass(unittest.TestCase):
-    def remove_node_with_connections(self, graph: list) -> list:
-        """Remove a node and its connections from the graph.
-
-        Parameters
-        ----------
-        graph : list
-            The adjacency matrix of the graph
-
-        Returns
-        -------
-        list
-            The new graph after removing a node and its connections
-        """
-        n = len(graph)
-        new_graph = [[0] * (n - 1) for _ in range(n - 1)]
-        for i in range(n - 1):
-            for j in range(n - 1):
-                new_graph[i][j] = graph[i][j]
-        return new_graph
-
     @parameterized.expand(gen_tcs_randomly(1000))
     def test23(self, graph: list, src: int, dst: int, method: str): # Fixed
-        """Metamorphic Relation 23: If the graph represents a real-world network, removing a node and its connections should change the shortest path distances."""
-        # Get source output
-        source_out = shortest_path(graph, method=method, directed=True)
+        """Metamorphic Relation 23: Given the same graph, the same source and destination vertices,
+        changing the order of the vertices indices should not change the shortest path length."""
 
-        # Remove a node and its connections
-        new_graph = self.remove_node_with_connections(graph)
+        # Get source output
+        source_out = shortest_path(graph, method=method)
+
+        # Create a new graph with reordered vertices
+        reordered_graph = graph.copy()
+        np.random.shuffle(reordered_graph)
 
         # Get follow-up output
-        follow_out = shortest_path(new_graph, method=method, directed=True)
+        follow_out = shortest_path(reordered_graph, method=method)
 
-        # Verify that the distance has changed
-        self.assertNotEqual(source_out[src][dst], follow_out[src][dst])
+        # Verification
+        self.assertTrue(np.array_equal(source_out, follow_out))
 
 
 if __name__ == "__main__":

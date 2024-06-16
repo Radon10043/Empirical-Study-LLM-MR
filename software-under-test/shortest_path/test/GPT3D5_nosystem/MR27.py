@@ -5,42 +5,21 @@ from utils import *
 
 
 class TestingClass(unittest.TestCase):
-    def reverse_edge_directions(self, graph: list) -> list:
-        """Reverse all edge directions in the graph.
-
-        Parameters
-        ----------
-        graph : list
-            The adjacency matrix of the graph
-
-        Returns
-        -------
-        list
-            The new graph after reversing all edge directions
-        """
-        n = len(graph)
-        new_graph = [[0] * n for _ in range(n)]
-        for i in range(n):
-            for j in range(n):
-                if graph[i][j] != 0:
-                    new_graph[j][i] = graph[i][j]
-        return new_graph
-
-
     @parameterized.expand(gen_tcs_randomly(1000))
-    def test27(self, graph: list, src: int, dst: int, method: str): # Fixed
-        """Metamorphic Relation 27: Reversing all the edge directions in the graph should change the shortest path distances."""
+    def test27(self, graph: list, src: int, dst: int, method: str):
+        """Metamorphic Relation 27: Given the same graph and the same source and destination vertices,
+        if we negate all edge weights in the graph, the shortest path length should remain unchanged."""
         # Get source output
-        source_out = shortest_path(graph, method=method, directed=True)
+        source_out = shortest_path(graph, method=method)
 
-        # Reverse all edge directions in the graph
-        new_graph = self.reverse_edge_directions(graph)
+        # Create a new graph with negated edge weights
+        negated_graph = [[x * -1 for x in row] for row in graph]
 
         # Get follow-up output
-        follow_out = shortest_path(new_graph, method=method, directed=True)
+        follow_out = shortest_path(negated_graph, method=method)
 
-        # Verify that at least one distance has changed
-        self.assertNotEqual(source_out[src][dst], follow_out[src][dst])
+        # Verification
+        self.assertTrue(np.array_equal(source_out, follow_out))
 
 
 if __name__ == '__main__':

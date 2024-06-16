@@ -5,42 +5,22 @@ from utils import *
 
 
 class TestingClass(unittest.TestCase):
-    def disconnect_nodes(self, graph: list, src: int, dst: int) -> list:
-        """Disconnect two nodes in the graph by setting the edge weight to infinity or removing the edge.
-
-        Parameters
-        ----------
-        graph : list
-            The adjacency matrix of the graph
-        src : int
-            The source vertex
-        dst : int
-            The destination vertex
-
-        Returns
-        -------
-        list
-            The new graph after disconnecting the nodes
-        """
-        inf = 99999
-        new_graph = [row[:] for row in graph]
-        new_graph[src][dst] = inf
-        return new_graph
-
     @parameterized.expand(gen_tcs_randomly(1000))
-    def test21(self, graph: list, src: int, dst: int, method: str):  # Fixed
-        """Metamorphic Relation 21: For any two nodes A and B, disconnecting node A and node B (by setting the edge weight to infinity or removing the edge) should affect the shortest path distances."""
-        # Get source output
-        source_out = shortest_path(graph, method=method, directed=True)
+    def test21(self, graph: list, src: int, dst: int, method: str):
+        """ Metamorphic Relation 21: Given the same graph, the same source and destination vertices,
+        if the graph is symmetric, the result should be the same regardless of whether the graph is 
+        treated as directed or undirected."""
+        # Make sure the graph is symmetric
+        graph = np.maximum(graph, np.transpose(graph))
 
-        # Disconnect node A and node B
-        new_graph = self.disconnect_nodes(graph, src, dst)
+        # Get source output with directed=True
+        source_out_directed = shortest_path(graph, method=method, directed=True)
 
-        # Get follow-up output
-        follow_out = shortest_path(new_graph, method=method, directed=True)
+        # Get source output with directed=False
+        source_out_undirected = shortest_path(graph, method=method, directed=False)
 
-        # Verify that the distance has changed
-        self.assertNotEqual(source_out[src][dst], follow_out[src][dst])
+        # Verification
+        np.testing.assert_almost_equal(source_out_directed, source_out_undirected)
 
 
 if __name__ == "__main__":

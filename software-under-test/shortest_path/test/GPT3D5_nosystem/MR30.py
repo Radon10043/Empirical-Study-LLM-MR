@@ -5,37 +5,20 @@ from utils import *
 
 
 class TestingClass(unittest.TestCase):
-    def find_min_edge_weight(self, graph: list) -> int:
-        """Find the minimum edge weight in the graph.
-
-        Parameters
-        ----------
-        graph : list
-            The adjacency matrix of the graph
-
-        Returns
-        -------
-        int
-            The minimum edge weight in the graph
-        """
-        min_edge_weight = float("inf")
-        for row in graph:
-            for weight in row:
-                if weight != 0 and weight < min_edge_weight:
-                    min_edge_weight = weight
-        return min_edge_weight
-
     @parameterized.expand(gen_tcs_randomly(1000))
-    def test30(self, graph: list, src: int, dst: int, method: str):  # Fixed
-        """Metamorphic Relation 30: For any two nodes A and B, the shortest path from node A to node B should be greater than or equal to the weight of any edge in the graph."""
+    def test30(self, graph: list, src: int, dst: int, method: str):
+        """Metamorphic Relation 30: Given the same graph and the same source and destination vertices, if the graph is converted into an unweighted graph (by setting all non-zero weights to 1), the shortest path should remain unchanged."""
         # Get source output
-        source_out = shortest_path(graph, method=method, directed=True)
+        source_out = shortest_path(graph, method=method)
 
-        # Find the minimum edge weight in the graph
-        min_edge_weight = self.find_min_edge_weight(graph)
+        # Convert the graph to an unweighted graph
+        unweighted_graph = [[1 for x in row] for row in graph]
 
-        # Verify that the distance from A to B is greater than or equal to the minimum edge weight
-        self.assertGreaterEqual(source_out[src][dst], min_edge_weight)
+        # Get follow-up output for the unweighted graph
+        follow_out = shortest_path(unweighted_graph, method=method)
+
+        # Verification
+        self.assertTrue(np.array_equal(source_out, follow_out))
 
 
 if __name__ == "__main__":
