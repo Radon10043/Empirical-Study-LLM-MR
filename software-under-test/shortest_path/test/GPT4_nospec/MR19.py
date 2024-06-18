@@ -6,24 +6,34 @@ from utils import *
 
 class TestingClass(unittest.TestCase):
     @parameterized.expand(gen_tcs_randomly(1000))
-    def test19(self, graph: list, src: int, dst: int, method: str):  # Fixed
-        """Metamorphic Relation 19: The shortest path from any source node to a set of selected nodes
-        should match the paths obtained when the shortest paths algorithm is run for the subset of
-        these nodes specified by indices."""
-        indices = [i for i in range(0, len(graph) - 1)]
+    def test19(self, graph: list, src: int, dst: int, method: str): # Fixed
+        """Metamorphic Relation 19: If the shortest path does not go through a particular vertex z,
+        then removing z from the graph should not change the shortest path from src to dst."""
+        # Get the shortest path from src to dst
+        matrix, proedcessors = shortest_path(graph, method=method, return_predecessors=True)
+        source_path = get_shortest_path(proedcessors, src, dst)
+        source_cost = matrix[src][dst]
 
-        # Get distance matrix for all nodes
-        full_dist_matrix = shortest_path(graph, method=method)
+        # Pick a vertex 'z' that is not in the shortest path from src to dst
+        for z in range(len(graph)):
+            if z not in source_path:
+                # Create a graph without vertex 'z'
+                graph_without_z = deepcopy(graph)
+                graph_without_z.pop(z)
+                for i in range(len(graph_without_z)):
+                    graph_without_z[i].pop(z)
+                # Adjust src and dst for removed vertex
+                adjusted_src = src - 1 if z < src else src
+                adjusted_dst = dst - 1 if z < dst else dst
 
-        # Get distance matrix for a subset of nodes
-        subset_dist_matrix = shortest_path(graph, method=method, indices=indices)
+                # Get the shortest path in the adjusted graph
+                matrix, predcessors = shortest_path(graph_without_z, method=method, return_predecessors=True)
+                follow_path = get_shortest_path(predcessors, adjusted_src, adjusted_dst)
+                follow_cost = matrix[adjusted_src][adjusted_dst]
 
-        # Verify that the distances to selected nodes are the same
-        for i in indices:
-            for j in indices:
-                subset_index_i = indices.index(i)
-                subset_index_j = indices.index(j)
-                self.assertEqual(full_dist_matrix[i][j], subset_dist_matrix[subset_index_i][subset_index_j])
+                # Verification of path and cost
+                self.assertEqual(source_cost, follow_cost)
+                break  # Only need to test with one such vertex, so we break after verification
 
 
 if __name__ == "__main__":

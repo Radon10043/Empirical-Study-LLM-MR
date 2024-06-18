@@ -16,7 +16,7 @@ class TestingClass(unittest.TestCase):
         # Construct follow-up input by finding an edge on the shortest path and increasing its weight
         path_edges = get_shortest_path(predecessors, src, dst)
         if path_edges:
-            u, v = path_edges[0]  # a sample edge from the shortest path
+            u, v = path_edges[0], path_edges[1]  # a sample edge from the shortest path
             graph[u][v] += 10  # increase the weight of this edge
 
             # Get follow-up output
