@@ -2,7 +2,7 @@
 Author: Radon
 Date: 2023-12-06 15:26:45
 LastEditors: Radon
-LastEditTime: 2024-03-08 14:31:19
+LastEditTime: 2024-09-08 19:37:29
 Description: Hi, say something
 """
 
@@ -96,7 +96,7 @@ def chat_with_gpt(list_prompt: list, gpt_name: str, output_dir: str, max_chat_co
             # 将answer加入msgs, 以让gpt记住历史聊天内容
             msgs.append({"role": "assistant", "content": answer})
 
-            # 如果输出内容中有Metamorphic Relation 55, 跳出循环
+            # 如果输出内容中有Metamorphic Relation 45或MR45, 跳出循环
             search_result = re.search("(Metamorphic Relation 45|MR45)", answer, flags=re.IGNORECASE)
             if not search_result is None:
                 break
