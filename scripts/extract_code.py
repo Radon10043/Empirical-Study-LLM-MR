@@ -2,7 +2,7 @@
 Author: Radon
 Date: 2024-01-11 19:31:12
 LastEditors: Radon
-LastEditTime: 2024-01-12 15:56:50
+LastEditTime: 2024-09-09 15:40:52
 Description: 从md文件中提取代码片段
 """
 import argparse, os, marko
@@ -37,7 +37,6 @@ def extract(md_file: str, out_dir: str):
             code_list.pop(-2)  # 去掉最后的```
             code_snippet = "\n".join(code_list)  # 合成代码片段
             f.write(code_snippet)
-        pass
 
     f.close()
     print(f"{code_file} finish!")
