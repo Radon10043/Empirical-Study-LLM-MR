@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assumptions.assumeFalse;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.security.SecureRandom;
 import java.util.Base64;
 import java.util.Collections;
 import java.util.List;
@@ -14,6 +15,7 @@ import java.util.Random;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -127,7 +129,7 @@ public class BoyerTestGPT4NoSystem {
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
-    public void test7(String text, String pattern) {
+    public void test7(String text, String pattern) {    // Fixed
         int originalIndex = Boyer.indexOf(text, pattern);
         if (originalIndex == -1) {
             return;
@@ -135,6 +137,12 @@ public class BoyerTestGPT4NoSystem {
 
         /* Construct follow-up input */
         String prefix = "extra";
+
+        SecureRandom rand = new SecureRandom();
+        while (prefix.indexOf(pattern) != -1) {
+            prefix = RandomStringUtils.randomAscii(rand.nextInt(1, 10));
+        }
+
         String followText = prefix + text;
 
         /* Get follow-up output */
@@ -308,7 +316,7 @@ public class BoyerTestGPT4NoSystem {
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
-    public void test14(String text, String pattern) {
+    public void test14(String text, String pattern) {   // Fixed
         int firstIndex = Boyer.indexOf(text, pattern);
         if (firstIndex == -1) {
             return; // There's no occurrence of the pattern, so skip this case.
@@ -328,7 +336,7 @@ public class BoyerTestGPT4NoSystem {
         /* Verification */
         // The new index in the modified text should map to the second occurrence's
         // index in the original text
-        assertEquals(newIndex + firstIndex + pattern.length(),
+        assertEquals(newIndex + pattern.length(),
                 Boyer.indexOf(text.substring(firstIndex + pattern.length()), pattern) + firstIndex + pattern.length());
     }
 
@@ -363,7 +371,7 @@ public class BoyerTestGPT4NoSystem {
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
-    public void test16(String text, String pattern) {
+    public void test16(String text, String pattern) {   // Fixed
         // Skip if the pattern does not exist in the text
         if (Boyer.indexOf(text, pattern) == -1) {
             return;
@@ -379,7 +387,7 @@ public class BoyerTestGPT4NoSystem {
         int followIndex = Boyer.indexOf(text, prefixedPattern);
 
         /* Verification */
-        if (originalIndex == 0) {
+        if (originalIndex == 0 || originalIndex == -1) {
             assertEquals(-1, followIndex); // If the pattern starts at index 0, it shouldn't be found
         } else {
             assertEquals(originalIndex - 1, followIndex);
@@ -593,21 +601,22 @@ public class BoyerTestGPT4NoSystem {
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
-    public void test24(String text, String pattern) {
+    public void test24(String text, String pattern) {   // Fixed
         int originalIndex = Boyer.indexOf(text, pattern);
-        if (originalIndex == -1 || text.endsWith(pattern)) {
+        if (originalIndex == -1 || originalIndex < text.length() / 2) {
             return; // Pattern is not found or is already at the end of the text
         }
 
         // Identify a unique substring that is not found in the text to insert in the
         // center
-        String uniqueString = "#$!";
-        while (text.contains(uniqueString)) {
-            uniqueString += "!";
+        SecureRandom rand = new SecureRandom();
+        String uniqueString = RandomStringUtils.randomAscii(rand.nextInt(1, 10));
+        while (text.contains(uniqueString) || uniqueString.contains(pattern)) {
+            uniqueString = RandomStringUtils.randomAscii(rand.nextInt(1, 10));
         }
 
         // Insert the unique string in the middle of text
-        int insertPosition = text.length() - pattern.length() - 1; // Position before pattern start
+        int insertPosition = text.length() / 2; // Position before pattern start
         String newText = text.substring(0, insertPosition) + uniqueString + text.substring(insertPosition);
 
         /* Get follow-up output */
@@ -742,7 +751,7 @@ public class BoyerTestGPT4NoSystem {
      */
     @ParameterizedTest
     @MethodSource("testcaseProvider")
-    public void test29(String text, String pattern) {
+    public void test29(String text, String pattern) {   // Fixed
         int originalIndex = Boyer.indexOf(text, pattern);
         if (originalIndex == -1) {
             return;
@@ -755,7 +764,7 @@ public class BoyerTestGPT4NoSystem {
         String capitalizedPattern = pattern.toUpperCase();
 
         /* Get follow-up output (assuming case-insensitive search) */
-        int capitalizedIndex = Boyer.indexOf(capitalizedText, capitalizedPattern);
+        int capitalizedIndex = Boyer.indexOf(capitalizedText, pattern);
 
         /* Verification */
         assertEquals(originalIndex, capitalizedIndex);
@@ -778,6 +787,10 @@ public class BoyerTestGPT4NoSystem {
          * Construct follow-up input by inserting a string before the pattern occurrence
          */
         String insertString = "!insert!";
+        SecureRandom rand = new SecureRandom();
+        while (insertString.contains(pattern)) {
+            insertString = RandomStringUtils.randomAscii(rand.nextInt(1, 10));
+        }
         String followText = text.substring(0, originalIndex) + insertString + text.substring(originalIndex);
 
         /* Get follow-up output */
