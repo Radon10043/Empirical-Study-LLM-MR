@@ -1,6 +1,6 @@
 chcp 65001
 
-@REM Vanilla
+@REM Original
 venv\Scripts\python.exe chat.py --template .\data\template\prompt.template.md --spec .\data\specification\specification.ACMS.md                 --demo .\data\demo\demo.ACMS.md                 --model gpt-4-1106-preview --name ACMS
 venv\Scripts\python.exe chat.py --template .\data\template\prompt.template.md --spec .\data\specification\specification.Boyer.md                --demo .\data\demo\demo.Boyer.md                --model gpt-4-1106-preview --name Boyer
 venv\Scripts\python.exe chat.py --template .\data\template\prompt.template.md --spec .\data\specification\specification.Bsearch1.md             --demo .\data\demo\demo.Bsearch1.md             --model gpt-4-1106-preview --name Bsearch1
@@ -39,19 +39,19 @@ venv\Scripts\python.exe chat.py --template .\data\template\prompt.template.md --
 venv\Scripts\python.exe chat.py --template .\data\template\prompt.template.md --spec .\data\specification\specification.TCAS.md                 --demo .\data\demo\demo.TCAS.md                 --model gpt-4-1106-preview --name TCAS
 venv\Scripts\python.exe chat.py --template .\data\template\prompt.template.md --spec .\data\specification\specification.Trisquarej.md           --demo .\data\demo\demo.Trisquarej.md           --model gpt-4-1106-preview --name Trisquarej
 
-@REM No System
+@REM No system (no concept)
 venv\Scripts\python.exe chat.py --template .\data\template\prompt.nosystem.md --spec .\data\specification\specification.Bsearch2.md             --demo .\data\demo\demo.Bsearch2.md             --model gpt-4-1106-preview --name Bsearch2
 venv\Scripts\python.exe chat.py --template .\data\template\prompt.nosystem.md --spec .\data\specification\specification.Boyer.md                --demo .\data\demo\demo.Boyer.md                --model gpt-4-1106-preview --name Boyer
 venv\Scripts\python.exe chat.py --template .\data\template\prompt.nosystem.md --spec .\data\specification\specification.QuickSort.md            --demo .\data\demo\demo.QuickSort.md            --model gpt-4-1106-preview --name QuickSort
 venv\Scripts\python.exe chat.py --template .\data\template\prompt.nosystem.md --spec .\data\specification\specification.shortest_path.md        --demo .\data\demo\demo.shortest_path.md        --model gpt-4-1106-preview --name shortest_path
 
-@REM No Specification
+@REM No specification
 venv\Scripts\python.exe chat.py --template .\data\template\prompt.nospec.md   --spec .\data\specification\specification.Bsearch2.md             --demo .\data\demo\demo.Bsearch2.md             --model gpt-4-1106-preview --name Bsearch2
 venv\Scripts\python.exe chat.py --template .\data\template\prompt.nospec.md   --spec .\data\specification\specification.Boyer.md                --demo .\data\demo\demo.Boyer.md                --model gpt-4-1106-preview --name Boyer
 venv\Scripts\python.exe chat.py --template .\data\template\prompt.nospec.md   --spec .\data\specification\specification.QuickSort.md            --demo .\data\demo\demo.QuickSort.md            --model gpt-4-1106-preview --name QuickSort
 venv\Scripts\python.exe chat.py --template .\data\template\prompt.nospec.md   --spec .\data\specification\specification.shortest_path.md        --demo .\data\demo\demo.shortest_path.md        --model gpt-4-1106-preview --name shortest_path
 
-@REM No Demo
+@REM No demo (no initial codified MRs)
 venv\Scripts\python.exe chat.py --template .\data\template\prompt.nodemo.md   --spec .\data\specification\specification.Bsearch2.md             --demo .\data\demo\demo.Bsearch2.md             --model gpt-4-1106-preview --name Bsearch2
 venv\Scripts\python.exe chat.py --template .\data\template\prompt.nodemo.md   --spec .\data\specification\specification.Boyer.md                --demo .\data\demo\demo.Boyer.md                --model gpt-4-1106-preview --name Boyer
 venv\Scripts\python.exe chat.py --template .\data\template\prompt.nodemo.md   --spec .\data\specification\specification.QuickSort.md            --demo .\data\demo\demo.QuickSort.md            --model gpt-4-1106-preview --name QuickSort
