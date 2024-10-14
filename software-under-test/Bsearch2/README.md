@@ -34,7 +34,7 @@ sudo make install
 Run specified test case:
 
 ```sh
-build/test/GPT4Test --gtest_filter=TrueReturn/BSearchParamTest.20/* > testcases.output.txt
+build/test/GPT4Test --gtest_filter=TrueReturn/BSearchParamTest.MR2/* > testcases.output.txt
 ```
 
 Run all test cases of GPT3D5Test, each test case is repeated five times:
