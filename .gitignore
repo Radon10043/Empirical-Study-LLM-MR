@@ -238,6 +238,8 @@ pyrightconfig.json
 *.jar
 *.exe
 *.out
+*.csv
+*.pdf
 
 api_key.txt
 testcases*.txt
