@@ -44,13 +44,13 @@ def draw_legal_plots(mr_path: str, sheet_name: str, out_dir: str):
     plt.figure(figsize=(15, 5))
     sns.lineplot(data=plot_df, x="SUT", y="Legal Rate", hue="LLM", style="LLM", markers=custom_markers, dashes=custom_dashes, palette=custom_palette)
     plt.xlabel("")
-    plt.ylabel("LR (%)")
+    plt.ylabel("$LR$ (\%)")
     plt.xticks(rotation=45, ha="right")
     plt.legend()
     plt.tight_layout()
 
     # 保存图片
-    plt.savefig(os.path.join(out_dir, "fig_legal_rate.pdf"))
+    plt.savefig(os.path.join(out_dir, "Legal_Rate.pdf"))
     print("Legal Rate plots saved.")
 
 
@@ -91,13 +91,13 @@ def draw_correct_plots(mr_path: str, sheet_name: str, out_dir: str):
     plt.figure(figsize=(15, 5))
     sns.lineplot(data=plot_df, x="SUT", y="Correct Rate", hue="LLM", style="LLM", markers=custom_markers, dashes=custom_dashes, palette=custom_palette)
     plt.xlabel("")
-    plt.ylabel("CR (%)")
+    plt.ylabel("$CR$ (\%)")
     plt.xticks(rotation=45, ha="right")
     plt.legend()
     plt.tight_layout()
 
     # 保存图片
-    plt.savefig(os.path.join(out_dir, "fig_correct_rate.pdf"))
+    plt.savefig(os.path.join(out_dir, "Correct_Rate.pdf"))
     print("Correct Rate plots saved.")
 
 
@@ -124,14 +124,13 @@ def draw_innova_plots(mr_path: str, sheet_name: str, out_dir: str):
     plt.figure(figsize=(15, 5))
     sns.barplot(data=plot_df, x="SUT", y="Innovative Rate", hue="LLM", palette=custom_palette)
     plt.xlabel("")
-    plt.ylabel("IR (%)")
+    plt.ylabel("$IR$ (\%)")
     plt.xticks(rotation=45, ha="right")
     plt.legend()
     plt.tight_layout()
 
     # 保存图片
-    plt.show()
-    # plt.savefig(os.path.join(out_dir, "fig_innovative_rate.pdf"))
+    plt.savefig(os.path.join(out_dir, "Innovative_Rate.pdf"))
     print("Innovative Rate plots saved.")
 
 
@@ -179,12 +178,12 @@ def draw_char_plots(sutcsv_path: str, mr_path: str, sheet_name: str, out_dir: st
             sns.boxplot(data=plot_df[plot_df["LLM"] == llm], x="CHAR", y=metric, hue="CHAR", showmeans=True, meanprops={"marker": "x", "markeredgecolor": "black"}, palette=["#FFFFFF", "#FFFFFF"], linecolor="black", ax=ax)
             sns.despine()
             ax.set_xlabel(llm)
-            ax.set_ylabel("LR (%)" if metric == "Legal Rate" else "CR (%)")
+            ax.set_ylabel("$LR$ (\%)" if metric == "Legal Rate" else "$CR$ (\%)")
             ax.set_ylim(0, 101)
 
     # 保存图片
     plt.tight_layout()
-    plt.savefig(os.path.join(out_dir, "fig_char.pdf"))
+    plt.savefig(os.path.join(out_dir, "Characteristicas.pdf"))
 
 
 def draw_freq_plots(sutcsv_path: str, mr_path: str, sheet_name: str, out_dir: str):
@@ -236,7 +235,7 @@ def draw_freq_plots(sutcsv_path: str, mr_path: str, sheet_name: str, out_dir: st
 
     # 保存图片
     plt.tight_layout()
-    plt.savefig(os.path.join(out_dir, "fig_freq.pdf"))
+    plt.savefig(os.path.join(out_dir, "Frequency.pdf"))
 
 
 def draw_abala_plots(mr_path: str, sheet_name: str, out_dir: str):
@@ -255,14 +254,15 @@ def draw_abala_plots(mr_path: str, sheet_name: str, out_dir: str):
                 correct_MRCs = df[(df["LLM"] == llm) & (df["SUT"] == sut) & (df["TEMPLATE"] == template) & (df["CORRECT"] == 1.0)].shape[0]
                 plot_data.append({"LLM": llm, "SUT": sut, "TEMPLATE": template, "Legal Rate": legal_MRCs / total_MRCs * 100, "Correct Rate": correct_MRCs / total_MRCs * 100})
 
-    # 画消融实验的图 (柱状图)
+    # 画消融实验的图 (柱状图)5
     for llm in llms:
 
         # 画柱状图
         fig, axes = plt.subplots(1, len(llms), figsize=(10, 3))
+        tmp_data = [data for data in plot_data if data["LLM"] == llm]
         for j, metric in enumerate(metrics):
             ax = axes[j]
-            sns.barplot(data=pd.DataFrame(plot_data), x="SUT", y=metric, hue="TEMPLATE", palette=["#0c0c0c", "#777777", "#cccccc", "#ffffff"], edgecolor="black", errorbar=None, ax=ax)
+            sns.barplot(data=pd.DataFrame(tmp_data), x="SUT", y=metric, hue="TEMPLATE", palette=["#0c0c0c", "#777777", "#cccccc", "#ffffff"], edgecolor="black", errorbar=None, ax=ax)
             sns.despine()
             ax.set_xlabel("")
             ax.set_ylabel("$LR$ (\%)" if metric == "Legal Rate" else "$CR$ (\%)")
@@ -281,7 +281,7 @@ def draw_abala_plots(mr_path: str, sheet_name: str, out_dir: str):
         fig.subplots_adjust(bottom=0.2)
 
         llm_abbrv = "".join(llm.split("-")[:2])
-        plt.savefig(os.path.join(out_dir, f"fig_abala_{llm_abbrv}.pdf"))
+        plt.savefig(os.path.join(out_dir, f"Ablation_{llm_abbrv}.pdf"))
         print(f"Abala plots for {llm} saved.")
 
 
@@ -318,7 +318,7 @@ def main(args: argparse.Namespace):
     if plots == "freq" or plots == "all":
         draw_freq_plots(sut_csv, mr_path, sheet_name, out_dir)
 
-    if plots == "abala" or plots == "all":
+    if plots == "ablat" or plots == "all":
         draw_abala_plots(mr_path, sheet_name, out_dir)
 
     print("All done.")

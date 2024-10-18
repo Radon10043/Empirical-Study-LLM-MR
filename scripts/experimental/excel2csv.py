@@ -102,7 +102,7 @@ def save_as_csv(input_file: str):
         df = pd.concat([df, tab], axis=0)
 
         # 4, Prompt-S
-        tmp0 = pd.DataFrame({"SUT": [sut] * 40, "LLM": ["gpt-4-1106-preview"] * 40, "Template": ["Prompt-C"] * 40})
+        tmp0 = pd.DataFrame({"SUT": [sut] * 40, "LLM": ["gpt-4-1106-preview"] * 40, "Template": ["Prompt-S"] * 40})
         tmp1 = pd.read_excel(input_file, engine="openpyxl", sheet_name=sut, usecols="AC", skiprows=1, nrows=40)
         tmp2 = pd.read_excel(input_file, engine="openpyxl", sheet_name=sut, usecols="AE:AK", skiprows=1, nrows=40)
         tmp3 = pd.read_excel(input_file, engine="openpyxl", sheet_name=sut, usecols="AM", skiprows=1, nrows=40)
@@ -113,7 +113,7 @@ def save_as_csv(input_file: str):
         df = pd.concat([df, tab], axis=0)
 
         # 4, Prompt-I
-        tmp0 = pd.DataFrame({"SUT": [sut] * 40, "LLM": ["gpt-4-1106-preview"] * 40, "Template": ["Prompt-C"] * 40})
+        tmp0 = pd.DataFrame({"SUT": [sut] * 40, "LLM": ["gpt-4-1106-preview"] * 40, "Template": ["Prompt-I"] * 40})
         tmp1 = pd.read_excel(input_file, engine="openpyxl", sheet_name=sut, usecols="AP", skiprows=1, nrows=40)
         tmp2 = pd.read_excel(input_file, engine="openpyxl", sheet_name=sut, usecols="AR:AX", skiprows=1, nrows=40)
         tmp3 = pd.read_excel(input_file, engine="openpyxl", sheet_name=sut, usecols="AZ", skiprows=1, nrows=40)
@@ -142,8 +142,8 @@ def save_as_csv(input_file: str):
     # fmt:on
 
     # 删掉is_legal为空值的行, 此类行只是占位置用的, LLM没有生成对应ID的MR
-    del_indexes = df[df["is_legal"].isnull()].index
-    df.drop(del_indexes, inplace=True)
+    # del_indexes = df[df["is_legal"].isnull()].index
+    # df.drop(del_indexes, inplace=True)
 
     for index, row in df.iterrows():
         if row["is_legal"] == "Illegal":
@@ -157,7 +157,7 @@ def save_as_csv(input_file: str):
         df[col] = df[col].fillna(-1).astype(int)
 
     # 保存为csv文件
-    df.to_csv(mr_csvf, index=True)
+    df.to_csv(mr_csvf, index=False)
     print(f"{mr_csvf} is saved.")
 
 
