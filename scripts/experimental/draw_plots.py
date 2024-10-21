@@ -1,11 +1,14 @@
 import argparse
 import os
+import openpyxl
 
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 
 from matplotlib import rcParams
+
+openpyxl.reader.excel.warnings.simplefilter(action="ignore")
 
 def draw_legal_plots(mr_path: str, sheet_name: str, out_dir: str):
     """画Legal Rate的折线图
@@ -41,13 +44,16 @@ def draw_legal_plots(mr_path: str, sheet_name: str, out_dir: str):
     custom_palette = ["#3a86ff", "#00b050"]
     custom_markers = {"gpt-3.5-turbo-1106": "o", "gpt-4-1106-preview": "s"}
     custom_dashes = [(1, 0), (1, 0)]
-    plt.figure(figsize=(15, 5))
+    plt.figure(figsize=(15, 4))
     sns.lineplot(data=plot_df, x="SUT", y="Legal Rate", hue="LLM", style="LLM", markers=custom_markers, dashes=custom_dashes, palette=custom_palette)
     plt.xlabel("")
     plt.ylabel("$LR$ (\%)")
     plt.xticks(rotation=45, ha="right")
-    plt.legend()
     plt.tight_layout()
+
+    legend = plt.legend()
+    for text in legend.get_texts():
+        text.set_text(r"\textit{" + text.get_text() + r"}")
 
     # 保存图片
     plt.savefig(os.path.join(out_dir, "Legal_Rate.pdf"))
@@ -88,13 +94,16 @@ def draw_correct_plots(mr_path: str, sheet_name: str, out_dir: str):
     custom_palette = ["#3a86ff", "#00b050"]
     custom_markers = {"gpt-3.5-turbo-1106": "o", "gpt-4-1106-preview": "s"}
     custom_dashes = [(1, 0), (1, 0)]
-    plt.figure(figsize=(15, 5))
+    plt.figure(figsize=(15, 4))
     sns.lineplot(data=plot_df, x="SUT", y="Correct Rate", hue="LLM", style="LLM", markers=custom_markers, dashes=custom_dashes, palette=custom_palette)
     plt.xlabel("")
     plt.ylabel("$CR$ (\%)")
     plt.xticks(rotation=45, ha="right")
-    plt.legend()
     plt.tight_layout()
+
+    legend = plt.legend()
+    for text in legend.get_texts():
+        text.set_text(r"\textit{" + text.get_text() + r"}")
 
     # 保存图片
     plt.savefig(os.path.join(out_dir, "Correct_Rate.pdf"))
@@ -102,6 +111,17 @@ def draw_correct_plots(mr_path: str, sheet_name: str, out_dir: str):
 
 
 def draw_innova_plots(mr_path: str, sheet_name: str, out_dir: str):
+    """画Innovative Rate的柱状图
+
+    Parameters
+    ----------
+    mr_path : str
+        EXCEL文件路径
+    sheet_name : str
+        工作表名称
+    out_dir : str
+        输出目录
+    """
     df = pd.read_excel(mr_path, engine="openpyxl", sheet_name=sheet_name)
     df = df[df["TEMPLATE"] == "Original"]
 
@@ -126,8 +146,12 @@ def draw_innova_plots(mr_path: str, sheet_name: str, out_dir: str):
     plt.xlabel("")
     plt.ylabel("$IR$ (\%)")
     plt.xticks(rotation=45, ha="right")
-    plt.legend()
+    legend = plt.legend()
     plt.tight_layout()
+
+    # 将legend里的字体调整为斜体
+    for text in legend.get_texts():
+        text.set_text(r"\textit{" + text.get_text() + r"}")
 
     # 保存图片
     plt.savefig(os.path.join(out_dir, "Innovative_Rate.pdf"))
@@ -171,19 +195,20 @@ def draw_char_plots(sutcsv_path: str, mr_path: str, sheet_name: str, out_dir: st
 
     # 画合法率和正确率的盒图
     plot_df = pd.DataFrame(plot_data)
-    _, axes = plt.subplots(1, len(llms) * len(metrics), figsize=(8, 5))
+    _, axes = plt.subplots(1, len(llms) * len(metrics), figsize=(8, 3))
     for i, metric in enumerate(metrics):
         for j, llm in enumerate(llms):
             ax = axes[i * len(metrics) + j]
             sns.boxplot(data=plot_df[plot_df["LLM"] == llm], x="CHAR", y=metric, hue="CHAR", showmeans=True, meanprops={"marker": "x", "markeredgecolor": "black"}, palette=["#FFFFFF", "#FFFFFF"], linecolor="black", ax=ax)
             sns.despine()
-            ax.set_xlabel(llm)
+            ax.set_xlabel(r"\textit{" + llm + r"}")
             ax.set_ylabel("$LR$ (\%)" if metric == "Legal Rate" else "$CR$ (\%)")
             ax.set_ylim(0, 101)
 
     # 保存图片
     plt.tight_layout()
-    plt.savefig(os.path.join(out_dir, "Characteristicas.pdf"))
+    plt.savefig(os.path.join(out_dir, "Characteristics.pdf"))
+    print("Characteristics plots saved.")
 
 
 def draw_freq_plots(sutcsv_path: str, mr_path: str, sheet_name: str, out_dir: str):
@@ -223,22 +248,34 @@ def draw_freq_plots(sutcsv_path: str, mr_path: str, sheet_name: str, out_dir: st
 
     # 画合法率和正确率的盒图
     plot_df = pd.DataFrame(plot_data)
-    _, axes = plt.subplots(1, len(llms) * len(metrics), figsize=(8, 5))
+    _, axes = plt.subplots(1, len(llms) * len(metrics), figsize=(8, 3))
     for i, metric in enumerate(metrics):
         for j, llm in enumerate(llms):
             ax = axes[i * len(metrics) + j]
             sns.boxplot(data=plot_df[plot_df["LLM"] == llm], x="FREQ", y=metric, hue="FREQ", showmeans=True, meanprops={"marker": "x", "markeredgecolor": "black"}, palette=["#FFFFFF", "#FFFFFF"], linecolor="black", ax=ax)
             sns.despine()
-            ax.set_xlabel(llm)
+            ax.set_xlabel(r"\textit{" + llm + r"}")
             ax.set_ylabel("$LR$ (\%)" if metric == "Legal Rate" else "$CR$ (\%)")
             ax.set_ylim(0, 101)
 
     # 保存图片
     plt.tight_layout()
     plt.savefig(os.path.join(out_dir, "Frequency.pdf"))
+    print("Frequency plots saved.")
 
 
 def draw_abala_plots(mr_path: str, sheet_name: str, out_dir: str):
+    """画消融实验的图 (柱状图)
+
+    Parameters
+    ----------
+    mr_path : str
+        存储MR信息的路径
+    sheet_name : str
+        工作表名称
+    out_dir : str
+        输出目录
+    """
     df = pd.read_excel(mr_path, engine="openpyxl", sheet_name=sheet_name)
     llms = df[df["TEMPLATE"] != "Original"]["LLM"].unique()
     suts = df[df["TEMPLATE"] != "Original"]["SUT"].unique()
@@ -331,5 +368,4 @@ if __name__ == "__main__":
     parser.add_argument("--sut_csv", type=str, required=True, help="sut csv file")
     parser.add_argument("--plots", type=str, choices=["legal", "correct", "innova", "char", "freq", "abala", "all"], default="all", help="plots to draw")
     args = parser.parse_args()
-
     main(args)
