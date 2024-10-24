@@ -10,20 +10,20 @@ from matplotlib import rcParams
 
 openpyxl.reader.excel.warnings.simplefilter(action="ignore")
 
-def draw_legal_plots(mr_path: str, sheet_name: str, out_dir: str):
+def draw_legal_plots(excel_path: str, mr_sheet: str, out_dir: str):
     """画Legal Rate的折线图
 
     Parameters
     ----------
-    mr_path : str
+    excel_path : str
         EXCEL文件路径
-    sheet_name : str
-        工作表名称
+    mr_sheet : str
+        存储MR信息的工作表名称
     out_dir : str
         输出目录
     """
     # 读取数据
-    df = pd.read_excel(mr_path, engine="openpyxl", sheet_name=sheet_name)
+    df = pd.read_excel(excel_path, engine="openpyxl", sheet_name=mr_sheet)
     df = df[df["TEMPLATE"] == "Original"]
 
     # 计算Legal Rate
@@ -44,7 +44,7 @@ def draw_legal_plots(mr_path: str, sheet_name: str, out_dir: str):
     custom_palette = ["#3a86ff", "#00b050"]
     custom_markers = {"gpt-3.5-turbo-1106": "o", "gpt-4-1106-preview": "s"}
     custom_dashes = [(1, 0), (1, 0)]
-    plt.figure(figsize=(15, 4))
+    plt.figure(figsize=(15, 3))
     sns.lineplot(data=plot_df, x="SUT", y="Legal Rate", hue="LLM", style="LLM", markers=custom_markers, dashes=custom_dashes, palette=custom_palette)
     plt.xlabel("")
     plt.ylabel("$LR$ (\%)")
@@ -60,20 +60,20 @@ def draw_legal_plots(mr_path: str, sheet_name: str, out_dir: str):
     print("Legal Rate plots saved.")
 
 
-def draw_correct_plots(mr_path: str, sheet_name: str, out_dir: str):
+def draw_correct_plots(excel_path: str, mr_sheet: str, out_dir: str):
     """画Correct Rate的折线图
 
     Parameters
     ----------
-    mr_path : str
+    excel_path : str
         EXCEL文件路径
-    sheet_name : str
-        工作表名称
+    mr_sheet : str
+        存储MR信息的工作表名称
     out_dir : str
         输出目录
     """
     # 读取数据
-    df = pd.read_excel(mr_path, engine="openpyxl", sheet_name=sheet_name)
+    df = pd.read_excel(excel_path, engine="openpyxl", sheet_name=mr_sheet)
     df = df[df["TEMPLATE"] == "Original"]
 
     # 计算Correct Rate
@@ -94,7 +94,7 @@ def draw_correct_plots(mr_path: str, sheet_name: str, out_dir: str):
     custom_palette = ["#3a86ff", "#00b050"]
     custom_markers = {"gpt-3.5-turbo-1106": "o", "gpt-4-1106-preview": "s"}
     custom_dashes = [(1, 0), (1, 0)]
-    plt.figure(figsize=(15, 4))
+    plt.figure(figsize=(15, 3))
     sns.lineplot(data=plot_df, x="SUT", y="Correct Rate", hue="LLM", style="LLM", markers=custom_markers, dashes=custom_dashes, palette=custom_palette)
     plt.xlabel("")
     plt.ylabel("$CR$ (\%)")
@@ -110,19 +110,19 @@ def draw_correct_plots(mr_path: str, sheet_name: str, out_dir: str):
     print("Correct Rate plots saved.")
 
 
-def draw_innova_plots(mr_path: str, sheet_name: str, out_dir: str):
+def draw_innova_plots(excel_path: str, mr_sheet: str, out_dir: str):
     """画Innovative Rate的柱状图
 
     Parameters
     ----------
-    mr_path : str
+    excel_path : str
         EXCEL文件路径
-    sheet_name : str
-        工作表名称
+    mr_sheet : str
+        存储MR信息的工作表名称
     out_dir : str
         输出目录
     """
-    df = pd.read_excel(mr_path, engine="openpyxl", sheet_name=sheet_name)
+    df = pd.read_excel(excel_path, engine="openpyxl", sheet_name=mr_sheet)
     df = df[df["TEMPLATE"] == "Original"]
 
     # 计算Innovative Rate
@@ -141,7 +141,7 @@ def draw_innova_plots(mr_path: str, sheet_name: str, out_dir: str):
 
     # 画柱状图
     custom_palette = ["#000000", "#7f7f7f"]
-    plt.figure(figsize=(15, 5))
+    plt.figure(figsize=(15, 3))
     sns.barplot(data=plot_df, x="SUT", y="Innovative Rate", hue="LLM", palette=custom_palette)
     plt.xlabel("")
     plt.ylabel("$IR$ (\%)")
@@ -158,25 +158,25 @@ def draw_innova_plots(mr_path: str, sheet_name: str, out_dir: str):
     print("Innovative Rate plots saved.")
 
 
-def draw_char_plots(sutcsv_path: str, mr_path: str, sheet_name: str, out_dir: str):
+def draw_char_plots(excel_path: str, mr_sheet: str, sut_sheet: str, out_dir: str):
     """根据SUT的特征和LLM为其生成MR的合法率和准确率, 画盒图
 
     Parameters
     ----------
+    excel_path : str
+        EXCEL文件路径
+    mr_sheet : str
+        存储MR信息的信息所在的工作表名称
     sutcsv_path : str
-        存储sut信息的csv文件路径
-    mr_path : str
-        存储mr信息的xlsx文件路径
-    sheet_name : str
-        xlsx文件中mr信息所在的工作表名称
+        存储sut信息的工作表名称
     out_dir : str
         输出目录
     """
     # 读取SUT信息
-    sut_df = pd.read_csv(sutcsv_path)
+    sut_df = pd.read_excel(excel_path, engine="openpyxl", sheet_name=sut_sheet)
 
     # 读取MR信息
-    mr_df = pd.read_excel(mr_path, engine="openpyxl", sheet_name=sheet_name)
+    mr_df = pd.read_excel(excel_path, engine="openpyxl", sheet_name=mr_sheet)
     mr_df = mr_df[mr_df["TEMPLATE"] == "Original"]
 
     llms = mr_df["LLM"].unique()
@@ -211,25 +211,25 @@ def draw_char_plots(sutcsv_path: str, mr_path: str, sheet_name: str, out_dir: st
     print("Characteristics plots saved.")
 
 
-def draw_freq_plots(sutcsv_path: str, mr_path: str, sheet_name: str, out_dir: str):
+def draw_freq_plots(excel_path: str, mr_sheet: str, sut_sheet: str, out_dir: str):
     """根据SUT的特征和LLM为其生成MR的合法率和准确率, 画盒图
 
     Parameters
     ----------
-    sutcsv_path : str
-        存储sut信息的csv文件路径
-    mr_path : str
-        存储mr信息的xlsx文件路径
-    sheet_name : str
-        xlsx文件中mr信息所在的工作表名称
+    excel_path : str
+        EXCEL文件路径
+    mr_sheet : str
+        存储MR信息所在的工作表名称
+    sut_sheet : str
+        存储sut信息的工作表
     out_dir : str
         输出目录
     """
     # 读取SUT信息
-    sut_df = pd.read_csv(sutcsv_path)
+    sut_df = pd.read_excel(excel_path, engine="openpyxl", sheet_name=sut_sheet)
 
     # 读取MR信息
-    mr_df = pd.read_excel(mr_path, engine="openpyxl", sheet_name=sheet_name)
+    mr_df = pd.read_excel(excel_path, engine="openpyxl", sheet_name=mr_sheet)
     mr_df = mr_df[mr_df["TEMPLATE"] == "Original"]
 
     llms = mr_df["LLM"].unique()
@@ -264,19 +264,19 @@ def draw_freq_plots(sutcsv_path: str, mr_path: str, sheet_name: str, out_dir: st
     print("Frequency plots saved.")
 
 
-def draw_abala_plots(mr_path: str, sheet_name: str, out_dir: str):
+def draw_abala_plots(excel_path: str, mr_sheet: str, out_dir: str):
     """画消融实验的图 (柱状图)
 
     Parameters
     ----------
-    mr_path : str
+    excel_path : str
         存储MR信息的路径
-    sheet_name : str
+    mr_sheet : str
         工作表名称
     out_dir : str
         输出目录
     """
-    df = pd.read_excel(mr_path, engine="openpyxl", sheet_name=sheet_name)
+    df = pd.read_excel(excel_path, engine="openpyxl", sheet_name=mr_sheet)
     llms = df[df["TEMPLATE"] != "Original"]["LLM"].unique()
     suts = df[df["TEMPLATE"] != "Original"]["SUT"].unique()
     templates = df["TEMPLATE"].unique()
@@ -330,9 +330,9 @@ def main(args: argparse.Namespace):
     args : argparse.Namespace
         命令行参数
     """
-    mr_path = args.mr_excel
-    sheet_name = args.sheet
-    sut_csv = args.sut_csv
+    excel_path = args.excel
+    mr_sheet = args.mr_sheet
+    sut_sheet = args.sut_sheet
     plots = args.plots
     out_dir = os.path.dirname(__file__)
 
@@ -341,31 +341,31 @@ def main(args: argparse.Namespace):
     rcParams["font.size"] = 12
 
     if plots == "legal" or plots == "all":
-        draw_legal_plots(mr_path, sheet_name, out_dir)
+        draw_legal_plots(excel_path, mr_sheet, out_dir)
 
     if plots == "correct" or plots == "all":
-        draw_correct_plots(mr_path, sheet_name, out_dir)
+        draw_correct_plots(excel_path, mr_sheet, out_dir)
 
     if plots == "innova" or plots == "all":
-        draw_innova_plots(mr_path, sheet_name, out_dir)
+        draw_innova_plots(excel_path, mr_sheet, out_dir)
 
     if plots == "char" or plots == "all":
-        draw_char_plots(sut_csv, mr_path, sheet_name, out_dir)
+        draw_char_plots(excel_path, mr_sheet, sut_sheet, out_dir)
 
     if plots == "freq" or plots == "all":
-        draw_freq_plots(sut_csv, mr_path, sheet_name, out_dir)
+        draw_freq_plots(excel_path, mr_sheet, sut_sheet, out_dir)
 
     if plots == "ablat" or plots == "all":
-        draw_abala_plots(mr_path, sheet_name, out_dir)
+        draw_abala_plots(excel_path, mr_sheet, out_dir)
 
     print("All done.")
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--mr_excel", type=str, required=True, help="mr excel file")
-    parser.add_argument("--sheet", type=str, required=True, help="sheet name of mr excel file")
-    parser.add_argument("--sut_csv", type=str, required=True, help="sut csv file")
+    parser.add_argument("--excel", type=str, required=True, help="Path of excel file")
+    parser.add_argument("--mr_sheet", type=str, required=True, help="Sheet name of mr data")
+    parser.add_argument("--sut_sheet", type=str, required=True, help="Sheet name for sut data")
     parser.add_argument("--plots", type=str, choices=["legal", "correct", "innova", "char", "freq", "abala", "all"], default="all", help="plots to draw")
     args = parser.parse_args()
     main(args)
