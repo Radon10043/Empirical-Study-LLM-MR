@@ -242,6 +242,7 @@ pyrightconfig.json
 *.pdf
 
 api_key.txt
+api_base.txt
 testcases*.txt
 testcases*.md
 

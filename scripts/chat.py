@@ -17,7 +17,8 @@ from typing import Any
 # openai.log = "debug"
 with open("api_key.txt") as f:
     openai.api_key = f.read()
-openai.api_base = "https://api.chatanywhere.com.cn/v1"
+with open*("api_base.txt") as f:
+    openai.api_base = f.read()
 
 
 def get_cur_time() -> str:
