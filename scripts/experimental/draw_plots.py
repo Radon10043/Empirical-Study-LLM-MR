@@ -10,6 +10,16 @@ from matplotlib import rcParams
 
 openpyxl.reader.excel.warnings.simplefilter(action="ignore")
 
+# ========== GLOBAL VARIABLES ==========
+LOG_PATH = os.path.join(os.path.dirname(__file__), "debug.log")
+# ======================================
+
+# ============ PREPROCESSING ===========
+if os.path.exists(LOG_PATH):
+    os.remove(LOG_PATH)
+# ======================================
+
+
 def draw_legal_plots(excel_path: str, mr_sheet: str, out_dir: str):
     """画Legal Rate的折线图
 
@@ -32,16 +42,27 @@ def draw_legal_plots(excel_path: str, mr_sheet: str, out_dir: str):
     suts = df["SUT"].unique()
     for llm in llms:
         for sut in suts:
-            total_MRCs = df[(df["LLM"] == llm) & (df["SUT"] == sut)].shape[0]
-            legal_MRCs = df[(df["LLM"] == llm) & (df["SUT"] == sut) & (df["TYPE"] != "Illegal")].shape[0]
-            plot_data.append({"LLM": llm, "SUT": sut, "Legal Rate": legal_MRCs / total_MRCs * 100})
+            num_MRCs = df[(df["LLM"] == llm) & (df["SUT"] == sut)].shape[0]
+            num_LMRCs = df[(df["LLM"] == llm) & (df["SUT"] == sut) & (df["TYPE"] != "Illegal")].shape[0]
+            plot_data.append({"LLM": llm, "SUT": sut, "Legal Rate": num_LMRCs / num_MRCs * 100})
 
     # 整理要画图的数据, 数据按照LLM升序, Legal Rate降序排列
     plot_df = pd.DataFrame(plot_data)
     plot_df = plot_df.sort_values(by=["LLM", "Legal Rate"], ascending=[True, False])
 
+    # 输出每个LLM的最低, 最高和总体合法率到日志文件
+    with open(LOG_PATH, "a") as f:
+        f.write("Messages from draw_legal_plots():\n")
+        for llm in llms:
+            num_all_MRCs = df[df["LLM"] == llm].shape[0]
+            num_all_LMRCs = df[(df["LLM"] == llm) & (df["TYPE"] != "Illegal")].shape[0]
+            f.write("%45s : %6s%%\n" % ("Lowest legal rate of " + llm, str(plot_df[plot_df["LLM"] == llm].tail(1)["Legal Rate"].values[0])))
+            f.write("%45s : %6s%%\n" % ("Highest legal rate of " + llm, str(plot_df[plot_df["LLM"] == llm].head(1)["Legal Rate"].values[0])))
+            f.write("%45s : %6.2f%%\n" % ("Overall legal rate of " + llm, round(num_all_LMRCs / num_all_MRCs * 100, 2)))
+        f.write("\n\n")
+
     # 画折线图
-    custom_palette = ["#3a86ff", "#00b050"]
+    custom_palette = ["#3a86ff", "#ff7d00"]
     custom_markers = {"gpt-3.5-turbo-1106": "o", "gpt-4-1106-preview": "s"}
     custom_dashes = [(1, 0), (1, 0)]
     plt.figure(figsize=(15, 3))
@@ -49,9 +70,10 @@ def draw_legal_plots(excel_path: str, mr_sheet: str, out_dir: str):
     plt.xlabel("")
     plt.ylabel("$LR$ (\%)")
     plt.xticks(rotation=45, ha="right")
+    plt.yticks(range(40, 101, 10))
     plt.tight_layout()
 
-    legend = plt.legend()
+    legend = plt.legend(loc="lower left", labelspacing=0.1)
     for text in legend.get_texts():
         text.set_text(r"\textit{" + text.get_text() + r"}")
 
@@ -82,16 +104,27 @@ def draw_correct_plots(excel_path: str, mr_sheet: str, out_dir: str):
     suts = df["SUT"].unique()
     for llm in llms:
         for sut in suts:
-            total_MRCs = df[(df["LLM"] == llm) & (df["SUT"] == sut)].shape[0]
-            correct_MRCs = df[(df["LLM"] == llm) & (df["SUT"] == sut) & (df["CORRECT"] == 1.0)].shape[0]
-            plot_data.append({"LLM": llm, "SUT": sut, "Correct Rate": correct_MRCs / total_MRCs * 100})
+            num_MRCs = df[(df["LLM"] == llm) & (df["SUT"] == sut)].shape[0]
+            num_CMRCs = df[(df["LLM"] == llm) & (df["SUT"] == sut) & (df["CORRECT"] == 1.0)].shape[0]
+            plot_data.append({"LLM": llm, "SUT": sut, "Correct Rate": num_CMRCs / num_MRCs * 100})
 
     # 整理要画图的数据, 数据按照LLM升序, Correct Rate降序排列
     plot_df = pd.DataFrame(plot_data)
     plot_df = plot_df.sort_values(by=["LLM", "Correct Rate"], ascending=[True, False])
 
+    # 输出每个LLM的最低, 最高和总体正确率到日志文件
+    with open(LOG_PATH, "a") as f:
+        f.write("Messages from draw_correct_plots():\n")
+        for llm in llms:
+            num_all_MRCs = df[df["LLM"] == llm].shape[0]
+            num_all_CMRCs = df[(df["LLM"] == llm) & (df["CORRECT"] == 1.0)].shape[0]
+            f.write("%45s : %6s%%\n" % ("Lowest correct rate of " + llm, str(plot_df[plot_df["LLM"] == llm].tail(1)["Correct Rate"].values[0])))
+            f.write("%45s : %6s%%\n" % ("Highest correct rate of " + llm, str(plot_df[plot_df["LLM"] == llm].head(1)["Correct Rate"].values[0])))
+            f.write("%45s : %6.2f%%\n" % ("Overall correct rate of " + llm, round(num_all_CMRCs / num_all_MRCs * 100, 2)))
+        f.write("\n\n")
+
     # 画折线图
-    custom_palette = ["#3a86ff", "#00b050"]
+    custom_palette = ["#3a86ff", "#ff7d00"]
     custom_markers = {"gpt-3.5-turbo-1106": "o", "gpt-4-1106-preview": "s"}
     custom_dashes = [(1, 0), (1, 0)]
     plt.figure(figsize=(15, 3))
@@ -99,9 +132,10 @@ def draw_correct_plots(excel_path: str, mr_sheet: str, out_dir: str):
     plt.xlabel("")
     plt.ylabel("$CR$ (\%)")
     plt.xticks(rotation=45, ha="right")
+    plt.yticks(range(0, 91, 10))
     plt.tight_layout()
 
-    legend = plt.legend()
+    legend = plt.legend(loc="upper right", labelspacing=0.1)
     for text in legend.get_texts():
         text.set_text(r"\textit{" + text.get_text() + r"}")
 
@@ -131,13 +165,24 @@ def draw_innova_plots(excel_path: str, mr_sheet: str, out_dir: str):
     suts = df["SUT"].unique()
     for llm in llms:
         for sut in suts:
-            total_MRCs = df[(df["LLM"] == llm) & (df["SUT"] == sut)].shape[0]
-            innova_MRCs = df[(df["LLM"] == llm) & (df["SUT"] == sut) & (df["NEW"] == 1.0)].shape[0]
-            plot_data.append({"LLM": llm, "SUT": sut, "Innovative Rate": innova_MRCs / total_MRCs * 100})
+            num_MRCs = df[(df["LLM"] == llm) & (df["SUT"] == sut)].shape[0]
+            num_EMRCs = df[(df["LLM"] == llm) & (df["SUT"] == sut) & (df["NEW"] == 1.0)].shape[0]
+            plot_data.append({"LLM": llm, "SUT": sut, "Innovative Rate": num_EMRCs / num_MRCs * 100})
 
     # 整理要画图的数据, 数据按照LLM升序, Innovative Rate降序排列
     plot_df = pd.DataFrame(plot_data)
     plot_df = plot_df.sort_values(by=["LLM", "Innovative Rate"], ascending=[True, False])
+
+    # 输出每个LLM的最低, 最高和总体创新率到日志文件
+    with open(LOG_PATH, "a") as f:
+        f.write("Messages from draw_innova_plots():\n")
+        for llm in llms:
+            num_all_MRCs = df[df["LLM"] == llm].shape[0]
+            num_all_EMRCs = df[(df["LLM"] == llm) & (df["NEW"] == 1.0)].shape[0]
+            f.write("%45s : %6s%%\n" % ("Lowest innovative rate of " + llm, str(plot_df[plot_df["LLM"] == llm].tail(1)["Innovative Rate"].values[0])))
+            f.write("%45s : %6s%%\n" % ("Highest innovative rate of " + llm, str(plot_df[plot_df["LLM"] == llm].head(1)["Innovative Rate"].values[0])))
+            f.write("%45s : %6.2f%%\n" % ("Overall innovative rate of " + llm, round(num_all_EMRCs / num_all_MRCs * 100, 2)))
+        f.write("\n\n")
 
     # 画柱状图
     custom_palette = ["#000000", "#7f7f7f"]
@@ -167,7 +212,7 @@ def draw_char_plots(excel_path: str, mr_sheet: str, sut_sheet: str, out_dir: str
         EXCEL文件路径
     mr_sheet : str
         存储MR信息的信息所在的工作表名称
-    sutcsv_path : str
+    sut_sheet : str
         存储sut信息的工作表名称
     out_dir : str
         输出目录
@@ -193,9 +238,23 @@ def draw_char_plots(excel_path: str, mr_sheet: str, sut_sheet: str, out_dir: str
             correct_MRCs = mr_df[(mr_df["LLM"] == llm) & (mr_df["SUT"] == sut) & (mr_df["CORRECT"] == 1.0)].shape[0]
             plot_data.append({"LLM": llm, "SUT": sut, "CHAR": char, "Legal Rate": legal_MRCs / total_MRCs * 100, "Correct Rate": correct_MRCs / total_MRCs * 100})
 
-    # 画合法率和正确率的盒图
+    # 将数据转换为Dataframe格式
     plot_df = pd.DataFrame(plot_data)
-    _, axes = plt.subplots(1, len(llms) * len(metrics), figsize=(8, 3))
+
+    # 输出不同LLM在不同特征下的平均合法率和正确率到日志文件
+    with open(LOG_PATH, "a") as f:
+        f.write("Messages from draw_char_plots():\n")
+        for llm in llms:
+            for char in plot_df["CHAR"].unique():
+                avg_legal_rate = plot_df[(plot_df["LLM"] == llm) & (plot_df["CHAR"] == char)]["Legal Rate"].mean()
+                avg_correct_rate = plot_df[(plot_df["LLM"] == llm) & (plot_df["CHAR"] == char)]["Correct Rate"].mean()
+                f.write("%55s : %6.2f%%\n" % ("Average legal rate of " + llm + " with " + char, round(avg_legal_rate, 2)))
+                f.write("%55s : %6.2f%%\n" % ("Average correct rate of " + llm + " with " + char, round(avg_correct_rate, 2)))
+        f.write("\n\n")
+
+    # 画合法率和正确率的盒图
+    rcParams["font.size"] = 14
+    _, axes = plt.subplots(1, len(llms) * len(metrics), figsize=(8.5, 3))
     for i, metric in enumerate(metrics):
         for j, llm in enumerate(llms):
             ax = axes[i * len(metrics) + j]
@@ -204,6 +263,7 @@ def draw_char_plots(excel_path: str, mr_sheet: str, sut_sheet: str, out_dir: str
             ax.set_xlabel(r"\textit{" + llm + r"}")
             ax.set_ylabel("$LR$ (\%)" if metric == "Legal Rate" else "$CR$ (\%)")
             ax.set_ylim(0, 101)
+    rcParams["font.size"] = 12
 
     # 保存图片
     plt.tight_layout()
@@ -246,9 +306,23 @@ def draw_freq_plots(excel_path: str, mr_sheet: str, sut_sheet: str, out_dir: str
             correct_MRCs = mr_df[(mr_df["LLM"] == llm) & (mr_df["SUT"] == sut) & (mr_df["CORRECT"] == 1.0)].shape[0]
             plot_data.append({"LLM": llm, "SUT": sut, "FREQ": freq, "Legal Rate": legal_MRCs / total_MRCs * 100, "Correct Rate": correct_MRCs / total_MRCs * 100})
 
-    # 画合法率和正确率的盒图
+    # 将数据转换为Dataframe格式
     plot_df = pd.DataFrame(plot_data)
-    _, axes = plt.subplots(1, len(llms) * len(metrics), figsize=(8, 3))
+
+    # 输出不同LLM在不同频率下的平均合法率和正确率到日志文件
+    with open(LOG_PATH, "a") as f:
+        f.write("Messages from draw_freq_plots():\n")
+        for llm in llms:
+            for freq in plot_df["FREQ"].unique():
+                avg_legal_rate = plot_df[(plot_df["LLM"] == llm) & (plot_df["FREQ"] == freq)]["Legal Rate"].mean()
+                avg_correct_rate = plot_df[(plot_df["LLM"] == llm) & (plot_df["FREQ"] == freq)]["Correct Rate"].mean()
+                f.write("%55s : %6.2f%%\n" % ("Average legal rate of " + llm + " with " + freq, round(avg_legal_rate, 2)))
+                f.write("%55s : %6.2f%%\n" % ("Average correct rate of " + llm + " with " + freq, round(avg_correct_rate, 2)))
+        f.write("\n\n")
+
+    # 画合法率和正确率的盒图
+    rcParams["font.size"] = 14
+    _, axes = plt.subplots(1, len(llms) * len(metrics), figsize=(8.5, 3))
     for i, metric in enumerate(metrics):
         for j, llm in enumerate(llms):
             ax = axes[i * len(metrics) + j]
@@ -257,6 +331,7 @@ def draw_freq_plots(excel_path: str, mr_sheet: str, sut_sheet: str, out_dir: str
             ax.set_xlabel(r"\textit{" + llm + r"}")
             ax.set_ylabel("$LR$ (\%)" if metric == "Legal Rate" else "$CR$ (\%)")
             ax.set_ylim(0, 101)
+    rcParams["font.size"] = 12
 
     # 保存图片
     plt.tight_layout()
@@ -291,11 +366,12 @@ def draw_abala_plots(excel_path: str, mr_sheet: str, out_dir: str):
                 correct_MRCs = df[(df["LLM"] == llm) & (df["SUT"] == sut) & (df["TEMPLATE"] == template) & (df["CORRECT"] == 1.0)].shape[0]
                 plot_data.append({"LLM": llm, "SUT": sut, "TEMPLATE": template, "Legal Rate": legal_MRCs / total_MRCs * 100, "Correct Rate": correct_MRCs / total_MRCs * 100})
 
-    # 画消融实验的图 (柱状图)5
+    # 画消融实验的图 (柱状图)
+    rcParams["font.size"] = 14
     for llm in llms:
 
         # 画柱状图
-        fig, axes = plt.subplots(1, len(llms), figsize=(10, 3))
+        fig, axes = plt.subplots(1, len(llms), figsize=(9, 3))
         tmp_data = [data for data in plot_data if data["LLM"] == llm]
         for j, metric in enumerate(metrics):
             ax = axes[j]
@@ -304,7 +380,9 @@ def draw_abala_plots(excel_path: str, mr_sheet: str, out_dir: str):
             ax.set_xlabel("")
             ax.set_ylabel("$LR$ (\%)" if metric == "Legal Rate" else "$CR$ (\%)")
             ax.set_ylim(0, 101)
+            ax.set_yticks(range(0, 101, 20))
             ax.get_legend().remove()
+            ax.set_xticklabels(ax.get_xticklabels(), rotation=15, ha="right")
 
         # 添加图例
         ax = axes[-1]
@@ -315,11 +393,13 @@ def draw_abala_plots(excel_path: str, mr_sheet: str, out_dir: str):
 
         # 调整布局
         fig.tight_layout()
-        fig.subplots_adjust(bottom=0.2)
+        fig.subplots_adjust(bottom=0.3)
 
         llm_abbrv = "".join(llm.split("-")[:2])
         plt.savefig(os.path.join(out_dir, f"Ablation_{llm_abbrv}.pdf"))
         print(f"Abala plots for {llm} saved.")
+
+    rcParams["font.size"] = 12
 
 
 def main(args: argparse.Namespace):
@@ -337,7 +417,7 @@ def main(args: argparse.Namespace):
     out_dir = os.path.dirname(__file__)
 
     rcParams["text.usetex"] = True
-    rcParams["font.family"] = "Times New Roman"
+    rcParams["font.family"] = "Times"
     rcParams["font.size"] = 12
 
     if plots == "legal" or plots == "all":
@@ -355,7 +435,7 @@ def main(args: argparse.Namespace):
     if plots == "freq" or plots == "all":
         draw_freq_plots(excel_path, mr_sheet, sut_sheet, out_dir)
 
-    if plots == "ablat" or plots == "all":
+    if plots == "abla" or plots == "all":
         draw_abala_plots(excel_path, mr_sheet, out_dir)
 
     print("All done.")
@@ -366,6 +446,6 @@ if __name__ == "__main__":
     parser.add_argument("--excel", type=str, required=True, help="Path of excel file")
     parser.add_argument("--mr_sheet", type=str, required=True, help="Sheet name of mr data")
     parser.add_argument("--sut_sheet", type=str, required=True, help="Sheet name for sut data")
-    parser.add_argument("--plots", type=str, choices=["legal", "correct", "innova", "char", "freq", "abala", "all"], default="all", help="plots to draw")
+    parser.add_argument("--plots", type=str, choices=["legal", "correct", "innova", "char", "freq", "abla", "all"], default="all", help="plots to draw")
     args = parser.parse_args()
     main(args)
