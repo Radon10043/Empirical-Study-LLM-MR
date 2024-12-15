@@ -189,8 +189,9 @@ def draw_innova_plots(excel_path: str, mr_sheet: str, out_dir: str):
     plt.figure(figsize=(15, 3))
     sns.barplot(data=plot_df, x="SUT", y="Innovative Rate", hue="LLM", palette=custom_palette)
     plt.xlabel("")
-    plt.ylabel("$IR$ (\%)")
     plt.xticks(rotation=45, ha="right")
+    plt.ylabel("$IR$ (\%)")
+    plt.yticks(range(0, 81, 20))
     legend = plt.legend()
     plt.tight_layout()
 
