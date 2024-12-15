@@ -5,6 +5,7 @@ import openpyxl
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
+import matplotlib.gridspec as gridspec
 
 from matplotlib import rcParams
 
@@ -62,7 +63,7 @@ def draw_legal_plots(excel_path: str, mr_sheet: str, out_dir: str):
         f.write("\n\n")
 
     # 画折线图
-    custom_palette = ["#3a86ff", "#ff7d00"]
+    custom_palette = ["#3a86ff", "#808b96"]
     custom_markers = {"gpt-3.5-turbo-1106": "o", "gpt-4-1106-preview": "s"}
     custom_dashes = [(1, 0), (1, 0)]
     plt.figure(figsize=(15, 3))
@@ -124,7 +125,7 @@ def draw_correct_plots(excel_path: str, mr_sheet: str, out_dir: str):
         f.write("\n\n")
 
     # 画折线图
-    custom_palette = ["#3a86ff", "#ff7d00"]
+    custom_palette = ["#3a86ff", "#808b96"]
     custom_markers = {"gpt-3.5-turbo-1106": "o", "gpt-4-1106-preview": "s"}
     custom_dashes = [(1, 0), (1, 0)]
     plt.figure(figsize=(15, 3))
@@ -254,16 +255,19 @@ def draw_char_plots(excel_path: str, mr_sheet: str, sut_sheet: str, out_dir: str
         f.write("\n\n")
 
     # 画合法率和正确率的盒图
-    rcParams["font.size"] = 14
-    _, axes = plt.subplots(1, len(llms) * len(metrics), figsize=(8.5, 3))
+    rcParams["font.size"] = 16
+    fig = plt.figure(figsize=(8, 3))
+    gs = gridspec.GridSpec(1, len(llms) * len(metrics), figure=fig, left=0.07, bottom=0.25, right=0.95, top=0.95, wspace=0.7)
     for i, metric in enumerate(metrics):
         for j, llm in enumerate(llms):
-            ax = axes[i * len(metrics) + j]
+            ax = fig.add_subplot(gs[i * len(metrics) + j])
             sns.boxplot(data=plot_df[plot_df["LLM"] == llm], x="CHAR", y=metric, hue="CHAR", showmeans=True, meanprops={"marker": "x", "markeredgecolor": "black"}, palette=["#FFFFFF", "#FFFFFF"], linecolor="black", ax=ax)
             sns.despine()
             ax.set_xlabel(r"\textit{" + llm + r"}")
+            ax.set_xticklabels(ax.get_xticklabels(), rotation=15, ha="right")
             ax.set_ylabel("$LR$ (\%)" if metric == "Legal Rate" else "$CR$ (\%)")
             ax.set_ylim(0, 101)
+            ax.yaxis.labelpad = -7
     rcParams["font.size"] = 12
 
     # 保存图片
@@ -322,16 +326,18 @@ def draw_freq_plots(excel_path: str, mr_sheet: str, sut_sheet: str, out_dir: str
         f.write("\n\n")
 
     # 画合法率和正确率的盒图
-    rcParams["font.size"] = 14
-    _, axes = plt.subplots(1, len(llms) * len(metrics), figsize=(8.5, 3))
+    rcParams["font.size"] = 16
+    fig = plt.figure(figsize=(8, 3))
+    gs = gridspec.GridSpec(1, len(llms) * len(metrics), figure=fig, left=0.07, bottom=0.2, right=0.95, top=0.95, wspace=0.7)
     for i, metric in enumerate(metrics):
         for j, llm in enumerate(llms):
-            ax = axes[i * len(metrics) + j]
+            ax = fig.add_subplot(gs[i * len(metrics) + j])
             sns.boxplot(data=plot_df[plot_df["LLM"] == llm], x="FREQ", y=metric, hue="FREQ", showmeans=True, meanprops={"marker": "x", "markeredgecolor": "black"}, palette=["#FFFFFF", "#FFFFFF"], linecolor="black", ax=ax)
             sns.despine()
             ax.set_xlabel(r"\textit{" + llm + r"}")
             ax.set_ylabel("$LR$ (\%)" if metric == "Legal Rate" else "$CR$ (\%)")
             ax.set_ylim(0, 101)
+            ax.yaxis.labelpad = -7
     rcParams["font.size"] = 12
 
     # 保存图片
