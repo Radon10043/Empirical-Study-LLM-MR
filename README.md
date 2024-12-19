@@ -4,3 +4,4 @@ Hi there👋, this is the repository for the paper "*Can Large Language Models D
 
 - [Docs for scripts](./scripts/README.md)
 - [Docs for software-under-test](./software-under-test/README.md)
+- [Download exmperimental data (Google Drive)](https://drive.google.com/file/d/1EqH8_8CHQJzbLL-DMcITuQlcFwK2G5gj/view?usp=sharing)
