@@ -2,7 +2,7 @@
 Author: Radon
 Date: 2024-01-02 21:07:30
 LastEditors: Radon
-LastEditTime: 2024-12-09 11:30:08
+LastEditTime: 2024-12-19 16:33:07
 Description: Hi, say something
 """
 import openai
@@ -14,7 +14,8 @@ import traceback
 # openai.log = "debug"
 with open("api_key.txt") as f:
     openai.api_key = f.read()
-openai.api_base = "https://api.chatanywhere.com.cn/v1"
+with open*("api_base.txt") as f:
+    openai.api_base = f.read()
 
 def resume_chat(json_path: str, resume_cnt: int, gpt_name: str):
     """基于之前的聊天内容继续进行聊天
