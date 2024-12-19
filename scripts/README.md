@@ -4,7 +4,7 @@ This folder stores the scripts used in the empirical study, including the script
 
 ## chat.py
 
-- **Summary:** The script instructs LLM to perform MR identification. The results of interaction with LLM will be saved in a json file and md file, respectively.
+- **Summary:** The script instructs LLM to perform MR identification. The results of interaction with LLM will be saved in a json file and md file, respectively. *Note: You need to create apt_base.txt and api_key.txt in your workspace first, which are used to store the base URL and api key for LLM interaction, respectively.*
 - **Input(s):**
   - *--template (Required):* The path of the prompt template file (markdown). Examples of prompt templates are shown under `data/template`.
   - *--spec (Required):* The path of a specification file (markdown) of Software Under Test. Examples of the specification are shown in the folder `data/specification`.
@@ -55,7 +55,7 @@ python LOC_counter.py \
 
 ## resume_chat.py
 
-- **Summary:** The script that continues talking to the LLM based on an input JSON. During the process of LLM query, the script may exit early due to network problems and not satisfying the stop condition. Users can use this script to continue the query based on the previous query records.
+- **Summary:** The script that continues talking to the LLM based on an input JSON. During the process of LLM query, the script may exit early due to network problems and not satisfying the stop condition. Users can use this script to continue the query based on the previous query records. *Note: You need to create apt_base.txt and api_key.txt in your workspace first, which are used to store the base URL and api key for LLM interaction, respectively.*
 - **Input(s):**
   - *--json (Reuqired):* JSON file path that saving query records.
   - *--model (Reuqired):* The name of LLM to be quired, e.g., *gpt-4-1106-preview*.
